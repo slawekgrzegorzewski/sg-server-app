@@ -21,7 +21,6 @@ jobs:
           key: v1-dependencies-{{ checksum "build.gradle" }}
       - run: gradle clean build runIntegrationTest
       - store_test_results:
-          root: ~/repo/accountant/build
           paths:
-            - integration-test-results
-            - test-results
+            - accountant/build/integration-test-results
+            - accountant/build/test-results
