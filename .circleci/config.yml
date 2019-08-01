@@ -23,5 +23,5 @@ jobs:
       - run: gradle clean build runIntegrationTest
       - store_test_results:
           paths:
-            - accountant/build/integration-test-results
-            - accountant/build/test-results
+            - build/integration-test-results
+            - build/test-results
