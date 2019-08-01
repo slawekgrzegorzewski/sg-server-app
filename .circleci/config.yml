@@ -12,7 +12,10 @@ jobs:
       - checkout
       - run: pwd
       - run: ls -al
-      - run: sudo echo "localhost accountant-tests-postgres" >> /etc/hosts
+      - run: whoami
+      - run: sudo su -
+      - run: echo "localhost accountant-tests-postgres" >> /etc/hosts
+      - run: exit
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "build.gradle" }}
