@@ -6,7 +6,6 @@ jobs:
       - image: postgres
         environment:
           POSTGRES_PASSWORD: slawek
-        hostname: accountant-tests-postgres
     working_directory: ~/accountent
     steps:
       - checkout
