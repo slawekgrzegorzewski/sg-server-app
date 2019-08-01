@@ -14,6 +14,7 @@ jobs:
       - run: ls -al
       - run: whoami
       - run: sudo su - -c 'echo "localhost accountant-tests-postgres" >> /etc/hosts'
+      - run: sudo su - -c 'cat /etc/hosts'
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "build.gradle" }}
