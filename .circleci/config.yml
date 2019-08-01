@@ -12,7 +12,7 @@ jobs:
       - checkout
       - run: pwd
       - run: ls -al
-      - run: sudo ping -c 10 accountant-tests-postgres
+      - run: sudo nslookup accountant-tests-postgres
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "build.gradle" }}
