@@ -6,15 +6,13 @@ jobs:
       - image: postgres
         environment:
           POSTGRES_PASSWORD: slawek
-        port: "32768:5432"
     working_directory: ~/accountent
     steps:
       - checkout
       - run: pwd
       - run: ls -al
-      - run: whoami
-      - run: sudo su - -c 'echo "127.0.0.1 accountant-tests-postgres" >> /etc/hosts'
-      - run: sudo su - -c 'cat /etc/hosts'
+      - run: sed -i 's/spring\.datasource\.url=.*/spring.datasource.url=jdbc:postgresql://localhost:5432/postgres/' src/integrationTest/resources/application-it.properties
+      - run: echo src/integrationTest/resources/application-it.properties
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "build.gradle" }}
