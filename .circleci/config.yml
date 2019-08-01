@@ -6,6 +6,7 @@ jobs:
       - image: postgres
         environment:
           POSTGRES_PASSWORD: slawek
+        port: "32768:5432"
     working_directory: ~/accountent
     steps:
       - checkout
