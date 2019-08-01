@@ -23,6 +23,7 @@ dependencies {
 }
 
 task runIntegrationTest(type: Test) {
+
     group = LifecycleBasePlugin.VERIFICATION_GROUP
     description = 'Runs the integration tests.'
 
@@ -40,8 +41,6 @@ task runIntegrationTest(type: Test) {
 
     mustRunAfter tasks.test
 }
-
-check.dependsOn runIntegrationTest
 
 gradle.projectsEvaluated {
     def quickTasks = []

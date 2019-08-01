@@ -1,0 +1,29 @@
+version: 2.0
+jobs:
+  build:
+    docker:
+      - image: circleci/openjdk:11-jdk
+      - image: postgres
+        environment:
+          POSTGRES_PASSWORD: slawek
+    working_directory: ~/accountent
+    steps:
+      - checkout
+      - run: pwd
+      - run: ls -al
+      - run: sed -i 's/spring\.datasource\.url=.*/spring.datasource.url=jdbc:postgresql:\/\/localhost:5432\/postgres/' src/integrationTest/resources/application-it.properties
+      - run: cat src/integrationTest/resources/application-it.properties
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle" }}
+            - v1-dependencies-
+      - run: gradle dependencies
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies-{{ checksum "build.gradle" }}
+      - run: gradle clean build runIntegrationTest
+      - store_test_results:
+          paths:
+            - build/integration-test-results
+            - build/test-results
