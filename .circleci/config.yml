@@ -12,7 +12,7 @@ jobs:
       - run: pwd
       - run: ls -al
       - run: sed -i 's/spring\.datasource\.url=.*/spring.datasource.url=jdbc:postgresql:\/\/localhost:5432\/postgres/' src/integrationTest/resources/application-it.properties
-      - run: echo src/integrationTest/resources/application-it.properties
+      - run: cat src/integrationTest/resources/application-it.properties
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "build.gradle" }}
