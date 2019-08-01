@@ -7,11 +7,12 @@ jobs:
         environment:
           POSTGRES_PASSWORD: slawek
         hostname: accountant-tests-postgres
-    working_directory: ~/repo
+    working_directory: ~/accountent
     steps:
       - checkout
       - run: pwd
       - run: ls -al
+      - run: ping -c 10 accountant-tests-postgres
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "build.gradle" }}
