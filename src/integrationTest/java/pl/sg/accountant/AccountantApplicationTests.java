@@ -9,7 +9,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@TestPropertySource(locations = "classpath:application-it.properties")
+@TestPropertySource(locations = "classpath:application-it.yml")
 public class AccountantApplicationTests {
     @Autowired
     private TestController controller;
