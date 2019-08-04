@@ -1,0 +1,28 @@
+security:
+  oauth2:
+    client:
+      clientId: ---
+      clientSecret: ---
+      accessTokenUri: https://oauth2.googleapis.com/token
+      userAuthorizationUri: https://accounts.google.com/o/oauth2/auth
+      tokenName: ---
+      authenticationScheme: query
+      clientAuthenticationScheme: form
+      scope:
+        - profile
+        - email
+    resource:
+      userInfoUri: https://www.googleapis.com/userinfo/v2/me
+      preferTokenInfo: false
+spring:
+  datasource:
+    hikari:
+      connectionTimeout: 20000
+      maximumPoolSize: 5
+    password: slawek
+    url: jdbc:postgresql://192.168.99.100:32768/postgres
+    username: postgres
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: create

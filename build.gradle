@@ -30,6 +30,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security:2.1.6.RELEASE'
     implementation 'org.springframework.boot:spring-boot-starter-web:2.1.6.RELEASE'
     implementation 'org.springframework.session:spring-session-core:2.1.7.RELEASE'
+    implementation 'org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.1.6.RELEASE'
+    implementation 'org.springframework.security:spring-security-oauth2-client:5.1.5.RELEASE'
+
+
+//    implementation 'org.springframework.security.oauth.boot:spring-security-oauth2:2.3.6.RELEASE'
 
     compileOnly 'org.projectlombok:lombok:1.18.8'
     compileOnly 'org.springframework.boot:spring-boot-devtools:2.1.6.RELEASE'
