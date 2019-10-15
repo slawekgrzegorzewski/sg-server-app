@@ -15,13 +15,13 @@ jobs:
       - run: cat src/integrationTest/resources/application-it.yml
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "build.gradle" }}
+            - v1-dependencies-{{ checksum "build.gradle.kts" }}
             - v1-dependencies-
       - run: gradle dependencies
       - save_cache:
           paths:
             - ~/.m2
-          key: v1-dependencies-{{ checksum "build.gradle" }}
+          key: v1-dependencies-{{ checksum "build.gradle.kts" }}
       - run: gradle clean build runIntegrationTest
       - store_test_results:
           paths:
