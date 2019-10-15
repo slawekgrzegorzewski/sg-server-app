@@ -11,8 +11,7 @@ jobs:
       - checkout
       - run: pwd
       - run: ls -al
-      - run: sed -i 's/spring\.datasource\.url=.*192\.168\.99\.100:32768\/postgres/spring.datasource.url=jdbc:postgresql:\/\/localhost:5432\/postgres/' src/integrationTest/resources/application-it.yml
-      - run: sed -i 's/url: .*192\.168\.99\.100:32768\/postgres/url: jdbc:postgresql:\/\/localhost:5432\/postgres/' src/integrationTest/resources/application-it.yml
+      - run: "sed -i 's/url: .*192\.168\.99\.100:32768\/postgres/url: jdbc:postgresql:\/\/localhost:5432\/postgres/' src/integrationTest/resources/application-it.yml"
       - run: cat src/integrationTest/resources/application-it.yml
       - restore_cache:
           keys:
