@@ -19,7 +19,7 @@ public class GoogleAuthoritiesExtractor implements AuthoritiesExtractor {
 
     @Override
     public List<GrantedAuthority> extractAuthorities(Map<String, Object> map) {
-        String username = (String) map.get("id");
+        String email = (String) map.get("email");
 //        CurrentUser user = userService.getByFacebookId(id);
 //        if (user == null) {
 //            return Collections.<GrantedAuthority> emptyList();

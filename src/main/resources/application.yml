@@ -1,11 +1,11 @@
 security:
   oauth2:
     client:
-      clientId: ---
-      clientSecret: ---
+      clientId: 880691357570-sdn1inkdtk2qdi5f2iakc1mn53o7m2gc.apps.googleusercontent.com
+      clientSecret: UM7r3mokeu7XkT50hjkswyH6
       accessTokenUri: https://oauth2.googleapis.com/token
       userAuthorizationUri: https://accounts.google.com/o/oauth2/auth
-      tokenName: ---
+      tokenName: oauth_token
       authenticationScheme: query
       clientAuthenticationScheme: form
       scope:
@@ -20,7 +20,7 @@ spring:
       connectionTimeout: 20000
       maximumPoolSize: 5
     password: slawek
-    url: jdbc:postgresql://192.168.99.100:32768/postgres
+    url: jdbc:postgresql://192.168.99.100:32769/postgres
     username: postgres
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
