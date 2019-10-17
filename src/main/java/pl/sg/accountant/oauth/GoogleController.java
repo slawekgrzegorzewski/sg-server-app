@@ -13,7 +13,7 @@ public class GoogleController {
 
     @RequestMapping(value = "/user")
 //    @Secured("B")
-    @PreAuthorize("authentication.principal.roles.contains('C')")
+    @PreAuthorize("authentication.principal.roles.contains('B')")
     public Principal user(OAuth2Authentication principal) {
         return principal;
     }
