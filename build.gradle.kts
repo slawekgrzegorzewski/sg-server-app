@@ -1,5 +1,3 @@
-import pl.sg.build.compose.DockerCompose
-
 plugins {
     id("org.springframework.boot") version "2.1.6.RELEASE" apply true
     java apply true
@@ -52,15 +50,3 @@ dependencies {
 }
 
 apply(from = "$rootDir/integrationTest.gradle.kts")
-apply(from = "$rootDir/docker.gradle.kts")
-
-val composeRunning = tasks.create("composeRunning", DockerCompose::class.java)
-composeRunning.machineName = "default"
-val composeStopped = tasks.create("composeStopped", DockerCompose::class.java)
-composeStopped.machineName = "dupa"
-val composeNotExisting = tasks.create("composeNotExisting", DockerCompose::class.java)
-composeNotExisting.machineName = "aaaa"
-
-val composeTest = tasks.create("composeTest")
-listOf(composeRunning, composeStopped, composeNotExisting).forEach { composeTest.dependsOn.add(it) }
-composeNotExisting.mustRunAfter(composeRunning, composeStopped)
