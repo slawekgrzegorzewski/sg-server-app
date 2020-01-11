@@ -54,8 +54,6 @@ gradle.projectsEvaluated {
 
     gradle.rootProject.allprojects.forEach { project ->
         quickTasks.addAll(project.tasks.toList().filter { it.name == "test" })
-        quickTasks.addAll(project.tasks.withType(FindBugs::class.java))
-        quickTasks.addAll(project.tasks.withType(Pmd::class.java))
     }
 
     quickTasks.forEach { runIntegrationTest.mustRunAfter(it) }
