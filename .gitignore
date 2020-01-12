@@ -15,7 +15,8 @@ build/
 .sts4-cache
 
 ### IntelliJ IDEA ###
-.idea
+.idea/
+!.idea/runConfigurations/
 *.iws
 *.iml
 *.ipr
@@ -33,3 +34,5 @@ out/
 
 ### Gradle Wrapper ###
 /gradlew*
+/docker/development/
+!/docker/development/Dockerfile

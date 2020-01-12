@@ -4,8 +4,7 @@ services:
     image: postgres
     hostname: accountant-tests-postgres
     environment:
-      POSTGRES_PASSWORD: slawek
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: SLAwek1!
     ports:
       - "32768:5432"
-    volumes:
-      - /c/Users/slag/accountant-pg-tests:/var/lib/postgresql/data

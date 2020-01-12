@@ -7,5 +7,3 @@ services:
       POSTGRES_PASSWORD: slawek
     ports:
       - "32768:5432"
-    volumes:
-      - /c/Users/qvc843/accountant-pg-tests:/var/lib/postgresql/data
