@@ -17,13 +17,14 @@ RUN  /etc/init.d/postgresql start &&\
 #App
 EXPOSE 5432
 EXPOSE 8080
+EXPOSE 5005
 USER root
 RUN mkdir -p /home/accountant/log
 WORKDIR /home/accountant
 
 RUN echo "#!/bin/bash" > /home/accountant/start.sh
 RUN echo "/etc/init.d/postgresql start" >> /home/accountant/start.sh
-RUN echo "java -jar /home/accountant/accountant.jar | tee /home/accountant/log/accountant.log" >> /home/accountant/start.sh
+RUN echo "java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar /home/accountant/accountant.jar | tee /home/accountant/log/accountant.log" >> /home/accountant/start.sh
 RUN cat /home/accountant/start.sh
 RUN chmod +x /home/accountant/start.sh
 

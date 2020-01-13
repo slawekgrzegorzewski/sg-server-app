@@ -59,6 +59,7 @@ tasks.clean.get().doFirst {
 val jar by tasks.getting(Jar::class);
 tasks.register<Copy>("toDocker") {
     dependsOn.add(tasks.build)
+    group = "docker"
     from(jar.archiveFile){
         rename { "accountant.jar" }
     }
