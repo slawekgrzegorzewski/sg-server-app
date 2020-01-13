@@ -16,7 +16,7 @@ public class AccountantApplicationTests {
 
     @Test
     public void contextLoads() {
-        controller.something();
+        controller.init();
     }
 
 }

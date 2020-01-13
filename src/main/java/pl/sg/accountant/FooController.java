@@ -17,7 +17,7 @@ public class FooController {
     }
 
     @RequestMapping(value = "/init", method = RequestMethod.GET)
-    public List<Foo> init() throws IOException {
+    public List<Foo> init() {
         if (fooRepository.count() == 0) {
             fooRepository.save(new Foo(1, "a"));
             fooRepository.save(new Foo(2, "b"));
