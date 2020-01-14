@@ -33,6 +33,7 @@ dependencies {
     implementation("org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.1.6.RELEASE")
     implementation("org.springframework.security:spring-security-oauth2-client:5.1.5.RELEASE")
     implementation(kotlin("stdlib-jdk8"))
+    implementation("org.modelmapper:modelmapper:2.3.6")
 
     compileOnly("org.projectlombok:lombok:1.18.8")
     compileOnly("org.springframework.boot:spring-boot-devtools:2.1.6.RELEASE")
@@ -60,7 +61,7 @@ val jar by tasks.getting(Jar::class);
 tasks.register<Copy>("toDocker") {
     dependsOn.add(tasks.build)
     group = "docker"
-    from(jar.archiveFile){
+    from(jar.archiveFile) {
         rename { "accountant.jar" }
     }
     from(Paths.get(project.rootDir.absolutePath, "src", "main", "resources", "application-dev-docker.yml")) {
