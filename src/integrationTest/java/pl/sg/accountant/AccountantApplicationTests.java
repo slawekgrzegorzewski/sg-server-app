@@ -12,11 +12,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 @TestPropertySource(properties = {"spring.config.location=classpath:application-it.yml"})
 public class AccountantApplicationTests {
     @Autowired
-    private FooController controller;
+    private TestController controller;
 
     @Test
     public void contextLoads() {
-        controller.init();
+        controller.something();
     }
 
 }

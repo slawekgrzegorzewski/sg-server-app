@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/accounts")
-public class AccountsRestController {
+public class AccountsRestController implements AccountsController {
     private final AccountsService accountsService;
     private final ModelMapper mapper;
 
@@ -23,6 +23,7 @@ public class AccountsRestController {
         this.mapper = mapper;
     }
 
+    @Override
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public ResponseEntity<AccountTO> createAccount(@RequestBody AccountTO account) {
         Account toCreate = mapper.map(account, Account.class);
@@ -30,6 +31,7 @@ public class AccountsRestController {
         return ResponseEntity.ok(mapper.map(toCreate, AccountTO.class));
     }
 
+    @Override
     @RequestMapping(value = "/transfer/{from}/{to}/{amount}", method = RequestMethod.POST)
     public ResponseEntity<TransactionTO> transfer(
             @PathVariable("from") int fromId,
