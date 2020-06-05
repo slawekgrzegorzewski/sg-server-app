@@ -35,4 +35,5 @@ out/
 ### Gradle Wrapper ###
 /gradlew*
 /docker/development/
-!/docker/development/Dockerfile
+!/docker/development/application/Dockerfile
+!/docker/development/postgres/Dockerfile
