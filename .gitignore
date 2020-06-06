@@ -32,8 +32,6 @@ out/
 ### VS Code ###
 .vscode/
 
-### Gradle Wrapper ###
-/gradlew*
-/docker/development/
 !/docker/development/application/Dockerfile
 !/docker/development/postgres/Dockerfile
+/docker/development/
