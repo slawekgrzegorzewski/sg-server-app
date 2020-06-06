@@ -2,7 +2,7 @@ version: 2.0
 jobs:
   build:
     docker:
-      - image: circleci/openjdk:14-jdk
+      - image: circleci/openjdk:14.0.1
       - image: postgres
         environment:
           POSTGRES_PASSWORD: slawek
@@ -23,3 +23,7 @@ jobs:
             - ~/.m2
           key: v1-dependencies-{{ checksum "build.gradle.kts" }}
       - run: gradle clean build runIntegrationTest
+      - store_test_results:
+          paths:
+            - build/integration-test-results
+            - build/test-results
