@@ -23,7 +23,3 @@ jobs:
             - ~/.m2
           key: v1-dependencies-{{ checksum "build.gradle.kts" }}
       - run: gradle clean build runIntegrationTest
-      - store_test_results:
-          paths:
-            - build/integration-test-results
-            - build/test-results
