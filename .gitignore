@@ -31,7 +31,5 @@ out/
 
 ### VS Code ###
 .vscode/
-
-!/docker/development/application/Dockerfile
-!/docker/development/postgres/Dockerfile
-/docker/development/
+/docker/development/accountant.jar
+/docker/development/application.yml
