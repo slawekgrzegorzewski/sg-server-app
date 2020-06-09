@@ -1,4 +1,4 @@
-package pl.sg.accountant.oauth;
+package pl.sg.security;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package pl.sg.accountant.oauth;
+package pl.sg.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.AuthoritiesExtractor;

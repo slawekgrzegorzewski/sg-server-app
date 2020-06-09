@@ -1,4 +1,4 @@
-package pl.sg.accountant.oauth;
+package pl.sg.security;
 
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.context.annotation.Configuration;

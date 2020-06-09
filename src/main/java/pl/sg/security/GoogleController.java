@@ -1,4 +1,4 @@
-package pl.sg.accountant.oauth;
+package pl.sg.security;
 
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;

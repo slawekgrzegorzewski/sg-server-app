@@ -1,4 +1,4 @@
-package pl.sg.accountant;
+package pl.sg;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
@@ -6,10 +6,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-public class AccountantApplication {
+public class Application {
 
     public static void main(String[] args) {
-        SpringApplication.run(AccountantApplication.class, args);
+        SpringApplication.run(Application.class, args);
     }
 
     @Bean
