@@ -20,6 +20,11 @@ public class AccountsJPAService implements AccountsService {
     }
 
     @Override
+    public List<Account> getAll() {
+        return accountRepository.findAll();
+    }
+
+    @Override
     public void createAccount(Account account) {
         accountRepository.save(account);
     }

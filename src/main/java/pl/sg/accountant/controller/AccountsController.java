@@ -1,24 +1,18 @@
 package pl.sg.accountant.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.security.core.Authentication;
 import pl.sg.accountant.service.AccountstException;
 import pl.sg.accountant.transport.AccountTO;
 import pl.sg.accountant.transport.TransactionTO;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public interface AccountsController {
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
-    ResponseEntity<AccountTO> createAccount(@RequestBody AccountTO account);
+    ResponseEntity<List<AccountTO>> accounts(AccountTO account);
 
-    @RequestMapping(value = "/transfer/{from}/{to}/{amount}", method = RequestMethod.POST)
-    ResponseEntity<TransactionTO> transfer(
-            @PathVariable("from") int fromId,
-            @PathVariable("to") int toId,
-            @PathVariable("amount") BigDecimal amount,
-            @RequestBody String description) throws AccountstException;
+    ResponseEntity<AccountTO> createAccount(AccountTO account);
+
+    ResponseEntity<TransactionTO> transfer(int fromId, int toId, BigDecimal amount, String description) throws AccountstException;
 }

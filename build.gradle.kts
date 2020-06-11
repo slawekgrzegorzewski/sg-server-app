@@ -29,9 +29,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-quartz:2.1.6.RELEASE")
     implementation("org.springframework.boot:spring-boot-starter-security:2.1.6.RELEASE")
     implementation("org.springframework.boot:spring-boot-starter-web:2.1.6.RELEASE")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client:2.1.6.RELEASE")
     implementation("org.springframework.session:spring-session-core:2.1.7.RELEASE")
-    implementation("org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.1.6.RELEASE")
-    implementation("org.springframework.security:spring-security-oauth2-client:5.1.5.RELEASE")
     implementation(kotlin("stdlib-jdk8"))
     implementation("org.modelmapper:modelmapper:2.3.6")
 

@@ -1,19 +1,5 @@
-#security:
-#  oauth2:
-#    client:
-#      clientId: 880691357570-sdn1inkdtk2qdi5f2iakc1mn53o7m2gc.apps.googleusercontent.com
-#      clientSecret: UM7r3mokeu7XkT50hjkswyH6
-#      accessTokenUri: https://oauth2.googleapis.com/token
-#      userAuthorizationUri: https://accounts.google.com/o/oauth2/auth
-#      tokenName: oauth_token
-#      authenticationScheme: query
-#      clientAuthenticationScheme: form
-#      scope:
-#        - profile
-#        - email
-#    resource:
-#      userInfoUri: https://www.googleapis.com/userinfo/v2/me
-#      preferTokenInfo: false
+server:
+  port: 8081
 spring:
   datasource:
     hikari:
@@ -25,7 +11,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         jdbc:
