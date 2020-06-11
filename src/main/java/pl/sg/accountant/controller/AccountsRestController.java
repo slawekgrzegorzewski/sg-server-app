@@ -36,10 +36,14 @@ public class AccountsRestController implements AccountsController {
 
     @Override
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public ResponseEntity<AccountTO> createAccount(@RequestBody AccountTO account) {
+    public ResponseEntity<AccountTO> createAccount(@RequestBody AccountTO account, Authentication authentication) {
         Account toCreate = mapper.map(account, Account.class);
-        accountsService.createAccount(toCreate);
+        accountsService.createAccount(toCreate, currentUserName(authentication));
         return ResponseEntity.ok(mapper.map(toCreate, AccountTO.class));
+    }
+
+    private String currentUserName(Authentication authentication) {
+        return ((org.springframework.security.core.userdetails.User)authentication.getPrincipal()).getUsername();
     }
 
     @Override
@@ -48,8 +52,14 @@ public class AccountsRestController implements AccountsController {
             @PathVariable("from") int fromId,
             @PathVariable("to") int toId,
             @PathVariable("amount") BigDecimal amount,
-            @RequestBody String description) throws AccountstException {
-        FinancialTransaction result = accountsService.transferMoneyWithoutConversion(fromId, toId, amount, description);
+            @RequestBody String description,
+            Authentication authentication) throws AccountstException {
+        FinancialTransaction result = accountsService.transferMoneyWithoutConversion(
+                fromId,
+                toId,
+                amount,
+                description,
+                currentUserName(authentication));
         return ResponseEntity.ok(mapper.map(result, TransactionTO.class));
     }
 }

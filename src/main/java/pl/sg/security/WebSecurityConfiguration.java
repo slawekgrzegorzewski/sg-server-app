@@ -33,7 +33,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        PasswordEncoder encoder = passwordEncoder();
         for (ApplicationUser user : applicationUserRepository.findAll()) {
             auth.inMemoryAuthentication()
                     .withUser(user.getLogin())

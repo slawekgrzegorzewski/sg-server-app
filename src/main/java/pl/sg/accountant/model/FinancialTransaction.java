@@ -1,6 +1,7 @@
 package pl.sg.accountant.model;
 
 import pl.sg.accountant.model.validation.AccountTransaction;
+import pl.sg.security.ApplicationUser;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -21,6 +22,8 @@ public class FinancialTransaction {
     Account destination;
     private BigDecimal debit;
     private BigDecimal credit;
+    @ManyToOne
+    private ApplicationUser applicationUser;
 
 
     public FinancialTransaction() {
@@ -72,6 +75,15 @@ public class FinancialTransaction {
 
     public FinancialTransaction setCredit(BigDecimal credit) {
         this.credit = credit;
+        return this;
+    }
+
+    public ApplicationUser getApplicationUser() {
+        return applicationUser;
+    }
+
+    public FinancialTransaction setApplicationUser(ApplicationUser applicationUser) {
+        this.applicationUser = applicationUser;
         return this;
     }
 }

@@ -1,8 +1,11 @@
 package pl.sg.accountant.model;
 
+import pl.sg.security.ApplicationUser;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import java.math.BigDecimal;
 import java.util.Currency;
 
@@ -15,6 +18,8 @@ public class Account {
     private Currency currency;
     private BigDecimal currentBalance;
     private int balanceIndex;
+    @ManyToOne
+    private ApplicationUser applicationUser;
 
     public Account() {
     }
@@ -57,5 +62,13 @@ public class Account {
     public Account setBalanceIndex(int balanceIndex) {
         this.balanceIndex = balanceIndex;
         return this;
+    }
+
+    public ApplicationUser getApplicationUser() {
+        return applicationUser;
+    }
+
+    public void setApplicationUser(ApplicationUser applicationUser) {
+        this.applicationUser = applicationUser;
     }
 }
