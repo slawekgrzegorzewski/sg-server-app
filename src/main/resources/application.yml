@@ -6,10 +6,11 @@ spring:
     password: SLAwek1!
     url: jdbc:postgresql://localhost:32768/accountant
     username: postgres
+    initialization-mode: always
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         jdbc:
