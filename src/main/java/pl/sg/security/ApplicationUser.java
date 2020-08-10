@@ -1,5 +1,7 @@
 package pl.sg.security;
 
+import org.jboss.aerogear.security.otp.api.Base32;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +14,10 @@ public class ApplicationUser {
     private int id;
     private String login;
     private String password;
+
+    private boolean isUsing2FA;
+    private String secret;
+
     private String firstName;
     private String lastName;
     private String email;
@@ -21,13 +27,15 @@ public class ApplicationUser {
     public ApplicationUser() {
     }
 
-    public ApplicationUser(int id, String firstName, String lastName, String email, String login, String password, List<String> roles) {
+    public ApplicationUser(int id, String login, String password, boolean isUsing2FA, String secret, String firstName, String lastName, String email, List<String> roles) {
         this.id = id;
+        this.login = login;
+        this.password = password;
+        this.isUsing2FA = isUsing2FA;
+        this.secret = secret;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.login = login;
-        this.password = password;
         this.roles = new ArrayList<>(roles);
     }
 
@@ -39,8 +47,41 @@ public class ApplicationUser {
         return login;
     }
 
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
     public String getPassword() {
         return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public boolean isUsing2FA() {
+        return isUsing2FA;
+    }
+
+    public void setUsing2FA(boolean using2FA) {
+        isUsing2FA = using2FA;
+        if (isUsing2FA) {
+            generateSecret();
+        }
+    }
+
+    private void generateSecret() {
+        if (secret == null) {
+            secret = Base32.random();
+        }
+    }
+
+    public String getSecret() {
+        if (isUsing2FA) {
+            generateSecret();
+            return secret;
+        }
+        return null;
     }
 
     public String getFirstName() {
