@@ -1,5 +1,6 @@
 package pl.sg.security;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.jboss.aerogear.security.otp.api.Base32;
 
 import javax.persistence.*;
@@ -72,7 +73,7 @@ public class ApplicationUser {
 
     private void generateSecret() {
         if (secret == null) {
-            secret = Base32.random();
+            secret = Base32.encode(RandomStringUtils.randomAscii(10).getBytes());
         }
     }
 
