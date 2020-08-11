@@ -3,7 +3,6 @@ import java.nio.file.Paths;
 plugins {
     id("org.springframework.boot") version "2.1.6.RELEASE" apply true
     java apply true
-    kotlin("jvm") version "1.3.50" apply true
 }
 
 group = "pl.sg"
@@ -33,7 +32,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator:2.1.6.RELEASE")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client:2.1.6.RELEASE")
     implementation("org.springframework.session:spring-session-core:2.1.6.RELEASE")
-    implementation(kotlin("stdlib-jdk8"))
+
     implementation("org.modelmapper:modelmapper:2.3.6")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.1.6.RELEASE")
     implementation("org.jboss.aerogear:aerogear-otp-java:1.0.0")
@@ -56,6 +55,7 @@ dependencies {
 
     testRuntime("org.springframework.security:spring-security-test:5.1.5.RELEASE")
 }
+
 
 tasks.clean.get().doFirst {
     val dockerDir = Paths.get(project.rootDir.absolutePath, "docker", "development");
