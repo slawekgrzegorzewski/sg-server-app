@@ -1,7 +1,7 @@
 package pl.sg.twofa;
 
 import org.jboss.aerogear.security.otp.Totp;
-import pl.sg.security.ApplicationUser;
+import pl.sg.application.model.ApplicationUser;
 
 public class QRCode {
     private static final String QR_PREFIX = "https://chart.googleapis.com/chart?chs=200x200&chld=M%%7C0&cht=qr&chl=";

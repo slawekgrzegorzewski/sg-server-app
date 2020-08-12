@@ -5,7 +5,7 @@ import pl.sg.accountant.model.Account;
 import pl.sg.accountant.model.FinancialTransaction;
 import pl.sg.accountant.repository.AccountRepository;
 import pl.sg.accountant.repository.FinancialTransactionRepository;
-import pl.sg.security.ApplicationUserRepository;
+import pl.sg.application.model.ApplicationUserRepository;
 
 import java.math.BigDecimal;
 import java.util.List;

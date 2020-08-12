@@ -1,4 +1,4 @@
-package pl.sg.security;
+package pl.sg.application.model;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jboss.aerogear.security.otp.api.Base32;

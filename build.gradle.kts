@@ -23,6 +23,8 @@ dependencies {
 
     configurations.implementation.get().isCanBeResolved = true;
 
+    implementation("com.auth0:java-jwt:3.10.3")
+
     implementation("org.apache.commons:commons-lang3:3.11")
     implementation("org.springframework.boot:spring-boot:2.1.6.RELEASE")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa:2.1.6.RELEASE")

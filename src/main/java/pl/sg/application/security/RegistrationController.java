@@ -1,4 +1,4 @@
-package pl.sg.security;
+package pl.sg.application.security;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jboss.aerogear.security.otp.Totp;
@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import pl.sg.application.model.ApplicationUser;
+import pl.sg.application.model.ApplicationUserRepository;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
