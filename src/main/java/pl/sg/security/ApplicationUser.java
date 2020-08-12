@@ -26,14 +26,15 @@ public class ApplicationUser {
     private List<String> roles;
 
     public ApplicationUser() {
+        this.secret = Base32.encode(RandomStringUtils.randomAscii(10).getBytes());
+        this.isUsing2FA = false;
     }
 
-    public ApplicationUser(int id, String login, String password, boolean isUsing2FA, String secret, String firstName, String lastName, String email, List<String> roles) {
+    public ApplicationUser(int id, String login, String password, String firstName, String lastName, String email, List<String> roles) {
+        this();
         this.id = id;
         this.login = login;
         this.password = password;
-        this.isUsing2FA = isUsing2FA;
-        this.secret = secret;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -66,23 +67,10 @@ public class ApplicationUser {
 
     public void setUsing2FA(boolean using2FA) {
         isUsing2FA = using2FA;
-        if (isUsing2FA) {
-            generateSecret();
-        }
-    }
-
-    private void generateSecret() {
-        if (secret == null) {
-            secret = Base32.encode(RandomStringUtils.randomAscii(10).getBytes());
-        }
     }
 
     public String getSecret() {
-        if (isUsing2FA) {
-            generateSecret();
-            return secret;
-        }
-        return null;
+        return secret;
     }
 
     public String getFirstName() {

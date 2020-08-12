@@ -2,28 +2,26 @@ package pl.sg.security;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jboss.aerogear.security.otp.Totp;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 
-@Controller
+import static pl.sg.twofa.QRCode.fromApplicationUser;
+
+@RestController
+@RequestMapping("/register")
 @Slf4j
 public class RegistrationController {
 
     public static final String APP_NAME = "accountant";
     private final ApplicationUserRepository applicationUserRepository;
     private final PasswordEncoder passwordEncoder;
-    public static String QR_PREFIX = "https://chart.googleapis.com/chart?chs=200x200&chld=M%%7C0&cht=qr&chl=";
 
     @Autowired
     public RegistrationController(ApplicationUserRepository applicationUserRepository, PasswordEncoder passwordEncoder) {
@@ -31,20 +29,10 @@ public class RegistrationController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @PostMapping("/register")
+    @PostMapping
     public ResponseEntity<String> registerUser(@RequestBody User user) {
-        String uname = user.getUname();
-        String upass = user.getUpass();
-        Integer token = user.getToken();
-        if (token == null) {
-            return registerUser(uname, upass);
-        } else {
-            return confirmToken(uname, upass, token);
-        }
-    }
-
-    @NotNull
-    private ResponseEntity<String> registerUser(String uname, String upass) {
+        String uname = user.getName();
+        String upass = user.getPass();
         if (uname == null || upass == null || "".equals(uname.trim()) || "".equals(upass.trim())) {
             throw new BadCredentialsException("Username/ password is required");
         }
@@ -55,33 +43,29 @@ public class RegistrationController {
         ApplicationUser applicationUser = new ApplicationUser();
         applicationUser.setLogin(uname);
         applicationUser.setPassword(passwordEncoder.encode(upass));
-        applicationUser.setUsing2FA(true);
         applicationUserRepository.save(applicationUser);
-        return ResponseEntity.ok().body(generateQRUrl(applicationUser));
+        return ResponseEntity.ok().body(fromApplicationUser(APP_NAME, applicationUser).qrLink());
     }
 
-    private ResponseEntity<String> confirmToken(String uname, String upass, Integer token) {
-
-        ApplicationUser firstByLogin = applicationUserRepository.findFirstByLogin(uname).orElseThrow(() -> new RuntimeException("Wrong user/password"));
-        if (!passwordEncoder.matches(upass, firstByLogin.getPassword())) {
+    @PostMapping("/setup2FA")
+    public ResponseEntity<String> setup2FA(@RequestBody User user) {
+        ApplicationUser firstByLogin = applicationUserRepository.findFirstByLogin(user.getName()).orElseThrow(() -> new RuntimeException("Wrong user/password"));
+        if (!passwordEncoder.matches(user.getPass(), firstByLogin.getPassword())) {
             throw new BadCredentialsException("Wrong user/password");
         }
-        Totp totp = new Totp(firstByLogin.getSecret());
-        if (!totp.verify(String.valueOf(token))) {
-            throw new BadCredentialsException("Invalid verfication code");
+        if (firstByLogin.isUsing2FA()) {
+            throw new BadCredentialsException("2FA already configured");
         }
-
+        Totp totp = new Totp(firstByLogin.getSecret());
+        if (!totp.verify(String.valueOf(user.getSecretFor2FA()))) {
+            throw new BadCredentialsException("Invalid verification code");
+        }
+        firstByLogin.setUsing2FA(true);
+        applicationUserRepository.save(firstByLogin);
         return ResponseEntity.ok().body("It's good");
     }
 
-    private String generateQRUrl(ApplicationUser applicationUser) {
-        return QR_PREFIX + String.format("otpauth://totp/%s?secret=%s&issuer=%s",
-                APP_NAME,
-                applicationUser.getSecret(),
-                APP_NAME);
-    }
-
-    @ExceptionHandler({ BadCredentialsException.class })
+    @ExceptionHandler({BadCredentialsException.class})
     public void handleException(HttpServletResponse response, Exception ex) throws IOException {
         response.setStatus(400);
         response.getWriter().write(ex.getMessage());
@@ -90,29 +74,29 @@ public class RegistrationController {
     }
 
     public static class User {
-        private String uname;
-        private String upass;
-        private Integer token;
+        private String name;
+        private String pass;
+        private Integer secretFor2FA;
 
         public User() {
         }
 
-        public User(String uname, String upass, Integer token) {
-            this.uname = uname;
-            this.upass = upass;
-            this.token = token;
+        public User(String name, String pass, Integer secretFor2FA) {
+            this.name = name;
+            this.pass = pass;
+            this.secretFor2FA = secretFor2FA;
         }
 
-        public String getUname() {
-            return uname;
+        public String getName() {
+            return name;
         }
 
-        public String getUpass() {
-            return upass;
+        public String getPass() {
+            return pass;
         }
 
-        public Integer getToken() {
-            return token;
+        public Integer getSecretFor2FA() {
+            return secretFor2FA;
         }
     }
 }

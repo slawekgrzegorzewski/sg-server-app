@@ -35,7 +35,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/", "/index.html", "/login.html", "/register").permitAll()
+                .antMatchers("/", "/index.html", "/login.html", "/register", "/register/*").permitAll()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 .anyRequest().authenticated()
                 .and().httpBasic().authenticationDetailsSource(authenticationDetailsSource)
