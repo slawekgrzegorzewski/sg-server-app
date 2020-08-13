@@ -24,7 +24,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests().anyRequest().permitAll()
-                .and().logout().logoutUrl("/logout").deleteCookies("JSESSIONID").permitAll()
                 .and().cors()
                 .and().csrf().disable();
     }
