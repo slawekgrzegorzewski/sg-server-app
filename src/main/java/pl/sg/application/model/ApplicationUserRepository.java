@@ -1,6 +1,7 @@
-package pl.sg.security;
+package pl.sg.application.model;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import pl.sg.application.model.ApplicationUser;
 
 import java.util.Optional;
 

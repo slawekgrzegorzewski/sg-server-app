@@ -2,8 +2,6 @@ package pl.sg.accountant.controller;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import pl.sg.accountant.model.Account;
 import pl.sg.accountant.model.FinancialTransaction;
@@ -11,6 +9,8 @@ import pl.sg.accountant.service.AccountsService;
 import pl.sg.accountant.service.AccountstException;
 import pl.sg.accountant.transport.AccountTO;
 import pl.sg.accountant.transport.TransactionTO;
+import pl.sg.application.model.ApplicationUser;
+import pl.sg.application.security.AuthorizationService;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -21,29 +21,28 @@ import java.util.stream.Collectors;
 public class AccountsRestController implements AccountsController {
     private final AccountsService accountsService;
     private final ModelMapper mapper;
+    private final AuthorizationService authorizationService;
 
-    public AccountsRestController(AccountsService accountsService, ModelMapper mapper) {
+    public AccountsRestController(AccountsService accountsService, ModelMapper mapper, AuthorizationService authorizationService) {
         this.accountsService = accountsService;
         this.mapper = mapper;
+        this.authorizationService = authorizationService;
     }
 
     @Override
     @RequestMapping(value = "/all", method = RequestMethod.GET)
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<AccountTO>> accounts(AccountTO account) {
+    public ResponseEntity<List<AccountTO>> accounts(AccountTO account, @RequestHeader("Authorization") String token) {
+        authorizationService.validate(token, "ADMIN");
         return ResponseEntity.ok(accountsService.getAll().stream().map(a -> mapper.map(a, AccountTO.class)).collect(Collectors.toList()));
     }
 
     @Override
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public ResponseEntity<AccountTO> createAccount(@RequestBody AccountTO account, Authentication authentication) {
+    public ResponseEntity<AccountTO> createAccount(@RequestBody AccountTO account, @RequestHeader("Authorization") String token) {
+        ApplicationUser user = authorizationService.validate(token, "ADMIN");
         Account toCreate = mapper.map(account, Account.class);
-        accountsService.createAccount(toCreate, currentUserName(authentication));
+        accountsService.createAccount(toCreate, user.getLogin());
         return ResponseEntity.ok(mapper.map(toCreate, AccountTO.class));
-    }
-
-    private String currentUserName(Authentication authentication) {
-        return ((org.springframework.security.core.userdetails.User)authentication.getPrincipal()).getUsername();
     }
 
     @Override
@@ -53,13 +52,14 @@ public class AccountsRestController implements AccountsController {
             @PathVariable("to") int toId,
             @PathVariable("amount") BigDecimal amount,
             @RequestBody String description,
-            Authentication authentication) throws AccountstException {
+            @RequestHeader("Authorization") String token) throws AccountstException {
+        ApplicationUser user = authorizationService.validate(token, "ADMIN");
         FinancialTransaction result = accountsService.transferMoneyWithoutConversion(
                 fromId,
                 toId,
                 amount,
                 description,
-                currentUserName(authentication));
+                user.getLogin());
         return ResponseEntity.ok(mapper.map(result, TransactionTO.class));
     }
 }

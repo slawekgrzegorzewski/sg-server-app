@@ -1,7 +1,7 @@
 package pl.sg.accountant.model;
 
 import pl.sg.accountant.model.validation.AccountTransaction;
-import pl.sg.security.ApplicationUser;
+import pl.sg.application.model.ApplicationUser;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
