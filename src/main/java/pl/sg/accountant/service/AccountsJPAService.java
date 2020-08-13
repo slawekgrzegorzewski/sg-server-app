@@ -37,12 +37,9 @@ public class AccountsJPAService implements AccountsService {
     }
 
     @Override
-    public FinancialTransaction transferMoneyWithoutConversion(
-            int sourceAccount,
-            int destinationAccount,
-            BigDecimal amount,
-            String description,
-            String userName) throws AccountstException {
+    public FinancialTransaction transferMoneyWithoutConversion(int sourceAccount, int destinationAccount,
+                                                               BigDecimal amount, String description,
+                                                               String userName) throws AccountstException {
         Account from = accountRepository.getOne(sourceAccount);
         Account to = accountRepository.getOne(destinationAccount);
         if (!from.getCurrency().equals(to.getCurrency())) {
