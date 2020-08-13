@@ -21,7 +21,7 @@ import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 @CrossOrigin
 public class LoginController {
 
-    private static final String TOKEN_PREFIX = "Bearer ";
+    private static final String TOKEN_PREFIX = "Bearer";
     private static final String HEADER_STRING = "Authorization";
     private final ApplicationUserRepository applicationUserRepository;
     private final PasswordEncoder passwordEncoder;
@@ -50,7 +50,7 @@ public class LoginController {
             throw new BadCredentialsException("Wrong 2FA code");
         }
         String jwt = authorizationService.generateJWTToken(uname, firstByLogin.getRoles());
-        return ResponseEntity.ok().body(HEADER_STRING + ":" + TOKEN_PREFIX + jwt);
+        return ResponseEntity.ok().body(HEADER_STRING + ": " + TOKEN_PREFIX + " " + jwt);
     }
 
     @GetMapping("/verify")

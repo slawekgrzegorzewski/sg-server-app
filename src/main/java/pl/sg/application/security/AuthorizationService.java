@@ -6,6 +6,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.stereotype.Component;
 import pl.sg.application.ForbiddenException;
 import pl.sg.application.UnauthorizedException;
+import pl.sg.application.configuration.Configuration;
 import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.ApplicationUserRepository;
 
@@ -18,19 +19,20 @@ import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 @Component
 public class AuthorizationService {
     private static final String ROLES = "roles";
-    private static final String SECRET = "SecretKeyToGenJWTs";
-    private static final Duration DURATION = Duration.ofMinutes(10);
+    private static final Duration DURATION = Duration.ofSeconds(10);
 
     private final ApplicationUserRepository applicationUserRepository;
+    private final Configuration configuration;
 
-    public AuthorizationService(ApplicationUserRepository applicationUserRepository) {
+    public AuthorizationService(ApplicationUserRepository applicationUserRepository, Configuration configuration) {
         this.applicationUserRepository = applicationUserRepository;
+        this.configuration = configuration;
     }
 
     public ApplicationUser validate(String token, String... roles) {
         DecodedJWT decodedJWT;
         try {
-            decodedJWT = JWT.require(HMAC512(SECRET.getBytes()))
+            decodedJWT = JWT.require(HMAC512(configuration.getJWTTokenSecret().getBytes()))
                     .build()
                     .verify(token.replace("Bearer ", ""));
         } catch (JWTVerificationException ex) {
@@ -50,6 +52,6 @@ public class AuthorizationService {
                 .withSubject(user)
                 .withClaim(ROLES, roles)
                 .withExpiresAt(new Date(System.currentTimeMillis() + DURATION.toMillis()))
-                .sign(HMAC512(SECRET.getBytes()));
+                .sign(HMAC512(configuration.getJWTTokenSecret().getBytes()));
     }
 }
