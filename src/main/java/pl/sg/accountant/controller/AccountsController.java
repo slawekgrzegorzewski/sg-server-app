@@ -12,9 +12,9 @@ import java.util.List;
 
 public interface AccountsController {
 
-    ResponseEntity<List<AccountTO>> accounts(AccountTO account, String token);
+    ResponseEntity<List<AccountTO>> accounts(AccountTO account);
 
-    ResponseEntity<AccountTO> createAccount(AccountTO account, String token);
+    ResponseEntity<AccountTO> createAccount(AccountTO account, String login);
 
-    ResponseEntity<TransactionTO> transfer(int fromId, int toId, BigDecimal amount, String description, String token) throws AccountstException;
+    ResponseEntity<TransactionTO> transfer(int fromId, int toId, BigDecimal amount, String description, String login) throws AccountstException;
 }

@@ -19,7 +19,7 @@ import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 @Component
 public class AuthorizationService {
     private static final String ROLES = "roles";
-    private static final Duration DURATION = Duration.ofMinutes(10);
+    private static final Duration DURATION = Duration.ofHours(10);
 
     private final ApplicationUserRepository applicationUserRepository;
     private final Configuration configuration;
@@ -29,7 +29,7 @@ public class AuthorizationService {
         this.configuration = configuration;
     }
 
-    public ApplicationUser validate(String token, String... roles) {
+    public DecodedJWT validate(String token, String... roles) {
         DecodedJWT decodedJWT;
         try {
             decodedJWT = JWT.require(HMAC512(configuration.getJWTTokenSecret().getBytes()))
@@ -44,7 +44,13 @@ public class AuthorizationService {
                 throw new ForbiddenException(decodedJWT.getSubject(), role);
             }
         }
-        return applicationUserRepository.findFirstByLogin(decodedJWT.getSubject()).orElseThrow(() -> new UnauthorizedException("Wrong JWT token"));
+        return decodedJWT;
+    }
+
+    public ApplicationUser getUserInfo(String token) {
+        DecodedJWT decodedJWT = validate(token);
+        return applicationUserRepository.findFirstByLogin(decodedJWT.getSubject())
+                .orElseThrow(() -> new UnauthorizedException("Wrong JWT token"));
     }
 
     public String generateJWTToken(String user, List<String> roles) {

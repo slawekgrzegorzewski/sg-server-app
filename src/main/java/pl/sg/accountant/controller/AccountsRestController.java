@@ -11,6 +11,8 @@ import pl.sg.accountant.transport.AccountTO;
 import pl.sg.accountant.transport.TransactionTO;
 import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.security.AuthorizationService;
+import pl.sg.application.security.annotations.RequestUser;
+import pl.sg.application.security.annotations.TokenBearerAuth;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -31,35 +33,37 @@ public class AccountsRestController implements AccountsController {
 
     @Override
     @RequestMapping(value = "/all", method = RequestMethod.GET)
-    public ResponseEntity<List<AccountTO>> accounts(AccountTO account, @RequestHeader("Authorization") String token) {
-        authorizationService.validate(token, "ADMIN");
+    @TokenBearerAuth("ADMIN")
+    public ResponseEntity<List<AccountTO>> accounts(AccountTO account) {
         return ResponseEntity.ok(accountsService.getAll().stream().map(a -> mapper.map(a, AccountTO.class)).collect(Collectors.toList()));
     }
 
     @Override
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public ResponseEntity<AccountTO> createAccount(@RequestBody AccountTO account, @RequestHeader("Authorization") String token) {
-        ApplicationUser user = authorizationService.validate(token, "ADMIN");
+    @TokenBearerAuth("ADMIN")
+    public ResponseEntity<AccountTO> createAccount(
+            @RequestBody AccountTO account,
+            @RequestUser(RequestUser.LOGIN) String login) {
         Account toCreate = mapper.map(account, Account.class);
-        accountsService.createAccount(toCreate, user.getLogin());
+        accountsService.createAccount(toCreate, login);
         return ResponseEntity.ok(mapper.map(toCreate, AccountTO.class));
     }
 
     @Override
     @RequestMapping(value = "/transfer/{from}/{to}/{amount}", method = RequestMethod.POST)
+    @TokenBearerAuth("ADMIN")
     public ResponseEntity<TransactionTO> transfer(
             @PathVariable("from") int fromId,
             @PathVariable("to") int toId,
             @PathVariable("amount") BigDecimal amount,
             @RequestBody String description,
-            @RequestHeader("Authorization") String token) throws AccountstException {
-        ApplicationUser user = authorizationService.validate(token, "ADMIN");
+            @RequestUser(RequestUser.LOGIN) String login) throws AccountstException {
         FinancialTransaction result = accountsService.transferMoneyWithoutConversion(
                 fromId,
                 toId,
                 amount,
                 description,
-                user.getLogin());
+                login);
         return ResponseEntity.ok(mapper.map(result, TransactionTO.class));
     }
 }
