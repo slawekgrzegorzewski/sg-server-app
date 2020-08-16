@@ -1,7 +1,7 @@
 import java.nio.file.Paths;
 
 plugins {
-    id("org.springframework.boot") version "2.1.6.RELEASE" apply true
+    id("org.springframework.boot") version "2.3.3.RELEASE" apply true
     java apply true
 }
 
@@ -26,31 +26,29 @@ dependencies {
     implementation("com.auth0:java-jwt:3.10.3")
 
     implementation("org.apache.commons:commons-lang3:3.11")
-    implementation("org.springframework.boot:spring-boot:2.1.6.RELEASE")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa:2.1.6.RELEASE")
-    implementation("org.springframework.boot:spring-boot-starter-mail:2.1.6.RELEASE")
-    implementation("org.springframework.boot:spring-boot-starter-quartz:2.1.6.RELEASE")
-    implementation("org.springframework.boot:spring-boot-starter-security:2.1.6.RELEASE")
-    implementation("org.springframework.boot:spring-boot-starter-web:2.1.6.RELEASE")
-    implementation("org.springframework.boot:spring-boot-starter-actuator:2.1.6.RELEASE")
-    implementation("org.springframework.boot:spring-boot-starter-oauth2-client:2.1.6.RELEASE")
-    implementation("org.springframework.session:spring-session-core:2.1.6.RELEASE")
+    implementation("org.springframework.boot:spring-boot:2.3.3.RELEASE")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa:2.3.3.RELEASE")
+    implementation("org.springframework.boot:spring-boot-starter-mail:2.3.3.RELEASE")
+    implementation("org.springframework.boot:spring-boot-starter-quartz:2.3.3.RELEASE")
+    implementation("org.springframework.boot:spring-boot-starter-security:2.3.3.RELEASE")
+    implementation("org.springframework.boot:spring-boot-starter-web:2.3.3.RELEASE")
+    implementation("org.springframework.boot:spring-boot-starter-aop:2.3.3.RELEASE")
+    implementation("org.springframework.boot:spring-boot-starter-validation:2.3.3.RELEASE")
 
     implementation("org.modelmapper:modelmapper:2.3.6")
-    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.1.6.RELEASE")
     implementation("org.jboss.aerogear:aerogear-otp-java:1.0.0")
 
     compileOnly("org.projectlombok:lombok:1.18.8")
-    compileOnly("org.springframework.boot:spring-boot-devtools:2.1.6.RELEASE")
+    compileOnly("org.springframework.boot:spring-boot-devtools:2.3.3.RELEASE")
 
     runtime("org.postgresql:postgresql:42.2.6")
 
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:2.1.6.RELEASE")
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:2.3.3.RELEASE")
     annotationProcessor("org.projectlombok:lombok:1.18.8")
 
     testImplementation("junit:junit:4.12")
     testImplementation("org.springframework:spring-test:4.3.2.RELEASE")
-    testImplementation("org.springframework.boot:spring-boot-test:2.1.6.RELEASE")
+    testImplementation("org.springframework.boot:spring-boot-test:2.3.3.RELEASE")
     testImplementation("org.hamcrest:hamcrest-library:1.3")
     testImplementation("com.jayway.jsonpath:json-path:2.2.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test:2.3.1.RELEASE")

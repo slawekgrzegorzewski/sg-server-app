@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.ApplicationUserRepository;
+import pl.sg.application.security.annotations.TokenBearerAuth;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -54,8 +55,8 @@ public class LoginController {
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<String> verify(@RequestHeader("Authorization") String bearerToken) {
-        authorizationService.validate(bearerToken);
+    @TokenBearerAuth
+    public ResponseEntity<String> verify() {
         return ResponseEntity.ok().body("OK");
     }
 
