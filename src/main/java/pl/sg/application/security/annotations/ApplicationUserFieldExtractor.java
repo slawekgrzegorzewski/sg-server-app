@@ -4,6 +4,8 @@ import pl.sg.application.model.ApplicationUser;
 
 import java.util.function.Function;
 
+import static pl.sg.application.security.annotations.RequestUser.NO_FIELD;
+
 public class ApplicationUserFieldExtractor<T> {
     private final Class<T> forClass;
 
@@ -12,14 +14,11 @@ public class ApplicationUserFieldExtractor<T> {
     }
 
     public T extract(ApplicationUser user, String field) {
-        if (forClass.isAssignableFrom(ApplicationUser.class) && !field.equals(RequestUser.NO_FIELD)) {
-            throw new RequestUserResolverException("Not supported field requested to be injected");
-        }
         return (T) getExtractor(field).apply(user);
     }
 
     Function<ApplicationUser, ?> getExtractor(String field) {
-        if (forClass.isAssignableFrom(ApplicationUser.class))
+        if (forClass.isAssignableFrom(ApplicationUser.class) && field.equals(NO_FIELD))
             return Function.identity();
         if (forClass.isAssignableFrom(String.class))
             return getStringExtractor(field);
