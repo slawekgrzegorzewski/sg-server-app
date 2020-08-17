@@ -1,5 +1,8 @@
 package pl.sg.accountant.controller;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,37 +13,37 @@ import pl.sg.accountant.service.AccountstException;
 import pl.sg.accountant.transport.AccountTO;
 import pl.sg.accountant.transport.TransactionTO;
 import pl.sg.application.model.ApplicationUser;
-import pl.sg.application.security.AuthorizationService;
 import pl.sg.application.security.annotations.RequestUser;
 import pl.sg.application.security.annotations.TokenBearerAuth;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/accounts")
 public class AccountsRestController implements AccountsController {
     private final AccountsService accountsService;
     private final ModelMapper mapper;
-    private final AuthorizationService authorizationService;
 
-    public AccountsRestController(AccountsService accountsService, ModelMapper mapper, AuthorizationService authorizationService) {
+    public AccountsRestController(AccountsService accountsService, ModelMapper mapper) {
         this.accountsService = accountsService;
         this.mapper = mapper;
-        this.authorizationService = authorizationService;
     }
 
     @Override
     @RequestMapping(value = "/all", method = RequestMethod.GET)
-    @TokenBearerAuth("ADMIN")
-    public ResponseEntity<List<AccountTO>> accounts(AccountTO account) {
-        return ResponseEntity.ok(accountsService.getAll().stream().map(a -> mapper.map(a, AccountTO.class)).collect(Collectors.toList()));
+    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    public ResponseEntity<List<AccountTO>> accounts(@RequestUser ApplicationUser user) {
+        final List<String> roles = user.getRoles();
+        if (roles.contains("ADMIN"))
+            return ResponseEntity.ok(map(accountsService.getAll()));
+        return ResponseEntity.ok(map(accountsService.getForUser(user.getLogin())));
+    }
+
+    private List<AccountTO> map(List<Account> accounts) {
+        return accounts.stream().map(a -> mapper.map(a, AccountTO.class)).collect(Collectors.toList());
     }
 
     @Override
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @TokenBearerAuth("ADMIN")
+    @TokenBearerAuth(any = {"ADMIN", "USER"})
     public ResponseEntity<AccountTO> createAccount(
             @RequestBody AccountTO account,
             @RequestUser(RequestUser.LOGIN) String login) {
@@ -51,7 +54,7 @@ public class AccountsRestController implements AccountsController {
 
     @Override
     @RequestMapping(value = "/transfer/{from}/{to}/{amount}", method = RequestMethod.POST)
-    @TokenBearerAuth("ADMIN")
+    @TokenBearerAuth(all = "ADMIN")
     public ResponseEntity<TransactionTO> transfer(
             @PathVariable("from") int fromId,
             @PathVariable("to") int toId,

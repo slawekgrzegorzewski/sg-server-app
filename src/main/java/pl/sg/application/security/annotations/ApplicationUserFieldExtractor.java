@@ -1,5 +1,6 @@
 package pl.sg.application.security.annotations;
 
+import java.util.List;
 import pl.sg.application.model.ApplicationUser;
 
 import java.util.function.Function;
@@ -24,6 +25,8 @@ public class ApplicationUserFieldExtractor<T> {
             return getStringExtractor(field);
         if (forClass.isAssignableFrom(Integer.class))
             return getIntegerExtractor(field);
+        if (forClass.isAssignableFrom(List.class))
+            return getListExtractor(field);
         throw new RequestUserResolverException("Not supported field requested to be injected");
     }
 
@@ -46,6 +49,15 @@ public class ApplicationUserFieldExtractor<T> {
         switch (field) {
             case RequestUser.ID:
                 return ApplicationUser::getId;
+            default:
+                throw new RequestUserResolverException("Not supported field requested to be injected");
+        }
+    }
+
+    Function<ApplicationUser, List> getListExtractor(String field) {
+        switch (field) {
+            case RequestUser.ROLES:
+                return ApplicationUser::getRoles;
             default:
                 throw new RequestUserResolverException("Not supported field requested to be injected");
         }

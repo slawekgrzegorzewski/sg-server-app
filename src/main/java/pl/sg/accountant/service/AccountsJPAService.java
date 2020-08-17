@@ -31,6 +31,11 @@ public class AccountsJPAService implements AccountsService {
     }
 
     @Override
+    public List<Account> getForUser(String userName) {
+        return accountRepository.findAllByApplicationUser_Login(userName);
+    }
+
+    @Override
     public void createAccount(Account account, String userName) {
         account.setApplicationUser(applicationUserRepository.findFirstByLogin(userName).get());
         accountRepository.save(account);
