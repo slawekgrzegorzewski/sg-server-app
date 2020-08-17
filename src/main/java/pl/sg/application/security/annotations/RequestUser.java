@@ -13,8 +13,8 @@ public @interface RequestUser {
     String EMAIL = "email";
     String FIRST_NAME = "firstName";
     String LAST_NAME = "lastName";
+    String ROLES = "roles";
     String NO_FIELD = "";
-
 
     String value() default NO_FIELD;
 }

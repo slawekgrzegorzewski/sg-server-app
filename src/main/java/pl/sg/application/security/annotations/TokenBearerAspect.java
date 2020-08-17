@@ -32,6 +32,7 @@ public class TokenBearerAspect {
         if (token == null) {
             throw new UnauthorizedException("No token bearer in the request.");
         }
-        authorizationService.validate(token, tokenBearerAuth.value());
+        authorizationService.validateAll(token, tokenBearerAuth.all());
+        authorizationService.validateAny(token, tokenBearerAuth.any());
     }
 }
