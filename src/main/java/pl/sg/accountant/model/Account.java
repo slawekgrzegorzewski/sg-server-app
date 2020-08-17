@@ -1,11 +1,9 @@
 package pl.sg.accountant.model;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import pl.sg.application.model.ApplicationUser;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import java.math.BigDecimal;
 import java.util.Currency;
 
@@ -14,10 +12,15 @@ public class Account {
     @Id
     @GeneratedValue
     private int id;
+    @NotNull
     private String name;
+    @NotNull
     private Currency currency;
-    private BigDecimal currentBalance;
-    private int balanceIndex;
+    @Column(columnDefinition = "numeric(19,2) default 0")
+    @NotNull
+    private BigDecimal currentBalance = new BigDecimal(0);
+    @ManyToOne
+    private FinancialTransaction lastTransactionIncludedInBalance;
     @ManyToOne
     private ApplicationUser applicationUser;
 
@@ -55,12 +58,12 @@ public class Account {
         return this;
     }
 
-    public int getBalanceIndex() {
-        return balanceIndex;
+    public FinancialTransaction getLastTransactionIncludedInBalance() {
+        return lastTransactionIncludedInBalance;
     }
 
-    public Account setBalanceIndex(int balanceIndex) {
-        this.balanceIndex = balanceIndex;
+    public Account setLastTransactionIncludedInBalance(FinancialTransaction lastTransactionIncludedInBalance) {
+        this.lastTransactionIncludedInBalance = lastTransactionIncludedInBalance;
         return this;
     }
 

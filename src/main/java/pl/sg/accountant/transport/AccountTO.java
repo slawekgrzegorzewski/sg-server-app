@@ -2,13 +2,18 @@ package pl.sg.accountant.transport;
 
 import java.math.BigDecimal;
 import java.util.Currency;
+import javax.validation.constraints.NotNull;
 
 public class AccountTO {
     private Integer id;
+    @NotNull
     private String name;
+    @NotNull
     private Currency currency;
+    @NotNull
     private BigDecimal currentBalance;
     private int balanceIndex;
+    @NotNull
     private String userName;
 
     public AccountTO() {

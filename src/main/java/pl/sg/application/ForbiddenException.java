@@ -15,4 +15,8 @@ public class ForbiddenException extends RuntimeException {
     public static ForbiddenException allRoleNotMet(String user, String... roles) {
         return new ForbiddenException("User %s lacks any of following roles %s", user, roles);
     }
+
+    public ForbiddenException(String message) {
+        super(message);
+    }
 }

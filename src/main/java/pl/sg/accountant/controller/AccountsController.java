@@ -14,5 +14,7 @@ public interface AccountsController {
 
     ResponseEntity<AccountTO> createAccount(AccountTO account, String login);
 
+    ResponseEntity<String> deleteAccount(Integer id, String login);
+
     ResponseEntity<TransactionTO> transfer(int fromId, int toId, BigDecimal amount, String description, String login) throws AccountstException;
 }

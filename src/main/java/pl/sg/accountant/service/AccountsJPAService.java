@@ -1,14 +1,14 @@
 package pl.sg.accountant.service;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 import pl.sg.accountant.model.Account;
 import pl.sg.accountant.model.FinancialTransaction;
 import pl.sg.accountant.repository.AccountRepository;
 import pl.sg.accountant.repository.FinancialTransactionRepository;
 import pl.sg.application.model.ApplicationUserRepository;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 @Component
 public class AccountsJPAService implements AccountsService {
@@ -23,6 +23,11 @@ public class AccountsJPAService implements AccountsService {
         this.accountRepository = accountRepository;
         this.financialTransactionRepository = financialTransactionRepository;
         this.applicationUserRepository = applicationUserRepository;
+    }
+
+    @Override
+    public Optional<Account> findById(Integer id) {
+        return accountRepository.findById(id);
     }
 
     @Override
@@ -61,11 +66,16 @@ public class AccountsJPAService implements AccountsService {
                 .setDebit(amount)
                 .setApplicationUser(applicationUserRepository.findFirstByLogin(userName).get());
         financialTransactionRepository.save(financialTransaction);
-        from.setBalanceIndex(financialTransaction.getId())
+        from.setLastTransactionIncludedInBalance(financialTransaction)
                 .setCurrentBalance(from.getCurrentBalance().subtract(amount));
-        to.setBalanceIndex(financialTransaction.getId())
+        to.setLastTransactionIncludedInBalance(financialTransaction)
                 .setCurrentBalance(to.getCurrentBalance().add(amount));
         accountRepository.saveAll(List.of(from, to));
         return financialTransaction;
+    }
+
+    @Override
+    public void delete(Account account) {
+        accountRepository.delete(account);
     }
 }
