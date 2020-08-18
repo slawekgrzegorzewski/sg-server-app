@@ -32,7 +32,7 @@ public class AccountsRestController implements AccountsController {
     }
 
     @Override
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     @TokenBearerAuth(any = {"ADMIN", "USER"})
     public ResponseEntity<List<AccountTO>> accounts(@RequestUser ApplicationUser user) {
         final List<String> roles = user.getRoles();
@@ -46,7 +46,7 @@ public class AccountsRestController implements AccountsController {
     }
 
     @Override
-    @RequestMapping(method = RequestMethod.PUT)
+    @PutMapping
     @TokenBearerAuth(any = {"ADMIN", "USER"})
     public ResponseEntity<AccountTO> createAccount(
             @RequestBody @Valid AccountTO account,
@@ -57,7 +57,7 @@ public class AccountsRestController implements AccountsController {
     }
 
     @Override
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @DeleteMapping("/{id}")
     @TokenBearerAuth(any = {"ADMIN", "USER"})
     public ResponseEntity<String> deleteAccount(
             @PathVariable Integer id,
@@ -75,7 +75,7 @@ public class AccountsRestController implements AccountsController {
     }
 
     @Override
-    @RequestMapping(value = "/transfer/{from}/{to}/{amount}", method = RequestMethod.POST)
+    @PostMapping("/transfer/{from}/{to}/{amount}")
     @TokenBearerAuth(all = "ADMIN")
     public ResponseEntity<TransactionTO> transfer(
             @PathVariable("from") int fromId,
