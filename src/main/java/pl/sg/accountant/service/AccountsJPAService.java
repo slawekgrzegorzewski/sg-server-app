@@ -75,6 +75,11 @@ public class AccountsJPAService implements AccountsService {
     }
 
     @Override
+    public void update(Account account) {
+        accountRepository.save(account);
+    }
+
+    @Override
     public void delete(Account account) {
         accountRepository.delete(account);
     }

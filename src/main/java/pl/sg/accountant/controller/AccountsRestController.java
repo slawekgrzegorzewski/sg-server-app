@@ -1,10 +1,5 @@
 package pl.sg.accountant.controller;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import javax.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +14,12 @@ import pl.sg.application.ForbiddenException;
 import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.security.annotations.RequestUser;
 import pl.sg.application.security.annotations.TokenBearerAuth;
+
+import javax.validation.Valid;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/accounts")
@@ -54,6 +55,26 @@ public class AccountsRestController implements AccountsController {
         Account toCreate = mapper.map(account, Account.class);
         accountsService.createAccount(toCreate, login);
         return ResponseEntity.ok(mapper.map(toCreate, AccountTO.class));
+    }
+
+    @Override
+    @PatchMapping
+    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    public ResponseEntity<String> updateAccount(
+            @RequestBody @Valid AccountTO account,
+            @RequestUser(RequestUser.LOGIN) String login) {
+        return accountsService.findById(account.getId())
+                .filter(toEdit -> toEdit.getApplicationUser().getLogin().equals(login))
+                .map(toEdit -> update(toEdit, account))
+                .map(toEdit -> {
+                    accountsService.update(toEdit);
+                    return ResponseEntity.ok("OK");
+                }).orElseGet(() -> ResponseEntity.badRequest().body("Account to edit does not exist or do not belong to you"));
+    }
+
+    private Account update(Account toEdit, AccountTO source) {
+        toEdit.setName(source.getName());
+        return toEdit;
     }
 
     @Override
