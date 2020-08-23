@@ -1,33 +1,36 @@
 package pl.sg.accountant.transport;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
-public class TransactionTO {
+public class FinancialTransactionTO {
     private int id;
     String description;
     AccountTO source;
     AccountTO destination;
     private BigDecimal debit;
     private BigDecimal credit;
+    private LocalDateTime timeOfTransaction;
 
 
-    public TransactionTO() {
+    public FinancialTransactionTO() {
     }
 
-    public TransactionTO(int id, String description, AccountTO source, AccountTO destination, BigDecimal debit, BigDecimal credit) {
+    public FinancialTransactionTO(int id, String description, AccountTO source, AccountTO destination, BigDecimal debit, BigDecimal credit, LocalDateTime timeOfTransaction) {
         this.id = id;
         this.description = description;
         this.source = source;
         this.destination = destination;
         this.debit = debit;
         this.credit = credit;
+        this.timeOfTransaction = timeOfTransaction;
     }
 
     public int getId() {
         return id;
     }
 
-    public TransactionTO setId(int id) {
+    public FinancialTransactionTO setId(int id) {
         this.id = id;
         return this;
     }
@@ -36,7 +39,7 @@ public class TransactionTO {
         return description;
     }
 
-    public TransactionTO setDescription(String description) {
+    public FinancialTransactionTO setDescription(String description) {
         this.description = description;
         return this;
     }
@@ -45,7 +48,7 @@ public class TransactionTO {
         return source;
     }
 
-    public TransactionTO setSource(AccountTO source) {
+    public FinancialTransactionTO setSource(AccountTO source) {
         this.source = source;
         return this;
     }
@@ -54,7 +57,7 @@ public class TransactionTO {
         return destination;
     }
 
-    public TransactionTO setDestination(AccountTO destination) {
+    public FinancialTransactionTO setDestination(AccountTO destination) {
         this.destination = destination;
         return this;
     }
@@ -63,7 +66,7 @@ public class TransactionTO {
         return debit;
     }
 
-    public TransactionTO setDebit(BigDecimal debit) {
+    public FinancialTransactionTO setDebit(BigDecimal debit) {
         this.debit = debit;
         return this;
     }
@@ -72,8 +75,17 @@ public class TransactionTO {
         return credit;
     }
 
-    public TransactionTO setCredit(BigDecimal credit) {
+    public FinancialTransactionTO setCredit(BigDecimal credit) {
         this.credit = credit;
+        return this;
+    }
+
+    public LocalDateTime getTimeOfTransaction() {
+        return timeOfTransaction;
+    }
+
+    public FinancialTransactionTO setTimeOfTransaction(LocalDateTime timeOfTransaction) {
+        this.timeOfTransaction = timeOfTransaction;
         return this;
     }
 }

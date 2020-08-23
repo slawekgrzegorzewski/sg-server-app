@@ -6,12 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.ApplicationUserRepository;
 import pl.sg.application.security.annotations.TokenBearerAuth;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.io.IOException;
 
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
@@ -20,6 +23,7 @@ import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 @RequestMapping("/login")
 @Slf4j
 @CrossOrigin
+@Validated
 public class LoginController {
 
     private static final String TOKEN_PREFIX = "Bearer";
@@ -36,7 +40,7 @@ public class LoginController {
     }
 
     @PostMapping
-    public ResponseEntity<String> login(@RequestBody User user, @RequestHeader("x-tfa") String token) {
+    public String login(@RequestBody @Valid User user, @RequestHeader("x-tfa") String token) {
         String uname = user.getName();
         String upass = user.getPass();
         if (uname == null || upass == null || "".equals(uname.trim()) || "".equals(upass.trim())) {
@@ -51,13 +55,13 @@ public class LoginController {
             throw new BadCredentialsException("Wrong 2FA code");
         }
         String jwt = authorizationService.generateJWTToken(uname, firstByLogin.getRoles());
-        return ResponseEntity.ok().body(HEADER_STRING + ": " + TOKEN_PREFIX + " " + jwt);
+        return HEADER_STRING + ": " + TOKEN_PREFIX + " " + jwt;
     }
 
     @GetMapping("/verify")
     @TokenBearerAuth
-    public ResponseEntity<String> verify() {
-        return ResponseEntity.ok().body("OK");
+    public String verify() {
+        return "OK";
     }
 
     @ExceptionHandler({BadCredentialsException.class})
@@ -69,7 +73,9 @@ public class LoginController {
     }
 
     public static class User {
+        @NotBlank
         private String name;
+        @NotBlank
         private String pass;
 
         public User() {

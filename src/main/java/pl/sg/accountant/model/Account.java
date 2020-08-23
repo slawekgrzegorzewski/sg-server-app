@@ -1,9 +1,11 @@
 package pl.sg.accountant.model;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import pl.sg.application.model.ApplicationUser;
 
+import javax.persistence.*;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.util.Currency;
 
@@ -17,6 +19,8 @@ public class Account {
     @NotNull
     private Currency currency;
     @Column(columnDefinition = "numeric(19,2) default 0")
+    @Digits(integer = Integer.MAX_VALUE, fraction = 2)
+    @PositiveOrZero
     @NotNull
     private BigDecimal currentBalance = new BigDecimal(0);
     @ManyToOne
@@ -73,5 +77,15 @@ public class Account {
 
     public void setApplicationUser(ApplicationUser applicationUser) {
         this.applicationUser = applicationUser;
+    }
+
+    public void debit(FinancialTransaction financialTransaction) {
+        this.lastTransactionIncludedInBalance = financialTransaction;
+        this.currentBalance = this.currentBalance.subtract(financialTransaction.getDebit());
+    }
+
+    public void credit(FinancialTransaction financialTransaction) {
+        this.lastTransactionIncludedInBalance = financialTransaction;
+        this.currentBalance = this.currentBalance.add(financialTransaction.getCredit());
     }
 }

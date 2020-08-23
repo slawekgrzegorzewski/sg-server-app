@@ -6,11 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.ApplicationUserRepository;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -19,6 +22,7 @@ import static pl.sg.twofa.QRCode.fromApplicationUser;
 @RestController
 @RequestMapping("/register")
 @Slf4j
+@Validated
 public class RegistrationController {
 
     public static final String APP_NAME = "accountant";
@@ -32,7 +36,7 @@ public class RegistrationController {
     }
 
     @PostMapping
-    public ResponseEntity<String> registerUser(@RequestBody User user) {
+    public String registerUser(@RequestBody @Valid User user) {
         String uname = user.getName();
         String upass = user.getPass();
         if (uname == null || upass == null || "".equals(uname.trim()) || "".equals(upass.trim())) {
@@ -46,11 +50,11 @@ public class RegistrationController {
         applicationUser.setLogin(uname);
         applicationUser.setPassword(passwordEncoder.encode(upass));
         applicationUserRepository.save(applicationUser);
-        return ResponseEntity.ok().body(fromApplicationUser(APP_NAME, applicationUser).qrLink());
+        return fromApplicationUser(APP_NAME, applicationUser).qrLink();
     }
 
     @PostMapping("/setup2FA")
-    public ResponseEntity<String> setup2FA(@RequestBody User user) {
+    public String setup2FA(@RequestBody @Valid User user) {
         ApplicationUser firstByLogin = applicationUserRepository.findFirstByLogin(user.getName()).orElseThrow(() -> new RuntimeException("Wrong user/password"));
         if (!passwordEncoder.matches(user.getPass(), firstByLogin.getPassword())) {
             throw new BadCredentialsException("Wrong user/password");
@@ -64,7 +68,7 @@ public class RegistrationController {
         }
         firstByLogin.setUsing2FA(true);
         applicationUserRepository.save(firstByLogin);
-        return ResponseEntity.ok().body("It's good");
+        return "It's good";
     }
 
     @ExceptionHandler({BadCredentialsException.class})
@@ -76,8 +80,11 @@ public class RegistrationController {
     }
 
     public static class User {
+        @NotBlank
         private String name;
+        @NotBlank
         private String pass;
+        @NotBlank
         private Integer secretFor2FA;
 
         public User() {

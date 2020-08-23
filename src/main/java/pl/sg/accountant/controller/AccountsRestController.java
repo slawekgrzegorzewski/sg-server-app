@@ -3,26 +3,23 @@ package pl.sg.accountant.controller;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.sg.accountant.model.Account;
-import pl.sg.accountant.model.FinancialTransaction;
 import pl.sg.accountant.service.AccountsService;
-import pl.sg.accountant.service.AccountstException;
 import pl.sg.accountant.transport.AccountTO;
-import pl.sg.accountant.transport.TransactionTO;
 import pl.sg.application.ForbiddenException;
-import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.security.annotations.RequestUser;
 import pl.sg.application.security.annotations.TokenBearerAuth;
 
 import javax.validation.Valid;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/accounts")
+@Validated
 public class AccountsRestController implements AccountsController {
     private final AccountsService accountsService;
     private final ModelMapper mapper;
@@ -34,12 +31,16 @@ public class AccountsRestController implements AccountsController {
 
     @Override
     @GetMapping
+    @TokenBearerAuth(any = {"ADMIN"})
+    public List<AccountTO> allAccounts() {
+        return map(accountsService.getAll());
+    }
+
+    @Override
+    @GetMapping("/mine")
     @TokenBearerAuth(any = {"ADMIN", "USER"})
-    public ResponseEntity<List<AccountTO>> accounts(@RequestUser ApplicationUser user) {
-        final List<String> roles = user.getRoles();
-        if (roles.contains("ADMIN"))
-            return ResponseEntity.ok(map(accountsService.getAll()));
-        return ResponseEntity.ok(map(accountsService.getForUser(user.getLogin())));
+    public List<AccountTO> userAccounts(@RequestUser(RequestUser.LOGIN) String login) {
+        return map(accountsService.getForUser(login));
     }
 
     private List<AccountTO> map(List<Account> accounts) {
@@ -49,12 +50,12 @@ public class AccountsRestController implements AccountsController {
     @Override
     @PutMapping
     @TokenBearerAuth(any = {"ADMIN", "USER"})
-    public ResponseEntity<AccountTO> createAccount(
+    public AccountTO createAccount(
             @RequestBody @Valid AccountTO account,
             @RequestUser(RequestUser.LOGIN) String login) {
         Account toCreate = mapper.map(account, Account.class);
         accountsService.createAccount(toCreate, login);
-        return ResponseEntity.ok(mapper.map(toCreate, AccountTO.class));
+        return mapper.map(toCreate, AccountTO.class);
     }
 
     @Override
@@ -93,23 +94,5 @@ public class AccountsRestController implements AccountsController {
         } else {
             throw new ForbiddenException("You can only delete accounts which belongs to you");
         }
-    }
-
-    @Override
-    @PostMapping("/transfer/{from}/{to}/{amount}")
-    @TokenBearerAuth(all = "ADMIN")
-    public ResponseEntity<TransactionTO> transfer(
-            @PathVariable("from") int fromId,
-            @PathVariable("to") int toId,
-            @PathVariable("amount") BigDecimal amount,
-            @RequestBody String description,
-            @RequestUser(RequestUser.LOGIN) String login) throws AccountstException {
-        FinancialTransaction result = accountsService.transferMoneyWithoutConversion(
-                fromId,
-                toId,
-                amount,
-                description,
-                login);
-        return ResponseEntity.ok(mapper.map(result, TransactionTO.class));
     }
 }

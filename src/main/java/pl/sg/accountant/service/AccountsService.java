@@ -14,9 +14,6 @@ public interface AccountsService {
 
     void createAccount(Account account, String userName);
 
-    FinancialTransaction transferMoneyWithoutConversion(int sourceAccount, int destinationAccount, BigDecimal amount,
-                                                        String description, String userName) throws AccountstException;
-
     void update(Account account);
 
     void delete(Account account);

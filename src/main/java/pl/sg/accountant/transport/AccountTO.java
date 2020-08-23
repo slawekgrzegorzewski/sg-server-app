@@ -1,16 +1,21 @@
 package pl.sg.accountant.transport;
 
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.util.Currency;
-import javax.validation.constraints.NotNull;
 
 public class AccountTO {
     private Integer id;
-    @NotNull
+    @NotBlank
     private String name;
     @NotNull
     private Currency currency;
     @NotNull
+    @Digits(integer = Integer.MAX_VALUE, fraction = 2)
+    @PositiveOrZero
     private BigDecimal currentBalance;
     private int balanceIndex;
     @NotNull

@@ -1,23 +1,20 @@
 package pl.sg.accountant.controller;
 
 import org.springframework.http.ResponseEntity;
-import pl.sg.accountant.service.AccountstException;
 import pl.sg.accountant.transport.AccountTO;
-import pl.sg.accountant.transport.TransactionTO;
-import pl.sg.application.model.ApplicationUser;
 
-import java.math.BigDecimal;
+import javax.validation.Valid;
 import java.util.List;
 
 public interface AccountsController {
 
-    ResponseEntity<List<AccountTO>> accounts(ApplicationUser applicationUser);
+    List<AccountTO> allAccounts();
 
-    ResponseEntity<AccountTO> createAccount(AccountTO account, String login);
+    List<AccountTO> userAccounts(String login);
 
-    ResponseEntity<String> updateAccount(AccountTO account, String login);
+    AccountTO createAccount(@Valid AccountTO account, String login);
+
+    ResponseEntity<String> updateAccount(@Valid AccountTO account, String login);
 
     ResponseEntity<String> deleteAccount(Integer id, String login);
-
-    ResponseEntity<TransactionTO> transfer(int fromId, int toId, BigDecimal amount, String description, String login) throws AccountstException;
 }
