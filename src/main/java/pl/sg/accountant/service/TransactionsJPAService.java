@@ -33,6 +33,15 @@ public class TransactionsJPAService implements TransactionsService {
     public FinancialTransaction transferMoneyWithoutConversion(int sourceAccount, int destinationAccount,
                                                                BigDecimal amount, String description,
                                                                ApplicationUser user) throws AccountsException {
+        return transfer(sourceAccount, destinationAccount, description, user, amount, amount, BigDecimal.ONE);
+    }
+
+    @Override
+    public FinancialTransaction transferMoneyWithConversion(int sourceAccount, int destinationAccount, BigDecimal amount, BigDecimal targetAmount, BigDecimal rate, String description, ApplicationUser user) throws AccountsException {
+        return transfer(sourceAccount, destinationAccount, description, user, amount, targetAmount, rate);
+    }
+
+    private FinancialTransaction transfer(int sourceAccount, int destinationAccount, String description, ApplicationUser user, BigDecimal amount, BigDecimal targetAmount, BigDecimal rate) throws AccountsException {
         Account from = accountRepository.getOne(sourceAccount);
         Account to = accountRepository.getOne(destinationAccount);
         validateUserOwnsTheAccount(from, user);
@@ -40,8 +49,13 @@ public class TransactionsJPAService implements TransactionsService {
         FinancialTransaction financialTransaction = new FinancialTransaction()
                 .setTimeOfTransaction(LocalDateTime.now())
                 .setDescription(description)
-                .transfer(from, to, amount)
+                .setTimeOfTransaction(LocalDateTime.now())
                 .setApplicationUser(user);
+        if (amount.equals(targetAmount)) {
+            financialTransaction.transfer(from, to, amount);
+        } else {
+            financialTransaction.transfer(from, to, amount, targetAmount, rate);
+        }
         financialTransaction = financialTransactionRepository.save(financialTransaction);
         from.debit(financialTransaction);
         to.credit(financialTransaction);

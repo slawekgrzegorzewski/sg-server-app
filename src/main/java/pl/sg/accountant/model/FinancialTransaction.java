@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
 @Entity
@@ -101,11 +102,16 @@ public class FinancialTransaction {
 
     public FinancialTransaction transfer(Account from, Account to, BigDecimal amount) throws AccountsException {
         validateSameCurrency(from, to);
+        return transfer(from, to, amount, amount, BigDecimal.ONE);
+    }
+
+    public FinancialTransaction transfer(Account from, Account to, BigDecimal amount, BigDecimal targetAmount, BigDecimal rate) throws AccountsException {
         validateEnoughMoney(from, amount);
+        validateRate(amount, targetAmount, rate);
         this.source = from;
         this.destination = to;
-        this.credit = amount;
         this.debit = amount;
+        this.credit = targetAmount;
         return this;
     }
 
@@ -136,6 +142,12 @@ public class FinancialTransaction {
 
     private void validateEnoughMoney(Account account, BigDecimal amount) throws AccountsException {
         if (account.getCurrentBalance().compareTo(amount) < 0) {
+            throw new AccountsException("Not enough money");
+        }
+    }
+
+    private void validateRate(BigDecimal amount, BigDecimal targetAmount, BigDecimal rate) throws AccountsException {
+        if (!amount.multiply(rate).setScale(2, RoundingMode.HALF_UP).equals(targetAmount)) {
             throw new AccountsException("Not enough money");
         }
     }

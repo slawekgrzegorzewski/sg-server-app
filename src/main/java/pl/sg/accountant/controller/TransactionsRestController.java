@@ -11,6 +11,7 @@ import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.security.annotations.RequestUser;
 import pl.sg.application.security.annotations.TokenBearerAuth;
 
+import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.util.List;
@@ -48,6 +49,21 @@ public class TransactionsRestController implements TransactionsController {
             @RequestBody String description,
             @RequestUser ApplicationUser user) throws AccountsException {
         FinancialTransaction result = transactionsService.transferMoneyWithoutConversion(fromId, toId, amount, description, user);
+        return mapper.map(result, FinancialTransactionTO.class);
+    }
+
+    @Override
+    @PostMapping("/transfer_with_conversion/{from}/{to}/{amount}/{targetAmount}/{rate}")
+    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    public FinancialTransactionTO transferWithConversion(
+            @PathVariable("from") int fromId,
+            @PathVariable("to") int toId,
+            @PathVariable("amount") @PositiveOrZero BigDecimal amount,
+            @PathVariable("targetAmount") @PositiveOrZero BigDecimal targetAmount,
+            @PathVariable("rate") @Positive BigDecimal rate,
+            @RequestBody String description,
+            @RequestUser ApplicationUser user) throws AccountsException {
+        FinancialTransaction result = transactionsService.transferMoneyWithConversion(fromId, toId, amount, targetAmount, rate, description, user);
         return mapper.map(result, FinancialTransactionTO.class);
     }
 
