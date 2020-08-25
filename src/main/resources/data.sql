@@ -20,11 +20,11 @@ VALUES (4, null, 'PLN', 0.0, 'Konto a', 1),
        (8, null, 'USD', 0.0, 'Konto e', 1),
        (9, null, 'USD', 0.0, 'Konto f', 1),
 
-       (10, null, 'PLN', 0.0, 'Konto g', 2),
-       (11, null, 'PLN', 0.0, 'Konto h', 2),
-       (12, null, 'EUR', 0.0, 'Konto i', 2),
-       (13, null, 'EUR', 0.0, 'Konto j', 2),
-       (14, null, 'USD', 0.0, 'Konto k', 2),
+       (10, null, 'PLN', 3100.0, 'Konto g', 2),
+       (11, null, 'PLN', 50000.0, 'Konto h', 2),
+       (12, null, 'EUR', 1150.0, 'Konto i', 2),
+       (13, null, 'EUR', 1000.0, 'Konto j', 2),
+       (14, null, 'USD', 3.5, 'Konto k', 2),
        (15, null, 'USD', 0.0, 'Konto l', 2),
 
        (16, null, 'PLN', 0.0, 'Konto m', 3),
@@ -54,16 +54,17 @@ SELECT nextval('hibernate_sequence');
 SELECT nextval('hibernate_sequence');
 SELECT nextval('hibernate_sequence');
 
--- INSERT INTO financial_transaction (id, credit, debit, description, time_of_transaction, application_user_id,
---                                    destination_id, source_id)
--- VALUES (22, 0.00, 0.00, 'a', now() + (1 ||' minutes')::interval, 2, 4, 20),
---        (23, 0.00, 0.00, 'b', now() + (2 ||' minutes')::interval, 1, 11, 20),
---        (24, 0.00, 0.00, 'c', now() + (3 ||' minutes')::interval, 3, 4, 11),
---        (25, 0.00, 0.00, 'd', now() + (4 ||' minutes')::interval, 2, 11, 20),
---        (26, 0.00, 0.00, 'e', now() + (5 ||' minutes')::interval, 2, 4, 11),
---        (27, 0.00, 0.00, 'f', now() + (6 ||' minutes')::interval, 2, 11, 12),
---        (28, 0.00, 0.00, 'g', now() + (7 ||' minutes')::interval, 1, 4, 5);
+INSERT INTO public.financial_transaction (id, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id)
+VALUES (29, 200.00, 0.00, 'Savings', '2020-08-25 14:07:38.731184', 2, 12, null),
+       (30, 0.00, 50.00, 'For a road ticket', '2020-08-25 14:08:00.475559', 2, null, 12),
+       (31, 2000.00, 0.00, 'Holiday''s work', '2020-08-25 14:08:17.393654', 2, 13, null),
+       (32, 1000.00, 1000.00, 'On holidays', '2020-08-25 14:10:51.545252', 2, 12, 13),
+       (33, 4500.00, 0.00, 'Wypłata', '2020-08-25 14:11:48.044368', 2, 10, null),
+       (34, 0.00, 1400.00, 'Mieszkanie', '2020-08-25 14:12:03.476252', 2, null, 10),
+       (35, 50000.00, 0.00, 'Oszczędności', '2020-08-25 14:12:14.534483', 2, 11, null),
+       (36, 3.50, 0.00, 'Lol', '2020-08-25 14:12:36.740926', 2, 14, null);
 
+SELECT nextval('hibernate_sequence');
 SELECT nextval('hibernate_sequence');
 SELECT nextval('hibernate_sequence');
 SELECT nextval('hibernate_sequence');

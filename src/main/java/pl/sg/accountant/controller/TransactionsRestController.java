@@ -39,7 +39,7 @@ public class TransactionsRestController implements TransactionsController {
     }
 
     @Override
-    @PostMapping("/{from}/{to}/{amount}")
+    @PostMapping("/transfer/{from}/{to}/{amount}")
     @TokenBearerAuth(any = {"ADMIN", "USER"})
     public FinancialTransactionTO transfer(
             @PathVariable("from") int fromId,
