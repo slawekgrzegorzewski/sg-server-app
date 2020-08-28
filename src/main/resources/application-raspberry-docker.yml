@@ -1,12 +1,12 @@
 server:
-  port: 8081
+  port: 8080
 spring:
   datasource:
     hikari:
       connectionTimeout: 20000
       maximumPoolSize: 5
     password: SLAwek1!
-    url: jdbc:postgresql://localhost:5432/accountant
+    url: jdbc:postgresql://accountant-db:5432/accountant
     username: postgres
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect

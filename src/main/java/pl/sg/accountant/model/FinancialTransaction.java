@@ -147,7 +147,9 @@ public class FinancialTransaction {
     }
 
     private void validateRate(BigDecimal amount, BigDecimal targetAmount, BigDecimal rate) throws AccountsException {
-        if (!amount.multiply(rate).setScale(2, RoundingMode.HALF_UP).equals(targetAmount)) {
+        BigDecimal calculation = amount.multiply(rate).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal roundedTarget = targetAmount.setScale(2, RoundingMode.HALF_UP);
+        if (!calculation.equals(roundedTarget)) {
             throw new AccountsException("Not enough money");
         }
     }

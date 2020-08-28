@@ -3,7 +3,6 @@ package pl.sg.application.security;
 import lombok.extern.slf4j.Slf4j;
 import org.jboss.aerogear.security.otp.Totp;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
@@ -84,7 +83,6 @@ public class RegistrationController {
         private String name;
         @NotBlank
         private String pass;
-        @NotBlank
         private Integer secretFor2FA;
 
         public User() {

@@ -38,6 +38,8 @@ dependencies {
 
     implementation("org.modelmapper:modelmapper:2.3.6")
     implementation("org.jboss.aerogear:aerogear-otp-java:1.0.0")
+    implementation ("jakarta.xml.bind:jakarta.xml.bind-api:2.3.3")
+    implementation ("org.glassfish.jaxb:jaxb-runtime:2.3.3")
 
     compileOnly("org.projectlombok:lombok:1.18.8")
     compileOnly("org.springframework.boot:spring-boot-devtools:2.3.3.RELEASE")
@@ -60,9 +62,10 @@ dependencies {
 
 
 tasks.clean.get().doFirst {
-    val dockerDir = Paths.get(project.rootDir.absolutePath, "docker", "development");
+    val dockerDir = Paths.get(project.rootDir.absolutePath, "docker", "production", "raspberry");
     delete(dockerDir.resolve("application.yml"))
     delete(dockerDir.resolve("accountant.jar"))
+    delete(dockerDir.resolve("data.sql"))
 }
 
 val jar by tasks.getting(Jar::class);
@@ -72,10 +75,13 @@ tasks.register<Copy>("toDocker") {
     from(jar.archiveFile) {
         rename { "accountant.jar" }
     }
-    from(Paths.get(project.rootDir.absolutePath, "src", "main", "resources", "application-dev-docker.yml")) {
+    from(Paths.get(project.rootDir.absolutePath, "src", "main", "resources", "application-raspberry-docker.yml")) {
         rename { "application.yml" }
     }
-    destinationDir = Paths.get(project.rootDir.absolutePath, "docker", "development").toFile()
+    from(Paths.get(project.rootDir.absolutePath, "src", "main", "resources", "data.sql")) {
+        rename { "data.sql" }
+    }
+    destinationDir = Paths.get(project.rootDir.absolutePath, "docker", "production", "raspberry").toFile()
 }
 
 apply(from = "$rootDir/integrationTest.gradle.kts")
