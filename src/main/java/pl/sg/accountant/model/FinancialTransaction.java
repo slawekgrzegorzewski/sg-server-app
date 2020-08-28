@@ -25,6 +25,7 @@ public class FinancialTransaction {
     Account destination;
     private BigDecimal debit;
     private BigDecimal credit;
+    private BigDecimal conversionRate;
     @ManyToOne
     private ApplicationUser applicationUser;
     private LocalDateTime timeOfTransaction;
@@ -82,6 +83,15 @@ public class FinancialTransaction {
         return this;
     }
 
+    public BigDecimal getConversionRate() {
+        return conversionRate;
+    }
+
+    public FinancialTransaction setConversionRate(BigDecimal conversionRate) {
+        this.conversionRate = conversionRate;
+        return this;
+    }
+
     public ApplicationUser getApplicationUser() {
         return applicationUser;
     }
@@ -112,10 +122,12 @@ public class FinancialTransaction {
         this.destination = to;
         this.debit = amount;
         this.credit = targetAmount;
+        this.conversionRate = rate;
         return this;
     }
 
     public FinancialTransaction transfer(Account account, BigDecimal amount, OperationType operationType) throws AccountsException {
+        this.conversionRate = BigDecimal.ONE;
         switch (operationType) {
             case DEBIT:
                 validateEnoughMoney(account, amount);
