@@ -1,9 +1,8 @@
 package pl.sg.accountant.service;
 
 import org.springframework.stereotype.Component;
-import pl.sg.accountant.model.Account;
+import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.repository.AccountRepository;
-import pl.sg.accountant.repository.FinancialTransactionRepository;
 import pl.sg.application.model.ApplicationUserRepository;
 
 import java.util.List;

@@ -1,6 +1,6 @@
 package pl.sg.accountant.model.validation;
 
-import pl.sg.accountant.model.FinancialTransaction;
+import pl.sg.accountant.model.accounts.FinancialTransaction;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

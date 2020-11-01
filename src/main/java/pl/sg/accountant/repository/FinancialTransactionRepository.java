@@ -1,7 +1,7 @@
 package pl.sg.accountant.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import pl.sg.accountant.model.FinancialTransaction;
+import pl.sg.accountant.model.accounts.FinancialTransaction;
 
 import java.util.List;
 

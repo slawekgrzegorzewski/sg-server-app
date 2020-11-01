@@ -1,13 +1,13 @@
 package pl.sg.accountant.service;
 
-import java.math.BigDecimal;
+import pl.sg.accountant.model.accounts.Account;
+
 import java.util.List;
 import java.util.Optional;
-import pl.sg.accountant.model.Account;
-import pl.sg.accountant.model.FinancialTransaction;
 
 public interface AccountsService {
     Optional<Account> findById(Integer id);
+
     List<Account> getAll();
 
     List<Account> getForUser(String userName);

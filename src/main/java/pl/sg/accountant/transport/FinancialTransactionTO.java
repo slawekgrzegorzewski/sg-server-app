@@ -1,5 +1,7 @@
 package pl.sg.accountant.transport;
 
+import pl.sg.accountant.transport.accounts.AccountTO;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 

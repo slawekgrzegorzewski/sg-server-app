@@ -1,5 +1,6 @@
-package pl.sg.accountant.model;
+package pl.sg.accountant.model.accounts;
 
+import pl.sg.accountant.model.OperationType;
 import pl.sg.accountant.model.validation.AccountTransaction;
 import pl.sg.accountant.service.AccountsException;
 import pl.sg.application.model.ApplicationUser;

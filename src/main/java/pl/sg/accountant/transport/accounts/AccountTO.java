@@ -1,4 +1,4 @@
-package pl.sg.accountant.transport;
+package pl.sg.accountant.transport.accounts;
 
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotBlank;
