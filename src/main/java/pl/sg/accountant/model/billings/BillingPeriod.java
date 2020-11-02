@@ -1,5 +1,6 @@
 package pl.sg.accountant.model.billings;
 
+import pl.sg.application.database.YearMonthStringAttributeConverter;
 import pl.sg.application.model.ApplicationUser;
 
 import javax.persistence.*;
@@ -15,6 +16,7 @@ public class BillingPeriod {
     @NotNull
     private String name;
     @NotNull
+    @Convert(converter = YearMonthStringAttributeConverter.class)
     private YearMonth period;
     @OneToMany(mappedBy = "billingPeriod")
     private List<Income> incomes;
