@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  db:
+    build: ./database
+    image: accountant-db:1.0.0
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: SLAwek1!
+    container_name: accountant-db
+    networks:
+      app_net:
+        ipv4_address: 172.16.238.10
+
+  app:
+    build: ./backend
+    image: accountant-backend:1.0.0
+    container_name: accountant-backend
+    ports:
+      - "8080:8080"
+    environment:
+      JWT_TOKEN: dupa
+    networks:
+      app_net:
+        ipv4_address: 172.16.238.11
+
+  client:
+    build: ./client
+    image: accountant-client:1.0.0
+    restart: always
+    ports:
+      - "80:80"
+    container_name: accountant-client
+    networks:
+      app_net:
+        ipv4_address: 172.16.238.12
+
+volumes:
+  postgres-data:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/postgres
+
+networks:
+  app_net:
+    driver: bridge
+    enable_ipv6: false
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.238.0/24
+          gateway: 172.16.238.1

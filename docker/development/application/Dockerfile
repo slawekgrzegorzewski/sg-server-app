@@ -1,5 +1,9 @@
 #Installation
-FROM base:1.0.0
+FROM ubuntu:20.04
+RUN export DEBIAN_FRONTEND=noninteractive && \
+    apt-get update && \
+    apt install -y gnupg && \
+    apt install -y postgresql postgresql-contrib
 
 #App
 EXPOSE 8081
