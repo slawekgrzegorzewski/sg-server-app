@@ -1,5 +1,5 @@
 import java.nio.file.Path
-import java.nio.file.Paths;
+import java.nio.file.Paths
 
 plugins {
     id("org.springframework.boot") version "2.3.3.RELEASE" apply true
@@ -102,6 +102,16 @@ tasks.register<Copy>("toDockerPC") {
 
     doFirst {
         delete("${destination}")
+    }
+
+    doLast {
+        val files = pl.sg.build.FilesToConvertingToUnixFilter(listOf("yml", "Dockerfile", "sql", "sh", "json", "conf"))
+                .textFiles(destination)
+        val convertToUnixLineEndings = pl.sg.build.ConvertToUnixLineEndings()
+        files.forEach { file -> convertToUnixLineEndings.forFile(file)}
+        convertToUnixLineEndings.convert();
+
+        pl.sg.build.GenerateJwtToken().forFile(destination.resolve("docker-compose.yml")).convert()
     }
 
     from(jar.archiveFile) {

@@ -1,2 +1,4 @@
 #!/bin/bash
-sudo docker-compose -f docker-compose.yml --tlsverify --tlscacert /home/slag/.docker/ca.pem --tlscert /home/slag/.docker/cert.pem --tlskey /home/slag/.docker/key.pem up
+mkdir -p /home/slag/Accountant/database-data
+chmod 777 /home/slag/Accountant/database-data
+sudo docker-compose -f docker-compose.yml up -d
