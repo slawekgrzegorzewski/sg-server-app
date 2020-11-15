@@ -32,8 +32,8 @@ public class GenerateJwtToken {
     }
 
     private String randomString(int length) {
-        int leftLimit = 48;
-        int rightLimit = 126;
+        int leftLimit = 65;
+        int rightLimit = 90;
         Random random = new Random();
 
         String generatedString = random.ints(leftLimit, rightLimit + 1)
