@@ -1,9 +1,8 @@
 package pl.sg.accountant.transport.billings;
 
-import pl.sg.accountant.transport.CurrencyTO;
-
 import java.math.BigDecimal;
 import java.util.Currency;
+import java.util.Date;
 
 public class IncomeTO {
     private int id;
@@ -11,16 +10,18 @@ public class IncomeTO {
     private BigDecimal amount;
     private Currency currency;
     private CategoryTO category;
+    private Date incomeDate;
 
     public IncomeTO() {
     }
 
-    public IncomeTO(int id, String description, BigDecimal amount, Currency currency, CategoryTO category) {
+    public IncomeTO(int id, String description, BigDecimal amount, Currency currency, CategoryTO category, Date incomeDate) {
         this.id = id;
         this.description = description;
         this.amount = amount;
         this.currency = currency;
         this.category = category;
+        this.incomeDate = incomeDate;
     }
 
     public int getId() {
@@ -61,5 +62,14 @@ public class IncomeTO {
 
     public void setCategory(CategoryTO category) {
         this.category = category;
+    }
+
+    public Date getIncomeDate() {
+        return incomeDate;
+    }
+
+    public IncomeTO setIncomeDate(Date incomeDate) {
+        this.incomeDate = incomeDate;
+        return this;
     }
 }

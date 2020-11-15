@@ -4,6 +4,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Currency;
+import java.util.Date;
 
 @Entity
 public class Income {
@@ -20,6 +21,7 @@ public class Income {
     private Currency currency;
     @ManyToOne(optional = false, cascade = CascadeType.MERGE)
     private Category category;
+    private Date incomeDate;
 
     public Income() {
     }
@@ -66,5 +68,14 @@ public class Income {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public Date getIncomeDate() {
+        return incomeDate;
+    }
+
+    public Income setIncomeDate(Date incomeDate) {
+        this.incomeDate = incomeDate;
+        return this;
     }
 }

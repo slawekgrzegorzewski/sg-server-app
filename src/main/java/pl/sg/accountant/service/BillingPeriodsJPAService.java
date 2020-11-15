@@ -13,6 +13,7 @@ import pl.sg.application.model.ApplicationUser;
 import java.math.BigDecimal;
 import java.time.YearMonth;
 import java.util.Currency;
+import java.util.Date;
 import java.util.Optional;
 
 @Component
@@ -61,6 +62,9 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
         validateCurrency(account, income.getCurrency());
         transactionsService.credit(account.getId(), income.getAmount(), income.getDescription(), user);
         income.setBillingPeriod(billingPeriod);
+        if(income.getIncomeDate() == null){
+            income.setIncomeDate(new Date());
+        }
         incomeRepository.save(income);
     }
 
@@ -70,6 +74,9 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
         validateAmount(account, expense.getAmount());
         transactionsService.debit(account.getId(), expense.getAmount(), expense.getDescription(), user);
         expense.setBillingPeriod(billingPeriod);
+        if(expense.getDescription() == null){
+            expense.setExpenseDate(new Date());
+        }
         expenseRepository.save(expense);
     }
 

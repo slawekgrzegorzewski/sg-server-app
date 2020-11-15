@@ -7,6 +7,7 @@ import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Currency;
+import java.util.Date;
 
 @Entity
 public class Expense {
@@ -23,6 +24,7 @@ public class Expense {
     private Currency currency;
     @ManyToOne(optional = false)
     private Category category;
+    private Date expenseDate;
 
     public Expense() {
     }
@@ -69,5 +71,14 @@ public class Expense {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public Date getExpenseDate() {
+        return expenseDate;
+    }
+
+    public Expense setExpenseDate(Date expenseDate) {
+        this.expenseDate = expenseDate;
+        return this;
     }
 }
