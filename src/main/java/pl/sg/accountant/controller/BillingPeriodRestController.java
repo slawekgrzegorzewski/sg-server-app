@@ -3,24 +3,44 @@ package pl.sg.accountant.controller;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.sg.accountant.service.BillingPeriodsService;
+import pl.sg.accountant.model.accounts.Account;
+import pl.sg.accountant.model.billings.BillingPeriod;
+import pl.sg.accountant.model.billings.Category;
+import pl.sg.accountant.model.billings.Expense;
+import pl.sg.accountant.model.billings.Income;
+import pl.sg.accountant.service.*;
 import pl.sg.accountant.transport.billings.BillingPeriodTO;
+import pl.sg.accountant.transport.billings.CategoryTO;
+import pl.sg.accountant.transport.billings.ExpenseTO;
+import pl.sg.accountant.transport.billings.IncomeTO;
 import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.security.annotations.RequestUser;
 import pl.sg.application.security.annotations.TokenBearerAuth;
 
 import javax.validation.constraints.NotNull;
 import java.time.YearMonth;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/billing-periods")
 public class BillingPeriodRestController implements BillingPeriodController {
 
     private final BillingPeriodsService billingPeriodsService;
+    private final CategoryService categoryService;
+    private final TransactionsService transactionsService;
+    private final AccountsService accountsService;
     private final ModelMapper mapper;
 
-    public BillingPeriodRestController(BillingPeriodsService billingPeriodsService, ModelMapper mapper) {
+    public BillingPeriodRestController(BillingPeriodsService billingPeriodsService,
+                                       CategoryService categoryService,
+                                       TransactionsService transactionsService,
+                                       AccountsService accountsService,
+                                       ModelMapper mapper) {
         this.billingPeriodsService = billingPeriodsService;
+        this.categoryService = categoryService;
+        this.transactionsService = transactionsService;
+        this.accountsService = accountsService;
         this.mapper = mapper;
     }
 
@@ -43,7 +63,7 @@ public class BillingPeriodRestController implements BillingPeriodController {
         return this.billingPeriodsService.findByPeriodAndUser(month, user)
                 .map(period -> mapper.map(period, BillingPeriodTO.class))
                 .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.badRequest().body(null));
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @Override
@@ -67,5 +87,58 @@ public class BillingPeriodRestController implements BillingPeriodController {
                 .map(period -> mapper.map(period, BillingPeriodTO.class))
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.badRequest().body(null));
+    }
+
+    @Override
+    @GetMapping("/categories")
+    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    public ResponseEntity<List<CategoryTO>> getAllCategories(@RequestUser ApplicationUser user) {
+        return ResponseEntity.ok(
+                categoryService.getAllForUser(user).stream()
+                        .map(category -> mapper.map(category, CategoryTO.class))
+                        .collect(Collectors.toList())
+        );
+    }
+
+    @Override
+    @PutMapping("/categories")
+    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    public ResponseEntity<CategoryTO> addCategory(@RequestBody CategoryTO categoryTO, @RequestUser ApplicationUser user) throws AccountsException {
+        Category created;
+        if (categoryTO.getId() == null) {
+            created = categoryService.create(mapper.map(categoryTO, Category.class), user);
+        } else {
+            Category category = categoryService.findByIdAndApplicationUser(categoryTO.getId(), user)
+                    .orElseThrow(() -> new AccountsException("Category to update does not exist."));
+            mapper.map(categoryTO, category);
+            created = categoryService.update(categoryTO.getId(), category, user);
+        }
+        return ResponseEntity.ok(mapper.map(created, CategoryTO.class));
+    }
+
+    @Override
+    @PutMapping("/{periodId}/income/{accountId}")
+    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    public ResponseEntity<String> createIncome(@PathVariable int periodId, @PathVariable int accountId,
+                                               @RequestBody IncomeTO incomeTO,
+                                               @RequestUser ApplicationUser user) throws AccountsException {
+        Account account = accountsService.getById(accountId);
+        BillingPeriod billingPeriod = billingPeriodsService.getById(periodId);
+        Income income = mapper.map(incomeTO, Income.class);
+        billingPeriodsService.addIncome(billingPeriod, account, income, user);
+        return ResponseEntity.ok("OK");
+    }
+
+    @Override
+    @PutMapping("/{periodId}/expense/{accountId}")
+    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    public ResponseEntity<String> createExpense(@PathVariable int periodId, @PathVariable int accountId,
+                                               @RequestBody ExpenseTO expenseTO,
+                                               @RequestUser ApplicationUser user) throws AccountsException {
+        Account account = accountsService.getById(accountId);
+        BillingPeriod billingPeriod = billingPeriodsService.getById(periodId);
+        Expense expense = mapper.map(expenseTO, Expense.class);
+        billingPeriodsService.addExpense(billingPeriod, account, expense, user);
+        return ResponseEntity.ok("OK");
     }
 }

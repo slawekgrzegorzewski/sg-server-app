@@ -1,5 +1,7 @@
 package pl.sg.accountant.model.billings;
 
+import pl.sg.application.model.ApplicationUser;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -8,19 +10,26 @@ import java.util.List;
 public class Category {
     @Id
     @GeneratedValue
-    private int id;
+    private Integer id;
     @NotNull
     private String name;
     @NotNull
     private String description;
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     private List<Income> incomesOfThisType;
+    @ManyToOne
+    private ApplicationUser applicationUser;
 
     public Category() {
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
+    }
+
+    public Category setId(Integer id) {
+        this.id = id;
+        return this;
     }
 
     public String getName() {
@@ -45,5 +54,14 @@ public class Category {
 
     public void setIncomesOfThisType(List<Income> income) {
         this.incomesOfThisType = income;
+    }
+
+    public ApplicationUser getApplicationUser() {
+        return applicationUser;
+    }
+
+    public Category setApplicationUser(ApplicationUser applicationUser) {
+        this.applicationUser = applicationUser;
+        return this;
     }
 }

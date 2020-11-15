@@ -1,20 +1,36 @@
 package pl.sg.accountant.service;
 
 import org.springframework.stereotype.Component;
+import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.model.billings.BillingPeriod;
+import pl.sg.accountant.model.billings.Expense;
+import pl.sg.accountant.model.billings.Income;
 import pl.sg.accountant.repository.BillingPeriodRepository;
+import pl.sg.accountant.repository.ExpenseRepository;
+import pl.sg.accountant.repository.IncomeRepository;
 import pl.sg.application.model.ApplicationUser;
 
+import java.math.BigDecimal;
 import java.time.YearMonth;
+import java.util.Currency;
 import java.util.Optional;
 
 @Component
 public class BillingPeriodsJPAService implements BillingPeriodsService {
 
     private final BillingPeriodRepository billingPeriodRepository;
+    private final IncomeRepository incomeRepository;
+    private final ExpenseRepository expenseRepository;
+    private final TransactionsService transactionsService;
 
-    public BillingPeriodsJPAService(BillingPeriodRepository billingPeriodRepository) {
+    public BillingPeriodsJPAService(BillingPeriodRepository billingPeriodRepository,
+                                    IncomeRepository incomeRepository,
+                                    ExpenseRepository expenseRepository,
+                                    TransactionsService transactionsService) {
         this.billingPeriodRepository = billingPeriodRepository;
+        this.incomeRepository = incomeRepository;
+        this.expenseRepository = expenseRepository;
+        this.transactionsService = transactionsService;
     }
 
     @Override
@@ -38,5 +54,34 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
                 .setApplicationUser(user);
         billingPeriodRepository.save(period);
         return Optional.of(period.getId());
+    }
+
+    @Override
+    public void addIncome(BillingPeriod billingPeriod, Account account, Income income, ApplicationUser user) throws AccountsException {
+        validateCurrency(account, income.getCurrency());
+        transactionsService.credit(account.getId(), income.getAmount(), income.getDescription(), user);
+        income.setBillingPeriod(billingPeriod);
+        incomeRepository.save(income);
+    }
+
+    @Override
+    public void addExpense(BillingPeriod billingPeriod, Account account, Expense expense, ApplicationUser user) throws AccountsException {
+        validateCurrency(account, expense.getCurrency());
+        validateAmount(account, expense.getAmount());
+        transactionsService.debit(account.getId(), expense.getAmount(), expense.getDescription(), user);
+        expense.setBillingPeriod(billingPeriod);
+        expenseRepository.save(expense);
+    }
+
+    private void validateAmount(Account account, BigDecimal amount) throws AccountsException {
+        if (account.getCurrentBalance().compareTo(amount) < 0) {
+            throw new AccountsException("There is not enough money for that expense.");
+        }
+    }
+
+    private void validateCurrency(Account account, Currency currency) throws AccountsException {
+        if (!account.getCurrency().equals(currency)) {
+            throw new AccountsException("Account and income currencies differ");
+        }
     }
 }

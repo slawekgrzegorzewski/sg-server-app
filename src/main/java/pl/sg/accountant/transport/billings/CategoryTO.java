@@ -1,7 +1,7 @@
 package pl.sg.accountant.transport.billings;
 
 public class CategoryTO {
-    private int id;
+    private Integer id;
     private String name;
     private String description;
 
@@ -14,7 +14,7 @@ public class CategoryTO {
         this.description = description;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

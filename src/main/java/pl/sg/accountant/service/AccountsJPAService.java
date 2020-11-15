@@ -26,6 +26,11 @@ public class AccountsJPAService implements AccountsService {
     }
 
     @Override
+    public Account getById(Integer id) {
+        return accountRepository.getOne(id);
+    }
+
+    @Override
     public List<Account> getAll() {
         return accountRepository.findAll();
     }

@@ -1,9 +1,6 @@
 package pl.sg.accountant.model.billings;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Currency;
@@ -21,7 +18,7 @@ public class Income {
     private BigDecimal amount;
     @NotNull
     private Currency currency;
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, cascade = CascadeType.MERGE)
     private Category category;
 
     public Income() {

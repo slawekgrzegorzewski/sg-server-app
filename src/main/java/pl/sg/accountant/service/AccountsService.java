@@ -8,6 +8,8 @@ import java.util.Optional;
 public interface AccountsService {
     Optional<Account> findById(Integer id);
 
+    Account getById(Integer id);
+
     List<Account> getAll();
 
     List<Account> getForUser(String userName);

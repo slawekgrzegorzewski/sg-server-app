@@ -43,3 +43,6 @@ VALUES (nextval('hibernate_sequence'), 200.00, 0.00, 'Savings', '2020-08-25 14:0
        (nextval('hibernate_sequence'), 0.00, 1400.00, 'Mieszkanie', '2020-08-25 14:12:03.476252', 2, null, 10),
        (nextval('hibernate_sequence'), 50000.00, 0.00, 'Oszczędności', '2020-08-25 14:12:14.534483', 2, 11, null),
        (nextval('hibernate_sequence'), 3.50, 0.00, 'Lol', '2020-08-25 14:12:36.740926', 2, 14, null);
+
+INSERT INTO category(id, name, description, application_user_id)
+VALUES(nextval('hibernate_sequence'), 'Jedzenie', 'Wydatki na żywność', 2);
