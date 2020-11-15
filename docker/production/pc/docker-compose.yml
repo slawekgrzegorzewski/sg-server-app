@@ -1,20 +1,6 @@
 version: '3.8'
 
 services:
-  db:
-    build: ./database
-    image: accountant-db:1.0.0
-    restart: always
-    ports:
-      - "5432:5432"
-    volumes:
-      - /home/slag/Accountant/database-data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_PASSWORD: SLAwek1!
-    container_name: accountant-db
-    networks:
-      app_net:
-        ipv4_address: 172.16.238.10
 
   app:
     build: ./backend

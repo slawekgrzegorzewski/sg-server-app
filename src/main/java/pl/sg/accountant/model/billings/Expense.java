@@ -1,11 +1,10 @@
 package pl.sg.accountant.model.billings;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Currency;
 import java.util.Date;
 
@@ -17,6 +16,7 @@ public class Expense {
     @ManyToOne
     private BillingPeriod billingPeriod;
     @NotNull
+    @Column(length = 2000)
     private String description;
     @NotNull
     private BigDecimal amount;
@@ -24,7 +24,7 @@ public class Expense {
     private Currency currency;
     @ManyToOne(optional = false)
     private Category category;
-    private Date expenseDate;
+    private LocalDate expenseDate;
 
     public Expense() {
     }
@@ -73,11 +73,11 @@ public class Expense {
         this.category = category;
     }
 
-    public Date getExpenseDate() {
+    public LocalDate getExpenseDate() {
         return expenseDate;
     }
 
-    public Expense setExpenseDate(Date expenseDate) {
+    public Expense setExpenseDate(LocalDate expenseDate) {
         this.expenseDate = expenseDate;
         return this;
     }

@@ -3,6 +3,8 @@ package pl.sg.accountant.model.billings;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Currency;
 import java.util.Date;
 
@@ -14,6 +16,7 @@ public class Income {
     @ManyToOne
     private BillingPeriod billingPeriod;
     @NotNull
+    @Column(length = 2000)
     private String description;
     @NotNull
     private BigDecimal amount;
@@ -21,7 +24,7 @@ public class Income {
     private Currency currency;
     @ManyToOne(optional = false, cascade = CascadeType.MERGE)
     private Category category;
-    private Date incomeDate;
+    private LocalDate incomeDate;
 
     public Income() {
     }
@@ -70,11 +73,11 @@ public class Income {
         this.category = category;
     }
 
-    public Date getIncomeDate() {
+    public LocalDate getIncomeDate() {
         return incomeDate;
     }
 
-    public Income setIncomeDate(Date incomeDate) {
+    public Income setIncomeDate(LocalDate incomeDate) {
         this.incomeDate = incomeDate;
         return this;
     }
