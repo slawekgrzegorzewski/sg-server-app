@@ -1,5 +1,8 @@
 package pl.sg.accountant.model;
 
+import pl.sg.accountant.model.accounts.Account;
+import pl.sg.accountant.model.accounts.FinancialTransaction;
+
 import java.util.function.BiConsumer;
 
 public enum OperationType {

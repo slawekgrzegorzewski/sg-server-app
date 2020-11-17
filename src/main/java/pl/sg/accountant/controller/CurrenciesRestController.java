@@ -14,8 +14,9 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/currency")
-public class CurrenciesRestController {
+public class CurrenciesRestController implements CurrenciesController {
 
+    @Override
     @RequestMapping(value = "/all/{locale}", method = RequestMethod.GET)
     @TokenBearerAuth
     public List<CurrencyTO> accounts(@PathVariable Locale locale) {

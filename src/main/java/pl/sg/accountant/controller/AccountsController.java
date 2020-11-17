@@ -1,7 +1,7 @@
 package pl.sg.accountant.controller;
 
 import org.springframework.http.ResponseEntity;
-import pl.sg.accountant.transport.AccountTO;
+import pl.sg.accountant.transport.accounts.AccountTO;
 
 import javax.validation.Valid;
 import java.util.List;

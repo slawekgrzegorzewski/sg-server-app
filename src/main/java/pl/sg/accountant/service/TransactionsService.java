@@ -1,6 +1,6 @@
 package pl.sg.accountant.service;
 
-import pl.sg.accountant.model.FinancialTransaction;
+import pl.sg.accountant.model.accounts.FinancialTransaction;
 import pl.sg.application.model.ApplicationUser;
 
 import java.math.BigDecimal;

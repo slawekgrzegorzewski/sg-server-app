@@ -1,13 +1,11 @@
-package pl.sg.accountant.model;
+package pl.sg.accountant.model.accounts;
 
+import pl.sg.accountant.model.OperationType;
 import pl.sg.accountant.model.validation.AccountTransaction;
 import pl.sg.accountant.service.AccountsException;
 import pl.sg.application.model.ApplicationUser;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -18,6 +16,7 @@ public class FinancialTransaction {
     @Id
     @GeneratedValue
     private int id;
+    @Column(length = 2000)
     String description;
     @ManyToOne
     Account source;
