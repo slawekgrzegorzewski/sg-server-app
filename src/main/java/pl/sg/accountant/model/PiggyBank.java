@@ -1,13 +1,10 @@
 package pl.sg.accountant.model;
 
-import pl.sg.accountant.model.billings.BillingPeriod;
-import pl.sg.accountant.model.billings.Category;
 import pl.sg.application.model.ApplicationUser;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Currency;
 
 @Entity
@@ -24,6 +21,9 @@ public class PiggyBank {
     private BigDecimal balance;
     @NotNull
     private Currency currency;
+    @Column(columnDefinition = "boolean default false")
+    private boolean savings;
+    private BigDecimal monthlyTopUp;
     @ManyToOne
     private ApplicationUser applicationUser;
 
@@ -70,12 +70,30 @@ public class PiggyBank {
         return this;
     }
 
+    public boolean isSavings() {
+        return savings;
+    }
+
+    public PiggyBank setSavings(boolean savings) {
+        this.savings = savings;
+        return this;
+    }
+
     public ApplicationUser getApplicationUser() {
         return applicationUser;
     }
 
     public PiggyBank setApplicationUser(ApplicationUser applicationUser) {
         this.applicationUser = applicationUser;
+        return this;
+    }
+
+    public BigDecimal getMonthlyTopUp() {
+        return monthlyTopUp;
+    }
+
+    public PiggyBank setMonthlyTopUp(BigDecimal monthlyTopUp) {
+        this.monthlyTopUp = monthlyTopUp;
         return this;
     }
 }
