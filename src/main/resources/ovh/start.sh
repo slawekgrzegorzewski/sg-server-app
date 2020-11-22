@@ -3,10 +3,6 @@
 sudo pkill -f 'ng'
 sudo pkill -f 'java'
 
-cd /home/slag/sg-application/client
-#npm install
-npm run startProdHttps 1>/home/slag/sg-application/client/logs/log.txt 2>/home/slag/sg-application/client/logs/error.txt &
-
 export JWT_TOKEN="aofasfIUIOONNgfdsngoi8291519689"
 export spring_profiles_active=https
 

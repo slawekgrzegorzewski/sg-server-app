@@ -19,7 +19,7 @@ spring:
 
 server:
   ssl:
-    key-store: "/home/slag/sg-application/certssgapplication.p12"
+    key-store: "/home/slag/sg-application/certs/sgapplication.p12"
     key-store-password: "fill_at_server"
     key-store-type: pkcs12
     key-alias: sg-application
