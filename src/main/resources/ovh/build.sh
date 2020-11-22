@@ -1,6 +1,5 @@
 #!/bin/bash
 
-sudo pkill -f 'ng'
 sudo pkill -f 'java'
 
 cd /home/slag/sg-application/client

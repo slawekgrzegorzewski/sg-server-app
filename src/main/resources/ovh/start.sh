@@ -1,6 +1,5 @@
 #!/bin/bash
 
-sudo pkill -f 'ng'
 sudo pkill -f 'java'
 
 export JWT_TOKEN="aofasfIUIOONNgfdsngoi8291519689"
