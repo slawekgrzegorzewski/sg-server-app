@@ -75,6 +75,16 @@ fun Build_gradle.cleanDockerDir(dockerDir: Path) {
     delete(dockerDir.resolve("data.sql"))
 }
 
+
+tasks.withType<Jar> {
+    exclude(
+            "ovh",
+            "application.yml",
+            "application-pc-docker.yml",
+            "application-raspberry-docker.yml",
+            "data.sql")
+}
+
 val jar by tasks.getting(Jar::class);
 
 tasks.register<Copy>("toDockerRaspberry") {
@@ -108,7 +118,7 @@ tasks.register<Copy>("toDockerPC") {
         val files = pl.sg.build.FilesToConvertingToUnixFilter(listOf("yml", "Dockerfile", "sql", "sh", "json", "conf"))
                 .textFiles(destination)
         val convertToUnixLineEndings = pl.sg.build.ConvertToUnixLineEndings()
-        files.forEach { file -> convertToUnixLineEndings.forFile(file)}
+        files.forEach { file -> convertToUnixLineEndings.forFile(file) }
         convertToUnixLineEndings.convert();
 
         pl.sg.build.GenerateJwtToken().forFile(destination.resolve("docker-compose.yml")).convert()
@@ -167,7 +177,7 @@ tasks.register<Copy>("toOVH") {
         val files = pl.sg.build.FilesToConvertingToUnixFilter(listOf("yml", "Dockerfile", "sql", "sh", "json", "conf"))
                 .textFiles(destination)
         val convertToUnixLineEndings = pl.sg.build.ConvertToUnixLineEndings()
-        files.forEach { file -> convertToUnixLineEndings.forFile(file)}
+        files.forEach { file -> convertToUnixLineEndings.forFile(file) }
         convertToUnixLineEndings.convert();
     }
 
