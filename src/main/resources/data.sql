@@ -1,48 +1,206 @@
-INSERT INTO application_user (id, email, first_name, last_name, login, password, is_using2fa, secret)
-VALUES (nextval('hibernate_sequence'), 'slawek.grz@gmail.com', E'Sławomir', 'Grzegorzewski', 'guest',
-        '$2a$10$NdTPC0d6I29aI0ob8dxBBOPm5dBEzIjJrtFYEwFQ4zly0DwdVaHwq', true, 'NBJH44TOJV7FWSKS'),
-       (nextval('hibernate_sequence'), 'slawek.grz@gmail.com', 'Sławomir', 'Grzegorzewski', 'admin',
-        '$2a$10$mqExUZDgfcnyomq3shnMKeoaHf3okGbLjd1IG2vP5ONdG7A61P4dW', true, 'NBJH44TOJV7FWSKS'),
-       (nextval('hibernate_sequence'), 'slawek.grz@gmail.com', E'Sławomir', 'Grzegorzewski', 'guest2',
-        '$2a$10$NdTPC0d6I29aI0ob8dxBBOPm5dBEzIjJrtFYEwFQ4zly0DwdVaHwq', true, 'NBJH44TOJV7FWSKS');
+DELETE FROM piggy_bank;
+DELETE FROM expense;
+DELETE FROM income;
+DELETE FROM category;
+UPDATE account SET last_transaction_included_in_balance_id = null;
+DELETE FROM financial_transaction;
+DELETE FROM account;
+DELETE FROM billing_period;
+DELETE FROM application_user_roles;
+DELETE FROM application_user;
 
-INSERT INTO application_user_roles (application_user_id, roles)
-VALUES (1, 'USER'),
-       (2, 'ADMIN'),
-       (3, 'USER');
 
-INSERT INTO account(id, last_transaction_included_in_balance_id, currency, current_balance, name, application_user_id)
-VALUES (nextval('hibernate_sequence'), null, 'PLN', 0.0, 'Konto a', 1),
-       (nextval('hibernate_sequence'), null, 'PLN', 0.0, 'Konto b', 1),
-       (nextval('hibernate_sequence'), null, 'EUR', 0.0, 'Konto c', 1),
-       (nextval('hibernate_sequence'), null, 'EUR', 0.0, 'Konto d', 1),
-       (nextval('hibernate_sequence'), null, 'USD', 0.0, 'Konto e', 1),
-       (nextval('hibernate_sequence'), null, 'USD', 0.0, 'Konto f', 1),
+INSERT INTO public.application_user (id, email, first_name, is_using2fa, last_name, login, password, secret) VALUES (1, null, null, true, null, 'slag', '$2a$11$aX3oqxqxAuKbso5ngTgqeejZtBdcjwVLARtUT8ZIIqv91vtcl74lq', 'LRWWUMSQGJFWCUKQ');
 
-       (nextval('hibernate_sequence'), null, 'PLN', 3100.0, 'Konto g', 2),
-       (nextval('hibernate_sequence'), null, 'PLN', 50000.0, 'Konto h', 2),
-       (nextval('hibernate_sequence'), null, 'EUR', 1150.0, 'Konto i', 2),
-       (nextval('hibernate_sequence'), null, 'EUR', 1000.0, 'Konto j', 2),
-       (nextval('hibernate_sequence'), null, 'USD', 3.5, 'Konto k', 2),
-       (nextval('hibernate_sequence'), null, 'USD', 0.0, 'Konto l', 2),
+INSERT INTO public.application_user_roles (application_user_id, roles) VALUES (1, 'ADMIN');
+INSERT INTO public.application_user_roles (application_user_id, roles) VALUES (1, 'USER');
 
-       (nextval('hibernate_sequence'), null, 'PLN', 0.0, 'Konto m', 3),
-       (nextval('hibernate_sequence'), null, 'PLN', 0.0, 'Konto n', 3),
-       (nextval('hibernate_sequence'), null, 'EUR', 0.0, 'Konto o', 3),
-       (nextval('hibernate_sequence'), null, 'EUR', 0.0, 'Konto p', 3),
-       (nextval('hibernate_sequence'), null, 'USD', 0.0, 'Konto r', 3),
-       (nextval('hibernate_sequence'), null, 'USD', 0.0, 'Konto s', 3);
+INSERT INTO public.account (id, currency, current_balance, name, application_user_id, last_transaction_included_in_balance_id) VALUES (4, 'PLN', 40.52, 'Gotówka', 1, null);
+INSERT INTO public.account (id, currency, current_balance, name, application_user_id, last_transaction_included_in_balance_id) VALUES (3, 'PLN', 64488.16, 'Konto poboczne', 1, null);
+INSERT INTO public.account (id, currency, current_balance, name, application_user_id, last_transaction_included_in_balance_id) VALUES (2, 'PLN', 0.00, 'Konto główne', 1, null);
+INSERT INTO public.account (id, currency, current_balance, name, application_user_id, last_transaction_included_in_balance_id) VALUES (5, 'PLN', 0.00, 'Revolut', 1, null);
+INSERT INTO public.account (id, currency, current_balance, name, application_user_id, last_transaction_included_in_balance_id) VALUES (103, 'PLN', 50218.03, 'Konto oszczędnościowe', 1, null);
 
-INSERT INTO public.financial_transaction (id, credit, debit, description, time_of_transaction, application_user_id,
-                                          destination_id, source_id)
-VALUES (nextval('hibernate_sequence'), 200.00, 0.00, 'Savings', '2020-08-25 14:07:38.731184', 2, 12, null),
-       (nextval('hibernate_sequence'), 0.00, 50.00, 'For a road ticket', '2020-08-25 14:08:00.475559', 2, null, 12),
-       (nextval('hibernate_sequence'), 2000.00, 0.00, 'Holiday''s work', '2020-08-25 14:08:17.393654', 2, 13, null),
-       (nextval('hibernate_sequence'), 1000.00, 1000.00, 'On holidays', '2020-08-25 14:10:51.545252', 2, 12, 13),
-       (nextval('hibernate_sequence'), 4500.00, 0.00, 'Wypłata', '2020-08-25 14:11:48.044368', 2, 10, null),
-       (nextval('hibernate_sequence'), 0.00, 1400.00, 'Mieszkanie', '2020-08-25 14:12:03.476252', 2, null, 10),
-       (nextval('hibernate_sequence'), 50000.00, 0.00, 'Oszczędności', '2020-08-25 14:12:14.534483', 2, 11, null),
-       (nextval('hibernate_sequence'), 3.50, 0.00, 'Lol', '2020-08-25 14:12:36.740926', 2, 14, null);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (6, 1.00, 46605.82, 0.00, 'Stan początkowy', '2020-11-01 19:45:23.240000', 1, 3, null);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (8, 1.00, 100.00, 100.00, 'Wypłata z bankomatu', '2020-11-01 19:48:13.179000', 1, 4, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (9, 1.00, 246.10, 246.10, 'Pozostałe z października', '2020-11-01 19:48:45.706000', 1, 3, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (10, 1.00, 1700.00, 1700.00, 'Pieniądze na listopad', '2020-11-01 19:49:20.560000', 1, 2, 3);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (13, 1.00, 5669.16, 0.00, 'Wypłata Ali', '2020-11-02 19:51:44.895000', 1, 3, null);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (15, 1.00, 0.00, 63.73, 'Mobi parking Ala', '2020-11-03 19:52:38.778000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (20, 1.00, 0.00, 98.99, 'Apteka - Ala', '2020-11-03 19:54:29.949000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (22, 1.00, 0.00, 46.68, 'Oliwa', '2020-11-03 19:54:50.856000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (17, 1.00, 0.00, 44.85, 'Stokrotka', '2020-11-03 19:53:48.828000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (27, 1.00, 0.00, 16.80, 'Piekarnia', '2020-11-04 20:16:33.347000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (25, 1.00, 0.00, 33.49, 'Luna - leopardus', '2020-11-04 19:57:47.909000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (29, 1.00, 0.00, 14.27, 'Apteka - Ala', '2020-11-04 20:30:16.739000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (32, 1.00, 0.00, 20.00, 'Gry', '2020-11-04 20:40:02.633000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (34, 1.00, 0.00, 30.57, 'Mobi parking - Ala', '2020-11-05 20:43:53.426000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (38, 1.00, 0.00, 20.00, 'Datek na Salę Królestwa', '2020-11-05 21:00:56.475000', 1, null, 3);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (36, 1.00, 0.00, 50.00, 'Datek na ogólnoświatową działalność', '2020-11-05 20:45:41.513000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (42, 1.00, 0.00, 133.65, 'Lidl', '2020-11-06 21:02:46.535000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (44, 1.00, 0.00, 30.13, 'Lidl', '2020-11-06 21:03:49.774000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (40, 1.00, 0.00, 169.31, 'Kaufland', '2020-11-06 21:02:22.652000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (52, 1.00, 0.00, 30.65, 'Hot dogi w czasie podróży na szkolenie', '2020-11-07 21:24:11.905000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (55, 1.00, 0.00, 29.99, 'Spotify', '2020-11-07 21:25:08.186000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (50, 1.00, 0.00, 48.00, 'Opłaty z autostradę', '2020-11-07 21:23:36.999000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (60, 1.00, 0.00, 48.00, 'Opłaty za autostradę', '2020-11-08 21:28:26.318000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (58, 1.00, 0.00, 26.00, 'Enea', '2020-11-08 21:27:24.291000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (62, 1.00, 331.20, 331.20, 'Zwrot za wydatki niezwiązane z życiem', '2020-11-09 21:29:46.137000', 1, 2, 3);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (63, 1.00, 0.00, 9.00, 'Pączki', '2020-11-09 21:30:38.482000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (70, 1.00, 0.00, 20.00, '20', '2020-11-09 21:32:21.285000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (68, 1.00, 0.00, 6.50, 'Poczta - przesłanie aktu ślubu do zakładu pogrzebowego', '2020-11-09 21:31:49.728000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (65, 1.00, 0.00, 18.17, 'Stokrotka', '2020-11-09 21:30:57.950000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (72, 1.00, 0.00, 25.88, 'Słodycze', '2020-11-10 21:33:57.343000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (74, 1.00, 9.74, 0.00, 'Stan początkowy', '2020-11-01 21:34:47.101000', 1, 5, null);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (75, 1.00, 9.74, 9.74, 'Transfer z Revolut', '2020-11-10 21:37:15.333000', 1, 3, 5);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (77, 1.00, 15195.32, 0.00, 'Pierwsza wypłata z Satago', '2020-11-10 21:38:58.176000', 1, 3, null);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (80, 1.00, 0.00, 67.00, 'pyszne.pl', '2020-11-11 21:40:42.181000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (86, 1.00, 0.00, 3.99, 'Żabka', '2020-11-12 21:44:05.711000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (82, 1.00, 0.00, 38.00, 'pyszne.pl', '2020-11-12 21:41:36.888000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (84, 1.00, 0.00, 39.00, 'pyszne.pl', '2020-11-12 21:41:55.959000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (90, 1.00, 0.00, 28.60, 'Zwrot paczki z polarami', '2020-11-12 21:45:17.540000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (88, 1.00, 0.00, 23.37, 'Stokrotka', '2020-11-12 21:44:31.657000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (95, 1.00, 0.00, 60.00, 'Weterynarz', '2020-11-13 21:47:12.241000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (99, 1.00, 0.00, 17.47, 'Stokrotka', '2020-11-13 21:51:50.308000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (97, 1.00, 0.00, 281.18, '1Password - roczna subskrypcja (73,62 USD)', '2020-11-13 21:51:17.628000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (93, 1.00, 0.00, 15.00, 'Squash - Sławek', '2020-11-13 21:46:46.403000', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (101, 1.00, 0.00, 60.00, 'Składki na drobne wydatki w czasie tropienia', '2020-11-15 21:53:30.004869', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (7, 1.00, 324.18, 0.00, 'Stan początkowy', '2020-11-01 19:47:11.660000', 1, 2, null);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (104, 1.00, 50218.03, 0.00, 'Stan początkowy', '2020-11-01 22:03:33.324000', 1, 103, null);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (105, 1.00, 0.00, 100.00, 'Brakujące pieniądze do wynagrodzenia Hani Ćwiek', '2020-11-01 22:07:05.163000', 1, null, 4);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (112, 1.00, 444.78, 444.78, 'Zwrot za następujące transakcje:
+2020-11-12 PLN28.60 - Zwrot paczki z polarami (Firma Ali)
+2020-11-13 PLN281.18 - 1Password - roczna subskrypcja (73,62 USD) (Subskrybcje)
+2020-11-13 PLN15.00 - Squash - Sławek (Sport)
+2020-11-13 PLN60.00 - Weterynarz (Zwierzęta)
+2020-11-15 PLN60.00 - Składki na drobne wydatki w czasie tropienia (Szkolenia - Ala)', '2020-11-15 22:25:04.069369', 1, 2, 3);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (114, 1.00, 0.00, 54.97, 'Chemia + kosmetyki', '2020-11-16 21:14:27.463749', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (116, 1.00, 0.00, 397.42, 'Jedzenie - Kaufland', '2020-11-16 21:15:04.316340', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (118, 1.00, 0.00, 30.57, 'MobiParking Ala', '2020-11-16 21:16:51.630214', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (120, 1.00, 30.57, 30.57, 'Zwrot za opłaty za Ali firmę', '2020-11-16 21:19:11.047030', 1, 2, 3);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (121, 1.00, 0.00, 25.78, 'Ciastka', '2020-11-17 18:37:47.932319', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (123, 1.00, 0.00, 8.00, 'Ala podpaski', '2020-11-17 18:38:11.562058', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (125, 1.00, 0.00, 3.87, 'Śmietana', '2020-11-17 18:39:29.675895', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (129, 1.00, 0.00, 302.00, 'LuxMed', '2020-11-18 10:50:55.099280', 1, null, 3);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (131, 1.00, 0.00, 40.60, 'Zrzutka na ebook o komunikacji psów', '2020-11-18 11:15:45.464194', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (133, 1.00, 40.60, 40.60, 'Za książkę Ali', '2020-11-18 11:16:20.844235', 1, 2, 3);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (168, 1.00, 0.00, 60.15, 'Internet za listopad', '2020-11-18 21:17:34.297808', 1, null, 3);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (170, 1.00, 0.00, 20.00, 'Ciastka', '2020-11-19 14:53:04.828930', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (172, 1.00, 0.00, 69.74, 'Ala kosmetyki', '2020-11-20 22:53:50.492679', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (174, 1.00, 0.00, 20.05, 'Stokrotka', '2020-11-20 22:54:19.616821', 1, null, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (176, 1.00, 100.00, 100.00, 'Wypłata z bankomatu na warzywa', '2020-11-21 15:04:56.114438', 1, 4, 2);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (177, 1.00, 0.00, 59.48, 'Warzywa', '2020-11-21 15:05:39.835628', 1, null, 4);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (179, 1.00, 308.68, 308.68, 'Na zakupy w kauflandzie', '2020-11-21 15:07:24.049302', 1, 2, 3);
+INSERT INTO public.financial_transaction (id, conversion_rate, credit, debit, description, time_of_transaction, application_user_id, destination_id, source_id) VALUES (180, 1.00, 0.00, 414.64, 'Jedzenie', '2020-11-21 15:08:16.043463', 1, null, 2);
 
-INSERT INTO category(id, name, description, application_user_id)
-VALUES(nextval('hibernate_sequence'), 'Jedzenie', 'Wydatki na żywność', 2);
+INSERT INTO public.category (id, description, name, application_user_id) VALUES (12, 'Pieniądze z wypłaty', 'Wypłata Ali', 1);
+INSERT INTO public.category (id, description, name, application_user_id) VALUES (16, 'Wydatki na żywność z wyłączeniem dowozów', 'Jedzenie', 1);
+INSERT INTO public.category (id, description, name, application_user_id) VALUES (19, 'Wydatki na zdrowie', 'Apteka', 1);
+INSERT INTO public.category (id, description, name, application_user_id) VALUES (24, 'Wydatki na jedzenie + plus weterynarza', 'Zwierzęta', 1);
+INSERT INTO public.category (id, description, name, application_user_id) VALUES (31, 'Wydatki na gry elektroniczne', 'Gry', 1);
+INSERT INTO public.category (id, description, name, application_user_id) VALUES (35, 'Datki na ŚJ', 'Datki', 1);
+INSERT INTO public.category (id, description, name, application_user_id) VALUES (46, 'Wydatki firmowe z prywatnego konta', 'Firma Ali', 1);
+INSERT INTO public.category (id, description, name, application_user_id) VALUES (49, 'Pieniądze na kursy Ali', 'Szkolenia - Ala', 1);
+INSERT INTO public.category (id, description, name, application_user_id) VALUES (54, 'Wydatki na subskrypcje  elektroniczne', 'Subskrybcje', 1);
+INSERT INTO public.category (id, description, name, application_user_id) VALUES (57, 'Wydatki związane z rozliczeniem spadku po ojcu Ali', 'Ojciec Ali', 1);
+INSERT INTO public.category (id, description, name, application_user_id) VALUES (67, 'Inne', 'Inne', 1);
+INSERT INTO public.category (id, description, name, application_user_id) VALUES (76, 'Pieniądze z wypłaty', 'Wypłata Sławek', 1);
+INSERT INTO public.category (id, description, name, application_user_id) VALUES (79, 'Wydatki jedzenie z dowozów', 'Jedzenie - zamawiane', 1);
+INSERT INTO public.category (id, description, name, application_user_id) VALUES (92, 'Wydatki związane ze sportem', 'Sport', 1);
+INSERT INTO public.category (id, description, name, application_user_id) VALUES (113, 'Chemia domowa + kosmetyki', 'Chemia', 1);
+INSERT INTO public.category (id, description, name, application_user_id) VALUES (128, 'Opłaty za usługi medyczne', 'LuxMed', 1);
+INSERT INTO public.category (id, description, name, application_user_id) VALUES (167, 'Wydatki na internet', 'Internet', 1);
+
+INSERT INTO public.billing_period (id, name, period, application_user_id) VALUES (11, '2020-11', '2020-11', 1);
+
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (18, 44.85, 'PLN', 'Stokrotka', '2020-11-03 19:53:48.957000', 11, 16);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (28, 16.80, 'PLN', 'Piekarnia', '2020-11-04 21:27:33.000000', 11, 16);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (30, 14.27, 'PLN', 'Apteka - Ala', '2020-11-04 00:00:00.000000', 11, 19);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (21, 98.99, 'PLN', 'Apteka - Ala', '2020-11-03 19:54:30.103000', 11, 19);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (26, 33.49, 'PLN', 'Luna - leopardus', '2020-11-04 19:57:48.065000', 11, 24);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (23, 46.68, 'PLN', 'Oliwa', '2020-11-03 19:54:51.004000', 11, 16);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (33, 20.00, 'PLN', 'Gry', '2020-11-04 00:00:00.000000', 11, 31);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (37, 50.00, 'PLN', 'Datek na ogólnoświatową działalność', '2020-11-05 00:00:00.000000', 11, 35);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (39, 20.00, 'PLN', 'Datek na Salę Królestwa', '2020-11-05 00:00:00.000000', 11, 35);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (41, 169.31, 'PLN', 'Kaufland', '2020-11-06 00:00:00.000000', 11, 16);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (43, 133.65, 'PLN', 'Lidl', '2020-11-06 00:00:00.000000', 11, 16);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (45, 30.13, 'PLN', 'Lidl', '2020-11-06 00:00:00.000000', 11, 16);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (47, 63.73, 'PLN', 'MobiParking Ala', '2020-11-03 19:54:51.004000', 11, 46);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (48, 30.57, 'PLN', 'MobiParking Ala', '2020-11-03 19:54:51.004000', 11, 46);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (51, 48.00, 'PLN', 'Opłaty z autostradę', '2020-11-07 00:00:00.000000', 11, 49);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (53, 30.65, 'PLN', 'Hot dogi w czasie podróży na szkolenie', '2020-11-07 00:00:00.000000', 11, 49);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (56, 29.99, 'PLN', 'Spotify', '2020-11-07 00:00:00.000000', 11, 54);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (59, 26.00, 'PLN', 'Enea', '2020-11-08 00:00:00.000000', 11, 57);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (61, 48.00, 'PLN', 'Opłaty za autostradę', '2020-11-08 00:00:00.000000', 11, 49);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (64, 9.00, 'PLN', 'Pączki', '2020-11-09 00:00:00.000000', 11, 16);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (66, 18.17, 'PLN', 'Stokrotka', '2020-11-09 00:00:00.000000', 11, 16);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (69, 6.50, 'PLN', 'Poczta - przesłanie aktu ślubu do zakładu pogrzebowego', '2020-11-09 00:00:00.000000', 11, 67);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (71, 20.00, 'PLN', 'Weterynarz', '2020-11-09 00:00:00.000000', 11, 24);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (73, 25.88, 'PLN', 'Słodycze', '2020-11-10 00:00:00.000000', 11, 16);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (81, 67.00, 'PLN', 'pyszne.pl', '2020-11-11 00:00:00.000000', 11, 79);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (83, 38.00, 'PLN', 'pyszne.pl', '2020-11-12 00:00:00.000000', 11, 79);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (85, 39.00, 'PLN', 'pyszne.pl', '2020-11-12 00:00:00.000000', 11, 79);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (87, 3.99, 'PLN', 'Żabka', '2020-11-12 00:00:00.000000', 11, 16);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (89, 23.37, 'PLN', 'Stokrotka', '2020-11-12 00:00:00.000000', 11, 16);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (91, 28.60, 'PLN', 'Zwrot paczki z polarami', '2020-11-12 00:00:00.000000', 11, 46);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (94, 15.00, 'PLN', 'Squash - Sławek', '2020-11-13 00:00:00.000000', 11, 92);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (96, 60.00, 'PLN', 'Weterynarz', '2020-11-13 00:00:00.000000', 11, 24);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (98, 281.18, 'PLN', '1Password - roczna subskrypcja (73,62 USD)', '2020-11-13 00:00:00.000000', 11, 54);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (100, 17.47, 'PLN', 'Stokrotka', '2020-11-13 00:00:00.000000', 11, 16);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (102, 60.00, 'PLN', 'Składki na drobne wydatki w czasie tropienia', '2020-11-15 00:00:00.000000', 11, 49);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (106, 100.00, 'PLN', 'Brakujące pieniądze do wynagrodzenia Hani Ćwiek', '2020-11-01 00:00:00.000000', 11, 46);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (115, 54.97, 'PLN', 'Chemia + kosmetyki', '2020-11-16 00:00:00.000000', 11, 113);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (117, 397.42, 'PLN', 'Jedzenie - Kaufland', '2020-11-16 00:00:00.000000', 11, 16);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (119, 30.57, 'PLN', 'MobiParking Ala', '2020-11-16 00:00:00.000000', 11, 46);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (122, 25.78, 'PLN', 'Ciastka', '2020-11-17 00:00:00.000000', 11, 16);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (124, 8.00, 'PLN', 'Ala podpaski', '2020-11-17 00:00:00.000000', 11, 113);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (126, 3.87, 'PLN', 'Śmietana', '2020-11-17 00:00:00.000000', 11, 16);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (130, 302.00, 'PLN', 'LuxMed', '2020-11-18 00:00:00.000000', 11, 128);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (132, 40.60, 'PLN', 'Zrzutka na ebook o komunikacji psów', '2020-11-18 00:00:00.000000', 11, 49);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (169, 60.15, 'PLN', 'Internet za listopad', '2020-11-18 00:00:00.000000', 11, 167);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (171, 20.00, 'PLN', 'Ciastka', '2020-11-19 00:00:00.000000', 11, 16);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (173, 69.74, 'PLN', 'Ala kosmetyki', '2020-11-20 00:00:00.000000', 11, 113);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (175, 20.05, 'PLN', 'Stokrotka', '2020-11-20 00:00:00.000000', 11, 16);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (178, 59.48, 'PLN', 'Warzywa', '2020-11-21 00:00:00.000000', 11, 16);
+INSERT INTO public.expense (id, amount, currency, description, expense_date, billing_period_id, category_id) VALUES (181, 414.64, 'PLN', 'Jedzenie', '2020-11-21 00:00:00.000000', 11, 16);
+
+INSERT INTO public.income (id, amount, currency, description, income_date, billing_period_id, category_id) VALUES (14, 5669.16, 'PLN', 'Wypłata Ali', '2020-11-02 19:51:45.014000', 11, 12);
+INSERT INTO public.income (id, amount, currency, description, income_date, billing_period_id, category_id) VALUES (78, 15195.32, 'PLN', 'Pierwsza wypłata z Satago', '2020-11-10 00:00:00.000000', 11, 76);
+
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (135, 1100.00, 'PLN', '', 'Odłożenie na niedopłatę czynszu', 1, 0.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (137, 1039.46, 'PLN', '', 'Prąd', 1, 160.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (139, 100.00, 'PLN', '', 'Media - wyrównanie', 1, 100.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (140, 246.00, 'PLN', '', 'Telefony', 1, 60.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (143, 190.09, 'PLN', '', 'Paliwo', 1, 500.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (144, 185.93, 'PLN', '', 'Spotify', 1, 30.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (145, 63.09, 'PLN', '', 'Netflix', 1, 26.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (146, 153.82, 'PLN', '', 'Youtube premium', 1, 40.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (147, 32.05, 'PLN', '', 'Google Drive', 1, 12.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (148, 20.40, 'PLN', '', 'Apple iCloud', 1, 8.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (149, 1501.71, 'PLN', '', 'Utrzymanie Hondy', 1, 0.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (150, 176.25, 'PLN', '', 'Utrzymanie Peugeot', 1, 0.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (151, 0.00, 'PLN', '', 'Datki', 1, 70.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (153, 2460.00, 'PLN', '', 'Odłożenie na OC/AC Honda', 1, 330.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (155, -264.00, 'PLN', '', 'Luxmed', 1, 340.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (156, 321.61, 'PLN', '', 'Drukarka', 1, 40.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (157, 349.01, 'PLN', '', 'Wkłady do maszynka do golenia', 1, 0.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (158, -113.49, 'PLN', '', 'Luna', 1, 200.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (159, 100.15, 'PLN', '', 'Soczewki + odczulanie', 1, 75.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (160, 719.36, 'PLN', '', 'Multisport', 1, 200.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (161, -1302.86, 'PLN', '', 'Ubrania', 1, 200.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (163, 374.72, 'PLN', '', 'Sprzęt AGD', 1, 300.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (164, 1715.12, 'PLN', '', 'Na podatek za akcje', 1, 0.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (165, -4323.37, 'PLN', '', 'Pożyczka na rzecz podatku', 1, 0.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (166, 199.70, 'PLN', '', 'Na rachunki ojca Ali', 1, 0.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (136, 85.22, 'PLN', '', 'Internet', 1, 60.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (154, 1050.00, 'PLN', '', 'Odłożenie na OC/AC Peugeot', 1, 120.00, false);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (141, 70344.11, 'PLN', '', 'Oszczędności - Sławek', 1, 0.00, true);
+INSERT INTO public.piggy_bank (id, balance, currency, description, name, application_user_id, monthly_top_up, savings) VALUES (142, 38222.63, 'PLN', '', 'Oszczędności - Ala firma', 1, 0.00, true);
+
+UPDATE public.account SET last_transaction_included_in_balance_id = 177 WHERE id = 4;
+UPDATE public.account SET last_transaction_included_in_balance_id = 179 WHERE id = 3;
+UPDATE public.account SET last_transaction_included_in_balance_id = 180 WHERE id = 2;
+UPDATE public.account SET last_transaction_included_in_balance_id = 75 WHERE id = 5;
+UPDATE public.account SET last_transaction_included_in_balance_id = 104 WHERE id = 103;
+
+ALTER SEQUENCE hibernate_sequence RESTART WITH 182;

@@ -1,0 +1,1 @@
+pg_dump accountant -h localhost -U postgres > /home/slag/sg-application/database-backups/database_`date +"%Y-%m-%d_%H-%M-%S"`.sql

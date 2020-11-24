@@ -184,11 +184,8 @@ tasks.register<Copy>("toOVH") {
     from(jar.archiveFile) {
         rename { "backend/accountant.jar" }
     }
-    from(appProject.resolve("application-pc-docker.yml")) {
+    from(appProject.resolve("ovh").resolve("application.yml")) {
         rename { "backend/application.yml" }
-    }
-    from(appProject.resolve("data.sql")) {
-        rename { "backend/data.sql" }
     }
     from(clientProject.resolve("angular.json")) {
         into("client")
@@ -214,7 +211,9 @@ tasks.register<Copy>("toOVH") {
     from(clientProject.resolve("src")) {
         into("client/src")
     }
-    from(Paths.get(project.rootDir.absolutePath, "src", "main", "resources", "ovh"))
+    from(appProject.resolve("ovh")){
+        exclude("application.yml")
+    }
     destinationDir = destination.toFile()
 }
 
