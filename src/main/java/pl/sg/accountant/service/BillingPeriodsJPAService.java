@@ -12,9 +12,9 @@ import pl.sg.application.model.ApplicationUser;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.Currency;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -43,6 +43,11 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
     @Override
     public Optional<BillingPeriod> findByPeriodAndUser(YearMonth month, ApplicationUser user) {
         return this.billingPeriodRepository.findByPeriodEqualsAndApplicationUserEquals(month, user);
+    }
+
+    @Override
+    public List<BillingPeriod> unfinishedBillingPeriods(ApplicationUser user) {
+        return this.billingPeriodRepository.allUnfinishedBillingPeriods(user);
     }
 
     @Override

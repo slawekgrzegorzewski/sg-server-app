@@ -1,4 +1,4 @@
-package pl.sg.accountant.model;
+package pl.sg.accountant.model.billings;
 
 import pl.sg.application.model.ApplicationUser;
 

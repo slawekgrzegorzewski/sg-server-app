@@ -1,7 +1,7 @@
 package pl.sg.accountant.service;
 
 import org.springframework.stereotype.Component;
-import pl.sg.accountant.model.PiggyBank;
+import pl.sg.accountant.model.billings.PiggyBank;
 import pl.sg.accountant.repository.PiggyBankRepository;
 import pl.sg.application.model.ApplicationUser;
 

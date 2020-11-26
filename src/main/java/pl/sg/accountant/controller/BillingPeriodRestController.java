@@ -8,6 +8,7 @@ import pl.sg.accountant.model.billings.BillingPeriod;
 import pl.sg.accountant.model.billings.Category;
 import pl.sg.accountant.model.billings.Expense;
 import pl.sg.accountant.model.billings.Income;
+import pl.sg.accountant.repository.BillingPeriodInfo;
 import pl.sg.accountant.service.*;
 import pl.sg.accountant.transport.billings.BillingPeriodTO;
 import pl.sg.accountant.transport.billings.CategoryTO;
@@ -47,44 +48,55 @@ public class BillingPeriodRestController implements BillingPeriodController {
     @Override
     @GetMapping
     @TokenBearerAuth(any = {"ADMIN", "USER"})
-    public ResponseEntity<BillingPeriodTO> currentPeriod(@RequestUser ApplicationUser user) {
-        return getBilling(YearMonth.now(), user);
+    public ResponseEntity<BillingPeriodInfo> currentPeriod(@RequestUser ApplicationUser user) {
+        return getBilling(YearMonth.now(), user, getUnfinishedPeriods(user));
     }
 
     @Override
     @GetMapping("/{period}")
     @TokenBearerAuth(any = {"ADMIN", "USER"})
-    public ResponseEntity<BillingPeriodTO> periodForMonth(@PathVariable("period") YearMonth month, @RequestUser ApplicationUser user) {
-        return getBilling(month, user);
+    public ResponseEntity<BillingPeriodInfo> periodForMonth(@PathVariable("period") YearMonth month, @RequestUser ApplicationUser user) {
+        return getBilling(month, user, getUnfinishedPeriods(user));
     }
 
     @NotNull
-    private ResponseEntity<BillingPeriodTO> getBilling(YearMonth month, ApplicationUser user) {
+    private ResponseEntity<BillingPeriodInfo> getBilling(YearMonth month,
+                                                         ApplicationUser user,
+                                                         @NotNull List<BillingPeriodTO> unfinishedPeriods) {
         return this.billingPeriodsService.findByPeriodAndUser(month, user)
                 .map(period -> mapper.map(period, BillingPeriodTO.class))
+                .map(period -> new BillingPeriodInfo(period, unfinishedPeriods))
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @NotNull
+    private List<BillingPeriodTO> getUnfinishedPeriods(ApplicationUser user) {
+        return this.billingPeriodsService.unfinishedBillingPeriods(user).stream()
+                .map(period -> mapper.map(period, BillingPeriodTO.class))
+                .collect(Collectors.toList());
     }
 
     @Override
     @PutMapping
     @TokenBearerAuth(any = {"ADMIN", "USER"})
-    public ResponseEntity<BillingPeriodTO> create(@RequestUser ApplicationUser user) {
-        return createBilling(YearMonth.now(), user);
+    public ResponseEntity<BillingPeriodInfo> create(@RequestUser ApplicationUser user) {
+        return createBilling(YearMonth.now(), user, getUnfinishedPeriods(user));
     }
 
     @Override
     @PutMapping("/{period}")
     @TokenBearerAuth(any = {"ADMIN", "USER"})
-    public ResponseEntity<BillingPeriodTO> create(@PathVariable("period") YearMonth month, @RequestUser ApplicationUser user) {
-        return createBilling(month, user);
+    public ResponseEntity<BillingPeriodInfo> create(@PathVariable("period") YearMonth month, @RequestUser ApplicationUser user) {
+        return createBilling(month, user, getUnfinishedPeriods(user));
     }
 
     @NotNull
-    private ResponseEntity<BillingPeriodTO> createBilling(YearMonth month, ApplicationUser user) {
+    private ResponseEntity<BillingPeriodInfo> createBilling(YearMonth month, ApplicationUser user, @NotNull List<BillingPeriodTO> unfinishedPeriods) {
         return this.billingPeriodsService.create(month, user)
                 .map(billingPeriodsService::getById)
                 .map(period -> mapper.map(period, BillingPeriodTO.class))
+                .map(period -> new BillingPeriodInfo(period, unfinishedPeriods))
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.badRequest().body(null));
     }
@@ -133,8 +145,8 @@ public class BillingPeriodRestController implements BillingPeriodController {
     @PutMapping("/{periodId}/expense/{accountId}")
     @TokenBearerAuth(any = {"ADMIN", "USER"})
     public ResponseEntity<String> createExpense(@PathVariable int periodId, @PathVariable int accountId,
-                                               @RequestBody ExpenseTO expenseTO,
-                                               @RequestUser ApplicationUser user) throws AccountsException {
+                                                @RequestBody ExpenseTO expenseTO,
+                                                @RequestUser ApplicationUser user) throws AccountsException {
         Account account = accountsService.getById(accountId);
         BillingPeriod billingPeriod = billingPeriodsService.getById(periodId);
         Expense expense = mapper.map(expenseTO, Expense.class);

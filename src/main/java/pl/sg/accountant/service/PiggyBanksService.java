@@ -1,7 +1,6 @@
 package pl.sg.accountant.service;
 
-import org.modelmapper.ModelMapper;
-import pl.sg.accountant.model.PiggyBank;
+import pl.sg.accountant.model.billings.PiggyBank;
 import pl.sg.application.model.ApplicationUser;
 
 import java.util.List;

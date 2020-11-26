@@ -7,12 +7,15 @@ import pl.sg.accountant.model.billings.Income;
 import pl.sg.application.model.ApplicationUser;
 
 import java.time.YearMonth;
+import java.util.List;
 import java.util.Optional;
 
 public interface BillingPeriodsService {
     BillingPeriod getById(Integer id);
 
     Optional<BillingPeriod> findByPeriodAndUser(YearMonth month, ApplicationUser user);
+
+    List<BillingPeriod> unfinishedBillingPeriods(ApplicationUser user);
 
     Optional<Integer> create(YearMonth month, ApplicationUser user);
 

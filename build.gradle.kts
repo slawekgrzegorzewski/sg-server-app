@@ -25,6 +25,7 @@ dependencies {
     configurations.implementation.get().isCanBeResolved = true;
 
     implementation("com.auth0:java-jwt:3.10.3")
+    implementation("com.google.code.gson:gson:2.8.6")
 
     implementation("org.apache.commons:commons-lang3:3.11")
     implementation("org.springframework.boot:spring-boot:2.3.3.RELEASE")
@@ -211,7 +212,7 @@ tasks.register<Copy>("toOVH") {
     from(clientProject.resolve("src")) {
         into("client/src")
     }
-    from(appProject.resolve("ovh")){
+    from(appProject.resolve("ovh")) {
         exclude("application.yml")
     }
     destinationDir = destination.toFile()

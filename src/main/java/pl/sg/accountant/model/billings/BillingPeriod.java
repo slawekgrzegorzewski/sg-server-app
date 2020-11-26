@@ -1,5 +1,6 @@
 package pl.sg.accountant.model.billings;
 
+import pl.sg.accountant.model.billings.summary.MonthSummary;
 import pl.sg.application.database.YearMonthStringAttributeConverter;
 import pl.sg.application.model.ApplicationUser;
 
@@ -22,6 +23,8 @@ public class BillingPeriod {
     private List<Income> incomes;
     @OneToMany(mappedBy = "billingPeriod")
     private List<Expense> expenses;
+    @OneToOne(mappedBy = "billingPeriod")
+    private MonthSummary monthSummary;
     @ManyToOne
     private ApplicationUser applicationUser;
 
@@ -47,6 +50,20 @@ public class BillingPeriod {
 
     public BillingPeriod setPeriod(YearMonth period) {
         this.period = period;
+        return this;
+    }
+
+    public BillingPeriod setId(int id) {
+        this.id = id;
+        return this;
+    }
+
+    public MonthSummary getMonthSummary() {
+        return monthSummary;
+    }
+
+    public BillingPeriod setMonthSummary(MonthSummary monthSummary) {
+        this.monthSummary = monthSummary;
         return this;
     }
 

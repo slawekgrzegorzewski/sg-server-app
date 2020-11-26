@@ -3,7 +3,7 @@ package pl.sg.accountant.controller;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.sg.accountant.model.PiggyBank;
+import pl.sg.accountant.model.billings.PiggyBank;
 import pl.sg.accountant.service.AccountsException;
 import pl.sg.accountant.service.PiggyBanksService;
 import pl.sg.accountant.transport.PiggyBankTO;

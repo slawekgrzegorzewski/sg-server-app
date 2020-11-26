@@ -1,8 +1,8 @@
 package pl.sg.accountant.controller;
 
 import org.springframework.http.ResponseEntity;
+import pl.sg.accountant.repository.BillingPeriodInfo;
 import pl.sg.accountant.service.AccountsException;
-import pl.sg.accountant.transport.billings.BillingPeriodTO;
 import pl.sg.accountant.transport.billings.CategoryTO;
 import pl.sg.accountant.transport.billings.ExpenseTO;
 import pl.sg.accountant.transport.billings.IncomeTO;
@@ -13,13 +13,13 @@ import java.util.List;
 
 public interface BillingPeriodController {
 
-    ResponseEntity<BillingPeriodTO> currentPeriod(ApplicationUser user);
+    ResponseEntity<BillingPeriodInfo> currentPeriod(ApplicationUser user);
 
-    ResponseEntity<BillingPeriodTO> periodForMonth(YearMonth month, ApplicationUser user);
+    ResponseEntity<BillingPeriodInfo> periodForMonth(YearMonth month, ApplicationUser user);
 
-    ResponseEntity<BillingPeriodTO> create(ApplicationUser user);
+    ResponseEntity<BillingPeriodInfo> create(ApplicationUser user);
 
-    ResponseEntity<BillingPeriodTO> create(YearMonth month, ApplicationUser user);
+    ResponseEntity<BillingPeriodInfo> create(YearMonth month, ApplicationUser user);
 
     ResponseEntity<List<CategoryTO>> getAllCategories(ApplicationUser user);
 
