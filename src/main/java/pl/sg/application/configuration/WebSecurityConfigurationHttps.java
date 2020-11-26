@@ -23,15 +23,18 @@ import java.util.List;
         prePostEnabled = true,
         securedEnabled = true,
         jsr250Enabled = true)
-@Profile("dev")
-public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
+@Profile("https")
+public class WebSecurityConfigurationHttps extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests().anyRequest().permitAll()
                 .and().cors()
-                .and().csrf().disable();
+                .and().csrf().disable()
+                .requiresChannel()
+                .anyRequest()
+                .requiresSecure();
     }
 
 

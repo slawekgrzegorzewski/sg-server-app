@@ -75,6 +75,16 @@ fun Build_gradle.cleanDockerDir(dockerDir: Path) {
     delete(dockerDir.resolve("data.sql"))
 }
 
+
+tasks.withType<Jar> {
+    exclude(
+            "ovh",
+            "application.yml",
+            "application-pc-docker.yml",
+            "application-raspberry-docker.yml",
+            "data.sql")
+}
+
 val jar by tasks.getting(Jar::class);
 
 tasks.register<Copy>("toDockerRaspberry") {
@@ -108,7 +118,7 @@ tasks.register<Copy>("toDockerPC") {
         val files = pl.sg.build.FilesToConvertingToUnixFilter(listOf("yml", "Dockerfile", "sql", "sh", "json", "conf"))
                 .textFiles(destination)
         val convertToUnixLineEndings = pl.sg.build.ConvertToUnixLineEndings()
-        files.forEach { file -> convertToUnixLineEndings.forFile(file)}
+        files.forEach { file -> convertToUnixLineEndings.forFile(file) }
         convertToUnixLineEndings.convert();
 
         pl.sg.build.GenerateJwtToken().forFile(destination.resolve("docker-compose.yml")).convert()
@@ -148,6 +158,62 @@ tasks.register<Copy>("toDockerPC") {
         into("client/src")
     }
     from(Paths.get(project.rootDir.absolutePath, "docker", "production", "pc"))
+    destinationDir = destination.toFile()
+}
+
+tasks.register<Copy>("toOVH") {
+    dependsOn.add(tasks.build)
+    group = "docker"
+
+    val appProject = Paths.get(project.rootDir.absolutePath, "src", "main", "resources")
+    val clientProject = Paths.get(project.rootDir.absolutePath, "..", "sg-client-app")
+    val destination = Paths.get("E:", "docker")
+
+    doFirst {
+        delete("${destination}")
+    }
+
+    doLast {
+        val files = pl.sg.build.FilesToConvertingToUnixFilter(listOf("yml", "Dockerfile", "sql", "sh", "json", "conf"))
+                .textFiles(destination)
+        val convertToUnixLineEndings = pl.sg.build.ConvertToUnixLineEndings()
+        files.forEach { file -> convertToUnixLineEndings.forFile(file) }
+        convertToUnixLineEndings.convert();
+    }
+
+    from(jar.archiveFile) {
+        rename { "backend/accountant.jar" }
+    }
+    from(appProject.resolve("ovh").resolve("application.yml")) {
+        rename { "backend/application.yml" }
+    }
+    from(clientProject.resolve("angular.json")) {
+        into("client")
+    }
+    from(clientProject.resolve("nginx.conf")) {
+        into("client")
+    }
+    from(clientProject.resolve("mime.types")) {
+        into("client")
+    }
+    from(clientProject.resolve("package.json")) {
+        into("client")
+    }
+    from(clientProject.resolve("tsconfig.app.json")) {
+        into("client")
+    }
+    from(clientProject.resolve("tsconfig.base.json")) {
+        into("client")
+    }
+    from(clientProject.resolve("tsconfig.json")) {
+        into("client")
+    }
+    from(clientProject.resolve("src")) {
+        into("client/src")
+    }
+    from(appProject.resolve("ovh")){
+        exclude("application.yml")
+    }
     destinationDir = destination.toFile()
 }
 
