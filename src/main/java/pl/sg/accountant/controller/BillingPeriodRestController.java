@@ -21,6 +21,7 @@ import pl.sg.application.security.annotations.TokenBearerAuth;
 import javax.validation.constraints.NotNull;
 import java.time.YearMonth;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -63,11 +64,10 @@ public class BillingPeriodRestController implements BillingPeriodController {
     private ResponseEntity<BillingPeriodInfo> getBilling(YearMonth month,
                                                          ApplicationUser user,
                                                          @NotNull List<BillingPeriodTO> unfinishedPeriods) {
-        return this.billingPeriodsService.findByPeriodAndUser(month, user)
+        BillingPeriodTO periodTO = this.billingPeriodsService.findByPeriodAndUser(month, user)
                 .map(period -> mapper.map(period, BillingPeriodTO.class))
-                .map(period -> new BillingPeriodInfo(period, unfinishedPeriods))
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElse(null);
+        return ResponseEntity.ok(new BillingPeriodInfo(periodTO, unfinishedPeriods));
     }
 
     @NotNull
@@ -89,6 +89,17 @@ public class BillingPeriodRestController implements BillingPeriodController {
     @TokenBearerAuth(any = {"ADMIN", "USER"})
     public ResponseEntity<BillingPeriodInfo> create(@PathVariable("period") YearMonth month, @RequestUser ApplicationUser user) {
         return createBilling(month, user, getUnfinishedPeriods(user));
+    }
+
+    @Override
+    @GetMapping("/{period}/finish")
+    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    public ResponseEntity<BillingPeriodInfo> finish(@PathVariable("period") YearMonth month, @RequestUser ApplicationUser user) throws AccountsException {
+        Optional<BillingPeriod> period = this.billingPeriodsService.findByPeriodAndUser(month, user);
+        if (period.isPresent()) {
+            this.billingPeriodsService.finish(period.get());
+        }
+        return getBilling(month, user, getUnfinishedPeriods(user));
     }
 
     @NotNull

@@ -21,6 +21,8 @@ public interface BillingPeriodController {
 
     ResponseEntity<BillingPeriodInfo> create(YearMonth month, ApplicationUser user);
 
+    ResponseEntity<BillingPeriodInfo> finish(YearMonth month, ApplicationUser user) throws AccountsException;
+
     ResponseEntity<List<CategoryTO>> getAllCategories(ApplicationUser user);
 
     ResponseEntity<CategoryTO> addCategory(CategoryTO categoryTO, ApplicationUser user) throws AccountsException;

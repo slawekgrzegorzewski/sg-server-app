@@ -13,6 +13,7 @@ public class MonthSummary {
     @Id
     @GeneratedValue
     private int id;
+    @Column(length = 10000)
     private String data;
     @OneToOne
     @JoinColumn(name = "billing_period_id", referencedColumnName = "id")

@@ -5,9 +5,11 @@ import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.model.billings.BillingPeriod;
 import pl.sg.accountant.model.billings.Expense;
 import pl.sg.accountant.model.billings.Income;
+import pl.sg.accountant.model.billings.summary.MonthSummary;
 import pl.sg.accountant.repository.BillingPeriodRepository;
 import pl.sg.accountant.repository.ExpenseRepository;
 import pl.sg.accountant.repository.IncomeRepository;
+import pl.sg.accountant.repository.MonthlySummaryRepository;
 import pl.sg.application.model.ApplicationUser;
 
 import java.math.BigDecimal;
@@ -20,19 +22,27 @@ import java.util.Optional;
 @Component
 public class BillingPeriodsJPAService implements BillingPeriodsService {
 
+    private final AccountsService accountsService;
     private final BillingPeriodRepository billingPeriodRepository;
     private final IncomeRepository incomeRepository;
     private final ExpenseRepository expenseRepository;
     private final TransactionsService transactionsService;
+    private final MonthlySummaryRepository monthlySummaryRepository;
+    private final PiggyBanksService piggyBanksService;
 
-    public BillingPeriodsJPAService(BillingPeriodRepository billingPeriodRepository,
+    public BillingPeriodsJPAService(AccountsService accountsService, BillingPeriodRepository billingPeriodRepository,
                                     IncomeRepository incomeRepository,
                                     ExpenseRepository expenseRepository,
-                                    TransactionsService transactionsService) {
+                                    TransactionsService transactionsService,
+                                    MonthlySummaryRepository monthlySummaryRepository,
+                                    PiggyBanksService piggyBanksService) {
+        this.accountsService = accountsService;
         this.billingPeriodRepository = billingPeriodRepository;
         this.incomeRepository = incomeRepository;
         this.expenseRepository = expenseRepository;
         this.transactionsService = transactionsService;
+        this.monthlySummaryRepository = monthlySummaryRepository;
+        this.piggyBanksService = piggyBanksService;
     }
 
     @Override
@@ -96,5 +106,18 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
         if (!account.getCurrency().equals(currency)) {
             throw new AccountsException("Account and income currencies differ");
         }
+    }
+
+    @Override
+    public void finish(BillingPeriod billingPeriod) throws AccountsException {
+        Optional<MonthSummary> monthSummary = this.monthlySummaryRepository.findByBillingPeriod(billingPeriod);
+        if (monthSummary.isPresent()) {
+            throw new AccountsException("Already finished billing period");
+        }
+        String userName = billingPeriod.getApplicationUser().getLogin();
+        MonthSummary ms = new MonthSummary(billingPeriod,
+                this.accountsService.getForUser(userName),
+                this.piggyBanksService.findByUser(billingPeriod.getApplicationUser()));
+        this.monthlySummaryRepository.save(ms);
     }
 }

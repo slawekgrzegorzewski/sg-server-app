@@ -22,4 +22,6 @@ public interface BillingPeriodsService {
     void addIncome(BillingPeriod billingPeriod, Account account, Income income, ApplicationUser user) throws AccountsException;
 
     void addExpense(BillingPeriod billingPeriod, Account account, Expense expense, ApplicationUser user) throws AccountsException;
+
+    void finish(BillingPeriod billingPeriod) throws AccountsException;
 }
