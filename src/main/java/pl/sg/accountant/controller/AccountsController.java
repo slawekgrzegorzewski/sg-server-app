@@ -10,7 +10,7 @@ public interface AccountsController {
 
     List<AccountTO> allAccounts();
 
-    List<AccountTO> userAccounts(String login);
+    List<AccountTO> userAccount(String login);
 
     AccountTO createAccount(@Valid AccountTO account, String login);
 

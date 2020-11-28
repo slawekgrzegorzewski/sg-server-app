@@ -1,11 +1,6 @@
 package pl.sg.application.model;
 
-import org.apache.commons.lang3.RandomStringUtils;
-import org.jboss.aerogear.security.otp.api.Base32;
-
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Entity
@@ -13,83 +8,40 @@ public class ApplicationUser {
     @Id
     @GeneratedValue
     private int id;
-    private String login;
-    private String password;
 
-    private boolean isUsing2FA;
-    private String secret;
+    @Transient
+    ApplicationUserLogin loggedInUser;
 
-    private String firstName;
-    private String lastName;
-    private String email;
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<String> roles;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "applicationUser")
+    private List<ApplicationUserLogin> userLogins;
 
     public ApplicationUser() {
-        this.secret = Base32.encode(RandomStringUtils.randomAscii(10).getBytes());
-        this.isUsing2FA = false;
     }
 
-    public ApplicationUser(int id, String login, String password, String firstName, String lastName, String email, List<String> roles) {
-        this();
+    public ApplicationUser(int id, List<ApplicationUserLogin> userLogins) {
         this.id = id;
-        this.login = login;
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.roles = new ArrayList<>(roles);
+        this.userLogins = userLogins;
     }
 
     public int getId() {
         return id;
     }
 
-    public String getLogin() {
-        return login;
+    public ApplicationUserLogin getLoggedInUser() {
+        return loggedInUser;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
+    public ApplicationUser setLoggedInUser(ApplicationUserLogin loggedInUser) {
+        this.loggedInUser = loggedInUser;
+        return this;
     }
 
-    public String getPassword() {
-        return password;
+    public List<ApplicationUserLogin> getUserLogins() {
+        return userLogins;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public boolean isUsing2FA() {
-        return isUsing2FA;
-    }
-
-    public void setUsing2FA(boolean using2FA) {
-        isUsing2FA = using2FA;
-    }
-
-    public String getSecret() {
-        return secret;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public List<String> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(String... roles) {
-        this.roles.addAll(Arrays.asList(roles));
+    public ApplicationUser setUserLogins(List<ApplicationUserLogin> userLogins) {
+        this.userLogins = userLogins;
+        return this;
     }
 }

@@ -33,13 +33,13 @@ public class ApplicationUserFieldExtractor<T> {
     Function<ApplicationUser, String> getStringExtractor(String field) {
         switch (field) {
             case RequestUser.LOGIN:
-                return ApplicationUser::getLogin;
+                return applicationUser -> applicationUser.getLoggedInUser().getLogin();
             case RequestUser.EMAIL:
-                return ApplicationUser::getEmail;
+                return applicationUser -> applicationUser.getLoggedInUser().getEmail();
             case RequestUser.FIRST_NAME:
-                return ApplicationUser::getFirstName;
+                return applicationUser -> applicationUser.getLoggedInUser().getFirstName();
             case RequestUser.LAST_NAME:
-                return ApplicationUser::getLastName;
+                return applicationUser -> applicationUser.getLoggedInUser().getLastName();
             default:
                 throw new RequestUserResolverException("Not supported field requested to be injected");
         }
@@ -57,7 +57,7 @@ public class ApplicationUserFieldExtractor<T> {
     Function<ApplicationUser, List> getListExtractor(String field) {
         switch (field) {
             case RequestUser.ROLES:
-                return ApplicationUser::getRoles;
+                return applicationUser -> applicationUser.getLoggedInUser().getRoles();
             default:
                 throw new RequestUserResolverException("Not supported field requested to be injected");
         }

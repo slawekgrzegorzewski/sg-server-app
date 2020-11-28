@@ -5,9 +5,9 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import pl.sg.accountant.model.billings.PiggyBank;
 import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.model.billings.BillingPeriod;
+import pl.sg.accountant.model.billings.PiggyBank;
 import pl.sg.accountant.transport.PiggyBankTO;
 import pl.sg.accountant.transport.accounts.AccountTO;
 import pl.sg.accountant.transport.billings.BillingPeriodTO;
@@ -25,13 +25,13 @@ public class Application {
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
         modelMapper
                 .typeMap(Account.class, AccountTO.class)
-                .addMapping(a -> a.getApplicationUser().getLogin(), AccountTO::setUserName);
+                .addMapping(a -> a.getApplicationUser().getLoggedInUser().getLogin(), AccountTO::setUserName);
         modelMapper
                 .typeMap(BillingPeriod.class, BillingPeriodTO.class)
-                .addMapping(b -> b.getApplicationUser().getLogin(), BillingPeriodTO::setUserName);
+                .addMapping(b -> b.getApplicationUser().getLoggedInUser().getLogin(), BillingPeriodTO::setUserName);
         modelMapper
                 .typeMap(PiggyBank.class, PiggyBankTO.class)
-                .addMapping(a -> a.getApplicationUser().getLogin(), PiggyBankTO::setUserName);
+                .addMapping(a -> a.getApplicationUser().getLoggedInUser().getLogin(), PiggyBankTO::setUserName);
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STANDARD);
         return modelMapper;
     }

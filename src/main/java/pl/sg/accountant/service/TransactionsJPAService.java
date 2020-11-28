@@ -1,8 +1,8 @@
 package pl.sg.accountant.service;
 
 import org.springframework.stereotype.Component;
-import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.model.OperationType;
+import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.model.accounts.FinancialTransaction;
 import pl.sg.accountant.repository.AccountRepository;
 import pl.sg.accountant.repository.FinancialTransactionRepository;
@@ -95,6 +95,6 @@ public class TransactionsJPAService implements TransactionsService {
     }
 
     private boolean accountBelongsTo(Account account, ApplicationUser user) {
-        return account.getApplicationUser().getLogin().equals(user.getLogin());
+        return account.getApplicationUser().getId() == user.getId();
     }
 }

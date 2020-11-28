@@ -39,7 +39,7 @@ public class AccountsRestController implements AccountsController {
     @Override
     @GetMapping("/mine")
     @TokenBearerAuth(any = {"ADMIN", "USER"})
-    public List<AccountTO> userAccounts(@RequestUser(RequestUser.LOGIN) String login) {
+    public List<AccountTO> userAccount(@RequestUser(RequestUser.LOGIN) String login) {
         return map(accountsService.getForUser(login));
     }
 
@@ -65,7 +65,7 @@ public class AccountsRestController implements AccountsController {
             @RequestBody @Valid AccountTO account,
             @RequestUser(RequestUser.LOGIN) String login) {
         return accountsService.findById(account.getId())
-                .filter(toEdit -> toEdit.getApplicationUser().getLogin().equals(login))
+                .filter(toEdit -> toEdit.getApplicationUser().getLoggedInUser().getLogin().equals(login))
                 .map(toEdit -> update(toEdit, account))
                 .map(toEdit -> {
                     accountsService.update(toEdit);
@@ -88,7 +88,7 @@ public class AccountsRestController implements AccountsController {
         if (toDelete.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Entity with id " + id + " not found.");
         }
-        if (toDelete.get().getApplicationUser().getLogin().equals(login)) {
+        if (toDelete.get().getApplicationUser().getLoggedInUser().getLogin().equals(login)) {
             accountsService.delete(toDelete.get());
             return ResponseEntity.ok("Account deleted");
         } else {

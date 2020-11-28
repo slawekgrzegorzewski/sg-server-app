@@ -6,6 +6,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import pl.sg.application.model.ApplicationUser;
+import pl.sg.application.model.ApplicationUserLogin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +23,17 @@ class ApplicationUserFieldExtractorTest {
         add("a");
         add("b");
     }};
-    private final static ApplicationUser applicationUser = new ApplicationUser(ID, LOGIN, PASSWORD, FIRST_NAME,
-            LAST_NAME, EMAIL, ROLES);
+    private final static ApplicationUser applicationUser = createApplicationUser();
+
+    private static ApplicationUser createApplicationUser() {
+        ApplicationUserLogin applicationUserLogin = new ApplicationUserLogin(ID, LOGIN, PASSWORD, FIRST_NAME, LAST_NAME, EMAIL, ROLES);
+        ApplicationUser applicationUser = new ApplicationUser(
+                ID * ID,
+                List.of(applicationUserLogin)
+        );
+        applicationUser.setLoggedInUser(applicationUserLogin);
+        return applicationUser;
+    }
 
     @ParameterizedTest
     @MethodSource("supportedFields")

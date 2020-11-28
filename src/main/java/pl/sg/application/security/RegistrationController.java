@@ -8,12 +8,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.sg.application.model.ApplicationUser;
+import pl.sg.application.model.ApplicationUserLogin;
+import pl.sg.application.model.ApplicationUserLoginRepository;
 import pl.sg.application.model.ApplicationUserRepository;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 import static pl.sg.twofa.QRCode.fromApplicationUser;
@@ -26,12 +29,19 @@ public class RegistrationController {
 
     public static final String APP_NAME = "accountant";
     private final ApplicationUserRepository applicationUserRepository;
+    private final ApplicationUserLoginRepository applicationUserLoginRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthorizationService authorizationService;
 
     @Autowired
-    public RegistrationController(ApplicationUserRepository applicationUserRepository, PasswordEncoder passwordEncoder) {
+    public RegistrationController(ApplicationUserRepository applicationUserRepository,
+                                  ApplicationUserLoginRepository applicationUserLoginRepository,
+                                  PasswordEncoder passwordEncoder,
+                                  AuthorizationService authorizationService) {
         this.applicationUserRepository = applicationUserRepository;
+        this.applicationUserLoginRepository = applicationUserLoginRepository;
         this.passwordEncoder = passwordEncoder;
+        this.authorizationService = authorizationService;
     }
 
     @PostMapping
@@ -41,20 +51,27 @@ public class RegistrationController {
         if (uname == null || upass == null || "".equals(uname.trim()) || "".equals(upass.trim())) {
             throw new BadCredentialsException("Username/ password is required");
         }
-        Optional<ApplicationUser> firstByLogin = applicationUserRepository.findFirstByLogin(uname);
+        Optional<ApplicationUser> firstByLogin = applicationUserRepository.findFirstByUserLogins(uname);
         if (firstByLogin.isPresent()) {
             throw new BadCredentialsException(String.format("Username %s already exists.", uname));
         }
         ApplicationUser applicationUser = new ApplicationUser();
-        applicationUser.setLogin(uname);
-        applicationUser.setPassword(passwordEncoder.encode(upass));
+        ApplicationUserLogin applicationUserLogin = new ApplicationUserLogin();
+        applicationUserLogin.setLogin(uname);
+        applicationUserLogin.setPassword(passwordEncoder.encode(upass));
+        applicationUser.setUserLogins(List.of(applicationUserLogin));
+        applicationUser.setLoggedInUser(applicationUserLogin);
+        applicationUserLogin.setApplicationUser(applicationUser);
         applicationUserRepository.save(applicationUser);
-        return fromApplicationUser(APP_NAME, applicationUser).qrLink();
+        applicationUserLoginRepository.save(applicationUserLogin);
+        return fromApplicationUser(APP_NAME, uname, applicationUser.getLoggedInUser().getSecret()).qrLink();
     }
 
     @PostMapping("/setup2FA")
     public String setup2FA(@RequestBody @Valid User user) {
-        ApplicationUser firstByLogin = applicationUserRepository.findFirstByLogin(user.getName()).orElseThrow(() -> new RuntimeException("Wrong user/password"));
+        ApplicationUser applicationUser = applicationUserRepository.findFirstByUserLogins(user.getName()).orElseThrow(() -> new RuntimeException("Wrong user/password"));
+        authorizationService.setLoggedInUser(applicationUser, user.getName());
+        ApplicationUserLogin firstByLogin = applicationUser.getLoggedInUser();
         if (!passwordEncoder.matches(user.getPass(), firstByLogin.getPassword())) {
             throw new BadCredentialsException("Wrong user/password");
         }
@@ -66,7 +83,7 @@ public class RegistrationController {
             throw new BadCredentialsException("Invalid verification code");
         }
         firstByLogin.setUsing2FA(true);
-        applicationUserRepository.save(firstByLogin);
+        applicationUserRepository.save(applicationUser);
         return "It's good";
     }
 

@@ -3,7 +3,6 @@ package pl.sg.application.security;
 import lombok.extern.slf4j.Slf4j;
 import org.jboss.aerogear.security.otp.Totp;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
@@ -16,8 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.io.IOException;
-
-import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 
 @RestController
 @RequestMapping("/login")
@@ -46,15 +43,16 @@ public class LoginController {
         if (uname == null || upass == null || "".equals(uname.trim()) || "".equals(upass.trim())) {
             throw new BadCredentialsException("user/password is required");
         }
-        ApplicationUser firstByLogin = applicationUserRepository.findFirstByLogin(uname).orElseThrow(
+        ApplicationUser firstByLogin = applicationUserRepository.findFirstByUserLogins(uname).orElseThrow(
                 () -> new BadCredentialsException("Wrong user/password"));
-        if (!passwordEncoder.matches(upass, firstByLogin.getPassword())) {
+        authorizationService.setLoggedInUser(firstByLogin, uname);
+        if (!passwordEncoder.matches(upass, firstByLogin.getLoggedInUser().getPassword())) {
             throw new BadCredentialsException("Wrong user/password");
         }
-        if (!new Totp(firstByLogin.getSecret()).verify(token)) {
+        if (!new Totp(firstByLogin.getLoggedInUser().getSecret()).verify(token)) {
             throw new BadCredentialsException("Wrong 2FA code");
         }
-        String jwt = authorizationService.generateJWTToken(uname, firstByLogin.getRoles());
+        String jwt = authorizationService.generateJWTToken(uname, firstByLogin.getLoggedInUser().getRoles());
         return HEADER_STRING + ": " + TOKEN_PREFIX + " " + jwt;
     }
 

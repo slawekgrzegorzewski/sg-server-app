@@ -1,5 +1,6 @@
 package pl.sg.application.security.annotations;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -32,7 +33,8 @@ public class TokenBearerAspect {
         if (token == null) {
             throw new UnauthorizedException("No token bearer in the request.");
         }
-        authorizationService.validateAll(token, tokenBearerAuth.all());
-        authorizationService.validateAny(token, tokenBearerAuth.any());
+        DecodedJWT decodedJWT = authorizationService.decodeToken(token);
+        authorizationService.validateAll(decodedJWT, tokenBearerAuth.all());
+        authorizationService.validateAny(decodedJWT, tokenBearerAuth.any());
     }
 }
