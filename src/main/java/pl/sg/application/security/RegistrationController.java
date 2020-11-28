@@ -87,6 +87,26 @@ public class RegistrationController {
         return "It's good";
     }
 
+    @PostMapping("/change-password")
+    public String changePassword(@RequestBody @Valid ChangePasswordUser user) {
+        ApplicationUser applicationUser = applicationUserRepository.findFirstByUserLogins(user.getName()).orElseThrow(() -> new RuntimeException("Wrong user/password"));
+        authorizationService.setLoggedInUser(applicationUser, user.getName());
+        ApplicationUserLogin firstByLogin = applicationUser.getLoggedInUser();
+        if (!passwordEncoder.matches(user.getOldpass(), firstByLogin.getPassword())) {
+            throw new BadCredentialsException("Wrong user/password");
+        }
+        if (!firstByLogin.isUsing2FA()) {
+            throw new BadCredentialsException("2FA already configured");
+        }
+        Totp totp = new Totp(firstByLogin.getSecret());
+        if (!totp.verify(String.valueOf(user.getAuthcode()))) {
+            throw new BadCredentialsException("User not registered properly");
+        }
+        firstByLogin.setPassword(passwordEncoder.encode(user.getNewpass()));
+        applicationUserLoginRepository.save(firstByLogin);
+        return "It's good";
+    }
+
     @ExceptionHandler({BadCredentialsException.class})
     public void handleException(HttpServletResponse response, Exception ex) throws IOException {
         response.setStatus(400);
@@ -121,6 +141,43 @@ public class RegistrationController {
 
         public Integer getSecretFor2FA() {
             return secretFor2FA;
+        }
+    }
+
+    public static class ChangePasswordUser {
+        @NotBlank
+        private String name;
+        @NotBlank
+        private String oldpass;
+        @NotBlank
+        private String authcode;
+        @NotBlank
+        private String newpass;
+
+        public ChangePasswordUser() {
+        }
+
+        public ChangePasswordUser(@NotBlank String name, @NotBlank String oldpass, @NotBlank String authcode, @NotBlank String newpass) {
+            this.name = name;
+            this.oldpass = oldpass;
+            this.authcode = authcode;
+            this.newpass = newpass;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getOldpass() {
+            return oldpass;
+        }
+
+        public String getAuthcode() {
+            return authcode;
+        }
+
+        public String getNewpass() {
+            return newpass;
         }
     }
 }
