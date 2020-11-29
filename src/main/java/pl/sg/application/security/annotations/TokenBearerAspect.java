@@ -33,8 +33,6 @@ public class TokenBearerAspect {
         if (token == null) {
             throw new UnauthorizedException("No token bearer in the request.");
         }
-        DecodedJWT decodedJWT = authorizationService.decodeToken(token);
-        authorizationService.validateAll(decodedJWT, tokenBearerAuth.all());
-        authorizationService.validateAny(decodedJWT, tokenBearerAuth.any());
+        authorizationService.validateRequiredRoles(token, tokenBearerAuth.all(), tokenBearerAuth.any());
     }
 }

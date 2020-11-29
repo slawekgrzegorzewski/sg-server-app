@@ -19,18 +19,18 @@ public class AccountTO {
     private BigDecimal currentBalance;
     private int balanceIndex;
     @NotNull
-    private String userName;
+    private int userId;
 
     public AccountTO() {
     }
 
-    public AccountTO(int id, String name, Currency currency, BigDecimal currentBalance, int balanceIndex, String userName) {
+    public AccountTO(int id, String name, Currency currency, BigDecimal currentBalance, int balanceIndex, int userId) {
         this.id = id;
         this.name = name;
         this.currency = currency;
         this.currentBalance = currentBalance;
         this.balanceIndex = balanceIndex;
-        this.userName = userName;
+        this.userId = userId;
     }
 
     public int getId() {
@@ -82,11 +82,12 @@ public class AccountTO {
         return this;
     }
 
-    public String getUserName() {
-        return userName;
+    public Integer getUserId() {
+        return userId;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public AccountTO setUserId(Integer userId) {
+        this.userId = userId;
+        return this;
     }
 }

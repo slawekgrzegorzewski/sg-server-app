@@ -25,13 +25,14 @@ public class Application {
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
         modelMapper
                 .typeMap(Account.class, AccountTO.class)
-                .addMapping(a -> a.getApplicationUser().getLoggedInUser().getLogin(), AccountTO::setUserName);
+                .addMapping(a -> a.getApplicationUser().getId(),
+                        AccountTO::setUserId);
         modelMapper
                 .typeMap(BillingPeriod.class, BillingPeriodTO.class)
-                .addMapping(b -> b.getApplicationUser().getLoggedInUser().getLogin(), BillingPeriodTO::setUserName);
+                .addMapping(b -> b.getApplicationUser().getId(), BillingPeriodTO::setUserId);
         modelMapper
                 .typeMap(PiggyBank.class, PiggyBankTO.class)
-                .addMapping(a -> a.getApplicationUser().getLoggedInUser().getLogin(), PiggyBankTO::setUserName);
+                .addMapping(a -> a.getApplicationUser().getId(), PiggyBankTO::setUserId);
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STANDARD);
         return modelMapper;
     }

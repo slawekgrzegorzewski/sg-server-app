@@ -11,18 +11,18 @@ public class BillingPeriodTO {
     private List<IncomeTO> incomes;
     private List<ExpenseTO> expenses;
     @NotNull
-    private String userName;
+    private int userId;
 
     public BillingPeriodTO() {
     }
 
-    public BillingPeriodTO(int id, String name, YearMonth period, List<IncomeTO> incomes, List<ExpenseTO> expenses, @NotNull String userName) {
+    public BillingPeriodTO(int id, String name, YearMonth period, List<IncomeTO> incomes, List<ExpenseTO> expenses, @NotNull int userId) {
         this.id = id;
         this.name = name;
         this.period = period;
         this.incomes = incomes;
         this.expenses = expenses;
-        this.userName = userName;
+        this.userId = userId;
     }
 
     public int getId() {
@@ -65,11 +65,12 @@ public class BillingPeriodTO {
         this.expenses = expenses;
     }
 
-    public String getUserName() {
-        return userName;
+    public Integer getUserId() {
+        return userId;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public BillingPeriodTO setUserId(Integer userId) {
+        this.userId = userId;
+        return this;
     }
 }

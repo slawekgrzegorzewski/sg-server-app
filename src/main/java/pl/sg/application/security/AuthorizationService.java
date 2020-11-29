@@ -8,7 +8,6 @@ import pl.sg.application.ForbiddenException;
 import pl.sg.application.UnauthorizedException;
 import pl.sg.application.configuration.Configuration;
 import pl.sg.application.model.ApplicationUser;
-import pl.sg.application.model.ApplicationUserLogin;
 import pl.sg.application.model.ApplicationUserRepository;
 
 import java.time.Duration;
@@ -31,19 +30,25 @@ public class AuthorizationService {
         this.configuration = configuration;
     }
 
-    public void validateAll(DecodedJWT token, String... all) {
+    public void validateRequiredRoles(String token, String[] all, String[] any) {
+        DecodedJWT decodedJWT = decodeToken(token);
+        validateAll(decodedJWT, all);
+        validateAny(decodedJWT, any);
+    }
+
+    private void validateAll(DecodedJWT token, String... all) {
         List<String> rolesFromToken = token.getClaim(ROLES).asList(String.class);
         if (all.length > 0 && !Stream.of(all).allMatch(rolesFromToken::contains))
-            throw ForbiddenException.allRoleNotMet(token.getSubject(), all);
+            throw ForbiddenException.allRoleNotMet(extractUserName(token), all);
     }
 
-    public void validateAny(DecodedJWT token, String[] any) {
+    private void validateAny(DecodedJWT token, String[] any) {
         List<String> rolesFromToken = token.getClaim(ROLES).asList(String.class);
         if (any.length > 0 && Stream.of(any).noneMatch(rolesFromToken::contains))
-            throw ForbiddenException.anyRoleNotMet(token.getSubject(), any);
+            throw ForbiddenException.anyRoleNotMet(extractUserName(token), any);
     }
 
-    public DecodedJWT decodeToken(String token) {
+    private DecodedJWT decodeToken(String token) {
         DecodedJWT decodedJWT;
         try {
             decodedJWT = JWT.require(HMAC512(configuration.getJWTTokenSecret().getBytes()))
@@ -57,24 +62,28 @@ public class AuthorizationService {
 
     public ApplicationUser getUserInfo(String token) {
         DecodedJWT decodedJWT = decodeToken(token);
-        ApplicationUser applicationUser = applicationUserRepository.findFirstByUserLogins(decodedJWT.getSubject())
+        ApplicationUser applicationUser = applicationUserRepository.findFirstByUserLogins(extractUserName(decodedJWT))
                 .orElseThrow(() -> new UnauthorizedException("Wrong JWT token"));
-        setLoggedInUser(applicationUser, decodedJWT.getSubject());
+        applicationUser.setLoggedInUser(extractUserName(decodedJWT));
         return applicationUser;
     }
 
-    public void setLoggedInUser(ApplicationUser applicationUser, String userName) {
-        ApplicationUserLogin userLogin = applicationUser.getUserLogins().stream()
-                .filter(ul -> ul.getLogin().equals(userName)).findAny()
-                .get();
-        applicationUser.setLoggedInUser(userLogin);
-    }
-
-    public String generateJWTToken(String user, List<String> roles) {
+    public String generateJWTToken(String subject, List<String> roles) {
         return JWT.create()
-                .withSubject(user)
+                .withSubject(subject)
                 .withClaim(ROLES, roles)
                 .withExpiresAt(new Date(System.currentTimeMillis() + DURATION.toMillis()))
                 .sign(HMAC512(configuration.getJWTTokenSecret().getBytes()));
+    }
+
+    private int extractUserId(DecodedJWT token) {
+        String[] elements = token.getSubject().split(":");
+        return Integer.parseInt(elements[0]);
+    }
+
+    private String extractUserName(DecodedJWT token) {
+        String subject = token.getSubject();
+        String[] elements = subject.split(":");
+        return subject.replace(elements[0] + ":", "");
     }
 }

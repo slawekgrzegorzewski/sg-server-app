@@ -11,13 +11,13 @@ public class PiggyBankTO {
     private Currency currency;
     private boolean savings;
     private BigDecimal monthlyTopUp;
-    private String userName;
+    private int userId;
 
     public PiggyBankTO() {
     }
 
     public PiggyBankTO(int id, String name, String description, BigDecimal balance, Currency currency, boolean savings,
-                       BigDecimal monthlyTopUp, String userName) {
+                       BigDecimal monthlyTopUp, int userId) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -25,7 +25,7 @@ public class PiggyBankTO {
         this.currency = currency;
         this.savings = savings;
         this.monthlyTopUp = monthlyTopUp;
-        this.userName = userName;
+        this.userId = userId;
     }
 
     public int getId() {
@@ -91,12 +91,12 @@ public class PiggyBankTO {
         return this;
     }
 
-    public String getUserName() {
-        return userName;
+    public Integer getUserId() {
+        return userId;
     }
 
-    public PiggyBankTO setUserName(String userName) {
-        this.userName = userName;
+    public PiggyBankTO setUserId(Integer userId) {
+        this.userId = userId;
         return this;
     }
 }

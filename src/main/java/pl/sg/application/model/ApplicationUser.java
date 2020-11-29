@@ -44,4 +44,11 @@ public class ApplicationUser {
         this.userLogins = userLogins;
         return this;
     }
+
+    public void setLoggedInUser(String userName) {
+        ApplicationUserLogin userLogin = getUserLogins().stream()
+                .filter(ul -> ul.getLogin().equals(userName)).findAny()
+                .get();
+        setLoggedInUser(userLogin);
+    }
 }

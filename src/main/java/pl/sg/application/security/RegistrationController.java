@@ -31,17 +31,14 @@ public class RegistrationController {
     private final ApplicationUserRepository applicationUserRepository;
     private final ApplicationUserLoginRepository applicationUserLoginRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AuthorizationService authorizationService;
 
     @Autowired
     public RegistrationController(ApplicationUserRepository applicationUserRepository,
                                   ApplicationUserLoginRepository applicationUserLoginRepository,
-                                  PasswordEncoder passwordEncoder,
-                                  AuthorizationService authorizationService) {
+                                  PasswordEncoder passwordEncoder) {
         this.applicationUserRepository = applicationUserRepository;
         this.applicationUserLoginRepository = applicationUserLoginRepository;
         this.passwordEncoder = passwordEncoder;
-        this.authorizationService = authorizationService;
     }
 
     @PostMapping
@@ -70,7 +67,7 @@ public class RegistrationController {
     @PostMapping("/setup2FA")
     public String setup2FA(@RequestBody @Valid User user) {
         ApplicationUser applicationUser = applicationUserRepository.findFirstByUserLogins(user.getName()).orElseThrow(() -> new RuntimeException("Wrong user/password"));
-        authorizationService.setLoggedInUser(applicationUser, user.getName());
+        applicationUser.setLoggedInUser(user.getName());
         ApplicationUserLogin firstByLogin = applicationUser.getLoggedInUser();
         if (!passwordEncoder.matches(user.getPass(), firstByLogin.getPassword())) {
             throw new BadCredentialsException("Wrong user/password");
@@ -90,7 +87,7 @@ public class RegistrationController {
     @PostMapping("/change-password")
     public String changePassword(@RequestBody @Valid ChangePasswordUser user) {
         ApplicationUser applicationUser = applicationUserRepository.findFirstByUserLogins(user.getName()).orElseThrow(() -> new RuntimeException("Wrong user/password"));
-        authorizationService.setLoggedInUser(applicationUser, user.getName());
+        applicationUser.setLoggedInUser(user.getName());
         ApplicationUserLogin firstByLogin = applicationUser.getLoggedInUser();
         if (!passwordEncoder.matches(user.getOldpass(), firstByLogin.getPassword())) {
             throw new BadCredentialsException("Wrong user/password");
