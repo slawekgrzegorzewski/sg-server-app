@@ -14,4 +14,6 @@ public interface PiggyBanksService {
     Optional<Integer> create(PiggyBank piggyBank);
 
     void update(PiggyBank piggyBank) throws AccountsException;
+
+    void updateAll(List<PiggyBank> piggyBanks) throws AccountsException;
 }

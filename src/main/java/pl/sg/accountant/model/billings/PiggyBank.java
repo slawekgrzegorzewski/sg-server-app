@@ -96,4 +96,10 @@ public class PiggyBank {
         this.monthlyTopUp = monthlyTopUp;
         return this;
     }
+
+    public void addMonthlyTopUp() {
+        if (this.balance != null && this.monthlyTopUp != null) {
+            this.balance = this.balance.add(this.monthlyTopUp);
+        }
+    }
 }

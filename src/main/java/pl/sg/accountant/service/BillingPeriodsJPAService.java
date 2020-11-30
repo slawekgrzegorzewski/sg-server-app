@@ -5,6 +5,7 @@ import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.model.billings.BillingPeriod;
 import pl.sg.accountant.model.billings.Expense;
 import pl.sg.accountant.model.billings.Income;
+import pl.sg.accountant.model.billings.PiggyBank;
 import pl.sg.accountant.model.billings.summary.MonthSummary;
 import pl.sg.accountant.repository.BillingPeriodRepository;
 import pl.sg.accountant.repository.ExpenseRepository;
@@ -18,6 +19,7 @@ import java.time.YearMonth;
 import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class BillingPeriodsJPAService implements BillingPeriodsService {
@@ -119,5 +121,13 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
                 this.accountsService.getForUser(userName),
                 this.piggyBanksService.findByUser(billingPeriod.getApplicationUser()));
         this.monthlySummaryRepository.save(ms);
+
+        List<PiggyBank> piggyBanks =
+                this.piggyBanksService.findByUser(billingPeriod.getApplicationUser()).stream()
+                .filter(pg -> pg.getMonthlyTopUp() != null)
+                .filter(pg -> pg.getMonthlyTopUp().compareTo(BigDecimal.ZERO) > 0)
+                .peek(PiggyBank::addMonthlyTopUp)
+                .collect(Collectors.toList());
+        this.piggyBanksService.updateAll(piggyBanks);
     }
 }

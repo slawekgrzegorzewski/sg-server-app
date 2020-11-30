@@ -6,7 +6,9 @@ import pl.sg.accountant.repository.PiggyBankRepository;
 import pl.sg.application.model.ApplicationUser;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.util.Optional.of;
 
@@ -39,6 +41,19 @@ public class PiggyBanksJPAService implements PiggyBanksService {
         PiggyBank tuUpdate = piggyBankRepository.getOne(piggyBank.getId());
         validateUser(tuUpdate, piggyBank.getApplicationUser());
         this.piggyBankRepository.save(piggyBank);
+    }
+
+    @Override
+    public void updateAll(List<PiggyBank> piggyBanks) throws AccountsException {
+        List<Integer> ids = piggyBanks.stream().map(PiggyBank::getId).collect(Collectors.toList());
+        Map<Integer, ApplicationUser> fromDB = piggyBankRepository
+                .findAllById(ids)
+                .stream()
+                .collect(Collectors.toMap(PiggyBank::getId, PiggyBank::getApplicationUser));
+        for (PiggyBank piggyBank : piggyBanks) {
+            validateUser(piggyBank, fromDB.get(piggyBank.getId()));
+        }
+        this.piggyBankRepository.saveAll(piggyBanks);
     }
 
     private void validateUser(PiggyBank toUpdate, ApplicationUser applicationUser) throws AccountsException {
