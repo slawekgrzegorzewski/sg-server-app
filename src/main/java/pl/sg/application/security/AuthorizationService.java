@@ -20,7 +20,7 @@ import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 @Component
 public class AuthorizationService {
     private static final String ROLES = "roles";
-    private static final Duration DURATION = Duration.ofDays(10 * 365);
+    private static final Duration DURATION = Duration.ofMinutes(20);
 
     private final ApplicationUserRepository applicationUserRepository;
     private final Configuration configuration;

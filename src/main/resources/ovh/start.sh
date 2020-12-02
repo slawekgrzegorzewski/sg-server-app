@@ -3,7 +3,7 @@
 /home/slag/sg-application/stop.sh
 
 sudo service nginx start
-export JWT_TOKEN="aofasfIUIOONNgfdsngoi8291519689"
+export JWT_SECRET="aofasfIUIOONNgfdsngoi8291519689"
 export spring_profiles_active=https
 
 
