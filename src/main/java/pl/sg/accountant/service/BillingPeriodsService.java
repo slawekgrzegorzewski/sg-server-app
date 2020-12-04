@@ -17,6 +17,8 @@ public interface BillingPeriodsService {
 
     List<BillingPeriod> unfinishedBillingPeriods(ApplicationUser user);
 
+    Optional<BillingPeriod> unfinishedCurrentBillingPeriod(ApplicationUser user);
+
     Optional<Integer> create(YearMonth month, ApplicationUser user);
 
     void addIncome(BillingPeriod billingPeriod, Account account, Income income, ApplicationUser user) throws AccountsException;

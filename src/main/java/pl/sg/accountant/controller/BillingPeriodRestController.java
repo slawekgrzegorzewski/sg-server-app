@@ -140,26 +140,28 @@ public class BillingPeriodRestController implements BillingPeriodController {
     }
 
     @Override
-    @PutMapping("/{periodId}/income/{accountId}")
+    @PutMapping("/income/{accountId}")
     @TokenBearerAuth(any = {"ADMIN", "USER"})
-    public ResponseEntity<String> createIncome(@PathVariable int periodId, @PathVariable int accountId,
+    public ResponseEntity<String> createIncome(@PathVariable int accountId,
                                                @RequestBody IncomeTO incomeTO,
                                                @RequestUser ApplicationUser user) throws AccountsException {
         Account account = accountsService.getById(accountId);
-        BillingPeriod billingPeriod = billingPeriodsService.getById(periodId);
+        BillingPeriod billingPeriod = billingPeriodsService.unfinishedCurrentBillingPeriod(user)
+                .orElseThrow(() -> new ArithmeticException("No current billing period available to create an income"));
         Income income = mapper.map(incomeTO, Income.class);
         billingPeriodsService.addIncome(billingPeriod, account, income, user);
         return ResponseEntity.ok("OK");
     }
 
     @Override
-    @PutMapping("/{periodId}/expense/{accountId}")
+    @PutMapping("/expense/{accountId}")
     @TokenBearerAuth(any = {"ADMIN", "USER"})
-    public ResponseEntity<String> createExpense(@PathVariable int periodId, @PathVariable int accountId,
+    public ResponseEntity<String> createExpense(@PathVariable int accountId,
                                                 @RequestBody ExpenseTO expenseTO,
                                                 @RequestUser ApplicationUser user) throws AccountsException {
         Account account = accountsService.getById(accountId);
-        BillingPeriod billingPeriod = billingPeriodsService.getById(periodId);
+        BillingPeriod billingPeriod = billingPeriodsService.unfinishedCurrentBillingPeriod(user)
+                .orElseThrow(() -> new ArithmeticException("No current billing period available to create an expense"));
         Expense expense = mapper.map(expenseTO, Expense.class);
         billingPeriodsService.addExpense(billingPeriod, account, expense, user);
         return ResponseEntity.ok("OK");

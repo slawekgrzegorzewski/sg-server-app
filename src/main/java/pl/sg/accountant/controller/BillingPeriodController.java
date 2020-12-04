@@ -27,11 +27,11 @@ public interface BillingPeriodController {
 
     ResponseEntity<CategoryTO> addCategory(CategoryTO categoryTO, ApplicationUser user) throws AccountsException;
 
-    ResponseEntity<String> createIncome(int periodId, int accountId,
+    ResponseEntity<String> createIncome(int accountId,
                                         IncomeTO incomeTO,
                                         ApplicationUser user) throws AccountsException;
 
-    ResponseEntity<String> createExpense(int periodId, int accountId,
+    ResponseEntity<String> createExpense(int accountId,
                                          ExpenseTO expenseTO,
                                          ApplicationUser user) throws AccountsException;
 }

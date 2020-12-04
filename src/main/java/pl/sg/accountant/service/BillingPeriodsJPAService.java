@@ -63,6 +63,11 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
     }
 
     @Override
+    public Optional<BillingPeriod> unfinishedCurrentBillingPeriod(ApplicationUser user) {
+        return this.billingPeriodRepository.unfinishedCurrentBillingPeriod(user);
+    }
+
+    @Override
     public Optional<Integer> create(YearMonth month, ApplicationUser user) {
         if (this.billingPeriodRepository.findByPeriodEqualsAndApplicationUserEquals(month, user).isPresent()) {
             return Optional.empty();
