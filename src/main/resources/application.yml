@@ -16,3 +16,11 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
+server:
+  ssl:
+    key-store: classpath:keystore.p12
+    key-store-password: slawek
+    key-store-type: pkcs12
+    key-alias: sg-app
+    key-password: slawek
+  port: 8443
