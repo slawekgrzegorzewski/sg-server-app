@@ -32,7 +32,7 @@ public class MonthRestSummaryController implements MonthSummaryController {
 
     @Override
     @GetMapping("/savings/{forNMonths}")
-    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public ResponseEntity<Map<YearMonth, Map<Currency, BigDecimal>>> getSavingsHistory(
             @PathVariable int forNMonths, @RequestUser ApplicationUser user) {
         Map<YearMonth, Map<Currency, BigDecimal>> result;
@@ -50,7 +50,7 @@ public class MonthRestSummaryController implements MonthSummaryController {
 
     @Override
     @GetMapping("/piggy-banks/{forNMonths}")
-    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public ResponseEntity<Map<YearMonth, List<MonthSummaryPiggyBank>>> getPiggyBanksHistory(
             @PathVariable int forNMonths, @RequestUser ApplicationUser user) {
         Map<YearMonth, List<MonthSummaryPiggyBank>> result = new HashMap<>();

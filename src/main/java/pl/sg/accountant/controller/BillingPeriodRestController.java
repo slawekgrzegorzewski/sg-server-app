@@ -48,14 +48,14 @@ public class BillingPeriodRestController implements BillingPeriodController {
 
     @Override
     @GetMapping
-    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public ResponseEntity<BillingPeriodInfo> currentPeriod(@RequestUser ApplicationUser user) {
         return getBilling(YearMonth.now(), user, getUnfinishedPeriods(user));
     }
 
     @Override
     @GetMapping("/{period}")
-    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public ResponseEntity<BillingPeriodInfo> periodForMonth(@PathVariable("period") YearMonth month, @RequestUser ApplicationUser user) {
         return getBilling(month, user, getUnfinishedPeriods(user));
     }
@@ -79,21 +79,21 @@ public class BillingPeriodRestController implements BillingPeriodController {
 
     @Override
     @PutMapping
-    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public ResponseEntity<BillingPeriodInfo> create(@RequestUser ApplicationUser user) {
         return createBilling(YearMonth.now(), user, getUnfinishedPeriods(user));
     }
 
     @Override
     @PutMapping("/{period}")
-    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public ResponseEntity<BillingPeriodInfo> create(@PathVariable("period") YearMonth month, @RequestUser ApplicationUser user) {
         return createBilling(month, user, getUnfinishedPeriods(user));
     }
 
     @Override
     @GetMapping("/{period}/finish")
-    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public ResponseEntity<BillingPeriodInfo> finish(@PathVariable("period") YearMonth month, @RequestUser ApplicationUser user) throws AccountsException {
         Optional<BillingPeriod> period = this.billingPeriodsService.findByPeriodAndUser(month, user);
         if (period.isPresent()) {
@@ -114,7 +114,7 @@ public class BillingPeriodRestController implements BillingPeriodController {
 
     @Override
     @GetMapping("/categories")
-    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public ResponseEntity<List<CategoryTO>> getAllCategories(@RequestUser ApplicationUser user) {
         return ResponseEntity.ok(
                 categoryService.getAllForUser(user).stream()
@@ -125,7 +125,7 @@ public class BillingPeriodRestController implements BillingPeriodController {
 
     @Override
     @PutMapping("/categories")
-    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public ResponseEntity<CategoryTO> addCategory(@RequestBody CategoryTO categoryTO, @RequestUser ApplicationUser user) throws AccountsException {
         Category created;
         if (categoryTO.getId() == null) {
@@ -141,7 +141,7 @@ public class BillingPeriodRestController implements BillingPeriodController {
 
     @Override
     @PutMapping("/income/{accountId}")
-    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public ResponseEntity<String> createIncome(@PathVariable int accountId,
                                                @RequestBody IncomeTO incomeTO,
                                                @RequestUser ApplicationUser user) throws AccountsException {
@@ -155,7 +155,7 @@ public class BillingPeriodRestController implements BillingPeriodController {
 
     @Override
     @PutMapping("/expense/{accountId}")
-    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public ResponseEntity<String> createExpense(@PathVariable int accountId,
                                                 @RequestBody ExpenseTO expenseTO,
                                                 @RequestUser ApplicationUser user) throws AccountsException {

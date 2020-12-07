@@ -31,14 +31,14 @@ public class AccountsRestController implements AccountsController {
 
     @Override
     @GetMapping
-    @TokenBearerAuth(any = {"ADMIN"})
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN"})
     public List<AccountTO> allAccounts() {
         return map(accountsService.getAll());
     }
 
     @Override
     @GetMapping("/mine")
-    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public List<AccountTO> userAccount(@RequestUser(RequestUser.LOGIN) String login) {
         return map(accountsService.getForUser(login));
     }
@@ -49,7 +49,7 @@ public class AccountsRestController implements AccountsController {
 
     @Override
     @PutMapping
-    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public AccountTO createAccount(
             @RequestBody @Valid AccountTO account,
             @RequestUser(RequestUser.LOGIN) String login) {
@@ -60,7 +60,7 @@ public class AccountsRestController implements AccountsController {
 
     @Override
     @PatchMapping
-    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public ResponseEntity<String> updateAccount(
             @RequestBody @Valid AccountTO account,
             @RequestUser(RequestUser.LOGIN) String login) {
@@ -80,7 +80,7 @@ public class AccountsRestController implements AccountsController {
 
     @Override
     @DeleteMapping("/{id}")
-    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public ResponseEntity<String> deleteAccount(
             @PathVariable Integer id,
             @RequestUser(RequestUser.LOGIN) String login) {

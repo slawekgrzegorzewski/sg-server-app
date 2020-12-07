@@ -32,7 +32,7 @@ public class TransactionsRestController implements TransactionsController {
 
     @Override
     @GetMapping
-    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public List<FinancialTransactionTO> getUserTransactions(@RequestUser(RequestUser.LOGIN) String login) {
         return transactionsService.transactionsForUser(login).stream()
                 .map(t -> this.mapper.map(t, FinancialTransactionTO.class))
@@ -41,7 +41,7 @@ public class TransactionsRestController implements TransactionsController {
 
     @Override
     @PostMapping("/transfer/{from}/{to}/{amount}")
-    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public FinancialTransactionTO transfer(
             @PathVariable("from") int fromId,
             @PathVariable("to") int toId,
@@ -54,7 +54,7 @@ public class TransactionsRestController implements TransactionsController {
 
     @Override
     @PostMapping("/transfer_with_conversion/{from}/{to}/{amount}/{targetAmount}/{rate}")
-    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public FinancialTransactionTO transferWithConversion(
             @PathVariable("from") int fromId,
             @PathVariable("to") int toId,
@@ -69,7 +69,7 @@ public class TransactionsRestController implements TransactionsController {
 
     @Override
     @PostMapping("/credit/{accountId}/{amount}")
-    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public FinancialTransactionTO credit(
             @PathVariable int accountId,
             @PathVariable("amount") @PositiveOrZero BigDecimal amount,
@@ -81,7 +81,7 @@ public class TransactionsRestController implements TransactionsController {
 
     @Override
     @PostMapping("/debit/{accountId}/{amount}")
-    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public FinancialTransactionTO debit(
             @PathVariable int accountId,
             @PathVariable("amount") @PositiveOrZero BigDecimal amount,

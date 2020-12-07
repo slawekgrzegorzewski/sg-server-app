@@ -28,7 +28,7 @@ public class PiggyBankRestController implements PiggyBankController {
 
     @Override
     @GetMapping
-    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public ResponseEntity<List<PiggyBankTO>> getAll(@RequestUser ApplicationUser user) {
         List<PiggyBankTO> result = piggyBanksService.findByUser(user).stream()
                 .map(pb -> mapper.map(pb, PiggyBankTO.class))
@@ -38,7 +38,7 @@ public class PiggyBankRestController implements PiggyBankController {
 
     @Override
     @PutMapping
-    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public ResponseEntity<Integer> create(@RequestBody PiggyBankTO piggyBankTO, @RequestUser ApplicationUser user) {
         PiggyBank piggyBank = mapper.map(piggyBankTO, PiggyBank.class);
         piggyBank.setApplicationUser(user);
@@ -49,7 +49,7 @@ public class PiggyBankRestController implements PiggyBankController {
 
     @Override
     @PatchMapping
-    @TokenBearerAuth(any = {"ADMIN", "USER"})
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public ResponseEntity<String> update(@RequestBody PiggyBankTO piggyBankTO, @RequestUser ApplicationUser user) throws AccountsException {
         PiggyBank piggyBank = piggyBanksService.getById(piggyBankTO.getId());
         mapper.map(piggyBankTO, piggyBank);
