@@ -5,12 +5,20 @@ import org.springframework.stereotype.Component;
 import pl.sg.checker.PageElementExtractor;
 import pl.sg.checker.PageFetcher;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
 @Component
 public class Checker {
     private static final String PAGE = "http://www.szkockiewrzosowisko.pl/";
     private final PageFetcher fetcher;
     private final PageElementExtractor pageElementExtractor;
     private final PageVersionsService pageVersionsService;
+
+    private String serverAddress = "https://localhost:8443";
+
 
     public Checker(PageFetcher fetcher, PageElementExtractor pageElementExtractor, PageVersionsService pageVersionsService) {
         this.fetcher = fetcher;
@@ -25,11 +33,21 @@ public class Checker {
                         .map(element -> PAGE + element.attr("href"))
                         .flatMap(this.fetcher::getPage))
                 .map(pageContent ->
-                    this.pageElementExtractor.visitElements(pageContent, "[src]", element -> {
-                        element.attr("src", PAGE + element.attr("src"));
-                    })
+                        this.pageElementExtractor.visitElements(pageContent, "[src]", element -> {
+                            String pageUrl = PAGE + element.attr("src").replace(" ", "%20");
+                            try {
+                                element.attr("src",
+                                        serverAddress + "/image-proxy/" + encodeValue(pageUrl));
+                            } catch (UnsupportedEncodingException e) {
+                                System.out.println("Error");
+                            }
+                        })
                 )
                 .ifPresent(this.pageVersionsService::updateVersion);
+    }
+
+    private String encodeValue(String value) throws UnsupportedEncodingException {
+        return new String(Base64.getEncoder().encode(value.getBytes(StandardCharsets.UTF_8)));
     }
 
 }

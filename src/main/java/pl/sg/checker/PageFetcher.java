@@ -4,4 +4,6 @@ import java.util.Optional;
 
 public interface PageFetcher {
     Optional<String> getPage(String page);
+
+    Optional<byte[]> getImage(String url);
 }
