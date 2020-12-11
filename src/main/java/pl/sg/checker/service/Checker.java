@@ -17,7 +17,7 @@ public class Checker {
     private final PageElementExtractor pageElementExtractor;
     private final PageVersionsService pageVersionsService;
 
-    private String serverAddress = "https://localhost:8443";
+    private String serverAddress = "https://grzegorzewski.org:8443";
 
 
     public Checker(PageFetcher fetcher, PageElementExtractor pageElementExtractor, PageVersionsService pageVersionsService) {
