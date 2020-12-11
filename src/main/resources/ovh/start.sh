@@ -4,6 +4,7 @@
 
 sudo service nginx start
 export JWT_SECRET="aofasfIUIOONNgfdsngoi8291519689"
+export SENDGRID_API_KEY="afdsjlfkdsjf"
 export spring_profiles_active=https
 
 

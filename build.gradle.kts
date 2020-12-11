@@ -43,6 +43,7 @@ dependencies {
     implementation("jakarta.xml.bind:jakarta.xml.bind-api:2.3.3")
     implementation("org.glassfish.jaxb:jaxb-runtime:2.3.3")
     implementation("org.jsoup:jsoup:1.13.1")
+    implementation("com.sendgrid:sendgrid-java:4.7.0")
 
     compileOnly("org.projectlombok:lombok:1.18.8")
     compileOnly("org.springframework.boot:spring-boot-devtools:2.3.3.RELEASE")
