@@ -37,6 +37,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-aop:2.3.3.RELEASE")
     implementation("org.springframework.boot:spring-boot-starter-validation:2.3.3.RELEASE")
     implementation("org.hibernate.validator:hibernate-validator:6.1.5.Final")
+    implementation("org.codehaus.groovy:groovy-all:3.0.7")
 
     implementation("org.modelmapper:modelmapper:2.3.6")
     implementation("org.jboss.aerogear:aerogear-otp-java:1.0.0")

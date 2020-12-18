@@ -2,52 +2,45 @@ package pl.sg.checker.service;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import pl.sg.checker.PageElementExtractor;
-import pl.sg.checker.PageFetcher;
+import pl.sg.checker.engine.CheckerProcessor;
+import pl.sg.checker.engine.TaskResult;
+import pl.sg.checker.model.CheckerTask;
+import pl.sg.checker.model.CheckerTaskHistory;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Component
 public class Checker {
-    private static final String PAGE = "http://www.szkockiewrzosowisko.pl/";
-    private final PageFetcher fetcher;
-    private final PageElementExtractor pageElementExtractor;
-    private final PageVersionsService pageVersionsService;
-
-    private String serverAddress = "https://grzegorzewski.org:8443";
+    private final CheckerProcessor processor;
+    private final CheckerTaskRepository checkerTaskRepository;
+    private final CheckerTaskHistoryRepository checkerTaskHistoryRepository;
 
 
-    public Checker(PageFetcher fetcher, PageElementExtractor pageElementExtractor, PageVersionsService pageVersionsService) {
-        this.fetcher = fetcher;
-        this.pageElementExtractor = pageElementExtractor;
-        this.pageVersionsService = pageVersionsService;
+    public Checker(CheckerProcessor processor, CheckerTaskRepository checkerTaskRepository, CheckerTaskHistoryRepository checkerTaskHistoryRepository) {
+        this.processor = processor;
+        this.checkerTaskRepository = checkerTaskRepository;
+        this.checkerTaskHistoryRepository = checkerTaskHistoryRepository;
     }
 
-    @Scheduled(fixedDelay = 3600 * 1000)
+    @Scheduled(fixedDelay = 1 * 1000)
     public void scheduleFixedDelayTask() {
-        this.fetcher.getPage(PAGE)
-                .flatMap(p -> this.pageElementExtractor.getElement(p, "a[href*=\"aktualnosci\"]")
-                        .map(element -> PAGE + element.attr("href"))
-                        .flatMap(this.fetcher::getPage))
-                .map(pageContent ->
-                        this.pageElementExtractor.visitElements(pageContent, "[src]", element -> {
-                            String pageUrl = PAGE + element.attr("src").replace(" ", "%20");
-                            try {
-                                element.attr("src",
-                                        serverAddress + "/image-proxy/" + encodeValue(pageUrl));
-                            } catch (UnsupportedEncodingException e) {
-                                System.out.println("Error");
-                            }
-                        })
-                )
-                .ifPresent(this.pageVersionsService::updateVersion);
-    }
-
-    private String encodeValue(String value) throws UnsupportedEncodingException {
-        return new String(Base64.getEncoder().encode(value.getBytes(StandardCharsets.UTF_8)));
+        List<CheckerTask> tasks = this.checkerTaskRepository.findTasksToRun();
+        for (CheckerTask task : tasks) {
+            processor.clearContext();
+            processor.setTask(task);
+            TaskResult result = processor.process(task);
+            CheckerTaskHistory history = new CheckerTaskHistory()
+                    .setTask(task)
+                    .setResult(result.getResult())
+                    .setMessages(result.getMessages())
+                    .setRunTime(LocalDateTime.now());
+            checkerTaskHistoryRepository.save(history);
+            task.getHistory().add(history);
+            task.setNextRun(history.getRunTime().plus(task.getInterval()));
+            checkerTaskRepository.save(task);
+            processor.clearContext();
+        }
     }
 
 }
