@@ -53,10 +53,9 @@ public class MonthRestSummaryController implements MonthSummaryController {
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public ResponseEntity<Map<YearMonth, List<MonthSummaryPiggyBank>>> getPiggyBanksHistory(
             @PathVariable int forNMonths, @RequestUser ApplicationUser user) {
-        Map<YearMonth, List<MonthSummaryPiggyBank>> result = new HashMap<>();
         YearMonth from = YearMonth.now().minusMonths(forNMonths);
         List<MonthSummary> allBySinceYear = this.monthlySummaryRepository.findAll();
-        result = allBySinceYear.stream()
+        Map<YearMonth, List<MonthSummaryPiggyBank>> result = allBySinceYear.stream()
                 .filter(ms -> ms.getBillingPeriod().getPeriod().isAfter(from.minusMonths(1)))
                 .collect(Collectors.toMap(
                         monthSummary -> monthSummary.getBillingPeriod().getPeriod(),

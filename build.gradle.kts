@@ -46,6 +46,9 @@ dependencies {
     implementation("org.jsoup:jsoup:1.13.1")
     implementation("com.sendgrid:sendgrid-java:4.7.0")
 
+    implementation("org.apache.poi:poi:3.15")
+    implementation("org.apache.poi:poi-ooxml:3.15")
+
     compileOnly("org.projectlombok:lombok:1.18.8")
     compileOnly("org.springframework.boot:spring-boot-devtools:2.3.3.RELEASE")
 
