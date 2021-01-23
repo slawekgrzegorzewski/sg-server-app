@@ -7,7 +7,7 @@ import pl.sg.accountant.model.accounts.FinancialTransaction;
 import java.util.List;
 
 public interface FinancialTransactionRepository extends JpaRepository<FinancialTransaction, Integer> {
-    @Query("SELECT ft FROM FinancialTransaction ft " +
+    @Query("SELECT DISTINCT ft FROM FinancialTransaction ft " +
             "LEFT JOIN ft.source s " +
             "LEFT JOIN s.applicationUser sau " +
             "LEFT JOIN sau.userLogins saul " +
@@ -18,3 +18,4 @@ public interface FinancialTransactionRepository extends JpaRepository<FinancialT
             "OR daul.login = ?1")
     List<FinancialTransaction> findAllByLogin(String login);
 }
+

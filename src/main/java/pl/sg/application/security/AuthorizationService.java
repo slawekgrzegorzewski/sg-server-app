@@ -20,7 +20,7 @@ import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 @Component
 public class AuthorizationService {
     private static final String ROLES = "roles";
-    private static final Duration DURATION = Duration.ofMinutes(20);
+    private static final Duration TOKEN_DURATION = Duration.ofDays(30);
 
     private final ApplicationUserRepository applicationUserRepository;
     private final Configuration configuration;
@@ -72,7 +72,7 @@ public class AuthorizationService {
         return JWT.create()
                 .withSubject(subject)
                 .withClaim(ROLES, roles)
-                .withExpiresAt(new Date(System.currentTimeMillis() + DURATION.toMillis()))
+                .withExpiresAt(new Date(System.currentTimeMillis() + TOKEN_DURATION.toMillis()))
                 .sign(HMAC512(configuration.getJWTTokenSecret().getBytes()));
     }
 
