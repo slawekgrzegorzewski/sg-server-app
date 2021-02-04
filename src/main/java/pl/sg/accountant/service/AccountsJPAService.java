@@ -3,6 +3,7 @@ package pl.sg.accountant.service;
 import org.springframework.stereotype.Component;
 import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.repository.AccountRepository;
+import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.ApplicationUserRepository;
 
 import java.util.List;
@@ -36,8 +37,8 @@ public class AccountsJPAService implements AccountsService {
     }
 
     @Override
-    public List<Account> getForUser(String userName) {
-        return accountRepository.findAllByApplicationUserLogin(userName);
+    public List<Account> getForUser(ApplicationUser user) {
+        return accountRepository.findAllByApplicationUserLogin(user);
     }
 
     @Override

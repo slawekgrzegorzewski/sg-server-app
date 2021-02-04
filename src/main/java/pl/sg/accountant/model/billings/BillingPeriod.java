@@ -1,8 +1,10 @@
 package pl.sg.accountant.model.billings;
 
+import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.model.billings.summary.MonthSummary;
 import pl.sg.application.database.YearMonthStringAttributeConverter;
 import pl.sg.application.model.ApplicationUser;
+import pl.sg.application.model.Domain;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -26,7 +28,7 @@ public class BillingPeriod {
     @OneToOne(mappedBy = "billingPeriod")
     private MonthSummary monthSummary;
     @ManyToOne
-    private ApplicationUser applicationUser;
+    private Domain domain;
 
     public BillingPeriod() {
     }
@@ -67,12 +69,12 @@ public class BillingPeriod {
         return this;
     }
 
-    public ApplicationUser getApplicationUser() {
-        return applicationUser;
+    public Domain getDomain() {
+        return domain;
     }
 
-    public BillingPeriod setApplicationUser(ApplicationUser applicationUser) {
-        this.applicationUser = applicationUser;
+    public BillingPeriod setDomain(Domain domain) {
+        this.domain = domain;
         return this;
     }
 

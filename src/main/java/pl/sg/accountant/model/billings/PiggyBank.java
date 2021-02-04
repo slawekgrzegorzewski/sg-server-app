@@ -1,6 +1,8 @@
 package pl.sg.accountant.model.billings;
 
+import pl.sg.accountant.model.accounts.Account;
 import pl.sg.application.model.ApplicationUser;
+import pl.sg.application.model.Domain;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -25,7 +27,7 @@ public class PiggyBank {
     private boolean savings;
     private BigDecimal monthlyTopUp;
     @ManyToOne
-    private ApplicationUser applicationUser;
+    private Domain domain;
 
     public PiggyBank() {
     }
@@ -79,12 +81,12 @@ public class PiggyBank {
         return this;
     }
 
-    public ApplicationUser getApplicationUser() {
-        return applicationUser;
+    public Domain getDomain() {
+        return domain;
     }
 
-    public PiggyBank setApplicationUser(ApplicationUser applicationUser) {
-        this.applicationUser = applicationUser;
+    public PiggyBank setDomain(Domain domain) {
+        this.domain = domain;
         return this;
     }
 

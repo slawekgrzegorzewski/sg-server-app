@@ -8,8 +8,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.sg.application.model.ApplicationUser;
-import pl.sg.application.model.ApplicationUserLogin;
-import pl.sg.application.model.ApplicationUserLoginRepository;
 import pl.sg.application.model.ApplicationUserRepository;
 
 import javax.servlet.http.HttpServletResponse;
@@ -29,15 +27,12 @@ public class RegistrationController {
 
     public static final String APP_NAME = "accountant";
     private final ApplicationUserRepository applicationUserRepository;
-    private final ApplicationUserLoginRepository applicationUserLoginRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public RegistrationController(ApplicationUserRepository applicationUserRepository,
-                                  ApplicationUserLoginRepository applicationUserLoginRepository,
                                   PasswordEncoder passwordEncoder) {
         this.applicationUserRepository = applicationUserRepository;
-        this.applicationUserLoginRepository = applicationUserLoginRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -53,54 +48,47 @@ public class RegistrationController {
             throw new BadCredentialsException(String.format("Username %s already exists.", uname));
         }
         ApplicationUser applicationUser = new ApplicationUser();
-        ApplicationUserLogin applicationUserLogin = new ApplicationUserLogin();
-        applicationUserLogin.setLogin(uname);
-        applicationUserLogin.setPassword(passwordEncoder.encode(upass));
-        applicationUser.setUserLogins(List.of(applicationUserLogin));
-        applicationUser.setLoggedInUser(applicationUserLogin);
-        applicationUserLogin.setApplicationUser(applicationUser);
+        applicationUser.setLogin(uname);
+        applicationUser.setPassword(passwordEncoder.encode(upass));
         applicationUserRepository.save(applicationUser);
-        applicationUserLoginRepository.save(applicationUserLogin);
-        return fromApplicationUser(APP_NAME, uname, applicationUser.getLoggedInUser().getSecret()).qrLink();
+        return fromApplicationUser(APP_NAME, uname, applicationUser.getSecret()).qrLink();
     }
 
     @PostMapping("/setup2FA")
     public String setup2FA(@RequestBody @Valid User user) {
-        ApplicationUser applicationUser = applicationUserRepository.findFirstByUserLogins(user.getName()).orElseThrow(() -> new RuntimeException("Wrong user/password"));
-        applicationUser.setLoggedInUser(user.getName());
-        ApplicationUserLogin firstByLogin = applicationUser.getLoggedInUser();
-        if (!passwordEncoder.matches(user.getPass(), firstByLogin.getPassword())) {
+        ApplicationUser applicationUser = applicationUserRepository.findFirstByUserLogins(user.getName())
+                .orElseThrow(() -> new RuntimeException("Wrong user/password"));
+        if (!passwordEncoder.matches(user.getPass(), applicationUser.getPassword())) {
             throw new BadCredentialsException("Wrong user/password");
         }
-        if (firstByLogin.isUsing2FA()) {
+        if (applicationUser.isUsing2FA()) {
             throw new BadCredentialsException("2FA already configured");
         }
-        Totp totp = new Totp(firstByLogin.getSecret());
+        Totp totp = new Totp(applicationUser.getSecret());
         if (!totp.verify(String.valueOf(user.getSecretFor2FA()))) {
             throw new BadCredentialsException("Invalid verification code");
         }
-        firstByLogin.setUsing2FA(true);
+        applicationUser.setUsing2FA(true);
         applicationUserRepository.save(applicationUser);
         return "It's good";
     }
 
     @PostMapping("/change-password")
     public String changePassword(@RequestBody @Valid ChangePasswordUser user) {
-        ApplicationUser applicationUser = applicationUserRepository.findFirstByUserLogins(user.getName()).orElseThrow(() -> new RuntimeException("Wrong user/password"));
-        applicationUser.setLoggedInUser(user.getName());
-        ApplicationUserLogin firstByLogin = applicationUser.getLoggedInUser();
-        if (!passwordEncoder.matches(user.getOldpass(), firstByLogin.getPassword())) {
+        ApplicationUser applicationUser = applicationUserRepository.findFirstByUserLogins(user.getName())
+                .orElseThrow(() -> new RuntimeException("Wrong user/password"));
+        if (!passwordEncoder.matches(user.getOldpass(), applicationUser.getPassword())) {
             throw new BadCredentialsException("Wrong user/password");
         }
-        if (!firstByLogin.isUsing2FA()) {
+        if (!applicationUser.isUsing2FA()) {
             throw new BadCredentialsException("2FA already configured");
         }
-        Totp totp = new Totp(firstByLogin.getSecret());
+        Totp totp = new Totp(applicationUser.getSecret());
         if (!totp.verify(String.valueOf(user.getAuthcode()))) {
             throw new BadCredentialsException("User not registered properly");
         }
-        firstByLogin.setPassword(passwordEncoder.encode(user.getNewpass()));
-        applicationUserLoginRepository.save(firstByLogin);
+        applicationUser.setPassword(passwordEncoder.encode(user.getNewpass()));
+        applicationUserRepository.save(applicationUser);
         return "It's good";
     }
 

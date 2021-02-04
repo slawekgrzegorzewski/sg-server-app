@@ -25,8 +25,6 @@ public class FinancialTransaction {
     private BigDecimal debit;
     private BigDecimal credit;
     private BigDecimal conversionRate;
-    @ManyToOne
-    private ApplicationUser applicationUser;
     private LocalDateTime timeOfTransaction;
 
 
@@ -88,15 +86,6 @@ public class FinancialTransaction {
 
     public FinancialTransaction setConversionRate(BigDecimal conversionRate) {
         this.conversionRate = conversionRate;
-        return this;
-    }
-
-    public ApplicationUser getApplicationUser() {
-        return applicationUser;
-    }
-
-    public FinancialTransaction setApplicationUser(ApplicationUser applicationUser) {
-        this.applicationUser = applicationUser;
         return this;
     }
 

@@ -9,6 +9,7 @@ import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.service.AccountsService;
 import pl.sg.accountant.transport.accounts.AccountTO;
 import pl.sg.application.ForbiddenException;
+import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.security.annotations.RequestUser;
 import pl.sg.application.security.annotations.TokenBearerAuth;
 
@@ -39,8 +40,8 @@ public class AccountsRestController implements AccountsController {
     @Override
     @GetMapping("/mine")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public List<AccountTO> userAccount(@RequestUser(RequestUser.LOGIN) String login) {
-        return map(accountsService.getForUser(login));
+    public List<AccountTO> userAccount(@RequestUser ApplicationUser user) {
+        return map(accountsService.getForUser(user));
     }
 
     private List<AccountTO> map(List<Account> accounts) {

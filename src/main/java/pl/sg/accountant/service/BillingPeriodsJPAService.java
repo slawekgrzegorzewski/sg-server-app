@@ -121,9 +121,9 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
         if (monthSummary.isPresent()) {
             throw new AccountsException("Already finished billing period");
         }
-        String userName = billingPeriod.getApplicationUser().getLoggedInUser().getLogin();
+        ApplicationUser user = billingPeriod.getApplicationUser().getLoggedInUser();
         MonthSummary ms = new MonthSummary(billingPeriod,
-                this.accountsService.getForUser(userName),
+                this.accountsService.getForUser(user),
                 this.piggyBanksService.findByUser(billingPeriod.getApplicationUser()));
         this.monthlySummaryRepository.save(ms);
 
