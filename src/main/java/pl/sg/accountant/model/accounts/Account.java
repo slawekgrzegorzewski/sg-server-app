@@ -25,7 +25,6 @@ public class Account {
     private BigDecimal currentBalance = new BigDecimal(0);
     @ManyToOne
     private FinancialTransaction lastTransactionIncludedInBalance;
-    @NotNull
     @ManyToOne
     private Domain domain;
 

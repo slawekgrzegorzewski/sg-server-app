@@ -34,7 +34,7 @@ public class TransactionsJPAService implements TransactionsService {
     public List<FinancialTransaction> transactionsForUserAndDomain(ApplicationUser user, int domainId) {
         final Domain domain = domainService.getById(domainId);
         user.validateDomain(domain);
-        return financialTransactionRepository.findAllByDomain(domainId);
+        return financialTransactionRepository.findAllByDomain(domain);
     }
 
     @Override

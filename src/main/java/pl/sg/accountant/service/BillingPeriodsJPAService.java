@@ -70,7 +70,7 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
 
     @Override
     public Optional<BillingPeriod> findByPeriodAndDomain(ApplicationUser user, int domainId, YearMonth month) {
-        return this.billingPeriodRepository.findByPeriodEqualsAndDomainIdEquals(domainId, month)
+        return this.billingPeriodRepository.findByDomainIdAndPeriod(domainId, month)
                 .map(byId -> {
                     user.validateDomain(byId.getDomain());
                     return byId;
@@ -79,7 +79,9 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
 
     @Override
     public List<BillingPeriod> unfinishedBillingPeriods(ApplicationUser user, int domainId) {
-        return this.billingPeriodRepository.allUnfinishedBillingPeriods(user, domainId);
+        final Domain domain = domainService.getById(domainId);
+        user.validateDomain(domain);
+        return this.billingPeriodRepository.allUnfinishedBillingPeriods(domain);
     }
 
     @Override
@@ -100,7 +102,7 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
     @Override
     public void addIncome(ApplicationUser user, int accountId, Income income) {
         Account account = accountsService.getById(user, accountId);
-        BillingPeriod billingPeriod = unfinishedCurrentBillingPeriod(user, account.getDomain().getId());
+        BillingPeriod billingPeriod = unfinishedCurrentBillingPeriod(account.getDomain());
 
         user.validateDomain(account.getDomain());
         user.validateDomain(billingPeriod.getDomain());
@@ -117,7 +119,7 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
     @Override
     public void addExpense(ApplicationUser user, int accountId, Expense expense) {
         Account account = accountsService.getById(user, accountId);
-        BillingPeriod billingPeriod = unfinishedCurrentBillingPeriod(user, account.getDomain().getId());
+        BillingPeriod billingPeriod = unfinishedCurrentBillingPeriod(account.getDomain());
 
         user.validateDomain(account.getDomain());
         user.validateDomain(billingPeriod.getDomain());
@@ -132,8 +134,8 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
         expenseRepository.save(expense);
     }
 
-    private BillingPeriod unfinishedCurrentBillingPeriod(ApplicationUser user, int domainId) {
-        return this.billingPeriodRepository.unfinishedCurrentBillingPeriod(user, domainId)
+    private BillingPeriod unfinishedCurrentBillingPeriod(Domain domain) {
+        return this.billingPeriodRepository.unfinishedCurrentBillingPeriod(domain)
                 .orElseThrow(() -> new EntityNotFoundException("No current billing period available to create an income"));
     }
 
@@ -163,9 +165,9 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
         this.monthlySummaryRepository.save(ms);
 
         piggyBanks.stream()
-                        .filter(pg -> pg.getMonthlyTopUp() != null)
-                        .filter(pg -> pg.getMonthlyTopUp().compareTo(BigDecimal.ZERO) > 0)
-                        .forEach(PiggyBank::addMonthlyTopUp);
+                .filter(pg -> pg.getMonthlyTopUp() != null)
+                .filter(pg -> pg.getMonthlyTopUp().compareTo(BigDecimal.ZERO) > 0)
+                .forEach(PiggyBank::addMonthlyTopUp);
 
         this.piggyBanksService.updateAll(user, piggyBanks);
     }

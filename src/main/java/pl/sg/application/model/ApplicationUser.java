@@ -1,6 +1,8 @@
 package pl.sg.application.model;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.jboss.aerogear.security.otp.api.Base32;
 import pl.sg.application.UnauthorizedException;
 
@@ -8,8 +10,6 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Entity
 public class ApplicationUser {
@@ -18,6 +18,7 @@ public class ApplicationUser {
     private int id;
     private String login;
     private String password;
+    @Column(columnDefinition = "boolean not null default false")
     private boolean isUsing2FA;
     private String secret;
 
@@ -25,6 +26,7 @@ public class ApplicationUser {
     private String lastName;
     private String email;
     @ElementCollection(fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<String> roles;
 
     @OneToMany(mappedBy = "applicationUser")

@@ -1,5 +1,8 @@
 package pl.sg.checker.model;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,6 +15,7 @@ public class PageVersion {
     @ManyToOne
     CheckerTask task;
     @ElementCollection(fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
     @Column(length = 200_000)
     private List<String> content;
     private LocalDateTime versionTime;
