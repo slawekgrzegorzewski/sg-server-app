@@ -1,12 +1,15 @@
 package pl.sg.accountant.service;
 
 import org.springframework.stereotype.Component;
+import pl.sg.accountant.model.AccountsException;
 import pl.sg.accountant.model.OperationType;
 import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.model.accounts.FinancialTransaction;
 import pl.sg.accountant.repository.AccountRepository;
 import pl.sg.accountant.repository.FinancialTransactionRepository;
 import pl.sg.application.model.ApplicationUser;
+import pl.sg.application.model.Domain;
+import pl.sg.application.service.DomainService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -16,41 +19,51 @@ import java.util.List;
 public class TransactionsJPAService implements TransactionsService {
     private final AccountRepository accountRepository;
     private final FinancialTransactionRepository financialTransactionRepository;
+    private final DomainService domainService;
 
     public TransactionsJPAService(
             AccountRepository accountRepository,
-            FinancialTransactionRepository financialTransactionRepository) {
+            FinancialTransactionRepository financialTransactionRepository,
+            DomainService domainService) {
         this.accountRepository = accountRepository;
         this.financialTransactionRepository = financialTransactionRepository;
+        this.domainService = domainService;
     }
 
     @Override
-    public List<FinancialTransaction> transactionsForUser(String login) {
-        return financialTransactionRepository.findAllByLogin(login);
+    public List<FinancialTransaction> transactionsForUserAndDomain(ApplicationUser user, int domainId) {
+        final Domain domain = domainService.getById(domainId);
+        user.validateDomain(domain);
+        return financialTransactionRepository.findAllByDomain(domainId);
     }
 
     @Override
     public FinancialTransaction transferMoneyWithoutConversion(int sourceAccount, int destinationAccount,
                                                                BigDecimal amount, String description,
-                                                               ApplicationUser user) throws AccountsException {
+                                                               ApplicationUser user) {
         return transfer(sourceAccount, destinationAccount, description, user, amount, amount, BigDecimal.ONE);
     }
 
     @Override
-    public FinancialTransaction transferMoneyWithConversion(int sourceAccount, int destinationAccount, BigDecimal amount, BigDecimal targetAmount, BigDecimal rate, String description, ApplicationUser user) throws AccountsException {
+    public FinancialTransaction transferMoneyWithConversion(int sourceAccount, int destinationAccount, BigDecimal amount, BigDecimal targetAmount, BigDecimal rate, String description, ApplicationUser user) {
         return transfer(sourceAccount, destinationAccount, description, user, amount, targetAmount, rate);
     }
 
-    private FinancialTransaction transfer(int sourceAccount, int destinationAccount, String description, ApplicationUser user, BigDecimal amount, BigDecimal targetAmount, BigDecimal rate) throws AccountsException {
+    private FinancialTransaction transfer(int sourceAccount,
+                                          int destinationAccount,
+                                          String description,
+                                          ApplicationUser user,
+                                          BigDecimal amount,
+                                          BigDecimal targetAmount,
+                                          BigDecimal rate) {
         Account from = accountRepository.getOne(sourceAccount);
         Account to = accountRepository.getOne(destinationAccount);
-        validateUserOwnsTheAccount(from, user);
-        validateUserOwnsTheAccount(to, user);
+        user.validateDomain(from.getDomain());
+        user.validateDomain(to.getDomain());
         FinancialTransaction financialTransaction = new FinancialTransaction()
                 .setTimeOfTransaction(LocalDateTime.now())
                 .setDescription(description)
-                .setTimeOfTransaction(LocalDateTime.now())
-                .setApplicationUser(user);
+                .setTimeOfTransaction(LocalDateTime.now());
         if (amount.equals(targetAmount)) {
             financialTransaction.transfer(from, to, amount);
         } else {
@@ -64,37 +77,25 @@ public class TransactionsJPAService implements TransactionsService {
     }
 
     @Override
-    public FinancialTransaction credit(int accountId, BigDecimal amount, String description, ApplicationUser user) throws AccountsException {
+    public FinancialTransaction credit(int accountId, BigDecimal amount, String description, ApplicationUser user) {
         return operation(accountId, amount, description, user, OperationType.CREDIT);
     }
 
     @Override
-    public FinancialTransaction debit(int accountId, BigDecimal amount, String description, ApplicationUser user) throws AccountsException {
+    public FinancialTransaction debit(int accountId, BigDecimal amount, String description, ApplicationUser user) {
         return operation(accountId, amount, description, user, OperationType.DEBIT);
     }
 
-    private FinancialTransaction operation(int accountId, BigDecimal amount, String description, ApplicationUser user, OperationType type) throws AccountsException {
+    private FinancialTransaction operation(int accountId, BigDecimal amount, String description, ApplicationUser user, OperationType type) {
         Account account = accountRepository.getOne(accountId);
-        validateUserOwnsTheAccount(account, user);
+        user.validateDomain(account.getDomain());
         FinancialTransaction financialTransaction = new FinancialTransaction()
                 .setTimeOfTransaction(LocalDateTime.now())
                 .transfer(account, amount, type)
-                .setDescription(description)
-                .setApplicationUser(user);
+                .setDescription(description);
         financialTransaction = financialTransactionRepository.save(financialTransaction);
         type.getOperation().accept(account, financialTransaction);
         accountRepository.save(account);
         return financialTransaction;
-    }
-
-    private ApplicationUser validateUserOwnsTheAccount(Account account, ApplicationUser user) throws AccountsException {
-        if (!accountBelongsTo(account, user)) {
-            throw new AccountsException("Trying to send money between accounts which does not belong to the user.");
-        }
-        return user;
-    }
-
-    private boolean accountBelongsTo(Account account, ApplicationUser user) {
-        return account.getApplicationUser().getId() == user.getId();
     }
 }

@@ -1,6 +1,5 @@
 package pl.sg.accountant.model.accounts;
 
-import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.Domain;
 
 import javax.persistence.*;
@@ -26,6 +25,7 @@ public class Account {
     private BigDecimal currentBalance = new BigDecimal(0);
     @ManyToOne
     private FinancialTransaction lastTransactionIncludedInBalance;
+    @NotNull
     @ManyToOne
     private Domain domain;
 

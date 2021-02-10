@@ -61,11 +61,8 @@ public class AuthorizationService {
     }
 
     public ApplicationUser getUserInfo(String token) {
-        DecodedJWT decodedJWT = decodeToken(token);
-        ApplicationUser applicationUser = applicationUserRepository.findFirstByUserLogins(extractUserName(decodedJWT))
+        return applicationUserRepository.findFirstByUserLogins(extractUserName(decodeToken(token)))
                 .orElseThrow(() -> new UnauthorizedException("Wrong JWT token"));
-        applicationUser.setLoggedInUser(extractUserName(decodedJWT));
-        return applicationUser;
     }
 
     public String generateJWTToken(String subject, List<String> roles) {
@@ -74,11 +71,6 @@ public class AuthorizationService {
                 .withClaim(ROLES, roles)
                 .withExpiresAt(new Date(System.currentTimeMillis() + TOKEN_DURATION.toMillis()))
                 .sign(HMAC512(configuration.getJWTTokenSecret().getBytes()));
-    }
-
-    private int extractUserId(DecodedJWT token) {
-        String[] elements = token.getSubject().split(":");
-        return Integer.parseInt(elements[0]);
     }
 
     private String extractUserName(DecodedJWT token) {

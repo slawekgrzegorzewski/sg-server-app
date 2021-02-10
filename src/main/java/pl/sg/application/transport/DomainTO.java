@@ -1,20 +1,20 @@
 package pl.sg.application.transport;
 
 public class DomainTO {
-    private int id;
 
+    private Integer id;
     String name;
 
 
     public DomainTO() {
     }
 
-    public DomainTO(int id, String name) {
+    public DomainTO(Integer id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

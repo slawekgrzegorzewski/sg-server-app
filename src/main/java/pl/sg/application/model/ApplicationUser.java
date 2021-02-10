@@ -2,11 +2,14 @@ package pl.sg.application.model;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jboss.aerogear.security.otp.api.Base32;
+import pl.sg.application.UnauthorizedException;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Entity
 public class ApplicationUser {
@@ -23,6 +26,9 @@ public class ApplicationUser {
     private String email;
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles;
+
+    @OneToMany(mappedBy = "applicationUser")
+    List<ApplicationUserDomainRelation> assignedDomains;
 
     public ApplicationUser() {
         this.secret = Base32.encode(RandomStringUtils.randomAscii(10).getBytes());
@@ -90,5 +96,39 @@ public class ApplicationUser {
 
     public void setRoles(String... roles) {
         this.roles.addAll(Arrays.asList(roles));
+    }
+
+    public List<ApplicationUserDomainRelation> getAssignedDomains() {
+        return assignedDomains;
+    }
+
+    public ApplicationUser setAssignedDomains(List<ApplicationUserDomainRelation> assignedDomains) {
+        this.assignedDomains = assignedDomains;
+        return this;
+    }
+
+    public ApplicationUser addAssignedDomain(DomainAccessLevel accessLevel, Domain domain) {
+        this.assignedDomains.add(new ApplicationUserDomainRelation(this, domain, accessLevel));
+        return this;
+    }
+
+    public void validateAdminDomain(Domain domain) {
+        validateDomain(domain);
+        final boolean userBelongsToDomain = assignedDomains.stream()
+                .filter(r -> r.getAccessLevel() == DomainAccessLevel.ADMIN)
+                .map(ApplicationUserDomainRelation::getDomain)
+                .anyMatch(d -> d.getId() == domain.getId());
+        if (!userBelongsToDomain) {
+            throw new UnauthorizedException("User " + getLogin() + " is not administrator of a " + domain.getId() + " domain.");
+        }
+    }
+
+    public void validateDomain(Domain domain) {
+        final boolean userBelongsToDomain = assignedDomains.stream()
+                .map(ApplicationUserDomainRelation::getDomain)
+                .anyMatch(d -> d.getId() == domain.getId());
+        if (!userBelongsToDomain) {
+            throw new UnauthorizedException("User " + getLogin() + " does not belong to a " + domain.getId() + " domain.");
+        }
     }
 }

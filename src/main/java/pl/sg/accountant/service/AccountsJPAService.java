@@ -7,7 +7,6 @@ import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.ApplicationUserRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class AccountsJPAService implements AccountsService {
@@ -22,13 +21,10 @@ public class AccountsJPAService implements AccountsService {
     }
 
     @Override
-    public Optional<Account> findById(Integer id) {
-        return accountRepository.findById(id);
-    }
-
-    @Override
-    public Account getById(Integer id) {
-        return accountRepository.getOne(id);
+    public Account getById(ApplicationUser user, Integer accountId) {
+        final Account result = accountRepository.getOne(accountId);
+        user.validateDomain(result.getDomain());
+        return result;
     }
 
     @Override
@@ -37,23 +33,27 @@ public class AccountsJPAService implements AccountsService {
     }
 
     @Override
-    public List<Account> getForUser(ApplicationUser user) {
-        return accountRepository.findAllByApplicationUserLogin(user);
+    public List<Account> getForUserAndDomain(ApplicationUser user, int domainId) {
+        return accountRepository.findAllByApplicationUserLoginAndDomain(user, domainId);
     }
 
     @Override
-    public void createAccount(Account account, String userName) {
-        account.setApplicationUser(applicationUserRepository.findFirstByUserLogins(userName).get());
+    public void createAccount(ApplicationUser user, Account account) {
+        user.validateAdminDomain(account.getDomain());
         accountRepository.save(account);
     }
 
     @Override
-    public void update(Account account) {
-        accountRepository.save(account);
+    public void update(ApplicationUser user, Account toEdit) {
+        final Account dbValue = getById(user, toEdit.getId());
+        user.validateDomain(dbValue.getDomain());
+        accountRepository.save(dbValue);
     }
 
     @Override
-    public void delete(Account account) {
-        accountRepository.delete(account);
+    public void delete(ApplicationUser user, int accountId) {
+        final Account toDelete = getById(user, accountId);
+        user.validateAdminDomain(toDelete.getDomain());
+        accountRepository.delete(toDelete);
     }
 }

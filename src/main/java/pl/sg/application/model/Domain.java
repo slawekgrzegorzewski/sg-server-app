@@ -1,6 +1,9 @@
 package pl.sg.application.model;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import java.util.List;
 
 @Entity
@@ -8,8 +11,10 @@ public class Domain {
     @Id
     @GeneratedValue
     private int id;
-
     String name;
+
+    @OneToMany(mappedBy = "domain")
+    List<ApplicationUserDomainRelation> assignedUsers;
 
 
     public Domain() {
@@ -30,6 +35,20 @@ public class Domain {
 
     public Domain setName(String name) {
         this.name = name;
+        return this;
+    }
+
+    public List<ApplicationUserDomainRelation> getAssignedUsers() {
+        return assignedUsers;
+    }
+
+    public Domain setAssignedUsers(List<ApplicationUserDomainRelation> assignedUsers) {
+        this.assignedUsers = assignedUsers;
+        return this;
+    }
+
+    public Domain addAssignedUsers(DomainAccessLevel accessLevel, ApplicationUser user) {
+        this.assignedUsers.add(new ApplicationUserDomainRelation(user, this, accessLevel));
         return this;
     }
 }

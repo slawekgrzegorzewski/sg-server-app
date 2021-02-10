@@ -1,6 +1,5 @@
 package pl.sg.accountant.controller;
 
-import pl.sg.accountant.service.AccountsException;
 import pl.sg.accountant.transport.FinancialTransactionTO;
 import pl.sg.application.model.ApplicationUser;
 
@@ -11,13 +10,13 @@ import java.util.List;
 
 public interface TransactionsController {
 
-    List<FinancialTransactionTO> getUserTransactions(String login);
+    List<FinancialTransactionTO> getUserTransactions(ApplicationUser user, int domainId);
 
-    FinancialTransactionTO transfer(int fromId, int toId, @PositiveOrZero BigDecimal amount, String description, ApplicationUser user) throws AccountsException;
+    FinancialTransactionTO transfer(ApplicationUser user, int fromId, int toId, @PositiveOrZero BigDecimal amount, String description) ;
 
-    FinancialTransactionTO transferWithConversion(int fromId, int toId, @PositiveOrZero BigDecimal amount, @PositiveOrZero BigDecimal targetAmount, @Positive BigDecimal rate, String description, ApplicationUser user) throws AccountsException;
+    FinancialTransactionTO transferWithConversion(ApplicationUser user, int fromId, int toId, @PositiveOrZero BigDecimal amount, @PositiveOrZero BigDecimal targetAmount, @Positive BigDecimal rate, String description) ;
 
-    FinancialTransactionTO credit(int accountId, @PositiveOrZero BigDecimal amount, String description, ApplicationUser user) throws AccountsException;
+    FinancialTransactionTO credit(ApplicationUser user, int accountId, @PositiveOrZero BigDecimal amount, String description) ;
 
-    FinancialTransactionTO debit(int accountId, @PositiveOrZero BigDecimal amount, String description, ApplicationUser user) throws AccountsException;
+    FinancialTransactionTO debit(ApplicationUser user, int accountId, @PositiveOrZero BigDecimal amount, String description) ;
 }

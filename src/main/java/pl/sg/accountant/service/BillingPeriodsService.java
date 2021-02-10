@@ -11,19 +11,19 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BillingPeriodsService {
-    BillingPeriod getById(Integer id);
+    BillingPeriod getById(ApplicationUser user, Integer id);
 
-    Optional<BillingPeriod> findByPeriodAndUser(YearMonth month, ApplicationUser user);
+    BillingPeriod getByPeriodAndDomain(ApplicationUser user, int domainId, YearMonth month);
 
-    List<BillingPeriod> unfinishedBillingPeriods(ApplicationUser user);
+    Optional<BillingPeriod> findByPeriodAndDomain(ApplicationUser user, int domainId, YearMonth month);
 
-    Optional<BillingPeriod> unfinishedCurrentBillingPeriod(ApplicationUser user);
+    List<BillingPeriod> unfinishedBillingPeriods(ApplicationUser user, int domainId);
 
-    Optional<Integer> create(YearMonth month, ApplicationUser user);
+    Optional<Integer> create(ApplicationUser user, int domainId, YearMonth month);
 
-    void addIncome(BillingPeriod billingPeriod, Account account, Income income, ApplicationUser user) throws AccountsException;
+    void addIncome(ApplicationUser user, int accountId, Income income);
 
-    void addExpense(BillingPeriod billingPeriod, Account account, Expense expense, ApplicationUser user) throws AccountsException;
+    void addExpense(ApplicationUser user, int accountId, Expense expense);
 
-    void finish(BillingPeriod billingPeriod) throws AccountsException;
+    void finishBillingPeriod(ApplicationUser user, int domainId, YearMonth month);
 }

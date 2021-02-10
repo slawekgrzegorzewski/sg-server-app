@@ -16,6 +16,6 @@ public interface FinancialTransactionRepository extends JpaRepository<FinancialT
             "LEFT JOIN dau.userLogins daul " +
             "WHERE saul.login = ?1 " +
             "OR daul.login = ?1")
-    List<FinancialTransaction> findAllByLogin(String login);
+    List<FinancialTransaction> findAllByDomain(int domainId);
 }
 

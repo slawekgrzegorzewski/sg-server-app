@@ -45,14 +45,13 @@ public class LoginController {
         }
         ApplicationUser firstByLogin = applicationUserRepository.findFirstByUserLogins(uname).orElseThrow(
                 () -> new BadCredentialsException("Wrong user/password"));
-        firstByLogin.setLoggedInUser(uname);
-        if (!passwordEncoder.matches(upass, firstByLogin.getLoggedInUser().getPassword())) {
+        if (!passwordEncoder.matches(upass, firstByLogin.getPassword())) {
             throw new BadCredentialsException("Wrong user/password");
         }
-        if (!new Totp(firstByLogin.getLoggedInUser().getSecret()).verify(token)) {
+        if (!new Totp(firstByLogin.getSecret()).verify(token)) {
             throw new BadCredentialsException("Wrong 2FA code");
         }
-        String jwt = authorizationService.generateJWTToken(firstByLogin.getId() + ":" + uname, firstByLogin.getLoggedInUser().getRoles());
+        String jwt = authorizationService.generateJWTToken(firstByLogin.getId() + ":" + uname, firstByLogin.getRoles());
         return HEADER_STRING + ": " + TOKEN_PREFIX + " " + jwt;
     }
 

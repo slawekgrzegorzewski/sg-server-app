@@ -13,13 +13,13 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/currency")
+@RequestMapping("/currencies")
 public class CurrenciesRestController implements CurrenciesController {
 
     @Override
-    @RequestMapping(value = "/all/{locale}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{locale}", method = RequestMethod.GET)
     @TokenBearerAuth
-    public List<CurrencyTO> accounts(@PathVariable Locale locale) {
+    public List<CurrencyTO> locales(@PathVariable Locale locale) {
         return Currency.getAvailableCurrencies().stream()
                 .map(c -> new CurrencyTO(c.getCurrencyCode(), c.getDisplayName(locale)))
                 .collect(Collectors.toList());

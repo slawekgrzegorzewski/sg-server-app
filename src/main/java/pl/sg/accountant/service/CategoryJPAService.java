@@ -7,6 +7,7 @@ import pl.sg.application.model.ApplicationUser;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class CategoryJPAService implements CategoryService {
@@ -18,39 +19,30 @@ public class CategoryJPAService implements CategoryService {
     }
 
     @Override
-    public Optional<Category> findById(Integer id) {
-        return categoryRepository.findById(id);
+    public Optional<Category> findByIdAndApplicationUser(ApplicationUser user, Integer id) {
+        return categoryRepository.getByIdEqualsAndApplicationUserEquals(id, user)
+                .map(c -> {
+                    user.validateDomain(c.getDomain());
+                    return c;
+                });
     }
 
     @Override
-    public Optional<Category> findByIdAndApplicationUser(Integer id, ApplicationUser applicationUser) {
-        return categoryRepository.getByIdEqualsAndApplicationUserEquals(id, applicationUser);
+    public List<Category> getForUser(ApplicationUser user, int domainId) {
+        return categoryRepository.findByApplicationUserEqualsAndDomainIdEquals(user, domainId);
     }
 
     @Override
-    public List<Category> getAllForUser(ApplicationUser user) {
-        return categoryRepository.findByApplicationUserEquals(user);
-    }
-
-    @Override
-    public List<Category> getAll() {
-        return categoryRepository.findAll();
-    }
-
-    @Override
-    public Category create(Category category, ApplicationUser user) {
-        category.setApplicationUser(user);
+    public Category create(ApplicationUser user, Category category) {
+        user.validateAdminDomain(category.getDomain());
+        category.setId(null);
         return categoryRepository.save(category);
     }
 
     @Override
-    public Category update(Integer id, Category category, ApplicationUser user) {
-        category.setApplicationUser(user);
+    public Category update(ApplicationUser user, Category category) {
+        final Category dbValue = categoryRepository.getOne(category.getId());
+        user.validateAdminDomain(dbValue.getDomain());
         return categoryRepository.save(category);
-    }
-
-    @Override
-    public void delete(Category category) {
-        categoryRepository.delete(category);
     }
 }

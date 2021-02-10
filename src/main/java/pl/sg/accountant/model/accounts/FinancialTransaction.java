@@ -2,8 +2,7 @@ package pl.sg.accountant.model.accounts;
 
 import pl.sg.accountant.model.OperationType;
 import pl.sg.accountant.model.validation.AccountTransaction;
-import pl.sg.accountant.service.AccountsException;
-import pl.sg.application.model.ApplicationUser;
+import pl.sg.accountant.model.AccountsException;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -26,7 +25,6 @@ public class FinancialTransaction {
     private BigDecimal credit;
     private BigDecimal conversionRate;
     private LocalDateTime timeOfTransaction;
-
 
     public FinancialTransaction() {
     }
@@ -98,12 +96,12 @@ public class FinancialTransaction {
         return this;
     }
 
-    public FinancialTransaction transfer(Account from, Account to, BigDecimal amount) throws AccountsException {
+    public FinancialTransaction transfer(Account from, Account to, BigDecimal amount)  {
         validateSameCurrency(from, to);
         return transfer(from, to, amount, amount, BigDecimal.ONE);
     }
 
-    public FinancialTransaction transfer(Account from, Account to, BigDecimal amount, BigDecimal targetAmount, BigDecimal rate) throws AccountsException {
+    public FinancialTransaction transfer(Account from, Account to, BigDecimal amount, BigDecimal targetAmount, BigDecimal rate)  {
         validateEnoughMoney(from, amount);
         validateRate(amount, targetAmount, rate);
         this.source = from;
@@ -114,7 +112,7 @@ public class FinancialTransaction {
         return this;
     }
 
-    public FinancialTransaction transfer(Account account, BigDecimal amount, OperationType operationType) throws AccountsException {
+    public FinancialTransaction transfer(Account account, BigDecimal amount, OperationType operationType)  {
         this.conversionRate = BigDecimal.ONE;
         switch (operationType) {
             case DEBIT:
@@ -134,19 +132,19 @@ public class FinancialTransaction {
         return this;
     }
 
-    private void validateSameCurrency(Account from, Account to) throws AccountsException {
+    private void validateSameCurrency(Account from, Account to)  {
         if (!from.getCurrency().equals(to.getCurrency())) {
             throw new AccountsException("Accounts currencies differ: source is " + from.getCurrency().getCurrencyCode() + ", target is " + to.getCurrency().getCurrencyCode());
         }
     }
 
-    private void validateEnoughMoney(Account account, BigDecimal amount) throws AccountsException {
+    private void validateEnoughMoney(Account account, BigDecimal amount)  {
         if (account.getCurrentBalance().compareTo(amount) < 0) {
             throw new AccountsException("Not enough money");
         }
     }
 
-    private void validateRate(BigDecimal amount, BigDecimal targetAmount, BigDecimal rate) throws AccountsException {
+    private void validateRate(BigDecimal amount, BigDecimal targetAmount, BigDecimal rate)  {
         BigDecimal calculation = amount.multiply(rate).setScale(2, RoundingMode.HALF_UP);
         BigDecimal roundedTarget = targetAmount.setScale(2, RoundingMode.HALF_UP);
         if (!calculation.equals(roundedTarget)) {

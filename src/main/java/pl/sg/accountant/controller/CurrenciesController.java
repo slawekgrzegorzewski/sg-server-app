@@ -6,5 +6,5 @@ import java.util.List;
 import java.util.Locale;
 
 public interface CurrenciesController {
-    List<CurrencyTO> accounts(Locale locale);
+    List<CurrencyTO> locales(Locale locale);
 }

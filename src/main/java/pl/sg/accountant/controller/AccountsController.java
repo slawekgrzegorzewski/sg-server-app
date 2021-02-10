@@ -11,11 +11,11 @@ public interface AccountsController {
 
     List<AccountTO> allAccounts();
 
-    List<AccountTO> userAccount(ApplicationUser user);
+    List<AccountTO> userAccount(ApplicationUser user, int domainId);
 
-    AccountTO createAccount(@Valid AccountTO account, String login);
+    AccountTO createAccount(ApplicationUser user, @Valid AccountTO account);
 
-    ResponseEntity<String> updateAccount(@Valid AccountTO account, String login);
+    ResponseEntity<String> updateAccount(ApplicationUser user, @Valid AccountTO account);
 
-    ResponseEntity<String> deleteAccount(Integer id, String login);
+    ResponseEntity<String> deleteAccount(Integer id, ApplicationUser user);
 }

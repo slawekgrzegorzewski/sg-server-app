@@ -4,7 +4,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.sg.accountant.model.billings.PiggyBank;
-import pl.sg.accountant.service.AccountsException;
 import pl.sg.accountant.service.PiggyBanksService;
 import pl.sg.accountant.transport.PiggyBankTO;
 import pl.sg.application.model.ApplicationUser;
@@ -27,10 +26,10 @@ public class PiggyBankRestController implements PiggyBankController {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/{domainId}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public ResponseEntity<List<PiggyBankTO>> getAll(@RequestUser ApplicationUser user) {
-        List<PiggyBankTO> result = piggyBanksService.findByUser(user).stream()
+    public ResponseEntity<List<PiggyBankTO>> getAll(@RequestUser ApplicationUser user, @PathVariable int domainId) {
+        List<PiggyBankTO> result = piggyBanksService.findByDomain(user, domainId).stream()
                 .map(pb -> mapper.map(pb, PiggyBankTO.class))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(result);
@@ -39,10 +38,9 @@ public class PiggyBankRestController implements PiggyBankController {
     @Override
     @PutMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public ResponseEntity<Integer> create(@RequestBody PiggyBankTO piggyBankTO, @RequestUser ApplicationUser user) {
+    public ResponseEntity<Integer> create(@RequestUser ApplicationUser user, @RequestBody PiggyBankTO piggyBankTO) {
         PiggyBank piggyBank = mapper.map(piggyBankTO, PiggyBank.class);
-        piggyBank.setApplicationUser(user);
-        return piggyBanksService.create(piggyBank)
+        return piggyBanksService.create(user, piggyBank)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.badRequest().build());
     }
@@ -50,11 +48,18 @@ public class PiggyBankRestController implements PiggyBankController {
     @Override
     @PatchMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public ResponseEntity<String> update(@RequestBody PiggyBankTO piggyBankTO, @RequestUser ApplicationUser user) throws AccountsException {
-        PiggyBank piggyBank = piggyBanksService.getById(piggyBankTO.getId());
-        mapper.map(piggyBankTO, piggyBank);
-        piggyBank.setApplicationUser(user);
-        piggyBanksService.update(piggyBank);
+    public ResponseEntity<String> update(@RequestUser ApplicationUser user, @RequestBody PiggyBankTO piggyBankTO) {
+        PiggyBank piggyBank = applyChanges(piggyBankTO, piggyBanksService.getById(user, piggyBankTO.getId()));
+        piggyBanksService.update(user, piggyBank);
         return ResponseEntity.ok("OK!");
+    }
+
+    private PiggyBank applyChanges(PiggyBankTO piggyBankTO, PiggyBank piggyBank) {
+        piggyBank.setName(piggyBank.getName());
+        piggyBank.setDescription(piggyBank.getDescription());
+        piggyBank.setBalance(piggyBankTO.getBalance());
+        piggyBank.setSavings(piggyBank.isSavings());
+        piggyBank.setMonthlyTopUp(piggyBank.getMonthlyTopUp());
+        return piggyBank;
     }
 }

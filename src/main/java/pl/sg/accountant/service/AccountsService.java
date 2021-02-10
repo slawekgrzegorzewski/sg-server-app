@@ -4,20 +4,18 @@ import pl.sg.accountant.model.accounts.Account;
 import pl.sg.application.model.ApplicationUser;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface AccountsService {
-    Optional<Account> findById(Integer id);
 
-    Account getById(Integer id);
+    Account getById(ApplicationUser user, Integer accountId);
 
     List<Account> getAll();
 
-    List<Account> getForUser(ApplicationUser userName);
+    List<Account> getForUserAndDomain(ApplicationUser userName, int domainId);
 
-    void createAccount(Account account, String userName);
+    void createAccount(ApplicationUser user, Account account);
 
-    void update(Account account);
+    void update(ApplicationUser user, Account account);
 
-    void delete(Account account);
+    void delete(ApplicationUser user, int accountId);
 }

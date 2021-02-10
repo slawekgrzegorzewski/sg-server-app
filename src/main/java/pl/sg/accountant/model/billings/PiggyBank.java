@@ -36,6 +36,11 @@ public class PiggyBank {
         return id;
     }
 
+    public PiggyBank setId(Integer id) {
+        this.id = id;
+        return this;
+    }
+
     public String getName() {
         return name;
     }

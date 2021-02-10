@@ -12,7 +12,7 @@ import java.util.Map;
 
 public interface MonthSummaryController {
 
-    ResponseEntity<Map<YearMonth, Map<Currency, BigDecimal>>> getSavingsHistory(int forNMonths, ApplicationUser user);
+    ResponseEntity<Map<YearMonth, Map<Currency, BigDecimal>>> getSavingsHistory(ApplicationUser user, int domainId, int forNMonths);
 
-    ResponseEntity<Map<YearMonth, List<MonthSummaryPiggyBank>>> getPiggyBanksHistory(int forNMonths, ApplicationUser user);
+    ResponseEntity<Map<YearMonth, List<MonthSummaryPiggyBank>>> getPiggyBanksHistory(ApplicationUser user, int domainId, int forNMonths);
 }

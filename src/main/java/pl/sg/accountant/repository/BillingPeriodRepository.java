@@ -10,15 +10,18 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BillingPeriodRepository extends JpaRepository<BillingPeriod, Integer> {
-    Optional<BillingPeriod> findByPeriodEqualsAndApplicationUserEquals(YearMonth month, ApplicationUser user);
 
+    Optional<BillingPeriod> findByPeriodEqualsAndDomainIdEquals(int domainId, YearMonth month);
+
+    //TODO
     @Query("SELECT bp FROM BillingPeriod bp LEFT JOIN bp.monthSummary ms WHERE ms IS NULL AND bp.applicationUser = ?1")
-    List<BillingPeriod> allUnfinishedBillingPeriods(ApplicationUser user);
+    List<BillingPeriod> allUnfinishedBillingPeriods(ApplicationUser user, int domainId);
 
+    //TODO
     @Query("SELECT bp FROM BillingPeriod bp LEFT JOIN bp.monthSummary ms WHERE ms IS NULL AND bp.applicationUser = ?1 and bp.period = ?2")
-    Optional<BillingPeriod> unfinishedBillingPeriod(ApplicationUser user, YearMonth month);
+    Optional<BillingPeriod> unfinishedBillingPeriod(ApplicationUser user, int domainId, YearMonth month);
 
-    default Optional<BillingPeriod> unfinishedCurrentBillingPeriod(ApplicationUser user) {
-        return this.unfinishedBillingPeriod(user, YearMonth.now());
+    default Optional<BillingPeriod> unfinishedCurrentBillingPeriod(ApplicationUser user, int domainId) {
+        return this.unfinishedBillingPeriod(user, domainId, YearMonth.now());
     }
 }

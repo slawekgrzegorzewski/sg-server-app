@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
     Optional<Category> getByIdEqualsAndApplicationUserEquals(Integer categoryId, ApplicationUser user);
 
-    List<Category> findByApplicationUserEquals(ApplicationUser user);
+    List<Category> findByApplicationUserEqualsAndDomainIdEquals(ApplicationUser user, int domainId);
 }

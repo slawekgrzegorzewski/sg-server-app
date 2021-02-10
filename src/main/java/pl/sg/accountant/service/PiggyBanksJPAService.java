@@ -4,9 +4,10 @@ import org.springframework.stereotype.Component;
 import pl.sg.accountant.model.billings.PiggyBank;
 import pl.sg.accountant.repository.PiggyBankRepository;
 import pl.sg.application.model.ApplicationUser;
+import pl.sg.application.model.Domain;
+import pl.sg.application.service.DomainService;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -16,49 +17,49 @@ import static java.util.Optional.of;
 public class PiggyBanksJPAService implements PiggyBanksService {
 
     private final PiggyBankRepository piggyBankRepository;
+    private final DomainService domainService;
 
-    public PiggyBanksJPAService(PiggyBankRepository piggyBankRepository) {
+    public PiggyBanksJPAService(PiggyBankRepository piggyBankRepository, DomainService domainService) {
         this.piggyBankRepository = piggyBankRepository;
+        this.domainService = domainService;
     }
 
     @Override
-    public PiggyBank getById(Integer id) {
-        return this.piggyBankRepository.getOne(id);
+    public PiggyBank getById(ApplicationUser user, Integer id) {
+        final PiggyBank result = this.piggyBankRepository.getOne(id);
+        user.validateDomain(result.getDomain());
+        return result;
     }
 
     @Override
-    public List<PiggyBank> findByUser(ApplicationUser user) {
-        return piggyBankRepository.findByApplicationUser(user);
+    public List<PiggyBank> findByDomain(ApplicationUser user, int domainId) {
+        final Domain domain = domainService.getById(domainId);
+        user.validateDomain(domain);
+        return piggyBankRepository.findByDomainId(domainId);
     }
 
     @Override
-    public Optional<Integer> create(PiggyBank piggyBank) {
+    public Optional<Integer> create(ApplicationUser user, PiggyBank piggyBank) {
+        user.validateAdminDomain(piggyBank.getDomain());
+        piggyBank.setId(null);
         return of(piggyBankRepository.save(piggyBank).getId());
     }
 
     @Override
-    public void update(PiggyBank piggyBank) throws AccountsException {
-        PiggyBank tuUpdate = piggyBankRepository.getOne(piggyBank.getId());
-        validateUser(tuUpdate, piggyBank.getApplicationUser());
+    public void update(ApplicationUser user, PiggyBank piggyBank) {
+        PiggyBank dbValue = piggyBankRepository.getOne(piggyBank.getId());
+        user.validateAdminDomain(dbValue.getDomain());
         this.piggyBankRepository.save(piggyBank);
     }
 
     @Override
-    public void updateAll(List<PiggyBank> piggyBanks) throws AccountsException {
+    public void updateAll(ApplicationUser user, List<PiggyBank> piggyBanks) {
         List<Integer> ids = piggyBanks.stream().map(PiggyBank::getId).collect(Collectors.toList());
-        Map<Integer, ApplicationUser> fromDB = piggyBankRepository
+        piggyBankRepository
                 .findAllById(ids)
                 .stream()
-                .collect(Collectors.toMap(PiggyBank::getId, PiggyBank::getApplicationUser));
-        for (PiggyBank piggyBank : piggyBanks) {
-            validateUser(piggyBank, fromDB.get(piggyBank.getId()));
-        }
+                .map(PiggyBank::getDomain)
+                .forEach(user::validateAdminDomain);
         this.piggyBankRepository.saveAll(piggyBanks);
-    }
-
-    private void validateUser(PiggyBank toUpdate, ApplicationUser applicationUser) throws AccountsException {
-        if (!toUpdate.getApplicationUser().equals(applicationUser)) {
-            throw new AccountsException("Changing owner is not allowed");
-        }
     }
 }

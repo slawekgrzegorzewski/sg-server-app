@@ -7,13 +7,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PiggyBanksService {
-    PiggyBank getById(Integer id);
 
-    List<PiggyBank> findByUser(ApplicationUser user);
+    PiggyBank getById(ApplicationUser user, Integer id);
 
-    Optional<Integer> create(PiggyBank piggyBank);
+    List<PiggyBank> findByDomain(ApplicationUser user, int domainId);
 
-    void update(PiggyBank piggyBank) throws AccountsException;
+    Optional<Integer> create(ApplicationUser user, PiggyBank piggyBank);
 
-    void updateAll(List<PiggyBank> piggyBanks) throws AccountsException;
+    void update(ApplicationUser user, PiggyBank piggyBank);
+
+    void updateAll(ApplicationUser user, List<PiggyBank> piggyBanks);
 }
