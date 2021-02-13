@@ -1,7 +1,6 @@
 package pl.sg.accountant.controller;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.sg.accountant.model.billings.PiggyBank;
 import pl.sg.accountant.service.PiggyBanksService;
@@ -28,38 +27,35 @@ public class PiggyBankRestController implements PiggyBankController {
     @Override
     @GetMapping("/{domainId}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public ResponseEntity<List<PiggyBankTO>> getAll(@RequestUser ApplicationUser user, @PathVariable int domainId) {
-        List<PiggyBankTO> result = piggyBanksService.findByDomain(user, domainId).stream()
+    public List<PiggyBankTO> getAll(@RequestUser ApplicationUser user, @PathVariable int domainId) {
+        return piggyBanksService.findByDomain(user, domainId).stream()
                 .map(pb -> mapper.map(pb, PiggyBankTO.class))
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(result);
     }
 
     @Override
     @PutMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public ResponseEntity<Integer> create(@RequestUser ApplicationUser user, @RequestBody PiggyBankTO piggyBankTO) {
+    public Integer create(@RequestUser ApplicationUser user, @RequestBody PiggyBankTO piggyBankTO) {
         PiggyBank piggyBank = mapper.map(piggyBankTO, PiggyBank.class);
-        return piggyBanksService.create(user, piggyBank)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.badRequest().build());
+        return piggyBanksService.create(user, piggyBank);
     }
 
     @Override
     @PatchMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public ResponseEntity<String> update(@RequestUser ApplicationUser user, @RequestBody PiggyBankTO piggyBankTO) {
+    public String update(@RequestUser ApplicationUser user, @RequestBody PiggyBankTO piggyBankTO) {
         PiggyBank piggyBank = applyChanges(piggyBankTO, piggyBanksService.getById(user, piggyBankTO.getId()));
         piggyBanksService.update(user, piggyBank);
-        return ResponseEntity.ok("OK!");
+        return "OK!";
     }
 
     private PiggyBank applyChanges(PiggyBankTO piggyBankTO, PiggyBank piggyBank) {
-        piggyBank.setName(piggyBank.getName());
-        piggyBank.setDescription(piggyBank.getDescription());
+        piggyBank.setName(piggyBankTO.getName());
+        piggyBank.setDescription(piggyBankTO.getDescription());
         piggyBank.setBalance(piggyBankTO.getBalance());
-        piggyBank.setSavings(piggyBank.isSavings());
-        piggyBank.setMonthlyTopUp(piggyBank.getMonthlyTopUp());
+        piggyBank.setSavings(piggyBankTO.isSavings());
+        piggyBank.setMonthlyTopUp(piggyBankTO.getMonthlyTopUp());
         return piggyBank;
     }
 }

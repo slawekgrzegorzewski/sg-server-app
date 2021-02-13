@@ -1,7 +1,7 @@
 package pl.sg.accountant.transport.billings;
 
 public class MonthSummaryTO {
-    private int id;
+    private Integer id;
     private String data;
     private BillingPeriodTO billingPeriod;
 
@@ -14,7 +14,7 @@ public class MonthSummaryTO {
         this.billingPeriod = billingPeriod;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

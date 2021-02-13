@@ -85,18 +85,18 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
     }
 
     @Override
-    public Optional<Integer> create(ApplicationUser user, int domainId, YearMonth month) {
+    public Integer create(ApplicationUser user, int domainId, YearMonth month) {
         if (findByPeriodAndDomain(user, domainId, month).isPresent()) {
-            return Optional.empty();
+            throw new AccountsException("Billing period for this period already exists.");
         }
         Domain domain = domainService.getById(domainId);
         user.validateAdminDomain(domain);
-        return Optional.of(billingPeriodRepository.save(
+        return billingPeriodRepository.save(
                 new BillingPeriod()
                         .setPeriod(month)
                         .setName(month.toString())
                         .setDomain(domain))
-                .getId());
+                .getId();
     }
 
     @Override

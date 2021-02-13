@@ -23,7 +23,7 @@ public class Country {
         this.names = countriesNames;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

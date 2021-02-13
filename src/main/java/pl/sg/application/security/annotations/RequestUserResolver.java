@@ -7,10 +7,9 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import pl.sg.application.model.ApplicationUser;
-import pl.sg.application.security.AuthorizationService;
+import pl.sg.application.service.AuthorizationService;
 
 import java.util.Objects;
-import java.util.function.Function;
 
 @Component
 public class RequestUserResolver implements HandlerMethodArgumentResolver {

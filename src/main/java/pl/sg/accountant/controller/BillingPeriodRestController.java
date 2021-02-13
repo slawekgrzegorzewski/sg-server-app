@@ -1,7 +1,6 @@
 package pl.sg.accountant.controller;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.sg.accountant.model.billings.BillingPeriod;
 import pl.sg.accountant.model.billings.Expense;
@@ -39,47 +38,45 @@ public class BillingPeriodRestController implements BillingPeriodController {
     @Override
     @GetMapping("/{domainId}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public ResponseEntity<BillingPeriodInfo> currentPeriod(@RequestUser ApplicationUser user,
-                                                           @PathVariable("domainId") int domainId) {
+    public BillingPeriodInfo currentPeriod(@RequestUser ApplicationUser user,
+                                           @PathVariable("domainId") int domainId) {
         return getBilling(user, domainId, YearMonth.now());
     }
 
     @Override
     @GetMapping("/{domainId}/{period}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public ResponseEntity<BillingPeriodInfo> periodForMonth(@RequestUser ApplicationUser user,
-                                                            @PathVariable("domainId") int domainId,
-                                                            @PathVariable("period") YearMonth month) {
+    public BillingPeriodInfo periodForMonth(@RequestUser ApplicationUser user,
+                                            @PathVariable("domainId") int domainId,
+                                            @PathVariable("period") YearMonth month) {
         return getBilling(user, domainId, month);
     }
 
     @Override
     @PutMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public ResponseEntity<BillingPeriodInfo> create(@RequestUser ApplicationUser user,
-                                                    @RequestBody @Valid DomainTO domain) {
-        return this.billingPeriodsService.create(user, domain.getId(), YearMonth.now())
-                .map(billingPeriodResponseCreator(user, domain.getId()))
-                .orElseGet(() -> ResponseEntity.badRequest().body(null));
+    public BillingPeriodInfo create(@RequestUser ApplicationUser user,
+                                    @RequestBody @Valid DomainTO domain) {
+        final Integer newEntityId = this.billingPeriodsService.create(user, domain.getId(), YearMonth.now());
+        return billingPeriodResponseCreator(user, domain.getId()).apply(newEntityId);
     }
 
     @Override
     @PutMapping("/{period}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public ResponseEntity<BillingPeriodInfo> create(@RequestUser ApplicationUser user,
-                                                    @RequestBody @Valid DomainTO domain,
-                                                    @PathVariable("period") YearMonth month) {
-        return this.billingPeriodsService.create(user, domain.getId(), month)
-                .map(billingPeriodResponseCreator(user, domain.getId()))
-                .orElseGet(() -> ResponseEntity.badRequest().body(null));
+    public BillingPeriodInfo create(@RequestUser ApplicationUser user,
+                                    @RequestBody @Valid DomainTO domain,
+                                    @PathVariable("period") YearMonth month) {
+        final Integer newEntityId = this.billingPeriodsService.create(user, domain.getId(), month);
+        return billingPeriodResponseCreator(user, domain.getId()).apply(newEntityId);
     }
 
     @Override
     @GetMapping("/{domainId}/{period}/finish")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public ResponseEntity<BillingPeriodInfo> finish(@RequestUser ApplicationUser user,
-                                                    @PathVariable("domainId") int domainId,
-                                                    @PathVariable("period") YearMonth month) {
+    public BillingPeriodInfo finish(@RequestUser ApplicationUser user,
+                                    @PathVariable("domainId") int domainId,
+                                    @PathVariable("period") YearMonth month) {
         this.billingPeriodsService.finishBillingPeriod(user, domainId, month);
         return getBilling(user, domainId, month);
     }
@@ -87,39 +84,39 @@ public class BillingPeriodRestController implements BillingPeriodController {
     @Override
     @PutMapping("/income/{accountId}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public ResponseEntity<String> createIncome(@RequestUser ApplicationUser user,
-                                               @PathVariable int accountId,
-                                               @RequestBody IncomeTO incomeTO) {
+    public String createIncome(@RequestUser ApplicationUser user,
+                               @PathVariable int accountId,
+                               @RequestBody IncomeTO incomeTO) {
         Income income = mapper.map(incomeTO, Income.class);
         billingPeriodsService.addIncome(user, accountId, income);
-        return ResponseEntity.ok("OK");
+        return "OK";
     }
 
     @Override
     @PutMapping("/expense/{accountId}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public ResponseEntity<String> createExpense(@RequestUser ApplicationUser user,
-                                                @PathVariable int accountId,
-                                                @RequestBody ExpenseTO expenseTO) {
+    public String createExpense(@RequestUser ApplicationUser user,
+                                @PathVariable int accountId,
+                                @RequestBody ExpenseTO expenseTO) {
         Expense expense = mapper.map(expenseTO, Expense.class);
         billingPeriodsService.addExpense(user, accountId, expense);
-        return ResponseEntity.ok("OK");
+        return "OK";
     }
 
 
     @NotNull
-    private ResponseEntity<BillingPeriodInfo> getBilling(ApplicationUser user, int domainId, YearMonth month) {
+    private BillingPeriodInfo getBilling(ApplicationUser user, int domainId, YearMonth month) {
         BillingPeriodTO periodTO = this.billingPeriodsService.findByPeriodAndDomain(user, domainId, month)
                 .map(period -> mapper.map(period, BillingPeriodTO.class))
                 .orElse(null);
-        return ResponseEntity.ok(new BillingPeriodInfo(periodTO, getUnfinishedPeriods(user, domainId)));
+        return new BillingPeriodInfo(periodTO, getUnfinishedPeriods(user, domainId));
     }
 
-    private Function<Integer, ResponseEntity<BillingPeriodInfo>> billingPeriodResponseCreator(ApplicationUser user, int domainId) {
+    private Function<Integer, BillingPeriodInfo> billingPeriodResponseCreator(ApplicationUser user, int domainId) {
         return id -> {
             final BillingPeriod byId = billingPeriodsService.getById(user, id);
             final BillingPeriodTO byIdTO = mapper.map(byId, BillingPeriodTO.class);
-            return ResponseEntity.ok(new BillingPeriodInfo(byIdTO, getUnfinishedPeriods(user, domainId)));
+            return new BillingPeriodInfo(byIdTO, getUnfinishedPeriods(user, domainId));
         };
     }
 

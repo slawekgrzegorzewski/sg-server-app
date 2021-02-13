@@ -1,6 +1,7 @@
 package pl.sg.application.service;
 
 import org.springframework.stereotype.Component;
+import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.Domain;
 import pl.sg.application.repository.DomainRepository;
 
@@ -22,5 +23,17 @@ public class DomainJPAService implements DomainService {
     @Override
     public Optional<Domain> findById(int domainId) {
         return domainRepository.findById(domainId);
+    }
+
+    @Override
+    public Domain create(Domain newDomain) {
+        newDomain.setId(null);
+        return domainRepository.save(newDomain);
+    }
+
+    @Override
+    public Domain save(ApplicationUser user, Domain domain) {
+        user.validateAdminDomain(domain);
+        return domainRepository.save(domain);
     }
 }

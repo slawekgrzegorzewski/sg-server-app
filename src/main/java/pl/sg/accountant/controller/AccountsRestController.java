@@ -1,7 +1,6 @@
 package pl.sg.accountant.controller;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.sg.accountant.model.accounts.Account;
@@ -59,21 +58,21 @@ public class AccountsRestController implements AccountsController {
     @Override
     @PatchMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public ResponseEntity<String> updateAccount(@RequestUser ApplicationUser user,
+    public String updateAccount(@RequestUser ApplicationUser user,
                                                 @RequestBody @Valid AccountTO account) {
         final Account byId = accountsService.getById(user, account.getId());
         byId.setName(account.getName());
         accountsService.update(user, byId);
-        return ResponseEntity.ok("OK");
+        return "OK";
     }
 
     @Override
     @DeleteMapping("/{id}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public ResponseEntity<String> deleteAccount(
+    public String deleteAccount(
             @PathVariable Integer id,
             @RequestUser ApplicationUser user) {
         accountsService.delete(user, id);
-        return ResponseEntity.ok("Deleted.");
+        return "Deleted.";
     }
 }

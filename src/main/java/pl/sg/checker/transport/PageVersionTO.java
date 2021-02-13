@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class PageVersionTO {
-    private int id;
+    private Integer id;
     private String content;
     private LocalDateTime versionTime;
     private List<String> elementsAdded;
@@ -21,7 +21,7 @@ public class PageVersionTO {
         this.elementsRemoved = elementsRemoved;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

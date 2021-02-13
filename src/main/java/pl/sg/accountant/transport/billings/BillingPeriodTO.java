@@ -5,7 +5,7 @@ import java.time.YearMonth;
 import java.util.List;
 
 public class BillingPeriodTO {
-    private int id;
+    private Integer id;
     private String name;
     private YearMonth period;
     private List<IncomeTO> incomes;
@@ -25,7 +25,7 @@ public class BillingPeriodTO {
         this.userId = userId;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

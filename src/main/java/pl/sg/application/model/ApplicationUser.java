@@ -15,7 +15,7 @@ import java.util.List;
 public class ApplicationUser {
     @Id
     @GeneratedValue
-    private int id;
+    private Integer id;
     private String login;
     private String password;
     @Column(columnDefinition = "boolean not null default false")
@@ -32,12 +32,16 @@ public class ApplicationUser {
     @OneToMany(mappedBy = "applicationUser")
     List<ApplicationUserDomainRelation> assignedDomains;
 
+    @ManyToOne
+    Domain defaultDomain;
+
     public ApplicationUser() {
         this.secret = Base32.encode(RandomStringUtils.randomAscii(10).getBytes());
         this.isUsing2FA = false;
     }
 
-    public ApplicationUser(int id, String login, String password, String firstName, String lastName, String email, List<String> roles) {
+    public ApplicationUser(int id, String login, String password, String firstName, String lastName, String email,
+                           List<String> roles, Domain defaultDomain) {
         this();
         this.id = id;
         this.login = login;
@@ -46,10 +50,16 @@ public class ApplicationUser {
         this.lastName = lastName;
         this.email = email;
         this.roles = new ArrayList<>(roles);
+        this.defaultDomain = defaultDomain;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
+    }
+
+    public ApplicationUser setId(Integer id) {
+        this.id = id;
+        return this;
     }
 
     public String getLogin() {
@@ -114,12 +124,21 @@ public class ApplicationUser {
         return this;
     }
 
+    public Domain getDefaultDomain() {
+        return defaultDomain;
+    }
+
+    public ApplicationUser setDefaultDomain(Domain defaultDomain) {
+        this.defaultDomain = defaultDomain;
+        return this;
+    }
+
     public void validateAdminDomain(Domain domain) {
         validateDomain(domain);
         final boolean userBelongsToDomain = assignedDomains.stream()
                 .filter(r -> r.getAccessLevel() == DomainAccessLevel.ADMIN)
                 .map(ApplicationUserDomainRelation::getDomain)
-                .anyMatch(d -> d.getId() == domain.getId());
+                .anyMatch(d -> d.getId().equals(domain.getId()));
         if (!userBelongsToDomain) {
             throw new UnauthorizedException("User " + getLogin() + " is not administrator of a " + domain.getId() + " domain.");
         }
@@ -128,7 +147,7 @@ public class ApplicationUser {
     public void validateDomain(Domain domain) {
         final boolean userBelongsToDomain = assignedDomains.stream()
                 .map(ApplicationUserDomainRelation::getDomain)
-                .anyMatch(d -> d.getId() == domain.getId());
+                .anyMatch(d -> d.getId().equals(domain.getId()));
         if (!userBelongsToDomain) {
             throw new UnauthorizedException("User " + getLogin() + " does not belong to a " + domain.getId() + " domain.");
         }

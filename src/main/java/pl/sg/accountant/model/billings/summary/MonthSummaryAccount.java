@@ -8,10 +8,10 @@ public class MonthSummaryAccount {
     public final String name;
     public final Currency currency;
     public final BigDecimal currentBalance;
-    public final int lastTransactionIdIncludedInBalance;
+    public final Integer lastTransactionIdIncludedInBalance;
 
 
-    public MonthSummaryAccount(int id, String name, Currency currency, BigDecimal currentBalance, int lastTransactionIdIncludedInBalance) {
+    public MonthSummaryAccount(int id, String name, Currency currency, BigDecimal currentBalance, Integer lastTransactionIdIncludedInBalance) {
         this.id = id;
         this.name = name;
         this.currency = currency;

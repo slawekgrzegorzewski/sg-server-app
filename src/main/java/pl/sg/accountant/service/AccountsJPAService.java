@@ -4,20 +4,15 @@ import org.springframework.stereotype.Component;
 import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.repository.AccountRepository;
 import pl.sg.application.model.ApplicationUser;
-import pl.sg.application.model.ApplicationUserRepository;
 
 import java.util.List;
 
 @Component
 public class AccountsJPAService implements AccountsService {
     private final AccountRepository accountRepository;
-    private final ApplicationUserRepository applicationUserRepository;
 
-    public AccountsJPAService(
-            AccountRepository accountRepository,
-            ApplicationUserRepository applicationUserRepository) {
+    public AccountsJPAService(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
-        this.applicationUserRepository = applicationUserRepository;
     }
 
     @Override

@@ -20,24 +20,21 @@ public class AccountTO {
     @PositiveOrZero
     private BigDecimal currentBalance;
     private int balanceIndex;
-    @NotNull
-    private int userId;
     private DomainTO domain;
 
     public AccountTO() {
     }
 
-    public AccountTO(int id, String name, Currency currency, BigDecimal currentBalance, int balanceIndex, int userId, DomainTO domain) {
+    public AccountTO(int id, String name, Currency currency, BigDecimal currentBalance, int balanceIndex, DomainTO domain) {
         this.id = id;
         this.name = name;
         this.currency = currency;
         this.currentBalance = currentBalance;
         this.balanceIndex = balanceIndex;
-        this.userId = userId;
         this.domain = domain;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -83,15 +80,6 @@ public class AccountTO {
 
     public AccountTO setBalanceIndex(int balanceIndex) {
         this.balanceIndex = balanceIndex;
-        return this;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public AccountTO setUserId(Integer userId) {
-        this.userId = userId;
         return this;
     }
 

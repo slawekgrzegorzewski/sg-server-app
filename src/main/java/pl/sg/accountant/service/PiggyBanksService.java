@@ -4,7 +4,6 @@ import pl.sg.accountant.model.billings.PiggyBank;
 import pl.sg.application.model.ApplicationUser;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface PiggyBanksService {
 
@@ -12,7 +11,7 @@ public interface PiggyBanksService {
 
     List<PiggyBank> findByDomain(ApplicationUser user, int domainId);
 
-    Optional<Integer> create(ApplicationUser user, PiggyBank piggyBank);
+    Integer create(ApplicationUser user, PiggyBank piggyBank);
 
     void update(ApplicationUser user, PiggyBank piggyBank);
 

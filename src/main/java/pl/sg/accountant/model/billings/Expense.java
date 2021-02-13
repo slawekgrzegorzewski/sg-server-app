@@ -29,7 +29,7 @@ public class Expense {
     public Expense() {
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

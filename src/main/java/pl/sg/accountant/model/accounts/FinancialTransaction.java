@@ -29,7 +29,7 @@ public class FinancialTransaction {
     public FinancialTransaction() {
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

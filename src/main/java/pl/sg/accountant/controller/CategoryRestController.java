@@ -1,7 +1,6 @@
 package pl.sg.accountant.controller;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.sg.accountant.model.billings.Category;
 import pl.sg.accountant.service.CategoryService;
@@ -28,22 +27,20 @@ public class CategoryRestController implements CategoryController {
     }
 
     @Override
-    @GetMapping("/{domainId}/categories")
+    @GetMapping("/{domainId}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public ResponseEntity<List<CategoryTO>> getCategories(@RequestUser ApplicationUser user,
-                                                          @PathVariable("domainId") int domainId) {
-        return ResponseEntity.ok(
-                categoryService.getForUser(user, domainId).stream()
-                        .map(category -> mapper.map(category, CategoryTO.class))
-                        .collect(Collectors.toList())
-        );
+    public List<CategoryTO> getCategories(@RequestUser ApplicationUser user,
+                                          @PathVariable("domainId") int domainId) {
+        return categoryService.getForUser(user, domainId).stream()
+                .map(category -> mapper.map(category, CategoryTO.class))
+                .collect(Collectors.toList());
     }
 
     @Override
-    @PutMapping("/categories")
+    @PutMapping()
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public ResponseEntity<CategoryTO> addCategory(@RequestUser ApplicationUser user,
-                                                  @RequestBody CategoryTO categoryTO) {
+    public CategoryTO addCategory(@RequestUser ApplicationUser user,
+                                  @RequestBody CategoryTO categoryTO) {
         Category created;
         if (categoryTO.getId() == null) {
             created = categoryService.create(user, mapper.map(categoryTO, Category.class));
@@ -53,7 +50,7 @@ public class CategoryRestController implements CategoryController {
                     .map(c -> categoryService.update(user, c))
                     .orElseThrow(() -> new EntityNotFoundException("Category to update does not exist."));
         }
-        return ResponseEntity.ok(mapper.map(created, CategoryTO.class));
+        return mapper.map(created, CategoryTO.class);
     }
 
     private Category applyChanges(CategoryTO source, Category destination) {

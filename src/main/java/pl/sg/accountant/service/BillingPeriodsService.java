@@ -19,7 +19,7 @@ public interface BillingPeriodsService {
 
     List<BillingPeriod> unfinishedBillingPeriods(ApplicationUser user, int domainId);
 
-    Optional<Integer> create(ApplicationUser user, int domainId, YearMonth month);
+    Integer create(ApplicationUser user, int domainId, YearMonth month);
 
     void addIncome(ApplicationUser user, int accountId, Income income);
 

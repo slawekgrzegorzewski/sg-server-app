@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class FinancialTransactionTO {
-    private int id;
+    private Integer id;
     String description;
     AccountTO source;
     AccountTO destination;
@@ -28,7 +28,7 @@ public class FinancialTransactionTO {
         this.timeOfTransaction = timeOfTransaction;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

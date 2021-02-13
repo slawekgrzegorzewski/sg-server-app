@@ -1,4 +1,4 @@
-package pl.sg.application.security;
+package pl.sg.application.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jboss.aerogear.security.otp.Totp;
@@ -8,8 +8,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.sg.application.model.ApplicationUser;
-import pl.sg.application.model.ApplicationUserRepository;
 import pl.sg.application.security.annotations.TokenBearerAuth;
+import pl.sg.application.service.ApplicationUserService;
+import pl.sg.application.service.AuthorizationService;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -25,13 +26,13 @@ public class LoginController {
 
     private static final String TOKEN_PREFIX = "Bearer";
     private static final String HEADER_STRING = "Authorization";
-    private final ApplicationUserRepository applicationUserRepository;
+    private final ApplicationUserService applicationUserService;
     private final PasswordEncoder passwordEncoder;
     private final AuthorizationService authorizationService;
 
     @Autowired
-    public LoginController(ApplicationUserRepository applicationUserRepository, PasswordEncoder passwordEncoder, AuthorizationService authorizationService) {
-        this.applicationUserRepository = applicationUserRepository;
+    public LoginController(ApplicationUserService applicationUserService, PasswordEncoder passwordEncoder, AuthorizationService authorizationService) {
+        this.applicationUserService = applicationUserService;
         this.passwordEncoder = passwordEncoder;
         this.authorizationService = authorizationService;
     }
@@ -43,15 +44,18 @@ public class LoginController {
         if (uname == null || upass == null || "".equals(uname.trim()) || "".equals(upass.trim())) {
             throw new BadCredentialsException("user/password is required");
         }
-        ApplicationUser firstByLogin = applicationUserRepository.findFirstByUserLogins(uname).orElseThrow(
-                () -> new BadCredentialsException("Wrong user/password"));
+
+        ApplicationUser firstByLogin = applicationUserService.getByUserLogins(uname);
+
         if (!passwordEncoder.matches(upass, firstByLogin.getPassword())) {
             throw new BadCredentialsException("Wrong user/password");
         }
         if (!new Totp(firstByLogin.getSecret()).verify(token)) {
             throw new BadCredentialsException("Wrong 2FA code");
         }
-        String jwt = authorizationService.generateJWTToken(firstByLogin.getId() + ":" + uname, firstByLogin.getRoles());
+        String jwt = authorizationService.generateJWTToken(
+                firstByLogin.getId() + ":" + uname, firstByLogin.getRoles(),
+                firstByLogin.getDefaultDomain().getId());
         return HEADER_STRING + ": " + TOKEN_PREFIX + " " + jwt;
     }
 

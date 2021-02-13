@@ -1,7 +1,5 @@
 package pl.sg.accountant.model.billings;
 
-import pl.sg.accountant.model.accounts.Account;
-import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.Domain;
 
 import javax.persistence.*;
@@ -13,7 +11,7 @@ import java.util.Currency;
 public class PiggyBank {
     @Id
     @GeneratedValue
-    private int id;
+    private Integer id;
     @NotNull
     private String name;
     @NotNull
@@ -32,7 +30,7 @@ public class PiggyBank {
     public PiggyBank() {
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

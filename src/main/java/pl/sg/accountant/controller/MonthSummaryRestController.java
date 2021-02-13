@@ -1,7 +1,5 @@
 package pl.sg.accountant.controller;
 
-import lombok.val;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,20 +29,18 @@ public class MonthSummaryRestController implements MonthSummaryController {
     @Override
     @GetMapping("/savings/{domainId}/{forNMonths}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public ResponseEntity<Map<YearMonth, Map<Currency, BigDecimal>>> getSavingsHistory(@RequestUser ApplicationUser user,
-                                                                                       @PathVariable int domainId,
-                                                                                       @PathVariable int forNMonths) {
-        val savingsHistory = this.monthSummaryService.getSavingsHistory(user, domainId, forNMonths);
-        return ResponseEntity.ok(savingsHistory);
+    public Map<YearMonth, Map<Currency, BigDecimal>> getSavingsHistory(@RequestUser ApplicationUser user,
+                                                                       @PathVariable int domainId,
+                                                                       @PathVariable int forNMonths) {
+        return this.monthSummaryService.getSavingsHistory(user, domainId, forNMonths);
     }
 
     @Override
     @GetMapping("/piggy-banks/{domainId}/{forNMonths}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public ResponseEntity<Map<YearMonth, List<MonthSummaryPiggyBank>>> getPiggyBanksHistory(@RequestUser ApplicationUser user,
-                                                                                            @PathVariable int domainId,
-                                                                                            @PathVariable int forNMonths) {
-        val piggyBanksHistory = this.monthSummaryService.getPiggyBanksHistory(user, domainId, forNMonths);
-        return ResponseEntity.ok(piggyBanksHistory);
+    public Map<YearMonth, List<MonthSummaryPiggyBank>> getPiggyBanksHistory(@RequestUser ApplicationUser user,
+                                                                            @PathVariable int domainId,
+                                                                            @PathVariable int forNMonths) {
+        return this.monthSummaryService.getPiggyBanksHistory(user, domainId, forNMonths);
     }
 }

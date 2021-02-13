@@ -10,7 +10,7 @@ import java.util.List;
 public class Domain {
     @Id
     @GeneratedValue
-    private int id;
+    private Integer id;
     String name;
 
     @OneToMany(mappedBy = "domain")
@@ -25,8 +25,13 @@ public class Domain {
         this.name = name;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
+    }
+
+    public Domain setId(Integer id) {
+        this.id = id;
+        return this;
     }
 
     public String getName() {

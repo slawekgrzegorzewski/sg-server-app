@@ -1,6 +1,5 @@
 package pl.sg.accountant.controller;
 
-import org.springframework.http.ResponseEntity;
 import pl.sg.accountant.transport.accounts.AccountTO;
 import pl.sg.application.model.ApplicationUser;
 
@@ -15,7 +14,7 @@ public interface AccountsController {
 
     AccountTO createAccount(ApplicationUser user, @Valid AccountTO account);
 
-    ResponseEntity<String> updateAccount(ApplicationUser user, @Valid AccountTO account);
+    String updateAccount(ApplicationUser user, @Valid AccountTO account);
 
-    ResponseEntity<String> deleteAccount(Integer id, ApplicationUser user);
+    String deleteAccount(Integer id, ApplicationUser user);
 }

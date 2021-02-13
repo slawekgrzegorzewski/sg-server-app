@@ -31,7 +31,7 @@ public class Account {
     public Account() {
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

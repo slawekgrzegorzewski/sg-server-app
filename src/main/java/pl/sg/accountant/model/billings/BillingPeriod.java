@@ -15,7 +15,7 @@ import java.util.List;
 public class BillingPeriod {
     @Id
     @GeneratedValue
-    private int id;
+    private Integer id;
     @NotNull
     private String name;
     @NotNull
@@ -33,7 +33,7 @@ public class BillingPeriod {
     public BillingPeriod() {
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

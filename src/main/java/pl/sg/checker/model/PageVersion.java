@@ -11,7 +11,7 @@ import java.util.List;
 public class PageVersion {
     @Id
     @GeneratedValue
-    private int id;
+    private Integer id;
     @ManyToOne
     CheckerTask task;
     @ElementCollection(fetch = FetchType.EAGER)
@@ -38,7 +38,7 @@ public class PageVersion {
         this.elementsRemoved = elementsRemoved;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

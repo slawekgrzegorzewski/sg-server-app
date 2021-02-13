@@ -3,10 +3,9 @@ package pl.sg.accountant.transport.billings;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Currency;
-import java.util.Date;
 
 public class ExpenseTO {
-    private int id;
+    private Integer id;
     private String description;
     private BigDecimal amount;
     private Currency currency;
@@ -25,7 +24,7 @@ public class ExpenseTO {
         this.expenseDate = expenseDate;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

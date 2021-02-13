@@ -27,7 +27,7 @@ public class MonthSummary {
         data = new Gson().toJson(MonthSummaryData.of(accounts, piggyBanks));
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

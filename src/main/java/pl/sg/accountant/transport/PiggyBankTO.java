@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.util.Currency;
 
 public class PiggyBankTO {
-    private int id;
+    private Integer id;
     private String name;
     private String description;
     private BigDecimal balance;
@@ -32,7 +32,7 @@ public class PiggyBankTO {
         this.domain = domain;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

@@ -23,7 +23,7 @@ public class CheckerStep<T extends CheckerStep> {
         this.stepOrder = stepOrder;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

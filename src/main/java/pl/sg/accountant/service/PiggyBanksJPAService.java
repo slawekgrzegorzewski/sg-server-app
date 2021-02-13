@@ -8,10 +8,7 @@ import pl.sg.application.model.Domain;
 import pl.sg.application.service.DomainService;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static java.util.Optional.of;
 
 @Component
 public class PiggyBanksJPAService implements PiggyBanksService {
@@ -39,10 +36,10 @@ public class PiggyBanksJPAService implements PiggyBanksService {
     }
 
     @Override
-    public Optional<Integer> create(ApplicationUser user, PiggyBank piggyBank) {
+    public Integer create(ApplicationUser user, PiggyBank piggyBank) {
         user.validateAdminDomain(piggyBank.getDomain());
         piggyBank.setId(null);
-        return of(piggyBankRepository.save(piggyBank).getId());
+        return piggyBankRepository.save(piggyBank).getId();
     }
 
     @Override

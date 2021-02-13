@@ -24,9 +24,7 @@ public class Application {
         final ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
         modelMapper
-                .typeMap(Account.class, AccountTO.class)
-                .addMapping(Account::getId,
-                        AccountTO::setUserId);
+                .typeMap(Account.class, AccountTO.class);
         modelMapper
                 .typeMap(BillingPeriod.class, BillingPeriodTO.class)
                 .addMapping(BillingPeriod::getId, BillingPeriodTO::setUserId);

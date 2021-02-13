@@ -4,7 +4,7 @@ import java.util.List;
 
 public class CountryTO {
 
-    private int id;
+    private Integer id;
     List<String> names;
 
     public CountryTO() {
@@ -18,7 +18,7 @@ public class CountryTO {
         this.names = countriesNames;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

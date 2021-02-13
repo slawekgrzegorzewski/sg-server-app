@@ -1,7 +1,5 @@
 package pl.sg.accountant.model.billings;
 
-import pl.sg.accountant.model.accounts.Account;
-import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.Domain;
 
 import javax.persistence.*;
