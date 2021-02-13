@@ -1,5 +1,7 @@
 package pl.sg.accountant.transport.accounts;
 
+import pl.sg.application.transport.DomainTO;
+
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -18,22 +20,21 @@ public class AccountTO {
     @PositiveOrZero
     private BigDecimal currentBalance;
     private int balanceIndex;
-    @NotNull
-    private int userId;
+    private DomainTO domain;
 
     public AccountTO() {
     }
 
-    public AccountTO(int id, String name, Currency currency, BigDecimal currentBalance, int balanceIndex, int userId) {
+    public AccountTO(int id, String name, Currency currency, BigDecimal currentBalance, int balanceIndex, DomainTO domain) {
         this.id = id;
         this.name = name;
         this.currency = currency;
         this.currentBalance = currentBalance;
         this.balanceIndex = balanceIndex;
-        this.userId = userId;
+        this.domain = domain;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -82,12 +83,12 @@ public class AccountTO {
         return this;
     }
 
-    public Integer getUserId() {
-        return userId;
+    public DomainTO getDomain() {
+        return domain;
     }
 
-    public AccountTO setUserId(Integer userId) {
-        this.userId = userId;
+    public AccountTO setDomain(DomainTO domain) {
+        this.domain = domain;
         return this;
     }
 }

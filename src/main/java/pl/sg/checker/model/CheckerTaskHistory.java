@@ -30,7 +30,7 @@ public class CheckerTaskHistory {
         this.messages = messages;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

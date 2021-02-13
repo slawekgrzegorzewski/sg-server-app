@@ -7,17 +7,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CategoryService {
-    Optional<Category> findById(Integer id);
 
-    Optional<Category> findByIdAndApplicationUser(Integer id, ApplicationUser applicationUser);
+    Optional<Category> findByIdAndApplicationUser(ApplicationUser applicationUser, Integer id);
 
-    List<Category> getAllForUser(ApplicationUser user);
+    List<Category> getForUser(ApplicationUser user, int domainId);
 
-    List<Category> getAll();
+    Category create(ApplicationUser user, Category category);
 
-    Category create(Category category, ApplicationUser user);
+    Category update(ApplicationUser user, Category category);
 
-    Category update(Integer id, Category category, ApplicationUser user);
-
-    void delete(Category category);
 }

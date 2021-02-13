@@ -21,7 +21,7 @@ public class SYR<T extends SYR> {
     public SYR() {
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

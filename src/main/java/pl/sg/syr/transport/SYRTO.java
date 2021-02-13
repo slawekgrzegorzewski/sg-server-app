@@ -3,7 +3,7 @@ package pl.sg.syr.transport;
 import java.time.Year;
 
 public class SYRTO<T extends SYRTO> {
-    protected int id;
+    protected Integer id;
     protected Year year;
     protected Integer peak;
     protected Integer average;
@@ -36,7 +36,7 @@ public class SYRTO<T extends SYRTO> {
         this.memorialAttendance = memorialAttendance;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

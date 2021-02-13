@@ -1,37 +1,26 @@
 package pl.sg.accountant.controller;
 
-import org.springframework.http.ResponseEntity;
 import pl.sg.accountant.repository.BillingPeriodInfo;
-import pl.sg.accountant.service.AccountsException;
-import pl.sg.accountant.transport.billings.CategoryTO;
 import pl.sg.accountant.transport.billings.ExpenseTO;
 import pl.sg.accountant.transport.billings.IncomeTO;
 import pl.sg.application.model.ApplicationUser;
+import pl.sg.application.transport.DomainTO;
 
 import java.time.YearMonth;
-import java.util.List;
 
 public interface BillingPeriodController {
 
-    ResponseEntity<BillingPeriodInfo> currentPeriod(ApplicationUser user);
+    BillingPeriodInfo currentPeriod(ApplicationUser user, int domainId);
 
-    ResponseEntity<BillingPeriodInfo> periodForMonth(YearMonth month, ApplicationUser user);
+    BillingPeriodInfo periodForMonth(ApplicationUser user, int domainId, YearMonth month);
 
-    ResponseEntity<BillingPeriodInfo> create(ApplicationUser user);
+    BillingPeriodInfo create(ApplicationUser user, DomainTO domain);
 
-    ResponseEntity<BillingPeriodInfo> create(YearMonth month, ApplicationUser user);
+    BillingPeriodInfo create(ApplicationUser user, DomainTO domain, YearMonth month);
 
-    ResponseEntity<BillingPeriodInfo> finish(YearMonth month, ApplicationUser user) throws AccountsException;
+    BillingPeriodInfo finish(ApplicationUser user, int domainId, YearMonth month);
 
-    ResponseEntity<List<CategoryTO>> getAllCategories(ApplicationUser user);
+    String createIncome(ApplicationUser user, int accountId, IncomeTO incomeTO);
 
-    ResponseEntity<CategoryTO> addCategory(CategoryTO categoryTO, ApplicationUser user) throws AccountsException;
-
-    ResponseEntity<String> createIncome(int accountId,
-                                        IncomeTO incomeTO,
-                                        ApplicationUser user) throws AccountsException;
-
-    ResponseEntity<String> createExpense(int accountId,
-                                         ExpenseTO expenseTO,
-                                         ApplicationUser user) throws AccountsException;
+    String createExpense(ApplicationUser user, int accountId, ExpenseTO expenseTO);
 }

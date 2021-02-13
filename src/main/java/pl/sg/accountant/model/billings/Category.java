@@ -1,6 +1,6 @@
 package pl.sg.accountant.model.billings;
 
-import pl.sg.application.model.ApplicationUser;
+import pl.sg.application.model.Domain;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -18,7 +18,7 @@ public class Category {
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     private List<Income> incomesOfThisType;
     @ManyToOne
-    private ApplicationUser applicationUser;
+    private Domain domain;
 
     public Category() {
     }
@@ -56,12 +56,12 @@ public class Category {
         this.incomesOfThisType = income;
     }
 
-    public ApplicationUser getApplicationUser() {
-        return applicationUser;
+    public Domain getDomain() {
+        return domain;
     }
 
-    public Category setApplicationUser(ApplicationUser applicationUser) {
-        this.applicationUser = applicationUser;
+    public Category setDomain(Domain domain) {
+        this.domain = domain;
         return this;
     }
 }

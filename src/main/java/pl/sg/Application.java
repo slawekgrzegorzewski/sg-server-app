@@ -24,15 +24,12 @@ public class Application {
         final ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
         modelMapper
-                .typeMap(Account.class, AccountTO.class)
-                .addMapping(a -> a.getApplicationUser().getId(),
-                        AccountTO::setUserId);
+                .typeMap(Account.class, AccountTO.class);
         modelMapper
                 .typeMap(BillingPeriod.class, BillingPeriodTO.class)
-                .addMapping(b -> b.getApplicationUser().getId(), BillingPeriodTO::setUserId);
+                .addMapping(BillingPeriod::getId, BillingPeriodTO::setUserId);
         modelMapper
-                .typeMap(PiggyBank.class, PiggyBankTO.class)
-                .addMapping(a -> a.getApplicationUser().getId(), PiggyBankTO::setUserId);
+                .typeMap(PiggyBank.class, PiggyBankTO.class);
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STANDARD);
         return modelMapper;
     }

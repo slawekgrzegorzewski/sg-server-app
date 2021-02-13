@@ -1,4 +1,4 @@
-package pl.sg.application.security;
+package pl.sg.application.service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.exceptions.JWTVerificationException;
@@ -8,7 +8,6 @@ import pl.sg.application.ForbiddenException;
 import pl.sg.application.UnauthorizedException;
 import pl.sg.application.configuration.Configuration;
 import pl.sg.application.model.ApplicationUser;
-import pl.sg.application.model.ApplicationUserRepository;
 
 import java.time.Duration;
 import java.util.Date;
@@ -18,18 +17,20 @@ import java.util.stream.Stream;
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 
 @Component
-public class AuthorizationService {
+public class AuthorizationJPAService implements AuthorizationService {
     private static final String ROLES = "roles";
+    private static final String DEFAULT_DOMAIN = "defaultDomain";
     private static final Duration TOKEN_DURATION = Duration.ofDays(30);
 
-    private final ApplicationUserRepository applicationUserRepository;
+    private final ApplicationUserService applicationUserService;
     private final Configuration configuration;
 
-    public AuthorizationService(ApplicationUserRepository applicationUserRepository, Configuration configuration) {
-        this.applicationUserRepository = applicationUserRepository;
+    public AuthorizationJPAService(ApplicationUserService applicationUserService, Configuration configuration) {
+        this.applicationUserService = applicationUserService;
         this.configuration = configuration;
     }
 
+    @Override
     public void validateRequiredRoles(String token, String[] all, String[] any) {
         DecodedJWT decodedJWT = decodeToken(token);
         validateAll(decodedJWT, all);
@@ -60,25 +61,20 @@ public class AuthorizationService {
         return decodedJWT;
     }
 
+    @Override
     public ApplicationUser getUserInfo(String token) {
-        DecodedJWT decodedJWT = decodeToken(token);
-        ApplicationUser applicationUser = applicationUserRepository.findFirstByUserLogins(extractUserName(decodedJWT))
+        return applicationUserService.findByUserLogins(extractUserName(decodeToken(token)))
                 .orElseThrow(() -> new UnauthorizedException("Wrong JWT token"));
-        applicationUser.setLoggedInUser(extractUserName(decodedJWT));
-        return applicationUser;
     }
 
-    public String generateJWTToken(String subject, List<String> roles) {
+    @Override
+    public String generateJWTToken(String subject, List<String> roles, int defaultDomainId) {
         return JWT.create()
                 .withSubject(subject)
                 .withClaim(ROLES, roles)
+                .withClaim(DEFAULT_DOMAIN, defaultDomainId)
                 .withExpiresAt(new Date(System.currentTimeMillis() + TOKEN_DURATION.toMillis()))
                 .sign(HMAC512(configuration.getJWTTokenSecret().getBytes()));
-    }
-
-    private int extractUserId(DecodedJWT token) {
-        String[] elements = token.getSubject().split(":");
-        return Integer.parseInt(elements[0]);
     }
 
     private String extractUserName(DecodedJWT token) {

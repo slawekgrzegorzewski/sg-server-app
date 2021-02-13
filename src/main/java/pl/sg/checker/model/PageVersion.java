@@ -1,5 +1,8 @@
 package pl.sg.checker.model;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -8,10 +11,11 @@ import java.util.List;
 public class PageVersion {
     @Id
     @GeneratedValue
-    private int id;
+    private Integer id;
     @ManyToOne
     CheckerTask task;
     @ElementCollection(fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
     @Column(length = 200_000)
     private List<String> content;
     private LocalDateTime versionTime;
@@ -34,7 +38,7 @@ public class PageVersion {
         this.elementsRemoved = elementsRemoved;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

@@ -4,7 +4,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.sg.accountant.model.accounts.FinancialTransaction;
-import pl.sg.accountant.service.AccountsException;
 import pl.sg.accountant.service.TransactionsService;
 import pl.sg.accountant.transport.FinancialTransactionTO;
 import pl.sg.application.model.ApplicationUser;
@@ -31,10 +30,10 @@ public class TransactionsRestController implements TransactionsController {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/{domainId}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public List<FinancialTransactionTO> getUserTransactions(@RequestUser(RequestUser.LOGIN) String login) {
-        return transactionsService.transactionsForUser(login).stream()
+    public List<FinancialTransactionTO> getUserTransactions(@RequestUser ApplicationUser user, @PathVariable int domainId) {
+        return transactionsService.transactionsForUserAndDomain(user, domainId).stream()
                 .map(t -> this.mapper.map(t, FinancialTransactionTO.class))
                 .collect(Collectors.toList());
     }
@@ -42,12 +41,11 @@ public class TransactionsRestController implements TransactionsController {
     @Override
     @PostMapping("/transfer/{from}/{to}/{amount}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public FinancialTransactionTO transfer(
-            @PathVariable("from") int fromId,
-            @PathVariable("to") int toId,
-            @PathVariable("amount") @PositiveOrZero BigDecimal amount,
-            @RequestBody String description,
-            @RequestUser ApplicationUser user) throws AccountsException {
+    public FinancialTransactionTO transfer(@RequestUser ApplicationUser user,
+                                           @PathVariable("from") int fromId,
+                                           @PathVariable("to") int toId,
+                                           @PathVariable("amount") @PositiveOrZero BigDecimal amount,
+                                           @RequestBody String description) {
         FinancialTransaction result = transactionsService.transferMoneyWithoutConversion(fromId, toId, amount, description, user);
         return mapper.map(result, FinancialTransactionTO.class);
     }
@@ -55,14 +53,13 @@ public class TransactionsRestController implements TransactionsController {
     @Override
     @PostMapping("/transfer_with_conversion/{from}/{to}/{amount}/{targetAmount}/{rate}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public FinancialTransactionTO transferWithConversion(
-            @PathVariable("from") int fromId,
-            @PathVariable("to") int toId,
-            @PathVariable("amount") @PositiveOrZero BigDecimal amount,
-            @PathVariable("targetAmount") @PositiveOrZero BigDecimal targetAmount,
-            @PathVariable("rate") @Positive BigDecimal rate,
-            @RequestBody String description,
-            @RequestUser ApplicationUser user) throws AccountsException {
+    public FinancialTransactionTO transferWithConversion(@RequestUser ApplicationUser user,
+                                                         @PathVariable("from") int fromId,
+                                                         @PathVariable("to") int toId,
+                                                         @PathVariable("amount") @PositiveOrZero BigDecimal amount,
+                                                         @PathVariable("targetAmount") @PositiveOrZero BigDecimal targetAmount,
+                                                         @PathVariable("rate") @Positive BigDecimal rate,
+                                                         @RequestBody String description) {
         FinancialTransaction result = transactionsService.transferMoneyWithConversion(fromId, toId, amount, targetAmount, rate, description, user);
         return mapper.map(result, FinancialTransactionTO.class);
     }
@@ -70,11 +67,10 @@ public class TransactionsRestController implements TransactionsController {
     @Override
     @PostMapping("/credit/{accountId}/{amount}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public FinancialTransactionTO credit(
-            @PathVariable int accountId,
-            @PathVariable("amount") @PositiveOrZero BigDecimal amount,
-            @RequestBody String description,
-            @RequestUser ApplicationUser user) throws AccountsException {
+    public FinancialTransactionTO credit(@RequestUser ApplicationUser user,
+                                         @PathVariable int accountId,
+                                         @PathVariable("amount") @PositiveOrZero BigDecimal amount,
+                                         @RequestBody String description) {
         FinancialTransaction result = transactionsService.credit(accountId, amount, description, user);
         return mapper.map(result, FinancialTransactionTO.class);
     }
@@ -82,11 +78,10 @@ public class TransactionsRestController implements TransactionsController {
     @Override
     @PostMapping("/debit/{accountId}/{amount}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public FinancialTransactionTO debit(
-            @PathVariable int accountId,
-            @PathVariable("amount") @PositiveOrZero BigDecimal amount,
-            @RequestBody String description,
-            @RequestUser ApplicationUser user) throws AccountsException {
+    public FinancialTransactionTO debit(@RequestUser ApplicationUser user,
+                                        @PathVariable int accountId,
+                                        @PathVariable("amount") @PositiveOrZero BigDecimal amount,
+                                        @RequestBody String description) {
         FinancialTransaction result = transactionsService.debit(accountId, amount, description, user);
         return mapper.map(result, FinancialTransactionTO.class);
     }

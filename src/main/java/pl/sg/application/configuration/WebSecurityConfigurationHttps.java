@@ -13,7 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import pl.sg.application.security.AuthorizationService;
+import pl.sg.application.service.AuthorizationService;
 import pl.sg.application.security.annotations.RequestUserResolver;
 
 import java.util.List;

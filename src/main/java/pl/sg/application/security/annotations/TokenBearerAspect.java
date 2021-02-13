@@ -1,6 +1,5 @@
 package pl.sg.application.security.annotations;
 
-import com.auth0.jwt.interfaces.DecodedJWT;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -9,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import pl.sg.application.UnauthorizedException;
-import pl.sg.application.security.AuthorizationService;
+import pl.sg.application.service.AuthorizationService;
 
 import javax.servlet.http.HttpServletRequest;
 

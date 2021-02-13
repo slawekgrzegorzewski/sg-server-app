@@ -20,7 +20,7 @@ public class MonthSummaryData {
         result.accounts = accounts.stream()
                 .map(a ->
                         new MonthSummaryAccount(a.getId(), a.getName(), a.getCurrency(), a.getCurrentBalance(),
-                                a.getLastTransactionIncludedInBalance().getId())
+                                a.getLastTransactionIncludedInBalance() == null ? null : a.getLastTransactionIncludedInBalance().getId())
                 )
                 .collect(Collectors.toList());
         result.piggyBanks = piggyBanks.stream()

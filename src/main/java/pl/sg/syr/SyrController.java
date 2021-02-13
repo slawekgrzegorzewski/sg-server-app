@@ -5,7 +5,6 @@ import com.google.gson.reflect.TypeToken;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pl.sg.accountant.transport.syr.NameCountryIdMapping;
@@ -43,7 +42,7 @@ public class SyrController {
 
     @PostMapping()
     @TokenBearerAuth(any = {"SYR_ADMIN"})
-    public ResponseEntity<SyrCreationResult> importReport(
+    public SyrCreationResult importReport(
             @RequestParam("uploadFile") MultipartFile file,
             @RequestParam("newCountriesMatch") String newCountriesMatch) throws IOException {
 
@@ -81,7 +80,7 @@ public class SyrController {
                     countries.stream().map(c -> this.mapper.map(c, CountryTO.class)).collect(Collectors.toList())
             );
         }
-        return ResponseEntity.ok(result);
+        return result;
     }
 
     private Function<List<String>, Set<String>> findNotMatchedCountries(

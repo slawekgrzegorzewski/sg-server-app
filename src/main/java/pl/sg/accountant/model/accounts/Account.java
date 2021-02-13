@@ -1,6 +1,6 @@
 package pl.sg.accountant.model.accounts;
 
-import pl.sg.application.model.ApplicationUser;
+import pl.sg.application.model.Domain;
 
 import javax.persistence.*;
 import javax.validation.constraints.Digits;
@@ -13,7 +13,7 @@ import java.util.Currency;
 public class Account {
     @Id
     @GeneratedValue
-    private int id;
+    private Integer id;
     @NotNull
     private String name;
     @NotNull
@@ -26,13 +26,17 @@ public class Account {
     @ManyToOne
     private FinancialTransaction lastTransactionIncludedInBalance;
     @ManyToOne
-    private ApplicationUser applicationUser;
+    private Domain domain;
 
     public Account() {
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -71,12 +75,13 @@ public class Account {
         return this;
     }
 
-    public ApplicationUser getApplicationUser() {
-        return applicationUser;
+    public Domain getDomain() {
+        return domain;
     }
 
-    public void setApplicationUser(ApplicationUser applicationUser) {
-        this.applicationUser = applicationUser;
+    public Account setDomain(Domain domain) {
+        this.domain = domain;
+        return this;
     }
 
     public void debit(FinancialTransaction financialTransaction) {
