@@ -26,8 +26,7 @@ class ApplicationUserFieldExtractorTest {
 
     private static ApplicationUser createApplicationUser() {
         return new ApplicationUser(
-                ID, LOGIN, PASSWORD, FIRST_NAME, LAST_NAME, EMAIL, ROLES
-        );
+                ID, LOGIN, PASSWORD, FIRST_NAME, LAST_NAME, EMAIL, ROLES, null);
     }
 
     @ParameterizedTest
