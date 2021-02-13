@@ -1,9 +1,7 @@
 package pl.sg.application.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -52,8 +50,12 @@ public class Domain {
         return this;
     }
 
-    public Domain addAssignedUsers(DomainAccessLevel accessLevel, ApplicationUser user) {
-        this.assignedUsers.add(new ApplicationUserDomainRelation(user, this, accessLevel));
-        return this;
+    public ApplicationUserDomainRelation addAssignedUsers(DomainAccessLevel accessLevel, ApplicationUser user) {
+        if (this.assignedUsers == null) {
+            this.assignedUsers = new ArrayList<>();
+        }
+        final ApplicationUserDomainRelation relation = new ApplicationUserDomainRelation(user, this, accessLevel);
+        this.assignedUsers.add(relation);
+        return relation;
     }
 }

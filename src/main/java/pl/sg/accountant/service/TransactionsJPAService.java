@@ -1,7 +1,6 @@
 package pl.sg.accountant.service;
 
 import org.springframework.stereotype.Component;
-import pl.sg.accountant.model.AccountsException;
 import pl.sg.accountant.model.OperationType;
 import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.model.accounts.FinancialTransaction;
@@ -13,6 +12,7 @@ import pl.sg.application.service.DomainService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Currency;
 import java.util.List;
 
 @Component
@@ -64,7 +64,7 @@ public class TransactionsJPAService implements TransactionsService {
                 .setTimeOfTransaction(LocalDateTime.now())
                 .setDescription(description)
                 .setTimeOfTransaction(LocalDateTime.now());
-        if (amount.equals(targetAmount)) {
+        if (from.getCurrency() == to.getCurrency()) {
             financialTransaction.transfer(from, to, amount);
         } else {
             financialTransaction.transfer(from, to, amount, targetAmount, rate);

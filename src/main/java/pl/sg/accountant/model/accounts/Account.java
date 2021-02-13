@@ -13,7 +13,7 @@ import java.util.Currency;
 public class Account {
     @Id
     @GeneratedValue
-    private int id;
+    private Integer id;
     @NotNull
     private String name;
     @NotNull
@@ -33,6 +33,10 @@ public class Account {
 
     public Integer getId() {
         return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {

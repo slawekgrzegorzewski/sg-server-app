@@ -6,6 +6,7 @@ import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.ApplicationUserDomainRelation;
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.DomainAccessLevel;
+import pl.sg.application.repository.ApplicationUserDomainRelationRepository;
 import pl.sg.application.security.annotations.RequestUser;
 import pl.sg.application.security.annotations.TokenBearerAuth;
 import pl.sg.application.service.ApplicationUserService;
@@ -22,11 +23,15 @@ public class DomainRestController implements DomainController {
 
     private final DomainService domainService;
     private final ApplicationUserService applicationUserService;
+    private final ApplicationUserDomainRelationRepository applicationUserDomainRelationRepository;
     private final ModelMapper mapper;
 
-    public DomainRestController(DomainService domainService, ApplicationUserService applicationUserService, ModelMapper mapper) {
+    public DomainRestController(DomainService domainService, ApplicationUserService applicationUserService,
+                                ApplicationUserDomainRelationRepository applicationUserDomainRelationRepository,
+                                ModelMapper mapper) {
         this.domainService = domainService;
         this.applicationUserService = applicationUserService;
+        this.applicationUserDomainRelationRepository = applicationUserDomainRelationRepository;
         this.mapper = mapper;
     }
 
@@ -44,9 +49,11 @@ public class DomainRestController implements DomainController {
     @PutMapping("/{domainName}")
     @TokenBearerAuth
     public DomainTO createDomain(@RequestUser ApplicationUser user, @PathVariable String domainName) {
-        final Domain newDomain = new Domain().setName(domainName).addAssignedUsers(DomainAccessLevel.ADMIN, user);
-        //TODO Check if user's relation is being update actually
-        return mapper.map(domainService.create(newDomain), DomainTO.class);
+        Domain newDomain = new Domain().setName(domainName);
+        newDomain = domainService.create(newDomain);
+        final ApplicationUserDomainRelation newRelation = newDomain.addAssignedUsers(DomainAccessLevel.ADMIN, user);
+        applicationUserDomainRelationRepository.save(newRelation);
+        return mapper.map(newDomain, DomainTO.class);
     }
 
     @Override
@@ -58,33 +65,42 @@ public class DomainRestController implements DomainController {
         ApplicationUser userToAdd = applicationUserService.getByUserLogins(userToAddLogin);
         Domain domain = domainService.getById(domainId);
         loggedInUser.validateAdminDomain(domain);
-        getExistingRelation(userToAdd, domain).ifPresent(domain.getAssignedUsers()::remove);
+        final Optional<ApplicationUserDomainRelation> relationToDelete = getExistingRelation(userToAdd, domain);
+        relationToDelete.ifPresent(domain.getAssignedUsers()::remove);
         final long numberOfAdmins = domain.getAssignedUsers().stream()
                 .filter(r -> r.getAccessLevel() == DomainAccessLevel.ADMIN)
                 .count();
         if (numberOfAdmins > 0) {
-            domain.addAssignedUsers(DomainAccessLevel.MEMBER, userToAdd);
+            final ApplicationUserDomainRelation newRelation = domain.addAssignedUsers(DomainAccessLevel.MEMBER, userToAdd);
+            relationToDelete.ifPresent(applicationUserDomainRelationRepository::delete);
+            applicationUserDomainRelationRepository.save(newRelation);
             domain = domainService.save(loggedInUser, domain);
         }
         return mapper.map(domain, DomainTO.class);
     }
 
     @Override
+    @PostMapping("/ADMIN/{domainId}/{userToAddLogin}")
+    @TokenBearerAuth
     public DomainTO setUserAdministratorOfDomain(@RequestUser ApplicationUser loggedInUser,
                                                  @PathVariable int domainId,
                                                  @PathVariable String userToAddLogin) {
         ApplicationUser userToAdd = applicationUserService.getByUserLogins(userToAddLogin);
         Domain domain = domainService.getById(domainId);
         loggedInUser.validateAdminDomain(domain);
-        getExistingRelation(userToAdd, domain).ifPresent(domain.getAssignedUsers()::remove);
-        domain.addAssignedUsers(DomainAccessLevel.ADMIN, userToAdd);
-        domain = domainService.save(loggedInUser, domain);
-        return mapper.map(domain, DomainTO.class);
+        getExistingRelation(userToAdd, domain).ifPresent(relation -> {
+            domain.getAssignedUsers().remove(relation);
+            applicationUserDomainRelationRepository.delete(relation);
+        });
+        final ApplicationUserDomainRelation newRelation = domain.addAssignedUsers(DomainAccessLevel.ADMIN, userToAdd);
+        applicationUserDomainRelationRepository.save(newRelation);
+        return mapper.map(domainService.save(loggedInUser, domain), DomainTO.class);
     }
 
     private Optional<ApplicationUserDomainRelation> getExistingRelation(ApplicationUser user, Domain domain) {
         return domain.getAssignedUsers().stream()
                 .filter(r -> r.getDomain().getId().equals(domain.getId()))
+                .filter(r -> r.getApplicationUser().getId().equals(user.getId()))
                 .findFirst();
     }
 }

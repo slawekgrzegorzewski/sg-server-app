@@ -29,8 +29,7 @@ public class Application {
                 .typeMap(BillingPeriod.class, BillingPeriodTO.class)
                 .addMapping(BillingPeriod::getId, BillingPeriodTO::setUserId);
         modelMapper
-                .typeMap(PiggyBank.class, PiggyBankTO.class)
-                .addMapping(PiggyBank::getId, PiggyBankTO::setUserId);
+                .typeMap(PiggyBank.class, PiggyBankTO.class);
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STANDARD);
         return modelMapper;
     }

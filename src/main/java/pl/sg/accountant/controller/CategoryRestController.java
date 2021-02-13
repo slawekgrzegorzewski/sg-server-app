@@ -6,8 +6,10 @@ import pl.sg.accountant.model.billings.Category;
 import pl.sg.accountant.service.CategoryService;
 import pl.sg.accountant.transport.billings.CategoryTO;
 import pl.sg.application.model.ApplicationUser;
+import pl.sg.application.model.Domain;
 import pl.sg.application.security.annotations.RequestUser;
 import pl.sg.application.security.annotations.TokenBearerAuth;
+import pl.sg.application.service.DomainService;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
@@ -18,11 +20,13 @@ import java.util.stream.Collectors;
 public class CategoryRestController implements CategoryController {
 
     private final CategoryService categoryService;
+    private final DomainService domainService;
     private final ModelMapper mapper;
 
     public CategoryRestController(CategoryService categoryService,
-                                  ModelMapper mapper) {
+                                  DomainService domainService, ModelMapper mapper) {
         this.categoryService = categoryService;
+        this.domainService = domainService;
         this.mapper = mapper;
     }
 
@@ -43,7 +47,10 @@ public class CategoryRestController implements CategoryController {
                                   @RequestBody CategoryTO categoryTO) {
         Category created;
         if (categoryTO.getId() == null) {
-            created = categoryService.create(user, mapper.map(categoryTO, Category.class));
+            Domain domain = domainService.getById(categoryTO.getDomain().getId());
+            final Category category = mapper.map(categoryTO, Category.class);
+            category.setDomain(domain);
+            created = categoryService.create(user, category);
         } else {
             created = categoryService.findByIdAndApplicationUser(user, categoryTO.getId())
                     .map(c -> applyChanges(categoryTO, c))

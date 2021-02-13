@@ -72,7 +72,7 @@ public class BillingPeriodRestController implements BillingPeriodController {
     }
 
     @Override
-    @GetMapping("/{domainId}/{period}/finish")
+    @PatchMapping("/{domainId}/{period}/finish")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public BillingPeriodInfo finish(@RequestUser ApplicationUser user,
                                     @PathVariable("domainId") int domainId,

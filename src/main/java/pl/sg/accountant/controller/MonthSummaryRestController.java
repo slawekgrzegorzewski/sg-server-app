@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/month-summaries")
+    @RequestMapping("/month-summaries")
 public class MonthSummaryRestController implements MonthSummaryController {
 
     private final MonthSummaryService monthSummaryService;

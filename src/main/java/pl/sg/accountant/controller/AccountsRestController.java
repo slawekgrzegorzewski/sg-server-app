@@ -59,7 +59,7 @@ public class AccountsRestController implements AccountsController {
     @PatchMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public String updateAccount(@RequestUser ApplicationUser user,
-                                                @RequestBody @Valid AccountTO account) {
+                                @RequestBody @Valid AccountTO account) {
         final Account byId = accountsService.getById(user, account.getId());
         byId.setName(account.getName());
         accountsService.update(user, byId);

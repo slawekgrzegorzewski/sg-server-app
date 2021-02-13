@@ -4,15 +4,19 @@ import org.springframework.stereotype.Component;
 import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.repository.AccountRepository;
 import pl.sg.application.model.ApplicationUser;
+import pl.sg.application.model.Domain;
+import pl.sg.application.service.DomainService;
 
 import java.util.List;
 
 @Component
 public class AccountsJPAService implements AccountsService {
     private final AccountRepository accountRepository;
+    private final DomainService domainService;
 
-    public AccountsJPAService(AccountRepository accountRepository) {
+    public AccountsJPAService(AccountRepository accountRepository, DomainService domainService) {
         this.accountRepository = accountRepository;
+        this.domainService = domainService;
     }
 
     @Override
@@ -29,11 +33,14 @@ public class AccountsJPAService implements AccountsService {
 
     @Override
     public List<Account> getForUserAndDomain(ApplicationUser user, int domainId) {
-        return accountRepository.findAllByApplicationUserLoginAndDomain(user, domainId);
+        final Domain domain = domainService.getById(domainId);
+        user.validateDomain(domain);
+        return accountRepository.findAllByApplicationUserLoginAndDomain(domainId);
     }
 
     @Override
     public void createAccount(ApplicationUser user, Account account) {
+        account.setId(null);
         user.validateAdminDomain(account.getDomain());
         accountRepository.save(account);
     }
