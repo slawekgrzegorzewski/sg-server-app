@@ -140,7 +140,7 @@ public class ApplicationUser {
                 .map(ApplicationUserDomainRelation::getDomain)
                 .anyMatch(d -> d.getId().equals(domain.getId()));
         if (!userBelongsToDomain) {
-            throw new UnauthorizedException("User " + getLogin() + " is not administrator of a " + domain.getId() + " domain.");
+            throw new UnauthorizedException("User " + getLogin() + " is not administrator of a \"" + domain.getId() + "\" domain.");
         }
     }
 
@@ -149,7 +149,7 @@ public class ApplicationUser {
                 .map(ApplicationUserDomainRelation::getDomain)
                 .anyMatch(d -> d.getId().equals(domain.getId()));
         if (!userBelongsToDomain) {
-            throw new UnauthorizedException("User " + getLogin() + " does not belong to a " + domain.getId() + " domain.");
+            throw new UnauthorizedException("User " + getLogin() + " does not belong to a \"" + domain.getId() + "\" domain.");
         }
     }
 }

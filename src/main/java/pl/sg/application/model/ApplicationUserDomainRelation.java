@@ -3,7 +3,7 @@ package pl.sg.application.model;
 import javax.persistence.*;
 
 @Entity
-@IdClass(ApplicationUserDomainRelationPK.class)
+@IdClass(ApplicationUserDomainPK.class)
 public class ApplicationUserDomainRelation {
     @Id
     @ManyToOne
