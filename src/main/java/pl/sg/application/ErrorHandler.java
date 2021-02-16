@@ -18,4 +18,9 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<String> forbidden(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
     }
+
+    @ExceptionHandler(value = {DomainException.class})
+    protected ResponseEntity<String> domainException(RuntimeException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
 }

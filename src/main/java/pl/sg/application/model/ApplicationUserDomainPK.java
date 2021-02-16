@@ -2,14 +2,14 @@ package pl.sg.application.model;
 
 import java.io.Serializable;
 
-public class ApplicationUserDomainRelationPK implements Serializable {
+public class ApplicationUserDomainPK implements Serializable {
     private int applicationUser;
     private int domain;
 
-    public ApplicationUserDomainRelationPK() {
+    public ApplicationUserDomainPK() {
     }
 
-    public ApplicationUserDomainRelationPK(int applicationUser, int domain) {
+    public ApplicationUserDomainPK(int applicationUser, int domain) {
         this.applicationUser = applicationUser;
         this.domain = domain;
     }
@@ -18,7 +18,7 @@ public class ApplicationUserDomainRelationPK implements Serializable {
         return applicationUser;
     }
 
-    public ApplicationUserDomainRelationPK setApplicationUser(int applicationUser) {
+    public ApplicationUserDomainPK setApplicationUser(int applicationUser) {
         this.applicationUser = applicationUser;
         return this;
     }
@@ -27,7 +27,7 @@ public class ApplicationUserDomainRelationPK implements Serializable {
         return domain;
     }
 
-    public ApplicationUserDomainRelationPK setDomain(int domain) {
+    public ApplicationUserDomainPK setDomain(int domain) {
         this.domain = domain;
         return this;
     }
