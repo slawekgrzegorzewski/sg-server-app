@@ -35,7 +35,7 @@ public class AccountsJPAService implements AccountsService {
     public List<Account> getForUserAndDomain(ApplicationUser user, int domainId) {
         final Domain domain = domainService.getById(domainId);
         user.validateDomain(domain);
-        return accountRepository.findAllByApplicationUserLoginAndDomain(domainId);
+        return accountRepository.findByDomain(domain);
     }
 
     @Override
