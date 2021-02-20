@@ -5,6 +5,7 @@ import pl.sg.accountant.model.billings.BillingPeriod;
 import pl.sg.accountant.model.billings.Expense;
 import pl.sg.accountant.model.billings.Income;
 import pl.sg.application.model.ApplicationUser;
+import pl.sg.application.model.Domain;
 
 import java.time.YearMonth;
 import java.util.List;
@@ -13,17 +14,17 @@ import java.util.Optional;
 public interface BillingPeriodsService {
     BillingPeriod getById(ApplicationUser user, Integer id);
 
-    BillingPeriod getByPeriodAndDomain(ApplicationUser user, int domainId, YearMonth month);
+    BillingPeriod getByPeriodAndDomain(Domain domain, YearMonth month);
 
-    Optional<BillingPeriod> findByPeriodAndDomain(ApplicationUser user, int domainId, YearMonth month);
+    Optional<BillingPeriod> findByPeriodAndDomain(Domain domain, YearMonth month);
 
-    List<BillingPeriod> unfinishedBillingPeriods(ApplicationUser user, int domainId);
+    List<BillingPeriod> unfinishedBillingPeriods(Domain domain);
 
-    Integer create(ApplicationUser user, int domainId, YearMonth month);
+    BillingPeriod create(Domain domain, YearMonth month);
 
-    void addIncome(ApplicationUser user, int accountId, Income income);
+    void finishBillingPeriod(Domain domain, YearMonth month);
 
-    void addExpense(ApplicationUser user, int accountId, Expense expense);
+    void addIncome(Account account, Income income);
 
-    void finishBillingPeriod(ApplicationUser user, int domainId, YearMonth month);
+    void addExpense(Account account, Expense expense);
 }

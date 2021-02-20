@@ -6,13 +6,11 @@ import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.model.accounts.FinancialTransaction;
 import pl.sg.accountant.repository.AccountRepository;
 import pl.sg.accountant.repository.FinancialTransactionRepository;
-import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.Domain;
 import pl.sg.application.service.DomainService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Currency;
 import java.util.List;
 
 @Component
@@ -31,64 +29,54 @@ public class TransactionsJPAService implements TransactionsService {
     }
 
     @Override
-    public List<FinancialTransaction> transactionsForUserAndDomain(ApplicationUser user, int domainId) {
-        final Domain domain = domainService.getById(domainId);
-        user.validateDomain(domain);
+    public List<FinancialTransaction> transactionsForDomain(Domain domain) {
         return financialTransactionRepository.findAllByDomain(domain);
     }
 
     @Override
-    public FinancialTransaction transferMoneyWithoutConversion(int sourceAccount, int destinationAccount,
-                                                               BigDecimal amount, String description,
-                                                               ApplicationUser user) {
-        return transfer(sourceAccount, destinationAccount, description, user, amount, amount, BigDecimal.ONE);
+    public FinancialTransaction transferMoneyWithoutConversion(Account source, Account destination,
+                                                               BigDecimal amount, String description) {
+        return transfer(source, destination, description, amount, amount, BigDecimal.ONE);
     }
 
     @Override
-    public FinancialTransaction transferMoneyWithConversion(int sourceAccount, int destinationAccount, BigDecimal amount, BigDecimal targetAmount, BigDecimal rate, String description, ApplicationUser user) {
-        return transfer(sourceAccount, destinationAccount, description, user, amount, targetAmount, rate);
+    public FinancialTransaction transferMoneyWithConversion(Account source, Account destination, BigDecimal amount,
+                                                            BigDecimal targetAmount, BigDecimal rate, String description) {
+        return transfer(source, destination, description, amount, targetAmount, rate);
     }
 
-    private FinancialTransaction transfer(int sourceAccount,
-                                          int destinationAccount,
+    private FinancialTransaction transfer(Account source, Account destination,
                                           String description,
-                                          ApplicationUser user,
                                           BigDecimal amount,
                                           BigDecimal targetAmount,
                                           BigDecimal rate) {
-        Account from = accountRepository.getOne(sourceAccount);
-        Account to = accountRepository.getOne(destinationAccount);
-        user.validateDomain(from.getDomain());
-        user.validateDomain(to.getDomain());
         FinancialTransaction financialTransaction = new FinancialTransaction()
                 .setTimeOfTransaction(LocalDateTime.now())
                 .setDescription(description)
                 .setTimeOfTransaction(LocalDateTime.now());
-        if (from.getCurrency() == to.getCurrency()) {
-            financialTransaction.transfer(from, to, amount);
+        if (source.getCurrency() == destination.getCurrency()) {
+            financialTransaction.transfer(source, destination, amount);
         } else {
-            financialTransaction.transfer(from, to, amount, targetAmount, rate);
+            financialTransaction.transfer(source, destination, amount, targetAmount, rate);
         }
         financialTransaction = financialTransactionRepository.save(financialTransaction);
-        from.debit(financialTransaction);
-        to.credit(financialTransaction);
-        accountRepository.saveAll(List.of(from, to));
+        source.debit(financialTransaction);
+        destination.credit(financialTransaction);
+        accountRepository.saveAll(List.of(source, destination));
         return financialTransaction;
     }
 
     @Override
-    public FinancialTransaction credit(int accountId, BigDecimal amount, String description, ApplicationUser user) {
-        return operation(accountId, amount, description, user, OperationType.CREDIT);
+    public FinancialTransaction credit(Account account, BigDecimal amount, String description) {
+        return operation(account, amount, description, OperationType.CREDIT);
     }
 
     @Override
-    public FinancialTransaction debit(int accountId, BigDecimal amount, String description, ApplicationUser user) {
-        return operation(accountId, amount, description, user, OperationType.DEBIT);
+    public FinancialTransaction debit(Account account, BigDecimal amount, String description) {
+        return operation(account, amount, description, OperationType.DEBIT);
     }
 
-    private FinancialTransaction operation(int accountId, BigDecimal amount, String description, ApplicationUser user, OperationType type) {
-        Account account = accountRepository.getOne(accountId);
-        user.validateDomain(account.getDomain());
+    private FinancialTransaction operation(Account account, BigDecimal amount, String description, OperationType type) {
         FinancialTransaction financialTransaction = new FinancialTransaction()
                 .setTimeOfTransaction(LocalDateTime.now())
                 .transfer(account, amount, type)

@@ -1,5 +1,7 @@
 package pl.sg.application.configuration;
 
+import com.google.gson.Gson;
+import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -13,9 +15,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import pl.sg.application.security.annotations.*;
 import pl.sg.application.service.AuthorizationService;
-import pl.sg.application.security.annotations.RequestUserResolver;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 
 @Configuration
@@ -38,17 +41,22 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 
     @Bean
-    public WebMvcConfigurer corsConfigurer(AuthorizationService authorizationService) {
+    public WebMvcConfigurer corsConfigurer(AuthorizationService authorizationService, Gson gson,
+                                           EntityManager entityManager, ModelMapper modelMapper) {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedMethods("OPTIONS","HEAD","GET","PUT","POST","DELETE","PATCH");
+                        .allowedMethods("OPTIONS", "HEAD", "GET", "PUT", "POST", "DELETE", "PATCH");
             }
 
             @Override
             public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
                 argumentResolvers.add(new RequestUserResolver(authorizationService));
+                argumentResolvers.add(new RequestDomainResolver(entityManager));
+                argumentResolvers.add(new PathVariableWithDomainResolver(authorizationService, entityManager));
+                argumentResolvers.add(new RequestBodyWithDomainResolver(authorizationService, entityManager, modelMapper, gson));
+                argumentResolvers.add(new MapRequestBodyResolver(modelMapper, gson));
             }
         };
     }

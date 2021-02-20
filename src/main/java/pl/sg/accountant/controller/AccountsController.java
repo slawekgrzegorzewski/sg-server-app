@@ -1,7 +1,9 @@
 package pl.sg.accountant.controller;
 
+import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.transport.accounts.AccountTO;
 import pl.sg.application.model.ApplicationUser;
+import pl.sg.application.model.Domain;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -10,11 +12,11 @@ public interface AccountsController {
 
     List<AccountTO> allAccounts();
 
-    List<AccountTO> userAccount(ApplicationUser user, int domainId);
+    List<AccountTO> domainAccount(Domain domain);
 
-    AccountTO createAccount(ApplicationUser user, @Valid AccountTO account);
+    AccountTO createAccount(@Valid Account account);
 
-    String updateAccount(ApplicationUser user, @Valid AccountTO account);
+    String updateAccount(@Valid Account account);
 
-    String deleteAccount(Integer id, ApplicationUser user);
+    String deleteAccount(Account account);
 }

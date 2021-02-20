@@ -2,20 +2,21 @@ package pl.sg.accountant.service;
 
 import pl.sg.accountant.model.accounts.Account;
 import pl.sg.application.model.ApplicationUser;
+import pl.sg.application.model.Domain;
 
 import java.util.List;
 
 public interface AccountsService {
 
-    Account getById(ApplicationUser user, Integer accountId);
+    Account getById(Integer accountId);
 
     List<Account> getAll();
 
-    List<Account> getForUserAndDomain(ApplicationUser userName, int domainId);
+    List<Account> getForDomain(Domain domain);
 
-    void createAccount(ApplicationUser user, Account account);
+    void createAccount(Account account);
 
-    void update(ApplicationUser user, Account account);
+    void update(Account account);
 
-    void delete(ApplicationUser user, int accountId);
+    void delete(Account account);
 }

@@ -1,7 +1,9 @@
 package pl.sg.accountant.controller;
 
+import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.transport.FinancialTransactionTO;
 import pl.sg.application.model.ApplicationUser;
+import pl.sg.application.model.Domain;
 
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
@@ -10,13 +12,13 @@ import java.util.List;
 
 public interface TransactionsController {
 
-    List<FinancialTransactionTO> getUserTransactions(ApplicationUser user, int domainId);
+    List<FinancialTransactionTO> getUserTransactions(Domain domain);
 
-    FinancialTransactionTO transfer(ApplicationUser user, int fromId, int toId, @PositiveOrZero BigDecimal amount, String description) ;
+    FinancialTransactionTO transfer(Account from, Account to, @PositiveOrZero BigDecimal amount, String description) ;
 
-    FinancialTransactionTO transferWithConversion(ApplicationUser user, int fromId, int toId, @PositiveOrZero BigDecimal amount, @PositiveOrZero BigDecimal targetAmount, @Positive BigDecimal rate, String description) ;
+    FinancialTransactionTO transferWithConversion(Account from, Account to, @PositiveOrZero BigDecimal amount, @PositiveOrZero BigDecimal targetAmount, @Positive BigDecimal rate, String description) ;
 
-    FinancialTransactionTO credit(ApplicationUser user, int accountId, @PositiveOrZero BigDecimal amount, String description) ;
+    FinancialTransactionTO credit(Account account, @PositiveOrZero BigDecimal amount, String description) ;
 
-    FinancialTransactionTO debit(ApplicationUser user, int accountId, @PositiveOrZero BigDecimal amount, String description) ;
+    FinancialTransactionTO debit(Account account, @PositiveOrZero BigDecimal amount, String description) ;
 }

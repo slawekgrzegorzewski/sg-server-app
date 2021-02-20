@@ -1,10 +1,9 @@
 package pl.sg.accountant.model.billings;
 
-import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.model.billings.summary.MonthSummary;
 import pl.sg.application.database.YearMonthStringAttributeConverter;
-import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.Domain;
+import pl.sg.application.model.WithDomain;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -12,7 +11,7 @@ import java.time.YearMonth;
 import java.util.List;
 
 @Entity
-public class BillingPeriod {
+public class BillingPeriod implements WithDomain<BillingPeriod> {
     @Id
     @GeneratedValue
     private Integer id;

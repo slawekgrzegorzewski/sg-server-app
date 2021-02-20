@@ -1,8 +1,9 @@
 package pl.sg.accountant.transport.billings;
 
 import pl.sg.application.transport.DomainTO;
+import pl.sg.application.transport.WithDomainTO;
 
-public class CategoryTO {
+public class CategoryTO implements WithDomainTO {
     private Integer id;
     private String name;
     private String description;

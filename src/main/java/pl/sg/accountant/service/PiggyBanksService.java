@@ -2,6 +2,7 @@ package pl.sg.accountant.service;
 
 import pl.sg.accountant.model.billings.PiggyBank;
 import pl.sg.application.model.ApplicationUser;
+import pl.sg.application.model.Domain;
 
 import java.util.List;
 
@@ -9,11 +10,11 @@ public interface PiggyBanksService {
 
     PiggyBank getById(ApplicationUser user, Integer id);
 
-    List<PiggyBank> findByDomain(ApplicationUser user, int domainId);
+    List<PiggyBank> findByDomain(Domain domain);
 
-    Integer create(ApplicationUser user, PiggyBank piggyBank);
+    Integer create(PiggyBank piggyBank);
 
-    void update(ApplicationUser user, PiggyBank piggyBank);
+    void update(PiggyBank piggyBank);
 
-    void updateAll(ApplicationUser user, List<PiggyBank> piggyBanks);
+    void updateAll(List<PiggyBank> piggyBanks);
 }

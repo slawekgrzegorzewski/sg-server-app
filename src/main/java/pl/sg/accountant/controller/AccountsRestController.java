@@ -6,13 +6,18 @@ import org.springframework.web.bind.annotation.*;
 import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.service.AccountsService;
 import pl.sg.accountant.transport.accounts.AccountTO;
-import pl.sg.application.model.ApplicationUser;
-import pl.sg.application.security.annotations.RequestUser;
+import pl.sg.application.model.Domain;
+import pl.sg.application.security.annotations.PathVariableWithDomain;
+import pl.sg.application.security.annotations.RequestBodyWithDomain;
+import pl.sg.application.security.annotations.RequestDomain;
 import pl.sg.application.security.annotations.TokenBearerAuth;
 
 import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static pl.sg.Application.CREATE_ACCOUNT;
+import static pl.sg.Application.UPDATE_ACCOUNT;
 
 @RestController
 @RequestMapping("/accounts")
@@ -34,11 +39,10 @@ public class AccountsRestController implements AccountsController {
     }
 
     @Override
-    @GetMapping("/mine/{domainId}")
+    @GetMapping("/mine")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public List<AccountTO> userAccount(@RequestUser ApplicationUser user,
-                                       @PathVariable int domainId) {
-        return map(accountsService.getForUserAndDomain(user, domainId));
+    public List<AccountTO> domainAccount(@RequestDomain Domain domain) {
+        return map(accountsService.getForDomain(domain));
     }
 
     private List<AccountTO> map(List<Account> accounts) {
@@ -47,32 +51,34 @@ public class AccountsRestController implements AccountsController {
 
     @Override
     @PutMapping
-    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public AccountTO createAccount(@RequestUser ApplicationUser user,
-                                   @RequestBody @Valid AccountTO account) {
-        Account toCreate = mapper.map(account, Account.class);
-        accountsService.createAccount(user, toCreate);
-        return mapper.map(toCreate, AccountTO.class);
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"}, domainAdmin = true)
+    public AccountTO createAccount(
+            @RequestBodyWithDomain(
+                    transportClass = AccountTO.class,
+                    mapperName = CREATE_ACCOUNT,
+                    create = true,
+                    domainAdmin = true)
+            @Valid Account account
+    ) {
+        accountsService.createAccount(account);
+        return mapper.map(account, AccountTO.class);
     }
 
     @Override
     @PatchMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public String updateAccount(@RequestUser ApplicationUser user,
-                                @RequestBody @Valid AccountTO account) {
-        final Account byId = accountsService.getById(user, account.getId());
-        byId.setName(account.getName());
-        accountsService.update(user, byId);
+    public String updateAccount(
+            @RequestBodyWithDomain(transportClass = AccountTO.class, mapperName = UPDATE_ACCOUNT) @Valid Account account
+    ) {
+        accountsService.update(account);
         return "OK";
     }
 
     @Override
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{account}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public String deleteAccount(
-            @PathVariable Integer id,
-            @RequestUser ApplicationUser user) {
-        accountsService.delete(user, id);
+    public String deleteAccount(@PathVariableWithDomain(requireAdmin = true) Account account) {
+        accountsService.delete(account);
         return "Deleted.";
     }
 }

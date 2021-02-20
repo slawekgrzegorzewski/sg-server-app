@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface BillingPeriodRepository extends JpaRepository<BillingPeriod, Integer> {
 
-    Optional<BillingPeriod> findByDomainIdAndPeriod(int domainId, YearMonth month);
+    Optional<BillingPeriod> findByDomainAndPeriod(Domain domain, YearMonth month);
 
     @Query("SELECT bp FROM BillingPeriod bp LEFT JOIN bp.monthSummary ms LEFT JOIN bp.domain d WHERE ms IS NULL AND d = ?1")
     List<BillingPeriod> allUnfinishedBillingPeriods(Domain domain);

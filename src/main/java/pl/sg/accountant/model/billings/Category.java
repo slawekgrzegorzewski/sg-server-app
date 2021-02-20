@@ -1,13 +1,14 @@
 package pl.sg.accountant.model.billings;
 
 import pl.sg.application.model.Domain;
+import pl.sg.application.model.WithDomain;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Entity
-public class Category {
+public class Category implements WithDomain<Category> {
     @Id
     @GeneratedValue
     private Integer id;
