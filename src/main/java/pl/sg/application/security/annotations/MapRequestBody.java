@@ -1,19 +1,17 @@
 package pl.sg.application.security.annotations;
 
+import pl.sg.application.transport.WithDomainTO;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.METHOD)
+@Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TokenBearerAuth {
+public @interface MapRequestBody {
+    Class<?> transportClass();
 
-    String[] all() default {};
+    String mapperName() default "";
 
-    String[] any() default {};
-
-    boolean domainAdmin() default false;
-
-    boolean domainMember() default true;
 }

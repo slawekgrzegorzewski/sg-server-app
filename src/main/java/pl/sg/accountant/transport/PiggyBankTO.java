@@ -1,11 +1,12 @@
 package pl.sg.accountant.transport;
 
 import pl.sg.application.transport.DomainTO;
+import pl.sg.application.transport.WithDomainTO;
 
 import java.math.BigDecimal;
 import java.util.Currency;
 
-public class PiggyBankTO {
+public class PiggyBankTO implements WithDomainTO {
     private Integer id;
     private String name;
     private String description;

@@ -63,52 +63,60 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
     }
 
     @Override
-    public BillingPeriod getByPeriodAndDomain(ApplicationUser user, int domainId, YearMonth month) {
-        return this.findByPeriodAndDomain(user, domainId, month)
-                .orElseThrow(EntityNotFoundException::new);
+    public BillingPeriod getByPeriodAndDomain(Domain domain, YearMonth month) {
+        return this.findByPeriodAndDomain(domain, month).orElseThrow(EntityNotFoundException::new);
     }
 
     @Override
-    public Optional<BillingPeriod> findByPeriodAndDomain(ApplicationUser user, int domainId, YearMonth month) {
-        return this.billingPeriodRepository.findByDomainIdAndPeriod(domainId, month)
-                .map(byId -> {
-                    user.validateDomain(byId.getDomain());
-                    return byId;
-                });
+    public Optional<BillingPeriod> findByPeriodAndDomain(Domain domain, YearMonth month) {
+        return this.billingPeriodRepository.findByDomainAndPeriod(domain, month);
     }
 
     @Override
-    public List<BillingPeriod> unfinishedBillingPeriods(ApplicationUser user, int domainId) {
-        final Domain domain = domainService.getById(domainId);
-        user.validateDomain(domain);
+    public List<BillingPeriod> unfinishedBillingPeriods(Domain domain) {
         return this.billingPeriodRepository.allUnfinishedBillingPeriods(domain);
     }
 
     @Override
-    public Integer create(ApplicationUser user, int domainId, YearMonth month) {
-        if (findByPeriodAndDomain(user, domainId, month).isPresent()) {
+    public BillingPeriod create(Domain domain, YearMonth month) {
+        if (findByPeriodAndDomain(domain, month).isPresent()) {
             throw new AccountsException("Billing period for this period already exists.");
         }
-        Domain domain = domainService.getById(domainId);
-        user.validateAdminDomain(domain);
         return billingPeriodRepository.save(
                 new BillingPeriod()
                         .setPeriod(month)
                         .setName(month.toString())
-                        .setDomain(domain))
-                .getId();
+                        .setDomain(domain));
     }
 
     @Override
-    public void addIncome(ApplicationUser user, int accountId, Income income) {
-        Account account = accountsService.getById(user, accountId);
+    public void finishBillingPeriod(Domain domain, YearMonth month) {
+        BillingPeriod billingPeriod = getByPeriodAndDomain(domain, month);
+        Optional<MonthSummary> monthSummary = this.monthlySummaryRepository.findByBillingPeriod(billingPeriod);
+        if (monthSummary.isPresent()) {
+            throw new AccountsException("Already finished billing period");
+        }
+        List<PiggyBank> piggyBanks = this.piggyBanksService.findByDomain(domain);
+        MonthSummary ms = new MonthSummary(billingPeriod,
+                this.accountsService.getForDomain(domain),
+                piggyBanks);
+        this.monthlySummaryRepository.save(ms);
+
+        piggyBanks.stream()
+                .filter(pg -> pg.getMonthlyTopUp() != null)
+                .filter(pg -> pg.getMonthlyTopUp().compareTo(BigDecimal.ZERO) > 0)
+                .forEach(PiggyBank::addMonthlyTopUp);
+
+        this.piggyBanksService.updateAll(piggyBanks);
+    }
+
+    @Override
+    public void addIncome(Account account, Income income) {
         BillingPeriod billingPeriod = unfinishedCurrentBillingPeriod(account.getDomain());
 
-        user.validateDomain(account.getDomain());
-        user.validateDomain(billingPeriod.getDomain());
         validateCurrency(account, income.getCurrency());
 
-        transactionsService.credit(account.getId(), income.getAmount(), income.getDescription(), user);
+        transactionsService.credit(account, income.getAmount(), income.getDescription());
         income.setBillingPeriod(billingPeriod);
         if (income.getIncomeDate() == null) {
             income.setIncomeDate(LocalDate.now());
@@ -117,16 +125,13 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
     }
 
     @Override
-    public void addExpense(ApplicationUser user, int accountId, Expense expense) {
-        Account account = accountsService.getById(user, accountId);
+    public void addExpense(Account account, Expense expense) {
         BillingPeriod billingPeriod = unfinishedCurrentBillingPeriod(account.getDomain());
 
-        user.validateDomain(account.getDomain());
-        user.validateDomain(billingPeriod.getDomain());
         validateCurrency(account, expense.getCurrency());
         validateAmount(account, expense.getAmount());
 
-        transactionsService.debit(account.getId(), expense.getAmount(), expense.getDescription(), user);
+        transactionsService.debit(account, expense.getAmount(), expense.getDescription());
         expense.setBillingPeriod(billingPeriod);
         if (expense.getDescription() == null) {
             expense.setExpenseDate(LocalDate.now());
@@ -149,26 +154,5 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
         if (!account.getCurrency().equals(currency)) {
             throw new AccountsException("Account and income currencies differ");
         }
-    }
-
-    @Override
-    public void finishBillingPeriod(ApplicationUser user, int domainId, YearMonth month) {
-        BillingPeriod billingPeriod = getByPeriodAndDomain(user, domainId, month);
-        Optional<MonthSummary> monthSummary = this.monthlySummaryRepository.findByBillingPeriod(billingPeriod);
-        if (monthSummary.isPresent()) {
-            throw new AccountsException("Already finished billing period");
-        }
-        List<PiggyBank> piggyBanks = this.piggyBanksService.findByDomain(user, domainId);
-        MonthSummary ms = new MonthSummary(billingPeriod,
-                this.accountsService.getForUserAndDomain(user, domainId),
-                piggyBanks);
-        this.monthlySummaryRepository.save(ms);
-
-        piggyBanks.stream()
-                .filter(pg -> pg.getMonthlyTopUp() != null)
-                .filter(pg -> pg.getMonthlyTopUp().compareTo(BigDecimal.ZERO) > 0)
-                .forEach(PiggyBank::addMonthlyTopUp);
-
-        this.piggyBanksService.updateAll(user, piggyBanks);
     }
 }

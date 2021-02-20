@@ -1,26 +1,26 @@
 package pl.sg.accountant.controller;
 
+import pl.sg.accountant.model.accounts.Account;
+import pl.sg.accountant.model.billings.Expense;
+import pl.sg.accountant.model.billings.Income;
 import pl.sg.accountant.repository.BillingPeriodInfo;
-import pl.sg.accountant.transport.billings.ExpenseTO;
-import pl.sg.accountant.transport.billings.IncomeTO;
-import pl.sg.application.model.ApplicationUser;
-import pl.sg.application.transport.DomainTO;
+import pl.sg.application.model.Domain;
 
 import java.time.YearMonth;
 
 public interface BillingPeriodController {
 
-    BillingPeriodInfo currentPeriod(ApplicationUser user, int domainId);
+    BillingPeriodInfo currentPeriod(Domain domain);
 
-    BillingPeriodInfo periodForMonth(ApplicationUser user, int domainId, YearMonth month);
+    BillingPeriodInfo periodForMonth(Domain domain, YearMonth month);
 
-    BillingPeriodInfo create(ApplicationUser user, DomainTO domain);
+    BillingPeriodInfo create(Domain domain);
 
-    BillingPeriodInfo create(ApplicationUser user, DomainTO domain, YearMonth month);
+    BillingPeriodInfo create(Domain domain, YearMonth month);
 
-    BillingPeriodInfo finish(ApplicationUser user, int domainId, YearMonth month);
+    BillingPeriodInfo finish(Domain domain, YearMonth month);
 
-    String createIncome(ApplicationUser user, int accountId, IncomeTO incomeTO);
+    String createIncome(Account account, Income income);
 
-    String createExpense(ApplicationUser user, int accountId, ExpenseTO expenseTO);
+    String createExpense(Account account, Expense expense);
 }

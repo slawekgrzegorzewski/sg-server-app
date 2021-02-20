@@ -1,28 +1,29 @@
 package pl.sg.accountant.transport.billings;
 
-import javax.validation.constraints.NotNull;
+import pl.sg.application.transport.DomainTO;
+import pl.sg.application.transport.WithDomainTO;
+
 import java.time.YearMonth;
 import java.util.List;
 
-public class BillingPeriodTO {
+public class BillingPeriodTO implements WithDomainTO {
     private Integer id;
     private String name;
     private YearMonth period;
     private List<IncomeTO> incomes;
     private List<ExpenseTO> expenses;
-    @NotNull
-    private int userId;
+    private DomainTO domain;
 
     public BillingPeriodTO() {
     }
 
-    public BillingPeriodTO(int id, String name, YearMonth period, List<IncomeTO> incomes, List<ExpenseTO> expenses, @NotNull int userId) {
+    public BillingPeriodTO(int id, String name, YearMonth period, List<IncomeTO> incomes, List<ExpenseTO> expenses, DomainTO domain) {
         this.id = id;
         this.name = name;
         this.period = period;
         this.incomes = incomes;
         this.expenses = expenses;
-        this.userId = userId;
+        this.domain = domain;
     }
 
     public Integer getId() {
@@ -65,12 +66,13 @@ public class BillingPeriodTO {
         this.expenses = expenses;
     }
 
-    public Integer getUserId() {
-        return userId;
+    @Override
+    public DomainTO getDomain() {
+        return domain;
     }
 
-    public BillingPeriodTO setUserId(Integer userId) {
-        this.userId = userId;
+    public BillingPeriodTO setDomain(DomainTO domain) {
+        this.domain = domain;
         return this;
     }
 }

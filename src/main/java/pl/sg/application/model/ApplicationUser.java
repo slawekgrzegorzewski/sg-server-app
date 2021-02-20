@@ -4,6 +4,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.jboss.aerogear.security.otp.api.Base32;
+import pl.sg.application.ForbiddenException;
 import pl.sg.application.UnauthorizedException;
 
 import javax.persistence.*;
@@ -134,22 +135,30 @@ public class ApplicationUser {
     }
 
     public void validateAdminDomain(Domain domain) {
-        validateDomain(domain);
+        validateAdminDomain(domain.getId());
+    }
+
+    private void validateAdminDomain(Integer domainId) {
+        validateDomain(domainId);
         final boolean userBelongsToDomain = assignedDomains.stream()
                 .filter(r -> r.getAccessLevel() == DomainAccessLevel.ADMIN)
                 .map(ApplicationUserDomainRelation::getDomain)
-                .anyMatch(d -> d.getId().equals(domain.getId()));
+                .anyMatch(d -> d.getId().equals(domainId));
         if (!userBelongsToDomain) {
-            throw new UnauthorizedException("User " + getLogin() + " is not administrator of a \"" + domain.getId() + "\" domain.");
+            throw new ForbiddenException("User " + getLogin() + " is not administrator of a \"" + domainId + "\" domain.");
         }
     }
 
     public void validateDomain(Domain domain) {
+        validateDomain(domain.getId());
+    }
+
+    private void validateDomain(Integer domainId) {
         final boolean userBelongsToDomain = assignedDomains.stream()
                 .map(ApplicationUserDomainRelation::getDomain)
-                .anyMatch(d -> d.getId().equals(domain.getId()));
+                .anyMatch(d -> d.getId().equals(domainId));
         if (!userBelongsToDomain) {
-            throw new UnauthorizedException("User " + getLogin() + " does not belong to a \"" + domain.getId() + "\" domain.");
+            throw new ForbiddenException("User " + getLogin() + " does not belong to a \"" + domainId + "\" domain.");
         }
     }
 }

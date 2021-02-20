@@ -1,6 +1,8 @@
 package pl.sg.accountant.transport.accounts;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import pl.sg.application.transport.DomainTO;
+import pl.sg.application.transport.WithDomainTO;
 
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotBlank;
@@ -9,7 +11,7 @@ import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.util.Currency;
 
-public class AccountTO {
+public class AccountTO implements WithDomainTO {
     private Integer id;
     @NotBlank
     private String name;

@@ -1,6 +1,7 @@
 package pl.sg.accountant.model.billings;
 
 import pl.sg.application.model.Domain;
+import pl.sg.application.model.WithDomain;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -8,7 +9,7 @@ import java.math.BigDecimal;
 import java.util.Currency;
 
 @Entity
-public class PiggyBank {
+public class PiggyBank implements WithDomain<PiggyBank> {
     @Id
     @GeneratedValue
     private Integer id;

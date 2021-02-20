@@ -32,23 +32,18 @@ public class CategoryJPAService implements CategoryService {
     }
 
     @Override
-    public List<Category> getForUser(ApplicationUser user, int domainId) {
-        final Domain domain = domainService.getById(domainId);
-        user.validateDomain(domain);
+    public List<Category> getForDomain(Domain domain) {
         return categoryRepository.findByDomain(domain);
     }
 
     @Override
-    public Category create(ApplicationUser user, Category category) {
-        user.validateAdminDomain(category.getDomain());
+    public Category create(Category category) {
         category.setId(null);
         return categoryRepository.save(category);
     }
 
     @Override
-    public Category update(ApplicationUser user, Category category) {
-        final Category dbValue = categoryRepository.getOne(category.getId());
-        user.validateAdminDomain(dbValue.getDomain());
+    public Category update(Category category) {
         return categoryRepository.save(category);
     }
 }

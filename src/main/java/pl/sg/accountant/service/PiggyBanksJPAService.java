@@ -29,34 +29,23 @@ public class PiggyBanksJPAService implements PiggyBanksService {
     }
 
     @Override
-    public List<PiggyBank> findByDomain(ApplicationUser user, int domainId) {
-        final Domain domain = domainService.getById(domainId);
-        user.validateDomain(domain);
-        return piggyBankRepository.findByDomainId(domainId);
+    public List<PiggyBank> findByDomain(Domain domain) {
+        return piggyBankRepository.findByDomain(domain);
     }
 
     @Override
-    public Integer create(ApplicationUser user, PiggyBank piggyBank) {
-        user.validateAdminDomain(piggyBank.getDomain());
+    public Integer create(PiggyBank piggyBank) {
         piggyBank.setId(null);
         return piggyBankRepository.save(piggyBank).getId();
     }
 
     @Override
-    public void update(ApplicationUser user, PiggyBank piggyBank) {
-        PiggyBank dbValue = piggyBankRepository.getOne(piggyBank.getId());
-        user.validateAdminDomain(dbValue.getDomain());
+    public void update(PiggyBank piggyBank) {
         this.piggyBankRepository.save(piggyBank);
     }
 
     @Override
-    public void updateAll(ApplicationUser user, List<PiggyBank> piggyBanks) {
-        List<Integer> ids = piggyBanks.stream().map(PiggyBank::getId).collect(Collectors.toList());
-        piggyBankRepository
-                .findAllById(ids)
-                .stream()
-                .map(PiggyBank::getDomain)
-                .forEach(user::validateAdminDomain);
+    public void updateAll(List<PiggyBank> piggyBanks) {;
         this.piggyBankRepository.saveAll(piggyBanks);
     }
 }
