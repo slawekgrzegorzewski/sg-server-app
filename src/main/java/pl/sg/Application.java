@@ -8,11 +8,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import pl.sg.accountant.model.accounts.Account;
+import pl.sg.accountant.model.accounts.Client;
 import pl.sg.accountant.model.billings.BillingPeriod;
 import pl.sg.accountant.model.billings.Category;
 import pl.sg.accountant.model.billings.PiggyBank;
 import pl.sg.accountant.transport.PiggyBankTO;
 import pl.sg.accountant.transport.accounts.AccountTO;
+import pl.sg.accountant.transport.accounts.ClientTO;
 import pl.sg.accountant.transport.billings.BillingPeriodTO;
 import pl.sg.accountant.transport.billings.CategoryTO;
 
@@ -27,6 +29,8 @@ public class Application {
     public static final String UPDATE_ACCOUNT = "updateAccount";
     public static final String CREATE_CATEGORY = "createCategory";
     public static final String UPDATE_CATEGORY = "updateCategory";
+    public static final String CREATE_CLIENT = "createClient";
+    public static final String UPDATE_CLIENT = "updateClient";
     public static final String CREATE_PIGGY_BANK = "createPiggyBank";
     public static final String UPDATE_PIGGY_BANK = "updatePiggyBank";
 
@@ -50,8 +54,13 @@ public class Application {
         modelMapper.typeMap(CategoryTO.class, Category.class, CREATE_CATEGORY)
                 .setConverter(context -> applyChanges(context.getSource(), new Category()));
 
-
         modelMapper.typeMap(CategoryTO.class, Category.class, UPDATE_CATEGORY)
+                .setConverter(context -> applyChanges(context.getSource(), context.getDestination()));
+
+        modelMapper.typeMap(ClientTO.class, Client.class, CREATE_CLIENT)
+                .setConverter(context -> applyChanges(context.getSource(), new Client()));
+
+        modelMapper.typeMap(ClientTO.class, Client.class, UPDATE_CLIENT)
                 .setConverter(context -> applyChanges(context.getSource(), context.getDestination()));
 
         modelMapper.typeMap(PiggyBankTO.class, PiggyBank.class, CREATE_PIGGY_BANK)
@@ -72,6 +81,11 @@ public class Application {
     private Category applyChanges(CategoryTO source, Category destination) {
         destination.setName(source.getName());
         destination.setDescription(source.getDescription());
+        return destination;
+    }
+
+    private Client applyChanges(ClientTO source, Client destination) {
+        destination.setName(source.getName());
         return destination;
     }
 
