@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import pl.sg.application.security.annotations.*;
 import pl.sg.application.service.AuthorizationService;
@@ -45,7 +46,8 @@ public class WebSecurityConfigurationHttps extends WebSecurityConfigurerAdapter 
 
     @Bean
     public WebMvcConfigurer corsConfigurer(AuthorizationService authorizationService, Gson gson,
-                                           EntityManager entityManager, ModelMapper modelMapper) {
+                                           EntityManager entityManager, ModelMapper modelMapper,
+                                           SavingRequestsInterceptor savingRequestsInterceptor) {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
@@ -60,6 +62,11 @@ public class WebSecurityConfigurationHttps extends WebSecurityConfigurerAdapter 
                 argumentResolvers.add(new PathVariableWithDomainResolver(authorizationService, entityManager));
                 argumentResolvers.add(new RequestBodyWithDomainResolver(authorizationService, entityManager, modelMapper, gson));
                 argumentResolvers.add(new MapRequestBodyResolver(modelMapper, gson));
+            }
+
+            @Override
+            public void addInterceptors(InterceptorRegistry registry) {
+                registry.addWebRequestInterceptor(savingRequestsInterceptor);
             }
         };
     }
