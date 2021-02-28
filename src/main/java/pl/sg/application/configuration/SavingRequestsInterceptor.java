@@ -10,7 +10,6 @@ import pl.sg.application.model.ReceivedRequest;
 import pl.sg.application.repository.ReceivedRequestRepository;
 import pl.sg.application.service.AuthorizationService;
 
-import javax.persistence.EntityTransaction;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -34,6 +33,9 @@ public class SavingRequestsInterceptor implements WebRequestInterceptor {
             HttpServletRequest r = ((DispatcherServletWebRequest) request).getRequest();
             String method = r.getMethod();
             String requestURI = r.getRequestURI();
+            if ("/error".equals(requestURI)) {
+                return;
+            }
             Map<String, String> headers = new HashMap<>();
             Enumeration<String> headerNames = r.getHeaderNames();
             while (headerNames.hasMoreElements()) {
@@ -42,8 +44,11 @@ public class SavingRequestsInterceptor implements WebRequestInterceptor {
             }
             String body = r.getReader().lines().collect(Collectors.joining("\n"));
             String token = request.getHeader("Authorization");
-            ApplicationUser userInfo = authorizationService.getUserInfo(token);
-            String login = userInfo.getLogin();
+            String login = "";
+            if (token != null) {
+                ApplicationUser userInfo = authorizationService.getUserInfo(token);
+                login = userInfo.getLogin();
+            }
             String remoteAddr = r.getRemoteAddr();
 
             ReceivedRequest receivedRequest = new ReceivedRequest()
