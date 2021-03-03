@@ -1,6 +1,7 @@
 package pl.sg.application.service;
 
 import org.springframework.stereotype.Component;
+import pl.sg.accountant.service.AccountantSettingsService;
 import pl.sg.application.DomainException;
 import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.ApplicationUserDomainRelation;
@@ -22,13 +23,16 @@ public class DomainJPAService implements DomainService {
     private final ApplicationUserDomainRelationRepository applicationUserDomainRelationRepository;
     private final DomainRepository domainRepository;
     private final DomainInvitationRepository domainInvitationRepository;
+    private final AccountantSettingsService accountantSettingsService;
 
     public DomainJPAService(ApplicationUserDomainRelationRepository applicationUserDomainRelationRepository,
                             DomainRepository domainRepository,
-                            DomainInvitationRepository domainInvitationRepository) {
+                            DomainInvitationRepository domainInvitationRepository,
+                            AccountantSettingsService accountantSettingsService) {
         this.applicationUserDomainRelationRepository = applicationUserDomainRelationRepository;
         this.domainRepository = domainRepository;
         this.domainInvitationRepository = domainInvitationRepository;
+        this.accountantSettingsService = accountantSettingsService;
     }
 
     @Override
@@ -47,6 +51,7 @@ public class DomainJPAService implements DomainService {
         final ApplicationUserDomainRelation newRelation = newDomain.addAssignedUsers(ADMIN, user);
         final Domain created = domainRepository.save(newDomain);
         applicationUserDomainRelationRepository.save(newRelation);
+        accountantSettingsService.createForDomain(created);
         return created;
     }
 

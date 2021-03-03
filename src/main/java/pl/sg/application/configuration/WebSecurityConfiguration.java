@@ -65,6 +65,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             public void addInterceptors(InterceptorRegistry registry) {
                 registry.addWebRequestInterceptor(savingRequestsInterceptor);
             }
+
+
         };
     }
 

@@ -43,6 +43,9 @@ public class SavingRequestsInterceptor implements WebRequestInterceptor {
                 headers.put(name, r.getHeader(name));
             }
             String body = r.getReader().lines().collect(Collectors.joining("\n"));
+            if ("/login".equals(requestURI)) {
+                body = body.replaceFirst("\"pass\":[^\"]*\"[^\"]*\"", "\"pass\":\"removed\"");
+            }
             String token = request.getHeader("Authorization");
             String login = "";
             if (token != null) {

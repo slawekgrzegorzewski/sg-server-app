@@ -7,20 +7,19 @@ import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import pl.sg.accountant.model.accounts.Account;
-import pl.sg.accountant.model.accounts.Client;
+import pl.sg.accountant.model.accounts.*;
 import pl.sg.accountant.model.billings.BillingPeriod;
 import pl.sg.accountant.model.billings.Category;
 import pl.sg.accountant.model.billings.PiggyBank;
 import pl.sg.accountant.transport.PiggyBankTO;
-import pl.sg.accountant.transport.accounts.AccountTO;
-import pl.sg.accountant.transport.accounts.ClientTO;
+import pl.sg.accountant.transport.accounts.*;
 import pl.sg.accountant.transport.billings.BillingPeriodTO;
 import pl.sg.accountant.transport.billings.CategoryTO;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.function.Function;
 
 @SpringBootApplication
 public class Application {
@@ -31,8 +30,16 @@ public class Application {
     public static final String UPDATE_CATEGORY = "updateCategory";
     public static final String CREATE_CLIENT = "createClient";
     public static final String UPDATE_CLIENT = "updateClient";
+    public static final String CREATE_CLIENT_PAYMENT = "createClientPayment";
+    public static final String UPDATE_CLIENT_PAYMENT = "updateClientPayment";
+    public static final String CREATE_PERFORMED_SERVICE = "createPerformedService";
+    public static final String UPDATE_PERFORMED_SERVICE = "updatePerformedService";
+    public static final String CREATE_PERFORMED_SERVICE_PAYMENT = "createPerformedServicePayment";
+    public static final String UPDATE_PERFORMED_SERVICE_PAYMENT = "updatePerformedServicePayment";
     public static final String CREATE_PIGGY_BANK = "createPiggyBank";
     public static final String UPDATE_PIGGY_BANK = "updatePiggyBank";
+    public static final String CREATE_SERVICE = "createService";
+    public static final String UPDATE_SERVICE = "updateService";
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -44,6 +51,10 @@ public class Application {
         modelMapper.typeMap(Account.class, AccountTO.class);
         modelMapper.typeMap(BillingPeriod.class, BillingPeriodTO.class);
         modelMapper.typeMap(PiggyBank.class, PiggyBankTO.class);
+        modelMapper.typeMap(ClientPayment.class, ClientPaymentTO.class)
+                .addMapping(ClientPayment::getServices, ClientPaymentTO::setServiceRelations);
+        modelMapper.typeMap(PerformedService.class, PerformedServiceTO.class)
+                .addMapping(PerformedService::getPayments, PerformedServiceTO::setClientPaymentsRelations);
 
         modelMapper.typeMap(AccountTO.class, Account.class, CREATE_ACCOUNT)
                 .setConverter(context -> applyChanges(context.getSource(), new Account()));
@@ -63,10 +74,34 @@ public class Application {
         modelMapper.typeMap(ClientTO.class, Client.class, UPDATE_CLIENT)
                 .setConverter(context -> applyChanges(context.getSource(), context.getDestination()));
 
+        modelMapper.typeMap(ClientPaymentTO.class, ClientPayment.class, CREATE_CLIENT_PAYMENT)
+                .setConverter(context -> applyChanges(context.getSource(), modelMapper));
+
+        modelMapper.typeMap(ClientPaymentTO.class, ClientPayment.class, UPDATE_CLIENT_PAYMENT)
+                .setConverter(context -> applyChanges(context.getSource(), context.getDestination()));
+
+        modelMapper.typeMap(PerformedServiceTO.class, PerformedService.class, CREATE_PERFORMED_SERVICE)
+                .setConverter(context -> applyChanges(context.getSource(), new PerformedService(), modelMapper));
+
+        modelMapper.typeMap(PerformedServiceTO.class, PerformedService.class, UPDATE_PERFORMED_SERVICE)
+                .setConverter(context -> applyChanges(context.getSource(), context.getDestination()));
+
+        modelMapper.typeMap(PerformedServicePaymentTO.class, PerformedServicePayment.class, CREATE_PERFORMED_SERVICE_PAYMENT)
+                .setConverter(context -> applyChanges(context.getSource(), new PerformedServicePayment(), modelMapper));
+
+        modelMapper.typeMap(PerformedServicePaymentTO.class, PerformedServicePayment.class, UPDATE_PERFORMED_SERVICE_PAYMENT)
+                .setConverter(context -> applyChanges(context.getSource(), context.getDestination(), modelMapper));
+
         modelMapper.typeMap(PiggyBankTO.class, PiggyBank.class, CREATE_PIGGY_BANK)
                 .setConverter(context -> applyChanges(context.getSource(), new PiggyBank()));
 
         modelMapper.typeMap(PiggyBankTO.class, PiggyBank.class, UPDATE_PIGGY_BANK)
+                .setConverter(context -> applyChanges(context.getSource(), context.getDestination()));
+
+        modelMapper.typeMap(ServiceTO.class, Service.class, CREATE_SERVICE)
+                .setConverter(context -> applyChanges(context.getSource(), new Service()));
+
+        modelMapper.typeMap(ServiceTO.class, Service.class, UPDATE_SERVICE)
                 .setConverter(context -> applyChanges(context.getSource(), context.getDestination()));
 
         return modelMapper;
@@ -89,6 +124,52 @@ public class Application {
         return destination;
     }
 
+    private PerformedService applyChanges(PerformedServiceTO source, PerformedService destination, ModelMapper modelMapper) {
+        destination.setDate(source.getDate());
+        destination.setPrice(source.getPrice());
+        destination.setCurrency(source.getCurrency());
+        if (source.getClient() != null) {
+            destination.setClient(modelMapper.map(source.getClient(), Client.class));
+        }
+        if (source.getService() != null) {
+            destination.setService(modelMapper.map(source.getService(), Service.class));
+        }
+        return destination;
+    }
+
+    private PerformedService applyChanges(PerformedServiceTO source, PerformedService destination) {
+        destination.setDate(source.getDate());
+        destination.setPrice(source.getPrice());
+        return destination;
+    }
+
+    private PerformedServicePayment applyChanges(PerformedServicePaymentTO source, PerformedServicePayment destination, ModelMapper modelMapper) {
+        PerformedServiceTO performedService = source.getPerformedService();
+        if (performedService != null) {
+            destination.setPerformedService(modelMapper.map(performedService, PerformedService.class));
+        }
+        ClientPaymentTO clientPayment = source.getClientPayment();
+        if (clientPayment != null) {
+            destination.setClientPayment(modelMapper.map(clientPayment, ClientPayment.class));
+        }
+        destination.setPrice(source.getPrice());
+        return destination;
+    }
+
+    private Function<ClientPayment, ClientPaymentTO> paymentMapper(ModelMapper modelMapper, Integer performedServiceId) {
+        return clientPayment -> {
+            ClientPaymentTO result = new ClientPaymentTO();
+            result.setId(clientPayment.getId());
+            result.setDate(clientPayment.getDate());
+            result.setPrice(clientPayment.getPrice());
+            result.setCurrency(clientPayment.getCurrency());
+            result.setBillOfSale(clientPayment.isBillOfSale());
+            result.setBillOfSaleAsInvoice(clientPayment.isBillOfSaleAsInvoice());
+            result.setInvoice(clientPayment.isInvoice());
+            return result;
+        };
+    }
+
     private PiggyBank applyChanges(PiggyBankTO source, PiggyBank destination) {
         destination.setName(source.getName());
         destination.setDescription(source.getDescription());
@@ -96,6 +177,29 @@ public class Application {
         destination.setCurrency(source.getCurrency());
         destination.setMonthlyTopUp(source.getMonthlyTopUp());
         destination.setSavings(source.isSavings());
+        return destination;
+    }
+
+    private Service applyChanges(ServiceTO source, Service destination) {
+        destination.setName(source.getName());
+        return destination;
+    }
+
+    private ClientPayment applyChanges(ClientPaymentTO source, ModelMapper modelMapper) {
+        ClientPayment destination = applyChanges(source, new ClientPayment());
+        if (source.getClient() != null) {
+            destination.setClient(modelMapper.map(source.getClient(), Client.class));
+        }
+        destination.setPrice(source.getPrice());
+        destination.setCurrency(source.getCurrency());
+        return destination;
+    }
+
+    private ClientPayment applyChanges(ClientPaymentTO source, ClientPayment destination) {
+        destination.setDate(source.getDate());
+        destination.setBillOfSale(source.isBillOfSale());
+        destination.setBillOfSaleAsInvoice(source.isBillOfSaleAsInvoice());
+        destination.setInvoice(source.isInvoice());
         return destination;
     }
 

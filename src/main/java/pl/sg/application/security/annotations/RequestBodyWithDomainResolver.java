@@ -52,7 +52,7 @@ public class RequestBodyWithDomainResolver implements HandlerMethodArgumentResol
         final String body = ((ServletWebRequest) webRequest).getRequest()
                 .getReader()
                 .lines()
-                .collect(Collectors.joining(""));
+                .collect(Collectors.joining("\n"));
 
         final RequestBodyWithDomain ann = parameter.getParameterAnnotation(RequestBodyWithDomain.class);
         Domain domain;
@@ -77,8 +77,6 @@ public class RequestBodyWithDomainResolver implements HandlerMethodArgumentResol
         if (ann.domainAdmin()) {
             user.validateAdminDomain(withDomain.getDomain());
         }
-        modelMapper.map(withDomainTO, withDomain, ann.mapperName());
-
         return withDomain;
     }
 
