@@ -156,20 +156,6 @@ public class Application {
         return destination;
     }
 
-    private Function<ClientPayment, ClientPaymentTO> paymentMapper(ModelMapper modelMapper, Integer performedServiceId) {
-        return clientPayment -> {
-            ClientPaymentTO result = new ClientPaymentTO();
-            result.setId(clientPayment.getId());
-            result.setDate(clientPayment.getDate());
-            result.setPrice(clientPayment.getPrice());
-            result.setCurrency(clientPayment.getCurrency());
-            result.setBillOfSale(clientPayment.isBillOfSale());
-            result.setBillOfSaleAsInvoice(clientPayment.isBillOfSaleAsInvoice());
-            result.setInvoice(clientPayment.isInvoice());
-            return result;
-        };
-    }
-
     private PiggyBank applyChanges(PiggyBankTO source, PiggyBank destination) {
         destination.setName(source.getName());
         destination.setDescription(source.getDescription());
@@ -200,6 +186,7 @@ public class Application {
         destination.setBillOfSale(source.isBillOfSale());
         destination.setBillOfSaleAsInvoice(source.isBillOfSaleAsInvoice());
         destination.setInvoice(source.isInvoice());
+        destination.setNotRegistered(source.isNotRegistered());
         return destination;
     }
 

@@ -18,13 +18,14 @@ public class ClientPaymentTO implements WithDomainTO {
     boolean billOfSale;
     boolean billOfSaleAsInvoice;
     boolean invoice;
+    boolean notRegistered;
     List<PerformedServicePaymentSimpleTO> serviceRelations;
     DomainTO domain;
 
     public ClientPaymentTO() {
     }
 
-    public ClientPaymentTO(Integer id, ClientTO client, LocalDate date, BigDecimal price, Currency currency, boolean billOfSale, boolean billOfSaleAsInvoice, boolean invoice, List<PerformedServicePaymentSimpleTO> serviceRelations, DomainTO domain) {
+    public ClientPaymentTO(Integer id, ClientTO client, LocalDate date, BigDecimal price, Currency currency, boolean billOfSale, boolean billOfSaleAsInvoice, boolean invoice, boolean notRegistered, List<PerformedServicePaymentSimpleTO> serviceRelations, DomainTO domain) {
         this.id = id;
         this.client = client;
         this.date = date;
@@ -33,6 +34,7 @@ public class ClientPaymentTO implements WithDomainTO {
         this.billOfSale = billOfSale;
         this.billOfSaleAsInvoice = billOfSaleAsInvoice;
         this.invoice = invoice;
+        this.notRegistered = notRegistered;
         this.serviceRelations = serviceRelations;
         this.domain = domain;
     }
@@ -107,6 +109,15 @@ public class ClientPaymentTO implements WithDomainTO {
 
     public ClientPaymentTO setInvoice(boolean invoice) {
         this.invoice = invoice;
+        return this;
+    }
+
+    public boolean isNotRegistered() {
+        return notRegistered;
+    }
+
+    public ClientPaymentTO setNotRegistered(boolean notRegistered) {
+        this.notRegistered = notRegistered;
         return this;
     }
 

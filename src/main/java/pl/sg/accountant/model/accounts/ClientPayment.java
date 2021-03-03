@@ -40,6 +40,10 @@ public class ClientPayment implements WithDomain<ClientPayment> {
     @NotNull
     boolean invoice;
 
+    @NotNull
+    @Column(columnDefinition = "boolean not null default false")
+    boolean notRegistered;
+
     @ManyToOne
     @NotNull
     Domain domain;
@@ -50,7 +54,7 @@ public class ClientPayment implements WithDomain<ClientPayment> {
     public ClientPayment() {
     }
 
-    public ClientPayment(Integer id, @NotNull LocalDate date, @NotNull Client client, @NotNull @Positive BigDecimal price, @NotNull Currency currency, @NotNull boolean billOfSale, @NotNull boolean billOfSaleAsInvoice, @NotNull boolean invoice, @NotNull Domain domain, List<PerformedServicePayment> services) {
+    public ClientPayment(Integer id, @NotNull LocalDate date, @NotNull Client client, @NotNull @Positive BigDecimal price, @NotNull Currency currency, @NotNull boolean billOfSale, @NotNull boolean billOfSaleAsInvoice, @NotNull boolean invoice, @NotNull boolean notRegistered, @NotNull Domain domain, List<PerformedServicePayment> services) {
         this.id = id;
         this.date = date;
         this.client = client;
@@ -59,6 +63,7 @@ public class ClientPayment implements WithDomain<ClientPayment> {
         this.billOfSale = billOfSale;
         this.billOfSaleAsInvoice = billOfSaleAsInvoice;
         this.invoice = invoice;
+        this.notRegistered = notRegistered;
         this.domain = domain;
         this.services = services;
     }
@@ -132,6 +137,15 @@ public class ClientPayment implements WithDomain<ClientPayment> {
 
     public ClientPayment setInvoice(boolean invoice) {
         this.invoice = invoice;
+        return this;
+    }
+
+    public boolean isNotRegistered() {
+        return notRegistered;
+    }
+
+    public ClientPayment setNotRegistered(boolean notRegistered) {
+        this.notRegistered = notRegistered;
         return this;
     }
 
