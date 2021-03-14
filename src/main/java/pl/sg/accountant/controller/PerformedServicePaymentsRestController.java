@@ -14,6 +14,7 @@ import pl.sg.application.security.annotations.RequestUser;
 import pl.sg.application.security.annotations.TokenBearerAuth;
 
 import javax.validation.Valid;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,9 +35,11 @@ public class PerformedServicePaymentsRestController implements PerformedServiceP
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/{forMonth}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public List<PerformedServicePaymentTO> payments(@RequestDomain Domain domain) {
+    public List<PerformedServicePaymentTO> payments(
+            @RequestDomain Domain domain,
+            @PathVariable YearMonth forMonth) {
         return performedServicePaymentsService.payments(domain).stream()
                 .map(c -> mapper.map(c, PerformedServicePaymentTO.class))
                 .collect(Collectors.toList());
