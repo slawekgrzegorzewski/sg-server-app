@@ -37,7 +37,7 @@ public class ClientPaymentRestController implements ClientPaymentController {
     public List<ClientPaymentTO> clientPayments(
             @RequestDomain Domain domain,
             @PathVariable YearMonth forMonth) {
-        return clientPaymentsService.clientPayments(domain).stream()
+        return clientPaymentsService.clientPayments(domain, forMonth).stream()
                 .map(c -> mapper.map(c, ClientPaymentTO.class))
                 .collect(Collectors.toList());
     }

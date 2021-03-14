@@ -5,6 +5,7 @@ import pl.sg.accountant.model.accounts.ClientPayment;
 import pl.sg.accountant.repository.ClientPaymentRepository;
 import pl.sg.application.model.Domain;
 
+import java.time.YearMonth;
 import java.util.List;
 
 @Component
@@ -22,8 +23,8 @@ public class ClientPaymentsJPAService implements ClientPaymentsService {
     }
 
     @Override
-    public List<ClientPayment> clientPayments(Domain domain) {
-        return clientPaymentRepository.findByDomain(domain);
+    public List<ClientPayment> clientPayments(Domain domain, YearMonth forMonth) {
+        return clientPaymentRepository.findByDomainAndNotPaidInMonth(domain, forMonth);
     }
 
     @Override
