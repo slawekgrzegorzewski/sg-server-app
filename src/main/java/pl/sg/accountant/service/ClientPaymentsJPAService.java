@@ -24,7 +24,11 @@ public class ClientPaymentsJPAService implements ClientPaymentsService {
 
     @Override
     public List<ClientPayment> clientPayments(Domain domain, YearMonth forMonth) {
-        return clientPaymentRepository.findByDomainAndNotPaidInMonth(domain, forMonth);
+        if (YearMonth.now().equals(forMonth)) {
+            return clientPaymentRepository.findByDomainInMonthAndNotPaid(domain, forMonth);
+        } else {
+            return clientPaymentRepository.findByDomainInMonthPaidOnly(domain, forMonth);
+        }
     }
 
     @Override

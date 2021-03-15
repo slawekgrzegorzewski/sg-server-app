@@ -10,18 +10,24 @@ import java.time.YearMonth;
 import java.util.List;
 
 public interface ClientPaymentRepository extends JpaRepository<ClientPayment, Integer> {
-    List<ClientPayment> findByDomainAndDateBetween(Domain domain, LocalDate from, LocalDate to);
 
-    @Query("SELECT cp FROM ClientPayment cp join cp.services cps " +
-            "WHERE cp.domain = ?1 AND SUM(cps.price) <> cp.price " +
-            "AND cp.date BETWEEN ?2 AND ?3 GROUP BY cp.id")
-    List<ClientPayment> findByDomainAndNotPaid(Domain domain, LocalDate from, LocalDate to);
+    @Query("SELECT cp FROM ClientPayment cp LEFT JOIN cp.services cps " +
+            "WHERE cp.domain = ?1 " +
+            "GROUP BY cp.id " +
+            "HAVING (cp.date BETWEEN ?2 AND ?3) AND COALESCE(SUM(cps.price), 0) = cp.price")
+    List<ClientPayment> findByDomainAndDateBetweenPaidOnly(Domain domain, LocalDate from, LocalDate to);
 
-    default List<ClientPayment> findByDomainAndInMonth(Domain domain, YearMonth month) {
-        return findByDomainAndDateBetween(domain, month.atDay(1), month.atEndOfMonth());
+    @Query("SELECT cp FROM ClientPayment cp LEFT JOIN cp.services cps " +
+            "WHERE cp.domain = ?1 " +
+            "GROUP BY cp.id " +
+            "HAVING (cp.date BETWEEN ?2 AND ?3) OR COALESCE(SUM(cps.price), 0) <> cp.price")
+    List<ClientPayment> findByDomainInMonthAndNotPaid(Domain domain, LocalDate from, LocalDate to);
+
+    default List<ClientPayment> findByDomainInMonthPaidOnly(Domain domain, YearMonth month) {
+        return findByDomainAndDateBetweenPaidOnly(domain, month.atDay(1), month.atEndOfMonth());
     }
 
-    default List<ClientPayment> findByDomainAndNotPaidInMonth(Domain domain, YearMonth month) {
-        return findByDomainAndNotPaid(domain, month.atDay(1), month.atEndOfMonth());
+    default List<ClientPayment> findByDomainInMonthAndNotPaid(Domain domain, YearMonth month) {
+        return findByDomainInMonthAndNotPaid(domain, month.atDay(1), month.atEndOfMonth());
     }
 }
