@@ -5,6 +5,7 @@ import pl.sg.accountant.model.accounts.PerformedService;
 import pl.sg.accountant.repository.PerformedServiceRepository;
 import pl.sg.application.model.Domain;
 
+import java.time.YearMonth;
 import java.util.List;
 
 @Component
@@ -22,8 +23,8 @@ public class PerformedServicesJPAService implements PerformedServicesService {
     }
 
     @Override
-    public List<PerformedService> services(Domain domain) {
-        return performedServiceRepository.findByDomain(domain);
+    public List<PerformedService> services(Domain domain, YearMonth forMonth) {
+        return performedServiceRepository.forMonth(domain, forMonth);
     }
 
     @Override

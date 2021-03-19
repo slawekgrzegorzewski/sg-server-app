@@ -11,23 +11,27 @@ import java.util.List;
 
 public interface ClientPaymentRepository extends JpaRepository<ClientPayment, Integer> {
 
-    @Query("SELECT cp FROM ClientPayment cp LEFT JOIN cp.services cps " +
-            "WHERE cp.domain = ?1 " +
-            "GROUP BY cp.id " +
-            "HAVING (cp.date BETWEEN ?2 AND ?3) AND COALESCE(SUM(cps.price), 0) = cp.price")
+    @Query("SELECT DISTINCT cp FROM PerformedService ps LEFT JOIN ps.payments psp LEFT JOIN psp.clientPayment cp " +
+            "WHERE cp.domain = ?1 AND (psp.clientPayment.date BETWEEN ?2 AND ?3) " +
+            "GROUP BY ps.id, cp.id " +
+            "HAVING COALESCE(SUM(psp.price), 0) > 0")
     List<ClientPayment> findByDomainAndDateBetweenPaidOnly(Domain domain, LocalDate from, LocalDate to);
 
-    @Query("SELECT cp FROM ClientPayment cp LEFT JOIN cp.services cps " +
+    @Query("SELECT DISTINCT cp FROM PerformedService ps LEFT JOIN ps.payments psp LEFT JOIN psp.clientPayment cp " +
             "WHERE cp.domain = ?1 " +
-            "GROUP BY cp.id " +
-            "HAVING (cp.date BETWEEN ?2 AND ?3) OR COALESCE(SUM(cps.price), 0) <> cp.price")
-    List<ClientPayment> findByDomainInMonthAndNotPaid(Domain domain, LocalDate from, LocalDate to);
+            "GROUP BY ps.id, cp.id " +
+            "HAVING COALESCE(SUM(psp.price), 0) < ps.price")
+    List<ClientPayment> findByDomainAndNotPaid(Domain domain);
 
-    default List<ClientPayment> findByDomainInMonthPaidOnly(Domain domain, YearMonth month) {
-        return findByDomainAndDateBetweenPaidOnly(domain, month.atDay(1), month.atEndOfMonth());
-    }
 
-    default List<ClientPayment> findByDomainInMonthAndNotPaid(Domain domain, YearMonth month) {
-        return findByDomainInMonthAndNotPaid(domain, month.atDay(1), month.atEndOfMonth());
+    default List<ClientPayment> forMonth(Domain domain, YearMonth forMonth) {
+        List<ClientPayment> result = findByDomainAndDateBetweenPaidOnly(
+                domain,
+                forMonth.atDay(1),
+                forMonth.atEndOfMonth());
+        if (YearMonth.now().equals(forMonth)) {
+            result.addAll(findByDomainAndNotPaid(domain));
+        }
+        return result;
     }
 }

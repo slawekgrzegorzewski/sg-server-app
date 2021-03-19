@@ -37,7 +37,7 @@ public class PerformedServicesRestController implements PerformedServicesControl
     public List<PerformedServiceTO> services(
             @RequestDomain Domain domain,
             @PathVariable YearMonth forMonth) {
-        return performedServicesService.services(domain).stream()
+        return performedServicesService.services(domain, forMonth).stream()
                 .map(c -> mapper.map(c, PerformedServiceTO.class))
                 .collect(Collectors.toList());
     }

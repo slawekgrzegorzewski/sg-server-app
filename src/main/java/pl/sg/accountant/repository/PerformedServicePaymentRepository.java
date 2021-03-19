@@ -18,6 +18,8 @@ public interface PerformedServicePaymentRepository extends JpaRepository<Perform
             "where ps.domain = ?1 or sp.domain = ?1")
     List<PerformedServicePayment> findByDomain(Domain domain);
 
-    List<PerformedServicePayment> findByClientPaymentAndPerformedService(ClientPayment clientPayment, PerformedService performedService);
+    List<PerformedServicePayment> findByClientPaymentAndPerformedService(
+            ClientPayment clientPayment,
+            PerformedService performedService);
 
 }
