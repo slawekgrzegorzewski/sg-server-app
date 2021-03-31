@@ -8,6 +8,7 @@ import pl.sg.application.model.Domain;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
+import java.util.Set;
 
 public interface PerformedServiceRepository extends JpaRepository<PerformedService, Integer> {
 
@@ -26,11 +27,13 @@ public interface PerformedServiceRepository extends JpaRepository<PerformedServi
     List<PerformedService> findByDomainAndNotPaid(Domain domain);
 
     default List<PerformedService> forMonth(Domain domain, YearMonth forMonth) {
-        List<PerformedService> result = findByDomainAndDateBetweenPaidOnly(domain, forMonth.atDay(1), forMonth.atEndOfMonth());
+        Set<PerformedService> result = new java.util.HashSet<>(Set.copyOf(
+                findByDomainAndDateBetweenPaidOnly(domain, forMonth.atDay(1), forMonth.atEndOfMonth())
+        ));
         if (forMonth.equals(YearMonth.now())) {
             result.addAll(findByDomainAndNotPaid(domain));
         }
-        return result;
+        return List.copyOf(result);
     }
 
 }

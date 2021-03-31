@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.spi.SourceGetter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +20,7 @@ import pl.sg.accountant.transport.billings.CategoryTO;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Optional;
 import java.util.function.Function;
 
 @SpringBootApplication
@@ -55,6 +57,32 @@ public class Application {
                 .addMapping(ClientPayment::getServices, ClientPaymentTO::setServiceRelations);
         modelMapper.typeMap(PerformedService.class, PerformedServiceTO.class)
                 .addMapping(PerformedService::getPayments, PerformedServiceTO::setClientPaymentsRelations);
+
+        modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentTO.class)
+                .addMapping(getPropertyOfPSP(ClientPayment::getDate, null), PerformedServicePaymentTO::setDate);
+        modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentTO.class)
+                .addMapping(getPropertyOfPSP(ClientPayment::getCurrency, null), PerformedServicePaymentTO::setCurrency);
+        modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentTO.class)
+                .addMapping(getPropertyOfPSP(ClientPayment::isInvoice, false), PerformedServicePaymentTO::setInvoice);
+        modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentTO.class)
+                .addMapping(getPropertyOfPSP(ClientPayment::isBillOfSale, false), PerformedServicePaymentTO::setBillOfSale);
+        modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentTO.class)
+                .addMapping(getPropertyOfPSP(ClientPayment::isBillOfSaleAsInvoice, false),PerformedServicePaymentTO::setBillOfSaleAsInvoice);
+        modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentTO.class)
+                .addMapping(getPropertyOfPSP(ClientPayment::isNotRegistered, false), PerformedServicePaymentTO::setNotRegistered);
+
+        modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentSimpleTO.class)
+                .addMapping(getPropertyOfPSP(ClientPayment::getDate, null), PerformedServicePaymentSimpleTO::setDate);
+        modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentSimpleTO.class)
+                .addMapping(getPropertyOfPSP(ClientPayment::getCurrency, null), PerformedServicePaymentSimpleTO::setCurrency);
+        modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentSimpleTO.class)
+                .addMapping(getPropertyOfPSP(ClientPayment::isInvoice, false), PerformedServicePaymentSimpleTO::setInvoice);
+        modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentSimpleTO.class)
+                .addMapping(getPropertyOfPSP(ClientPayment::isBillOfSale, false), PerformedServicePaymentSimpleTO::setBillOfSale);
+        modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentSimpleTO.class)
+                .addMapping(getPropertyOfPSP(ClientPayment::isBillOfSaleAsInvoice, false), PerformedServicePaymentSimpleTO::setBillOfSaleAsInvoice);
+        modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentSimpleTO.class)
+                .addMapping(getPropertyOfPSP(ClientPayment::isNotRegistered, false), PerformedServicePaymentSimpleTO::setNotRegistered);
 
         modelMapper.typeMap(AccountTO.class, Account.class, CREATE_ACCOUNT)
                 .setConverter(context -> applyChanges(context.getSource(), new Account()));
@@ -105,6 +133,13 @@ public class Application {
                 .setConverter(context -> applyChanges(context.getSource(), context.getDestination()));
 
         return modelMapper;
+    }
+
+    private <T> SourceGetter<PerformedServicePayment> getPropertyOfPSP(Function<ClientPayment, T> mapper, T defaultValue) {
+        return psp -> Optional.ofNullable(psp)
+                .map(PerformedServicePayment::getClientPayment)
+                .map(mapper)
+                .orElse(defaultValue);
     }
 
     private Account applyChanges(AccountTO source, Account destination) {
