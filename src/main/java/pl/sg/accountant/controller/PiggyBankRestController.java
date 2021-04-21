@@ -43,7 +43,6 @@ public class PiggyBankRestController implements PiggyBankController {
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public Integer create(
             @RequestBodyWithDomain(
-                    domainAdmin = true,
                     transportClass = PiggyBankTO.class,
                     create = true,
                     mapperName = CREATE_PIGGY_BANK
@@ -57,7 +56,6 @@ public class PiggyBankRestController implements PiggyBankController {
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public String update(
             @RequestBodyWithDomain(
-                    domainAdmin = true,
                     transportClass = PiggyBankTO.class,
                     mapperName = UPDATE_PIGGY_BANK
             )
