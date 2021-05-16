@@ -16,8 +16,13 @@ import pl.sg.accountant.transport.PiggyBankTO;
 import pl.sg.accountant.transport.accounts.*;
 import pl.sg.accountant.transport.billings.BillingPeriodTO;
 import pl.sg.accountant.transport.billings.CategoryTO;
+import pl.sg.application.transport.DomainTO;
+import pl.sg.cubes.model.CubeRecord;
+import pl.sg.cubes.transport.CubeRecordTO;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Optional;
@@ -42,6 +47,8 @@ public class Application {
     public static final String UPDATE_PIGGY_BANK = "updatePiggyBank";
     public static final String CREATE_SERVICE = "createService";
     public static final String UPDATE_SERVICE = "updateService";
+    public static final String CREATE_CUBE_RECORD = "createCubeRecord";
+    public static final String UPDATE_CUBE_RECORD = "updateCubeRecord";
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -67,7 +74,7 @@ public class Application {
         modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentTO.class)
                 .addMapping(getPropertyOfPSP(ClientPayment::isBillOfSale, false), PerformedServicePaymentTO::setBillOfSale);
         modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentTO.class)
-                .addMapping(getPropertyOfPSP(ClientPayment::isBillOfSaleAsInvoice, false),PerformedServicePaymentTO::setBillOfSaleAsInvoice);
+                .addMapping(getPropertyOfPSP(ClientPayment::isBillOfSaleAsInvoice, false), PerformedServicePaymentTO::setBillOfSaleAsInvoice);
         modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentTO.class)
                 .addMapping(getPropertyOfPSP(ClientPayment::isNotRegistered, false), PerformedServicePaymentTO::setNotRegistered);
 
@@ -130,6 +137,15 @@ public class Application {
                 .setConverter(context -> applyChanges(context.getSource(), new Service()));
 
         modelMapper.typeMap(ServiceTO.class, Service.class, UPDATE_SERVICE)
+                .setConverter(context -> applyChanges(context.getSource(), context.getDestination()));
+
+        modelMapper.typeMap(CubeRecordTO.class, CubeRecord.class, CREATE_CUBE_RECORD)
+                .setConverter(context -> applyChanges(context.getSource(), new CubeRecord()));
+
+        modelMapper.typeMap(CubeRecordTO.class, CubeRecord.class, UPDATE_CUBE_RECORD)
+                .setConverter(context -> applyChanges(context.getSource(), context.getDestination()));
+
+        modelMapper.typeMap(CubeRecord.class, CubeRecordTO.class)
                 .setConverter(context -> applyChanges(context.getSource(), context.getDestination()));
 
         return modelMapper;
@@ -225,6 +241,25 @@ public class Application {
         return destination;
     }
 
+    private CubeRecord applyChanges(CubeRecordTO source, CubeRecord destination) {
+        return destination.setCubesType(source.getCubesType())
+                .setScramble(source.getScramble())
+                .setTime(Duration.ofMillis((long) (source.getTime() * 1000)))
+                .setRecordTime(source.getRecordTime());
+    }
+
+    private CubeRecordTO applyChanges(CubeRecord source, CubeRecordTO destination) {
+        return (destination == null ? new CubeRecordTO() : destination).setCubesType(source.getCubesType())
+                .setScramble(source.getScramble())
+                .setTime(source.getTime() == null ? 0 : ((double) (source.getTime().toMillis())) / 1000.0)
+                .setDomain(source.getDomain() == null
+                        ? null
+                        : new DomainTO()
+                        .setId(source.getDomain().getId())
+                        .setName(source.getDomain().getName()))
+                .setRecordTime(source.getRecordTime());
+    }
+
     @Bean
     public Gson deserializer() {
         return new GsonBuilder().registerTypeAdapter(LocalDate.class, (JsonDeserializer<LocalDate>) (json, type, jsonDeserializationContext) -> {
@@ -233,6 +268,13 @@ public class Application {
                 return LocalDate.parse(stringValue, DateTimeFormatter.ISO_LOCAL_DATE);
             } catch (DateTimeParseException ex) {
                 return LocalDate.parse(stringValue, DateTimeFormatter.ISO_DATE_TIME);
+            }
+        }).registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>) (json, type, jsonDeserializationContext) -> {
+            final String stringValue = json.getAsJsonPrimitive().getAsString();
+            try {
+                return LocalDateTime.parse(stringValue, DateTimeFormatter.ISO_LOCAL_DATE);
+            } catch (DateTimeParseException ex) {
+                return LocalDateTime.parse(stringValue, DateTimeFormatter.ISO_DATE_TIME);
             }
         }).create();
     }
