@@ -181,7 +181,7 @@ tasks.register<Copy>("toOVH") {
     }
 
     doLast {
-        val files = pl.sg.build.FilesToConvertingToUnixFilter(listOf("yml", "Dockerfile", "sql", "sh", "json", "conf"))
+        val files = pl.sg.build.FilesToConvertingToUnixFilter(listOf("yml", "Dockerfile", "sql", "sh", "json", "conf", "browserslistrc"))
                 .textFiles(destination)
         val convertToUnixLineEndings = pl.sg.build.ConvertToUnixLineEndings()
         files.forEach { file -> convertToUnixLineEndings.forFile(file) }
@@ -193,6 +193,9 @@ tasks.register<Copy>("toOVH") {
     }
     from(appProject.resolve("ovh").resolve("application.yml")) {
         rename { "backend/application.yml" }
+    }
+    from(clientProject.resolve(".browserslistrc")) {
+        into("client")
     }
     from(clientProject.resolve("angular.json")) {
         into("client")

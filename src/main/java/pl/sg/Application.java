@@ -8,10 +8,12 @@ import org.modelmapper.spi.SourceGetter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import pl.sg.accountant.model.HolidayCurrencies;
 import pl.sg.accountant.model.accounts.*;
 import pl.sg.accountant.model.billings.BillingPeriod;
 import pl.sg.accountant.model.billings.Category;
 import pl.sg.accountant.model.billings.PiggyBank;
+import pl.sg.accountant.transport.HolidayCurrenciesTO;
 import pl.sg.accountant.transport.PiggyBankTO;
 import pl.sg.accountant.transport.accounts.*;
 import pl.sg.accountant.transport.billings.BillingPeriodTO;
@@ -49,6 +51,8 @@ public class Application {
     public static final String UPDATE_SERVICE = "updateService";
     public static final String CREATE_CUBE_RECORD = "createCubeRecord";
     public static final String UPDATE_CUBE_RECORD = "updateCubeRecord";
+    public static final String CREATE_HOLIDAY_CURRENCIES = "createHolidayCurrencies";
+    public static final String UPDATE_HOLIDAY_CURRENCIES = "updateHolidayCurrencies";
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -146,6 +150,12 @@ public class Application {
                 .setConverter(context -> applyChanges(context.getSource(), context.getDestination()));
 
         modelMapper.typeMap(CubeRecord.class, CubeRecordTO.class)
+                .setConverter(context -> applyChanges(context.getSource(), context.getDestination()));
+
+        modelMapper.typeMap(HolidayCurrenciesTO.class, HolidayCurrencies.class, CREATE_HOLIDAY_CURRENCIES)
+                .setConverter(context -> applyChanges(context.getSource(), new HolidayCurrencies()));
+
+        modelMapper.typeMap(HolidayCurrenciesTO.class, HolidayCurrencies.class, UPDATE_HOLIDAY_CURRENCIES)
                 .setConverter(context -> applyChanges(context.getSource(), context.getDestination()));
 
         return modelMapper;
@@ -258,6 +268,12 @@ public class Application {
                         .setId(source.getDomain().getId())
                         .setName(source.getDomain().getName()))
                 .setRecordTime(source.getRecordTime());
+    }
+
+    private HolidayCurrencies applyChanges(HolidayCurrenciesTO source, HolidayCurrencies destination) {
+        return destination
+                .setEuroConversionRate(source.getEuroConversionRate())
+                .setKunaConversionRate(source.getKunaConversionRate());
     }
 
     @Bean
