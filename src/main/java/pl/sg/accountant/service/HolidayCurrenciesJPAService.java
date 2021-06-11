@@ -5,6 +5,8 @@ import pl.sg.accountant.model.HolidayCurrencies;
 import pl.sg.accountant.repository.HolidayCurrenciesRepository;
 import pl.sg.application.model.Domain;
 
+import java.math.BigDecimal;
+import java.util.Currency;
 import java.util.Optional;
 
 @Component
@@ -29,5 +31,21 @@ public class HolidayCurrenciesJPAService implements HolidayCurrenciesService {
     @Override
     public void update(HolidayCurrencies holidayCurrencies) {
         holidayCurrenciesRepository.save(holidayCurrencies);
+    }
+
+    @Override
+    public void updateCurrencyRateForAll(Currency currency, BigDecimal rate) {
+        holidayCurrenciesRepository.findAll().stream()
+                .peek(hc -> {
+                    switch (currency.getCurrencyCode()) {
+                        case "EUR":
+                            hc.setEuroConversionRate(rate);
+                            break;
+                        case "HRK":
+                            hc.setKunaConversionRate(rate);
+                            break;
+                    }
+                })
+                .forEach(holidayCurrenciesRepository::save);
     }
 }

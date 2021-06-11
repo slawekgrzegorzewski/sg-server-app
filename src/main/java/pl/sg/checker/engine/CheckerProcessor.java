@@ -2,7 +2,7 @@ package pl.sg.checker.engine;
 
 import org.springframework.stereotype.Component;
 import pl.sg.checker.PageElementExtractor;
-import pl.sg.checker.PageFetcher;
+import pl.sg.utils.PageFetcher;
 import pl.sg.checker.model.*;
 import pl.sg.checker.service.PageVersionsService;
 

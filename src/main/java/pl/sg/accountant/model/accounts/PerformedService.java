@@ -30,6 +30,7 @@ public class PerformedService implements WithDomain<PerformedService> {
 
     @NotNull
     @Positive
+    @Column(precision=19, scale=6)
     BigDecimal price;
 
     @NotNull

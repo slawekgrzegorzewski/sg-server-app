@@ -2,7 +2,7 @@ package pl.sg.checker.engine;
 
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
-import pl.sg.checker.PageFetcher;
+import pl.sg.utils.PageFetcher;
 import pl.sg.checker.model.GetPageContentStep;
 
 import java.util.ArrayList;

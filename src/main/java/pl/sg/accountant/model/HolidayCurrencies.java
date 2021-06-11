@@ -3,10 +3,7 @@ package pl.sg.accountant.model;
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
@@ -14,7 +11,9 @@ public class HolidayCurrencies implements WithDomain<HolidayCurrencies> {
     @Id
     @GeneratedValue
     private Integer id;
+    @Column(columnDefinition = "numeric(19,6) default 0")
     private BigDecimal euroConversionRate;
+    @Column(columnDefinition = "numeric(19,6) default 0")
     private BigDecimal kunaConversionRate;
     @ManyToOne
     private Domain domain;

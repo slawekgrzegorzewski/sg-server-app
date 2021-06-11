@@ -1,15 +1,13 @@
 package pl.sg.accountant.model;
 
-import pl.sg.accountant.model.accounts.FinancialTransaction;
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;
 
-import javax.persistence.*;
-import javax.validation.constraints.Digits;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PositiveOrZero;
-import java.math.BigDecimal;
-import java.util.Currency;
 
 @Entity
 public class AccountantSettings implements WithDomain<AccountantSettings> {
