@@ -1,6 +1,5 @@
 package pl.sg.accountant.transport.accounts;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import pl.sg.application.transport.DomainTO;
 import pl.sg.application.transport.WithDomainTO;
 
@@ -22,17 +21,19 @@ public class AccountTO implements WithDomainTO {
     @PositiveOrZero
     private BigDecimal currentBalance;
     private int balanceIndex;
+    private boolean visible;
     private DomainTO domain;
 
     public AccountTO() {
     }
 
-    public AccountTO(int id, String name, Currency currency, BigDecimal currentBalance, int balanceIndex, DomainTO domain) {
+    public AccountTO(int id, String name, Currency currency, BigDecimal currentBalance, int balanceIndex, boolean visible, DomainTO domain) {
         this.id = id;
         this.name = name;
         this.currency = currency;
         this.currentBalance = currentBalance;
         this.balanceIndex = balanceIndex;
+        this.visible = visible;
         this.domain = domain;
     }
 
@@ -91,6 +92,15 @@ public class AccountTO implements WithDomainTO {
 
     public AccountTO setDomain(DomainTO domain) {
         this.domain = domain;
+        return this;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public AccountTO setVisible(boolean visible) {
+        this.visible = visible;
         return this;
     }
 }

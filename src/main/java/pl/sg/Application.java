@@ -171,6 +171,7 @@ public class Application {
     private Account applyChanges(AccountTO source, Account destination) {
         destination.setName(source.getName());
         destination.setCurrency(source.getCurrency());
+        destination.setVisible(source.isVisible());
         return destination;
     }
 

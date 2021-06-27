@@ -26,6 +26,8 @@ public class Account implements WithDomain<Account> {
     private BigDecimal currentBalance = new BigDecimal(0);
     @ManyToOne
     private FinancialTransaction lastTransactionIncludedInBalance;
+    @Column(columnDefinition = "boolean not null default true")
+    private boolean visible;
     @ManyToOne
     private Domain domain;
 
@@ -93,5 +95,14 @@ public class Account implements WithDomain<Account> {
     public void credit(FinancialTransaction financialTransaction) {
         this.lastTransactionIncludedInBalance = financialTransaction;
         this.currentBalance = this.currentBalance.add(financialTransaction.getCredit());
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public Account setVisible(boolean visible) {
+        this.visible = visible;
+        return this;
     }
 }
