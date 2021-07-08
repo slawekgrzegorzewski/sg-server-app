@@ -18,4 +18,10 @@ public interface ClientPaymentRepository extends JpaRepository<ClientPayment, In
     default List<ClientPayment> forMonth(Domain domain, YearMonth forMonth) {
         return findByDomainAndDateBetween(domain, forMonth.atDay(1), forMonth.atEndOfMonth());
     }
+
+    @Query("SELECT cp FROM ClientPayment cp LEFT JOIN cp.services psp " +
+            "WHERE cp.domain = ?1 " +
+            "GROUP BY cp.id " +
+            "HAVING COALESCE(SUM(psp.price), 0) < cp.price")
+    List<ClientPayment> notFullyUsed(Domain domain);
 }

@@ -7,6 +7,7 @@ import pl.sg.application.model.Domain;
 
 import java.time.YearMonth;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class ClientPaymentsJPAService implements ClientPaymentsService {
@@ -24,7 +25,12 @@ public class ClientPaymentsJPAService implements ClientPaymentsService {
 
     @Override
     public List<ClientPayment> clientPayments(Domain domain, YearMonth forMonth) {
-        return clientPaymentRepository.forMonth(domain, forMonth);
+        List<ClientPayment> clientPayments = clientPaymentRepository.forMonth(domain, forMonth);
+        clientPaymentRepository.notFullyUsed(domain)
+                .stream()
+                .filter(cp -> clientPayments.stream().noneMatch(cp1 -> cp1.getId().equals(cp.getId())))
+                .collect(Collectors.toCollection(() -> clientPayments));
+        return clientPayments;
     }
 
     @Override
