@@ -4,8 +4,8 @@
 
 cd /home/slag/sg-application/client
 
-sudo mv nginx.conf /etc/nginx/
-sudo mv mime.types /etc/nginx/
+# sudo mv nginx.conf /etc/nginx/
+# sudo mv mime.types /etc/nginx/
 
 npm install
 npm run buildProd

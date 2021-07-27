@@ -37,9 +37,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-aop:2.3.3.RELEASE")
     implementation("org.springframework.boot:spring-boot-starter-validation:2.3.3.RELEASE")
     implementation("org.hibernate.validator:hibernate-validator:6.1.5.Final")
-    implementation("org.codehaus.groovy:groovy-all:3.0.7")
+    implementation("org.codehaus.groovy:groovy-all:3.0.8")
 
-    implementation("org.modelmapper:modelmapper:2.3.6")
+    implementation("org.modelmapper:modelmapper:2.4.4")
     implementation("org.jboss.aerogear:aerogear-otp-java:1.0.0")
     implementation("jakarta.xml.bind:jakarta.xml.bind-api:2.3.3")
     implementation("org.glassfish.jaxb:jaxb-runtime:2.3.3")
@@ -49,13 +49,13 @@ dependencies {
     implementation("org.apache.poi:poi:3.15")
     implementation("org.apache.poi:poi-ooxml:3.15")
 
-    compileOnly("org.projectlombok:lombok:1.18.8")
+    compileOnly("org.projectlombok:lombok:1.18.20")
     compileOnly("org.springframework.boot:spring-boot-devtools:2.3.3.RELEASE")
 
-    runtime("org.postgresql:postgresql:42.2.6")
+    runtimeOnly("org.postgresql:postgresql:42.2.6")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:2.3.3.RELEASE")
-    annotationProcessor("org.projectlombok:lombok:1.18.8")
+    annotationProcessor("org.projectlombok:lombok:1.18.20")
 
     testImplementation("junit:junit:4.12")
     testImplementation("org.springframework:spring-test:4.3.2.RELEASE")
@@ -65,7 +65,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test:2.3.1.RELEASE")
     testImplementation("io.rest-assured:rest-assured:4.3.0")
 
-    testRuntime("org.springframework.security:spring-security-test:5.1.5.RELEASE")
+    testRuntimeOnly("org.springframework.security:spring-security-test:5.1.5.RELEASE")
 }
 
 

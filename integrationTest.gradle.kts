@@ -11,7 +11,7 @@ val integrationTestAnnotationProcessor by configurations.creating() {
     extendsFrom(*configurationsResolver("annotationProcessor"))
 }
 val integrationTestRuntime by configurations.creating() {
-    extendsFrom(*configurationsResolver("runtime", "testRuntime"))
+    extendsFrom(*configurationsResolver("runtimeOnly", "testRuntimeOnly"))
 }
 
 val sourceSetsFromBuildScript = the<SourceSetContainer>()
