@@ -19,6 +19,7 @@ import pl.sg.application.service.DomainService;
 import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.Currency;
 import java.util.List;
@@ -116,7 +117,7 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
 
         validateCurrency(account, income.getCurrency());
 
-        transactionsService.credit(account, income.getAmount(), income.getDescription());
+        transactionsService.credit(account, income.getAmount(), income.getIncomeDate().atStartOfDay(), income.getDescription());
         income.setBillingPeriod(billingPeriod);
         if (income.getIncomeDate() == null) {
             income.setIncomeDate(LocalDate.now());
@@ -131,7 +132,7 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
         validateCurrency(account, expense.getCurrency());
         validateAmount(account, expense.getAmount());
 
-        transactionsService.debit(account, expense.getAmount(), expense.getDescription());
+        transactionsService.debit(account, expense.getAmount(), expense.getExpenseDate().atStartOfDay(), expense.getDescription());
         expense.setBillingPeriod(billingPeriod);
         if (expense.getDescription() == null) {
             expense.setExpenseDate(LocalDate.now());

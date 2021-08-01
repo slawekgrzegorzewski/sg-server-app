@@ -68,17 +68,27 @@ public class TransactionsJPAService implements TransactionsService {
 
     @Override
     public FinancialTransaction credit(Account account, BigDecimal amount, String description) {
-        return operation(account, amount, description, OperationType.CREDIT);
+        return operation(account, amount, LocalDateTime.now(), description, OperationType.CREDIT);
+    }
+
+    @Override
+    public FinancialTransaction credit(Account account, BigDecimal amount, LocalDateTime transactionDate, String description) {
+        return operation(account, amount, transactionDate, description, OperationType.CREDIT);
     }
 
     @Override
     public FinancialTransaction debit(Account account, BigDecimal amount, String description) {
-        return operation(account, amount, description, OperationType.DEBIT);
+        return operation(account, amount, LocalDateTime.now(), description, OperationType.DEBIT);
     }
 
-    private FinancialTransaction operation(Account account, BigDecimal amount, String description, OperationType type) {
+    @Override
+    public FinancialTransaction debit(Account account, BigDecimal amount, LocalDateTime transactionDate, String description) {
+        return operation(account, amount, transactionDate, description, OperationType.DEBIT);
+    }
+
+    private FinancialTransaction operation(Account account, BigDecimal amount, LocalDateTime transactionDate, String description, OperationType type) {
         FinancialTransaction financialTransaction = new FinancialTransaction()
-                .setTimeOfTransaction(LocalDateTime.now())
+                .setTimeOfTransaction(transactionDate)
                 .transfer(account, amount, type)
                 .setDescription(description);
         financialTransaction = financialTransactionRepository.save(financialTransaction);

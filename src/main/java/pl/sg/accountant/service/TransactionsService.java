@@ -6,6 +6,7 @@ import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.Domain;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface TransactionsService {
@@ -19,6 +20,10 @@ public interface TransactionsService {
 
     FinancialTransaction credit(Account account, BigDecimal amount, String description);
 
+    FinancialTransaction credit(Account account, BigDecimal amount, LocalDateTime transactionDate, String description);
+
     FinancialTransaction debit(Account account, BigDecimal amount, String description);
+
+    FinancialTransaction debit(Account account, BigDecimal amount, LocalDateTime transactionDate, String description);
 
 }
