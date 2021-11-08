@@ -1,11 +1,10 @@
 package pl.sg.cubes.controller;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.sg.application.model.Domain;
 import pl.sg.application.security.annotations.RequestBodyWithDomain;
 import pl.sg.application.security.annotations.RequestDomain;
@@ -14,10 +13,10 @@ import pl.sg.cubes.model.CubeRecord;
 import pl.sg.cubes.service.CubeRecordService;
 import pl.sg.cubes.transport.CubeRecordTO;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static pl.sg.Application.CREATE_ACCOUNT;
 import static pl.sg.Application.CREATE_CUBE_RECORD;
 
 @RestController
@@ -36,8 +35,18 @@ public class CubeRecordRestController implements CubeRecordController {
     @GetMapping
     @TokenBearerAuth(any = {"CUBES"})
     public List<CubeRecordTO> all(@RequestDomain Domain domain) {
-        List<CubeRecordTO> collect = this.cubeRecordService.getForDomain(domain).stream().map(cr -> mapper.map(cr, CubeRecordTO.class)).collect(Collectors.toList());
-        return collect;
+        return this.cubeRecordService.getForDomain(domain).stream().map(cr -> mapper.map(cr, CubeRecordTO.class)).collect(Collectors.toList());
+    }
+
+    @Override
+    @GetMapping("/{forDate}")
+    @TokenBearerAuth(any = {"CUBES"})
+    public List<CubeRecordTO> forDate(@RequestDomain Domain domain,
+                                      @Nullable @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate forDate) {
+        if (forDate == null) {
+            forDate = LocalDate.now();
+        }
+        return this.cubeRecordService.getForDomainAndDate(domain, forDate).stream().map(cr -> mapper.map(cr, CubeRecordTO.class)).collect(Collectors.toList());
     }
 
     @Override

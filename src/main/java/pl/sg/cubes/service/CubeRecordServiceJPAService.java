@@ -24,6 +24,11 @@ public class CubeRecordServiceJPAService implements CubeRecordService {
     }
 
     @Override
+    public List<CubeRecord> getForDomainAndDate(Domain domain, LocalDate forDate) {
+        return cubeRecordRepository.findAllByDomainAndDate(domain, forDate);
+    }
+
+    @Override
     public CubeRecord record(CubeRecord record) {
         return this.cubeRecordRepository.save(record);
     }
