@@ -23,8 +23,8 @@ import pl.sg.banks.model.BankAccount;
 import pl.sg.banks.transport.BankAccountTO;
 import pl.sg.cubes.model.CubeRecord;
 import pl.sg.cubes.transport.CubeRecordTO;
-import pl.sg.banks.integrations.nodrigen.model.NodrigenBankPermission;
-import pl.sg.banks.integrations.nodrigen.transport.NodrigenBankPermissionTO;
+import pl.sg.integrations.nodrigen.model.NodrigenBankPermission;
+import pl.sg.integrations.nodrigen.transport.NodrigenBankPermissionTO;
 
 import java.time.Duration;
 import java.time.LocalDate;

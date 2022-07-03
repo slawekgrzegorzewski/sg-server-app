@@ -5,21 +5,21 @@ import pl.sg.accountant.model.AccountsException;
 import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.repository.AccountRepository;
 import pl.sg.application.model.Domain;
-import pl.sg.banks.integrations.nodrigen.NodrigenClient;
-import pl.sg.banks.integrations.nodrigen.model.balances.NodrigenAmount;
-import pl.sg.banks.integrations.nodrigen.model.balances.NodrigenBalanceEmbeddable;
-import pl.sg.banks.integrations.nodrigen.model.balances.NodrigenBankAccountBalance;
-import pl.sg.banks.integrations.nodrigen.model.rest.balances.Amount;
-import pl.sg.banks.integrations.nodrigen.model.rest.balances.Balance;
-import pl.sg.banks.integrations.nodrigen.model.rest.transactions.CurrencyExchange;
-import pl.sg.banks.integrations.nodrigen.model.rest.transactions.Transaction;
-import pl.sg.banks.integrations.nodrigen.model.rest.transactions.Transactions;
-import pl.sg.banks.integrations.nodrigen.model.transcations.NodrigenAccount;
-import pl.sg.banks.integrations.nodrigen.model.transcations.NodrigenCurrencyExchange;
-import pl.sg.banks.integrations.nodrigen.model.transcations.NodrigenPhase;
-import pl.sg.banks.integrations.nodrigen.model.transcations.NodrigenTransaction;
-import pl.sg.banks.integrations.nodrigen.repository.NodrigenBankAccountBalanceRepository;
-import pl.sg.banks.integrations.nodrigen.repository.NodrigenTransactionRepository;
+import pl.sg.integrations.nodrigen.NodrigenClient;
+import pl.sg.integrations.nodrigen.model.balances.NodrigenAmount;
+import pl.sg.integrations.nodrigen.model.balances.NodrigenBalanceEmbeddable;
+import pl.sg.integrations.nodrigen.model.balances.NodrigenBankAccountBalance;
+import pl.sg.integrations.nodrigen.model.rest.balances.Amount;
+import pl.sg.integrations.nodrigen.model.rest.balances.Balance;
+import pl.sg.integrations.nodrigen.model.rest.transactions.CurrencyExchange;
+import pl.sg.integrations.nodrigen.model.rest.transactions.Transaction;
+import pl.sg.integrations.nodrigen.model.rest.transactions.Transactions;
+import pl.sg.integrations.nodrigen.model.transcations.NodrigenAccount;
+import pl.sg.integrations.nodrigen.model.transcations.NodrigenCurrencyExchange;
+import pl.sg.integrations.nodrigen.model.transcations.NodrigenPhase;
+import pl.sg.integrations.nodrigen.model.transcations.NodrigenTransaction;
+import pl.sg.integrations.nodrigen.repository.NodrigenBankAccountBalanceRepository;
+import pl.sg.integrations.nodrigen.repository.NodrigenTransactionRepository;
 import pl.sg.banks.model.BankAccount;
 import pl.sg.banks.repositories.BankAccountRepository;
 
@@ -176,7 +176,7 @@ public class BankAccountServiceImpl implements BankAccountService {
                 .orElse(null);
     }
 
-    private NodrigenAccount mapNodrigenAccount(pl.sg.banks.integrations.nodrigen.model.rest.transactions.Account creditorAccount) {
+    private NodrigenAccount mapNodrigenAccount(pl.sg.integrations.nodrigen.model.rest.transactions.Account creditorAccount) {
         return ofNullable(creditorAccount)
                 .map(ca -> new NodrigenAccount().setBban(ca.bban).setIban(ca.iban))
                 .orElse(null);

@@ -3,8 +3,8 @@ package pl.sg.banks.model;
 import pl.sg.accountant.model.accounts.Account;
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;
-import pl.sg.banks.integrations.nodrigen.model.balances.NodrigenBankAccountBalance;
-import pl.sg.banks.integrations.nodrigen.model.transcations.NodrigenTransaction;
+import pl.sg.integrations.nodrigen.model.balances.NodrigenBankAccountBalance;
+import pl.sg.integrations.nodrigen.model.transcations.NodrigenTransaction;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
