@@ -90,18 +90,7 @@ public class AccountsRestController implements AccountsController {
                             .filter(pg -> pg.savings)
                             .map(pg -> pg.balance)
                             .reduce(BigDecimal::add);
-
-                    System.out.println(ym);
-                    System.out.println("\tpiggy banks not savings = " + sumOfPiggyBanksNoSavings.orElse(BigDecimal.ZERO) + " PLN");
-                    System.out.println("\tpiggy banks savings = " + sumOfPiggyBanksSavings.orElse(BigDecimal.ZERO) + " PLN");
-                    System.out.println("\tsavings = " + savingsHistory.get(ym).get(Currency.getInstance("PLN")) + " PLN");
-                    System.out.println("-------------------------");
                 });
-
-        System.out.println("\tincomes  = ");
-        incomes.forEach((currency, sum) -> System.out.println("\t\t" + sum + " " + currency));
-        System.out.println("\texpenses  = ");
-        expenses.forEach((currency, sum) -> System.out.println("\t\t" + sum + " " + currency));
 
         return map(accountsService.getForDomain(domain));
     }
