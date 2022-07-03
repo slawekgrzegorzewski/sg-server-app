@@ -19,8 +19,12 @@ import pl.sg.accountant.transport.accounts.*;
 import pl.sg.accountant.transport.billings.BillingPeriodTO;
 import pl.sg.accountant.transport.billings.CategoryTO;
 import pl.sg.application.transport.DomainTO;
+import pl.sg.banks.model.BankAccount;
+import pl.sg.banks.transport.BankAccountTO;
 import pl.sg.cubes.model.CubeRecord;
 import pl.sg.cubes.transport.CubeRecordTO;
+import pl.sg.banks.integrations.nodrigen.model.NodrigenBankPermission;
+import pl.sg.banks.integrations.nodrigen.transport.NodrigenBankPermissionTO;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -157,6 +161,9 @@ public class Application {
 
         modelMapper.typeMap(HolidayCurrenciesTO.class, HolidayCurrencies.class, UPDATE_HOLIDAY_CURRENCIES)
                 .setConverter(context -> applyChanges(context.getSource(), context.getDestination()));
+
+        modelMapper.typeMap(NodrigenBankPermission.class, NodrigenBankPermissionTO.class);
+        modelMapper.typeMap(BankAccount.class, BankAccountTO.class);
 
         return modelMapper;
     }

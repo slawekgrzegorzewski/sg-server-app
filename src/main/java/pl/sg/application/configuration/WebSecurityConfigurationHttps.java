@@ -61,6 +61,7 @@ public class WebSecurityConfigurationHttps extends WebSecurityConfigurerAdapter 
                 argumentResolvers.add(new RequestDomainResolver(entityManager));
                 argumentResolvers.add(new PathVariableWithDomainResolver(authorizationService, entityManager));
                 argumentResolvers.add(new RequestBodyWithDomainResolver(authorizationService, entityManager, modelMapper, gson));
+                argumentResolvers.add(new RequestBodyIdWithDomainResolver(authorizationService, entityManager, modelMapper, gson));
                 argumentResolvers.add(new MapRequestBodyResolver(modelMapper, gson));
             }
 

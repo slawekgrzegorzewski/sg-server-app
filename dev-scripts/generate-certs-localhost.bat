@@ -1,2 +1,2 @@
-"C:\Program Files\Java\jdk-16.0.2\bin\keytool.exe" -genkeypair -alias sg-app -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore keystore.p12 -validity 3650 -storepass slawek
-"C:\Program Files\Java\jdk-16.0.2\bin\keytool.exe" -list -v -storetype pkcs12 -keystore keystore.p12
+"C:\Program Files\Java\jdk-17.0.2\bin\keytool.exe" -genkeypair -alias sg-app -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore keystore.p12 -validity 3650 -storepass slawek
+"C:\Program Files\Java\jdk-17.0.2\bin\keytool.exe" -list -v -storetype pkcs12 -keystore keystore.p12

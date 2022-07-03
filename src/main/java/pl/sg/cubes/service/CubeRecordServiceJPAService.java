@@ -3,12 +3,14 @@ package pl.sg.cubes.service;
 import org.springframework.stereotype.Component;
 import pl.sg.application.model.Domain;
 import pl.sg.cubes.model.CubeRecord;
+import pl.sg.cubes.model.CubeStatistics;
 import pl.sg.cubes.model.CubesType;
 import pl.sg.cubes.repository.CubeRecordRepository;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class CubeRecordServiceJPAService implements CubeRecordService {
@@ -31,5 +33,10 @@ public class CubeRecordServiceJPAService implements CubeRecordService {
     @Override
     public CubeRecord record(CubeRecord record) {
         return this.cubeRecordRepository.save(record);
+    }
+
+    @Override
+    public Map<CubesType, CubeStatistics> getStatistics(Domain domain) {
+        return null;
     }
 }

@@ -25,3 +25,6 @@ server:
     key-alias: sg-application
     key-password: "fill_at_server"
   port: 8443
+
+nodrigen:
+  service-url: https://ob.nordigen.com/api/v2/

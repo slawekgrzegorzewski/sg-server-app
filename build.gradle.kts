@@ -173,7 +173,7 @@ tasks.register<Copy>("toOVH") {
     group = "docker"
 
     val appProject = Paths.get(project.rootDir.absolutePath, "src", "main", "resources")
-    val clientProject = Paths.get(project.rootDir.absolutePath, "..", "sg-client-app")
+    val clientProject = Paths.get(project.rootDir.absolutePath, "..", "..", "WWW Projects", "sg-client-app")
     val destination = Paths.get("E:", "docker")
 
     doFirst {

@@ -2,6 +2,7 @@ package pl.sg.accountant.model.accounts;
 
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;
+import pl.sg.banks.model.BankAccount;
 
 import javax.persistence.*;
 import javax.validation.constraints.Digits;
@@ -28,6 +29,8 @@ public class Account implements WithDomain<Account> {
     private FinancialTransaction lastTransactionIncludedInBalance;
     @Column(columnDefinition = "boolean not null default true")
     private boolean visible;
+    @OneToOne
+    BankAccount bankAccount;
     @ManyToOne
     private Domain domain;
 
@@ -103,6 +106,15 @@ public class Account implements WithDomain<Account> {
 
     public Account setVisible(boolean visible) {
         this.visible = visible;
+        return this;
+    }
+
+    public BankAccount getBankAccount() {
+        return bankAccount;
+    }
+
+    public Account setBankAccount(BankAccount bankAccount) {
+        this.bankAccount = bankAccount;
         return this;
     }
 }
