@@ -23,7 +23,7 @@ public class Checker {
         this.checkerTaskHistoryRepository = checkerTaskHistoryRepository;
     }
 
-    @Scheduled(fixedDelay = 1 * 1000)
+//    @Scheduled(fixedDelay = 1 * 1000)
     public void scheduleFixedDelayTask() {
         List<CheckerTask> tasks = this.checkerTaskRepository.findTasksToRun();
         for (CheckerTask task : tasks) {

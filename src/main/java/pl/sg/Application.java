@@ -13,6 +13,7 @@ import pl.sg.accountant.model.accounts.*;
 import pl.sg.accountant.model.billings.BillingPeriod;
 import pl.sg.accountant.model.billings.Category;
 import pl.sg.accountant.model.billings.PiggyBank;
+import pl.sg.accountant.transport.FinancialTransactionTO;
 import pl.sg.accountant.transport.HolidayCurrenciesTO;
 import pl.sg.accountant.transport.PiggyBankTO;
 import pl.sg.accountant.transport.accounts.*;
@@ -24,7 +25,9 @@ import pl.sg.banks.transport.BankAccountTO;
 import pl.sg.cubes.model.CubeRecord;
 import pl.sg.cubes.transport.CubeRecordTO;
 import pl.sg.integrations.nodrigen.model.NodrigenBankPermission;
+import pl.sg.integrations.nodrigen.model.NodrigenTransactionsToImport;
 import pl.sg.integrations.nodrigen.transport.NodrigenBankPermissionTO;
+import pl.sg.integrations.nodrigen.transport.NodrigenTransactionsToImportTO;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -164,6 +167,8 @@ public class Application {
 
         modelMapper.typeMap(NodrigenBankPermission.class, NodrigenBankPermissionTO.class);
         modelMapper.typeMap(BankAccount.class, BankAccountTO.class);
+        modelMapper.typeMap(NodrigenTransactionsToImport.class, NodrigenTransactionsToImportTO.class);
+        modelMapper.typeMap(FinancialTransaction.class, FinancialTransactionTO.class);
 
         return modelMapper;
     }

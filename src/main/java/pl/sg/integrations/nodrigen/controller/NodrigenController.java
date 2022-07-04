@@ -1,9 +1,16 @@
 package pl.sg.integrations.nodrigen.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import pl.sg.accountant.model.accounts.FinancialTransaction;
 import pl.sg.application.model.Domain;
+import pl.sg.application.security.annotations.RequestDomain;
+import pl.sg.application.security.annotations.TokenBearerAuth;
+import pl.sg.integrations.nodrigen.model.transcations.NodrigenTransaction;
 import pl.sg.integrations.nodrigen.transport.NodrigenBankPermissionTO;
 import pl.sg.integrations.nodrigen.transport.NodrigenPermissionRequest;
+import pl.sg.integrations.nodrigen.transport.NodrigenTransactionsToImportTO;
 
 import java.util.List;
 
@@ -18,4 +25,12 @@ public interface NodrigenController {
     String confirmPermission(Domain domain, String reference);
 
     List<NodrigenBankPermissionTO> getPermissionToProceed(Domain domain, NodrigenPermissionRequest nodrigenPermissionRequest);
+
+    List<NodrigenTransactionsToImportTO> getNodrigenTransactionsToImport(Domain domain);
+
+    List<NodrigenTransactionsToImportTO> matchNodrigenTransactionsToImport(
+            Domain domain,
+            int nodrigenTransactionId,
+            int financialTransactionId,
+            MatchingMode matchingMode);
 }

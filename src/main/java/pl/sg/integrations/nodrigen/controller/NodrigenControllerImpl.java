@@ -6,12 +6,14 @@ import org.springframework.web.bind.annotation.*;
 import pl.sg.application.model.Domain;
 import pl.sg.application.security.annotations.RequestDomain;
 import pl.sg.application.security.annotations.TokenBearerAuth;
+import pl.sg.integrations.nodrigen.repository.NodrigenTransactionsToImportRepository;
 import pl.sg.integrations.nodrigen.services.NodrigenService;
 import pl.sg.integrations.nodrigen.NodrigenClient;
 import pl.sg.integrations.nodrigen.model.NodrigenBankPermission;
 import pl.sg.integrations.nodrigen.repository.NodrigenBankPermissionRepository;
 import pl.sg.integrations.nodrigen.transport.NodrigenBankPermissionTO;
 import pl.sg.integrations.nodrigen.transport.NodrigenPermissionRequest;
+import pl.sg.integrations.nodrigen.transport.NodrigenTransactionsToImportTO;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,12 +26,17 @@ public class NodrigenControllerImpl implements NodrigenController {
     private final NodrigenClient nodrigenClient;
     private final NodrigenBankPermissionRepository nodrigenBankPermissionRepository;
     private final NodrigenService nodrigenService;
+    private final NodrigenTransactionsToImportRepository nodrigenTransactionsToImportRepository;
 
-    public NodrigenControllerImpl(ModelMapper modelMapper, NodrigenClient nodrigenClient, NodrigenBankPermissionRepository nodrigenBankPermissionRepository, NodrigenService nodrigenService) {
+    public NodrigenControllerImpl(ModelMapper modelMapper, NodrigenClient nodrigenClient,
+                                  NodrigenBankPermissionRepository nodrigenBankPermissionRepository,
+                                  NodrigenService nodrigenService,
+                                  NodrigenTransactionsToImportRepository nodrigenTransactionsToImportRepository) {
         this.modelMapper = modelMapper;
         this.nodrigenClient = nodrigenClient;
         this.nodrigenBankPermissionRepository = nodrigenBankPermissionRepository;
         this.nodrigenService = nodrigenService;
+        this.nodrigenTransactionsToImportRepository = nodrigenTransactionsToImportRepository;
     }
 
     @Override
@@ -79,5 +86,26 @@ public class NodrigenControllerImpl implements NodrigenController {
                 .stream()
                 .map(nbp -> this.modelMapper.map(nbp, NodrigenBankPermissionTO.class))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @GetMapping("/nodrigen_transaction_to_import")
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
+    public List<NodrigenTransactionsToImportTO> getNodrigenTransactionsToImport(@RequestDomain Domain domain) {
+        return nodrigenTransactionsToImportRepository.findNodrigenTransactionsToImportByDomainId(domain.getId())
+                .stream()
+                .map(t -> modelMapper.map(t, NodrigenTransactionsToImportTO.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @PutMapping("/nodrigen_transaction_to_import/{nodrigenTransactionId}/{financialTransactionId}/{matchingMode}")
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
+    public List<NodrigenTransactionsToImportTO> matchNodrigenTransactionsToImport(
+            @RequestDomain Domain domain,
+            @PathVariable int nodrigenTransactionId,
+            @PathVariable int financialTransactionId,
+            @PathVariable MatchingMode matchingMode) {
+        return nodrigenService.matchNodrigenTransactionsToImport(domain, nodrigenTransactionId, financialTransactionId, matchingMode);
     }
 }

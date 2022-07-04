@@ -15,12 +15,12 @@ public class BankAccountsDataFetcher {
         this.bankAccountService = bankAccountService;
     }
 
-    @Scheduled(cron = "0 0 8,11,14,18 * * *", zone = "Europe/Warsaw")
+    @Scheduled(cron = "${cron.fetch-transactions}", zone = "Europe/Warsaw")
     public void fetchAllTransactions() {
         domainRepository.findAll().forEach(bankAccountService::fetchAllTransactions);
     }
 
-    @Scheduled(cron = "0 5 8,11,14,18 * * *", zone = "Europe/Warsaw")
+    @Scheduled(cron = "${cron.fetch-accounts}", zone = "Europe/Warsaw")
     public void fetchAllBalances() {
         domainRepository.findAll().forEach(bankAccountService::fetchAllBalances);
     }

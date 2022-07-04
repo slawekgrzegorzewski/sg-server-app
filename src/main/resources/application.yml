@@ -10,11 +10,18 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     properties:
       hibernate:
+#        show_sql: true
+#        use_sql_comments: true
+#        format_sql: true
         jdbc:
           lob:
             non_contextual_creation: true
 nodrigen:
   service-url: https://ob.nordigen.com/api/v2/
+
+cron:
+  fetch-accounts: "-"
+  fetch-transactions: "-"

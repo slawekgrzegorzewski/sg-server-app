@@ -1,11 +1,13 @@
 package pl.sg.integrations.nodrigen.model.transcations;
 
+import pl.sg.accountant.model.accounts.FinancialTransaction;
 import pl.sg.integrations.nodrigen.model.balances.NodrigenAmount;
 import pl.sg.integrations.nodrigen.model.balances.NodrigenBalanceEmbeddable;
 import pl.sg.banks.model.BankAccount;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 @Entity
@@ -78,8 +80,13 @@ public class NodrigenTransaction {
     private String ultimateDebtor;
     private LocalDate valueDate;
     private OffsetDateTime valueDateTime;
+    private LocalDateTime importTime;
     @ManyToOne
     private BankAccount bankAccount;
+    @OneToOne(optional = true, fetch = FetchType.LAZY)
+    private FinancialTransaction creditTransaction;
+    @OneToOne(optional = true, fetch = FetchType.LAZY)
+    private FinancialTransaction debitTransaction;
 
     public Integer getId() {
         return id;
@@ -360,12 +367,39 @@ public class NodrigenTransaction {
         return this;
     }
 
+    public LocalDateTime getImportTime() {
+        return importTime;
+    }
+
+    public NodrigenTransaction setImportTime(LocalDateTime importTime) {
+        this.importTime = importTime;
+        return this;
+    }
+
     public BankAccount getBankAccount() {
         return bankAccount;
     }
 
     public NodrigenTransaction setBankAccount(BankAccount bankAccount) {
         this.bankAccount = bankAccount;
+        return this;
+    }
+
+    public FinancialTransaction getCreditTransaction() {
+        return creditTransaction;
+    }
+
+    public NodrigenTransaction setCreditTransaction(FinancialTransaction creditTransaction) {
+        this.creditTransaction = creditTransaction;
+        return this;
+    }
+
+    public FinancialTransaction getDebitTransaction() {
+        return debitTransaction;
+    }
+
+    public NodrigenTransaction setDebitTransaction(FinancialTransaction debitTransaction) {
+        this.debitTransaction = debitTransaction;
         return this;
     }
 }

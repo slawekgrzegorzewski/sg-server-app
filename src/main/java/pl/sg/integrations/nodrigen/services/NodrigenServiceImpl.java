@@ -1,31 +1,50 @@
 package pl.sg.integrations.nodrigen.services;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Controller;
+import pl.sg.accountant.model.AccountsException;
+import pl.sg.accountant.model.accounts.FinancialTransaction;
+import pl.sg.accountant.repository.FinancialTransactionRepository;
 import pl.sg.application.model.Domain;
-import pl.sg.integrations.nodrigen.NodrigenClient;
-import pl.sg.integrations.nodrigen.model.NodrigenBankPermission;
-import pl.sg.integrations.nodrigen.model.rest.Account;
-import pl.sg.integrations.nodrigen.repository.NodrigenBankPermissionRepository;
-import pl.sg.integrations.nodrigen.transport.NodrigenPermissionRequest;
 import pl.sg.banks.model.BankAccount;
 import pl.sg.banks.repositories.BankAccountRepository;
+import pl.sg.integrations.nodrigen.NodrigenClient;
+import pl.sg.integrations.nodrigen.controller.MatchingMode;
+import pl.sg.integrations.nodrigen.model.NodrigenBankPermission;
+import pl.sg.integrations.nodrigen.model.rest.Account;
+import pl.sg.integrations.nodrigen.model.transcations.NodrigenTransaction;
+import pl.sg.integrations.nodrigen.repository.NodrigenBankPermissionRepository;
+import pl.sg.integrations.nodrigen.repository.NodrigenTransactionRepository;
+import pl.sg.integrations.nodrigen.repository.NodrigenTransactionsToImportRepository;
+import pl.sg.integrations.nodrigen.transport.NodrigenPermissionRequest;
+import pl.sg.integrations.nodrigen.transport.NodrigenTransactionsToImportTO;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.Optional.ofNullable;
+
 @Controller
 public class NodrigenServiceImpl implements NodrigenService {
 
     private final BankAccountRepository bankAccountRepository;
+    private final FinancialTransactionRepository financialTransactionRepository;
+    private final ModelMapper modelMapper;
     private final NodrigenBankPermissionRepository nodrigenBankPermissionRepository;
     private final NodrigenClient nodrigenClient;
+    private final NodrigenTransactionRepository nodrigenTransactionRepository;
+    private final NodrigenTransactionsToImportRepository nodrigenTransactionsToImportRepository;
 
-    public NodrigenServiceImpl(BankAccountRepository bankAccountRepository, NodrigenBankPermissionRepository nodrigenBankPermissionRepository, NodrigenClient nodrigenClient) {
+    public NodrigenServiceImpl(BankAccountRepository bankAccountRepository, FinancialTransactionRepository financialTransactionRepository, ModelMapper modelMapper, NodrigenBankPermissionRepository nodrigenBankPermissionRepository, NodrigenClient nodrigenClient, NodrigenTransactionRepository nodrigenTransactionRepository, NodrigenTransactionsToImportRepository nodrigenTransactionsToImportRepository) {
         this.bankAccountRepository = bankAccountRepository;
+        this.financialTransactionRepository = financialTransactionRepository;
+        this.modelMapper = modelMapper;
         this.nodrigenBankPermissionRepository = nodrigenBankPermissionRepository;
         this.nodrigenClient = nodrigenClient;
+        this.nodrigenTransactionRepository = nodrigenTransactionRepository;
+        this.nodrigenTransactionsToImportRepository = nodrigenTransactionsToImportRepository;
     }
 
     @Override
@@ -77,5 +96,55 @@ public class NodrigenServiceImpl implements NodrigenService {
                     return bankAccount;
                 }).collect(Collectors.toList());
         bankAccountRepository.saveAll(bankAccountsToCreate);
+    }
+
+    @Override
+    public List<NodrigenTransactionsToImportTO> matchNodrigenTransactionsToImport(
+            Domain domain,
+            int nodrigenTransactionId,
+            int financialTransactionId,
+            MatchingMode matchingMode) {
+        NodrigenTransaction nodrigenTransaction = nodrigenTransactionRepository.getOne(nodrigenTransactionId);
+        FinancialTransaction financialTransaction = financialTransactionRepository.getOne(financialTransactionId);
+        validateSameDomain(domain, nodrigenTransaction.getBankAccount().getDomain());
+        validateSameDomain(domain, ofNullable(financialTransaction.getDestination())
+                .or(() -> ofNullable(financialTransaction.getSource()))
+                .map(pl.sg.accountant.model.accounts.Account::getDomain).orElseThrow());
+        validateNotAssigned(nodrigenTransaction, financialTransaction);
+        if (matchingMode == MatchingMode.CREDIT || matchingMode == MatchingMode.BOTH) {
+            nodrigenTransaction.setCreditTransaction(financialTransaction);
+            financialTransaction.setCreditNodrigenTransaction(nodrigenTransaction);
+        }
+        if (matchingMode == MatchingMode.DEBIT || matchingMode == MatchingMode.BOTH) {
+            nodrigenTransaction.setDebitTransaction(financialTransaction);
+            financialTransaction.setDebitNodrigenTransaction(nodrigenTransaction);
+        }
+        nodrigenTransactionRepository.save(nodrigenTransaction);
+        financialTransactionRepository.save(financialTransaction);
+        return nodrigenTransactionsToImportRepository.findNodrigenTransactionsToImportByDomainId(domain.getId())
+                .stream()
+                .map(t -> modelMapper.map(t, NodrigenTransactionsToImportTO.class))
+                .collect(Collectors.toList());
+    }
+
+    private void validateNotAssigned(NodrigenTransaction nodrigenTransaction, FinancialTransaction financialTransaction) {
+        if (nodrigenTransaction.getCreditTransaction() != null) {
+            throw new AccountsException("Nodrigen transaction has credit transaction set.");
+        }
+        if (nodrigenTransaction.getDebitTransaction() != null) {
+            throw new AccountsException("Nodrigen transaction has debit transaction set.");
+        }
+        if (financialTransaction.getCreditNodrigenTransaction() != null) {
+            throw new AccountsException("Financial transaction has credit nodrigen transaction set.");
+        }
+        if (financialTransaction.getDebitNodrigenTransaction() != null) {
+            throw new AccountsException("Financial transaction has debit nodrigen transaction set.");
+        }
+    }
+
+    private void validateSameDomain(Domain domain, Domain other) {
+        if (!domain.getId().equals(other.getId())) {
+            throw new AccountsException("Modyfing entity for other domain.");
+        }
     }
 }

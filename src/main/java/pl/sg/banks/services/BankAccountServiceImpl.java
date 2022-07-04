@@ -89,15 +89,16 @@ public class BankAccountServiceImpl implements BankAccountService {
                         Collectors.toList()
                 ));
 
+        LocalDateTime now = LocalDateTime.now();
         List<NodrigenTransaction> toSave = new ArrayList<>();
         allTransactionsFromNodrigen.forEach((bankAccount, transactions) -> {
             transactions.booked.stream()
                     .filter(transaction -> !transactionsExists(existingTransactions, transaction, bankAccount))
-                    .map(transaction -> mapToDb(transaction, bankAccount, NodrigenPhase.BOOKED))
+                    .map(transaction -> mapToDb(transaction, bankAccount, now, NodrigenPhase.BOOKED))
                     .collect(Collectors.toCollection(() -> toSave));
             transactions.pending.stream()
                     .filter(transaction -> !transactionsExists(existingTransactions, transaction, bankAccount))
-                    .map(transaction -> mapToDb(transaction, bankAccount, NodrigenPhase.PENDING))
+                    .map(transaction -> mapToDb(transaction, bankAccount, now, NodrigenPhase.PENDING))
                     .collect(Collectors.toCollection(() -> toSave));
         });
         nodrigenTransactionRepository.saveAll(toSave);
@@ -112,9 +113,10 @@ public class BankAccountServiceImpl implements BankAccountService {
                 .anyMatch(nodrigenTransaction -> nodrigenTransaction.getBankAccount().getId().equals(bankAccount.getId()));
     }
 
-    private NodrigenTransaction mapToDb(Transaction transaction, BankAccount bankAccount, NodrigenPhase phase) {
+    private NodrigenTransaction mapToDb(Transaction transaction, BankAccount bankAccount, LocalDateTime now, NodrigenPhase phase) {
         return new NodrigenTransaction()
                 .setBankAccount(bankAccount)
+                .setImportTime(now)
                 .setPhase(phase)
                 .setAdditionalInformation(transaction.additionalInformation)
                 .setAdditionalInformationStructured(transaction.additionalInformationStructured)
@@ -136,9 +138,9 @@ public class BankAccountServiceImpl implements BankAccountService {
                 .setProprietaryBankTransactionCode(transaction.proprietaryBankTransactionCode)
                 .setPurposeCode(transaction.purposeCode)
                 .setRemittanceInformationStructured(transaction.remittanceInformationStructured)
-                .setRemittanceInformationStructuredArray(Arrays.toString(transaction.remittanceInformationStructuredArray))
+                .setRemittanceInformationStructuredArray(ofNullable(transaction.remittanceInformationStructuredArray).map(Arrays::toString).orElse(null))
                 .setRemittanceInformationUnstructured(transaction.remittanceInformationUnstructured)
-                .setRemittanceInformationUnstructuredArray(Arrays.toString(transaction.remittanceInformationUnstructuredArray))
+                .setRemittanceInformationUnstructuredArray(ofNullable(transaction.remittanceInformationUnstructuredArray).map(Arrays::toString).orElse(null))
                 .setTransactionAmount(mapNodrigenAmount(transaction.transactionAmount))
                 .setTransactionId(transaction.transactionId)
                 .setUltimateCreditor(transaction.ultimateCreditor)
