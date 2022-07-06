@@ -25,6 +25,8 @@ public class FinancialTransaction {
     Account destination;
     private BigDecimal debit;
     private BigDecimal credit;
+    private BigDecimal fee;
+    private BigDecimal otherFee;
     private BigDecimal conversionRate;
     private LocalDateTime timeOfTransaction;
     @OneToOne(optional = true, mappedBy = "creditTransaction", fetch = FetchType.LAZY)
@@ -83,6 +85,24 @@ public class FinancialTransaction {
 
     public FinancialTransaction setCredit(BigDecimal credit) {
         this.credit = credit;
+        return this;
+    }
+
+    public BigDecimal getFee() {
+        return fee;
+    }
+
+    public FinancialTransaction setFee(BigDecimal fee) {
+        this.fee = fee;
+        return this;
+    }
+
+    public BigDecimal getOtherFee() {
+        return otherFee;
+    }
+
+    public FinancialTransaction setOtherFee(BigDecimal otherFee) {
+        this.otherFee = otherFee;
         return this;
     }
 

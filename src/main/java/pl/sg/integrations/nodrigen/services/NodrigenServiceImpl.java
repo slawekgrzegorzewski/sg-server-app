@@ -20,6 +20,7 @@ import pl.sg.integrations.nodrigen.repository.NodrigenTransactionsToImportReposi
 import pl.sg.integrations.nodrigen.transport.NodrigenPermissionRequest;
 import pl.sg.integrations.nodrigen.transport.NodrigenTransactionsToImportTO;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -120,6 +121,42 @@ public class NodrigenServiceImpl implements NodrigenService {
             financialTransaction.setDebitNodrigenTransaction(nodrigenTransaction);
         }
         nodrigenTransactionRepository.save(nodrigenTransaction);
+        financialTransactionRepository.save(financialTransaction);
+        return nodrigenTransactionsToImportRepository.findNodrigenTransactionsToImportByDomainId(domain.getId())
+                .stream()
+                .map(t -> modelMapper.map(t, NodrigenTransactionsToImportTO.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<NodrigenTransactionsToImportTO> matchNodrigenTransactionsToImport(
+            Domain domain, int nodrigenTransactionId, int secondNodrigenTransactionId,
+            int financialTransactionId) {
+        NodrigenTransaction nodrigenTransaction = nodrigenTransactionRepository.getOne(nodrigenTransactionId);
+        NodrigenTransaction secondNodrigenTransaction = nodrigenTransactionRepository.getOne(secondNodrigenTransactionId);
+        FinancialTransaction financialTransaction = financialTransactionRepository.getOne(financialTransactionId);
+        validateSameDomain(domain, nodrigenTransaction.getBankAccount().getDomain());
+        validateSameDomain(domain, secondNodrigenTransaction.getBankAccount().getDomain());
+        validateSameDomain(domain, ofNullable(financialTransaction.getDestination())
+                .or(() -> ofNullable(financialTransaction.getSource()))
+                .map(pl.sg.accountant.model.accounts.Account::getDomain).orElseThrow());
+        validateNotAssigned(nodrigenTransaction, financialTransaction);
+        validateNotAssigned(secondNodrigenTransaction, financialTransaction);
+
+        if(nodrigenTransaction.getTransactionAmount().getAmount().compareTo(BigDecimal.ZERO) > 0){
+            nodrigenTransaction.setCreditTransaction(financialTransaction);
+            secondNodrigenTransaction.setDebitTransaction(financialTransaction);
+            financialTransaction.setCreditNodrigenTransaction(nodrigenTransaction);
+            financialTransaction.setDebitNodrigenTransaction(secondNodrigenTransaction);
+        } else {
+            nodrigenTransaction.setDebitTransaction(financialTransaction);
+            secondNodrigenTransaction.setCreditTransaction(financialTransaction);
+            financialTransaction.setCreditNodrigenTransaction(secondNodrigenTransaction);
+            financialTransaction.setDebitNodrigenTransaction(nodrigenTransaction);
+        }
+
+        nodrigenTransactionRepository.save(nodrigenTransaction);
+        nodrigenTransactionRepository.save(secondNodrigenTransaction);
         financialTransactionRepository.save(financialTransaction);
         return nodrigenTransactionsToImportRepository.findNodrigenTransactionsToImportByDomainId(domain.getId())
                 .stream()

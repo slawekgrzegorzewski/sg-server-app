@@ -33,4 +33,8 @@ public interface NodrigenController {
             int nodrigenTransactionId,
             int financialTransactionId,
             MatchingMode matchingMode);
+
+    List<NodrigenTransactionsToImportTO> matchNodrigenTransactionsToImport(
+            Domain domain, int nodrigenTransactionId, int secondNodrigenTransactionId,
+            int financialTransactionId);
 }
