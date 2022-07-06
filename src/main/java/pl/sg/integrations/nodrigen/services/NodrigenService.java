@@ -23,4 +23,6 @@ public interface NodrigenService {
 
     List<NodrigenTransactionsToImportTO> matchNodrigenTransactionsToImport(Domain domain, int nodrigenTransactionId,
                                                                            int secondNodrigenTransactionId, int financialTransactionId);
+    List<NodrigenTransactionsToImportTO> matchNodrigenTransactionsToImport(Domain domain, int nodrigenTransactionId,
+                                                                           int financialTransactionId);
 }

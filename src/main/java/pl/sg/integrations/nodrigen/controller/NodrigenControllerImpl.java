@@ -119,4 +119,14 @@ public class NodrigenControllerImpl implements NodrigenController {
             @PathVariable int financialTransactionId) {
         return nodrigenService.matchNodrigenTransactionsToImport(domain, nodrigenTransactionId, secondNodrigenTransactionId, financialTransactionId);
     }
+
+    @Override
+    @PutMapping("/nodrigen_transactions_to_import/{nodrigenTransactionId}/{financialTransactionId}")
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
+    public List<NodrigenTransactionsToImportTO> matchNodrigenTransactionsToImport(
+            @RequestDomain Domain domain,
+            @PathVariable int nodrigenTransactionId,
+            @PathVariable int financialTransactionId) {
+        return nodrigenService.matchNodrigenTransactionsToImport(domain, nodrigenTransactionId, financialTransactionId);
+    }
 }

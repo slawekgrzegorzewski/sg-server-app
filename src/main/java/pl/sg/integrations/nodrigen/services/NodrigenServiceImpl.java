@@ -2,6 +2,7 @@ package pl.sg.integrations.nodrigen.services;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import pl.sg.accountant.model.AccountsException;
 import pl.sg.accountant.model.accounts.FinancialTransaction;
@@ -132,31 +133,71 @@ public class NodrigenServiceImpl implements NodrigenService {
     public List<NodrigenTransactionsToImportTO> matchNodrigenTransactionsToImport(
             Domain domain, int nodrigenTransactionId, int secondNodrigenTransactionId,
             int financialTransactionId) {
+        NodrigenTransaction debitNodrigenTransaction = nodrigenTransactionRepository.getOne(nodrigenTransactionId);
+        NodrigenTransaction creditNodrigenTransaction = nodrigenTransactionRepository.getOne(secondNodrigenTransactionId);
+        FinancialTransaction financialTransaction = financialTransactionRepository.getOne(financialTransactionId);
+
+
+        if ((financialTransaction.getConversionRate().equals(BigDecimal.ONE)
+                && debitNodrigenTransaction.getTransactionAmount().getAmount().compareTo(BigDecimal.ZERO) < 0)
+                || (!financialTransaction.getConversionRate().equals(BigDecimal.ONE)
+                && financialTransaction.getCredit().equals(debitNodrigenTransaction.getTransactionAmount().getAmount()))) {
+            NodrigenTransaction cache = debitNodrigenTransaction;
+            debitNodrigenTransaction = creditNodrigenTransaction;
+            creditNodrigenTransaction = cache;
+        }
+
+        validateSameDomain(domain, debitNodrigenTransaction.getBankAccount().getDomain());
+        validateSameDomain(domain, creditNodrigenTransaction.getBankAccount().getDomain());
+        validateSameDomain(domain, ofNullable(financialTransaction.getDestination())
+                .or(() -> ofNullable(financialTransaction.getSource()))
+                .map(pl.sg.accountant.model.accounts.Account::getDomain).orElseThrow());
+        validateNotAssigned(debitNodrigenTransaction, financialTransaction);
+        validateNotAssigned(creditNodrigenTransaction, financialTransaction);
+
+        debitNodrigenTransaction.setDebitTransaction(financialTransaction);
+        creditNodrigenTransaction.setCreditTransaction(financialTransaction);
+        financialTransaction.setCreditNodrigenTransaction(creditNodrigenTransaction);
+        financialTransaction.setDebitNodrigenTransaction(debitNodrigenTransaction);
+
+
+        if (!financialTransaction.getConversionRate().equals(BigDecimal.ONE)) {
+            financialTransaction.setFee(
+                    debitNodrigenTransaction.getTransactionAmount().getAmount()
+                            .add(debitNodrigenTransaction.getCurrencyExchange().getInstructedAmount().getAmount())
+                            .negate());
+        }
+
+        nodrigenTransactionRepository.save(debitNodrigenTransaction);
+        nodrigenTransactionRepository.save(creditNodrigenTransaction);
+        financialTransactionRepository.save(financialTransaction);
+        return nodrigenTransactionsToImportRepository.findNodrigenTransactionsToImportByDomainId(domain.getId())
+                .stream()
+                .map(t -> modelMapper.map(t, NodrigenTransactionsToImportTO.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<NodrigenTransactionsToImportTO> matchNodrigenTransactionsToImport(
+            Domain domain, int nodrigenTransactionId,
+            int financialTransactionId) {
         NodrigenTransaction nodrigenTransaction = nodrigenTransactionRepository.getOne(nodrigenTransactionId);
-        NodrigenTransaction secondNodrigenTransaction = nodrigenTransactionRepository.getOne(secondNodrigenTransactionId);
         FinancialTransaction financialTransaction = financialTransactionRepository.getOne(financialTransactionId);
         validateSameDomain(domain, nodrigenTransaction.getBankAccount().getDomain());
-        validateSameDomain(domain, secondNodrigenTransaction.getBankAccount().getDomain());
         validateSameDomain(domain, ofNullable(financialTransaction.getDestination())
                 .or(() -> ofNullable(financialTransaction.getSource()))
                 .map(pl.sg.accountant.model.accounts.Account::getDomain).orElseThrow());
         validateNotAssigned(nodrigenTransaction, financialTransaction);
-        validateNotAssigned(secondNodrigenTransaction, financialTransaction);
 
-        if(nodrigenTransaction.getTransactionAmount().getAmount().compareTo(BigDecimal.ZERO) > 0){
+        if (nodrigenTransaction.getTransactionAmount().getAmount().compareTo(BigDecimal.ZERO) > 0) {
             nodrigenTransaction.setCreditTransaction(financialTransaction);
-            secondNodrigenTransaction.setDebitTransaction(financialTransaction);
             financialTransaction.setCreditNodrigenTransaction(nodrigenTransaction);
-            financialTransaction.setDebitNodrigenTransaction(secondNodrigenTransaction);
         } else {
             nodrigenTransaction.setDebitTransaction(financialTransaction);
-            secondNodrigenTransaction.setCreditTransaction(financialTransaction);
-            financialTransaction.setCreditNodrigenTransaction(secondNodrigenTransaction);
             financialTransaction.setDebitNodrigenTransaction(nodrigenTransaction);
         }
 
         nodrigenTransactionRepository.save(nodrigenTransaction);
-        nodrigenTransactionRepository.save(secondNodrigenTransaction);
         financialTransactionRepository.save(financialTransaction);
         return nodrigenTransactionsToImportRepository.findNodrigenTransactionsToImportByDomainId(domain.getId())
                 .stream()

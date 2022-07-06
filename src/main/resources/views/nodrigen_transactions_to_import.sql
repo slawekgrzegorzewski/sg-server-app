@@ -66,8 +66,8 @@ union
         nt_debit.source_id                                                                        as source_id,
         nt_debit.credit_bank_account_id                                                           as credit_bank_account_id,
         nt_debit.debit_bank_account_id                                                            as debit_bank_account_id,
-        nt_credit.credit_bank_account_id                                                          as credit_nodrigen_transaction_id,
-        nt_debit.credit_bank_account_id                                                           as debit_nodrigen_transaction_id
+        nt_credit.nodrigen_transaction_id                                                          as credit_nodrigen_transaction_id,
+        nt_debit.nodrigen_transaction_id                                                           as debit_nodrigen_transaction_id
  from tranasactions nt_debit
           join tranasactions nt_credit on nt_debit.transaction_id = nt_credit.transaction_id
  where nt_debit.institution_id = 'REVOLUT_REVOGB21'
@@ -83,7 +83,7 @@ union
         1.0                                                                  as conversion_rate,
         0.0                                                                  as credit,
         nt_debit.debit - nt_debit.currency_exchange_instructed_amount_amount as debit,
-        'prowizja za wymianę ' || nt_debit.description                       as description,
+        'prowizja za wymianę ' || nt_debit.nodrigen_transaction_id           as description,
         nt_debit.time_of_transaction                                         as time_of_transaction,
         null                                                                 as destination_id,
         nt_debit.source_id                                                   as source_id,
