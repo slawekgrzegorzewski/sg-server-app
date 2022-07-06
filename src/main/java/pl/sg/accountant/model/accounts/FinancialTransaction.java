@@ -1,15 +1,15 @@
 package pl.sg.accountant.model.accounts;
 
+import pl.sg.accountant.model.AccountsException;
 import pl.sg.accountant.model.OperationType;
 import pl.sg.accountant.model.validation.AccountTransaction;
-import pl.sg.accountant.model.AccountsException;
 import pl.sg.integrations.nodrigen.model.transcations.NodrigenTransaction;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.Currency;
 
 @Entity
 @AccountTransaction
@@ -26,7 +26,9 @@ public class FinancialTransaction {
     private BigDecimal debit;
     private BigDecimal credit;
     private BigDecimal fee;
+    private Currency feeCurrency;
     private BigDecimal otherFee;
+    private Currency otherFeeCurrency;
     private BigDecimal conversionRate;
     private LocalDateTime timeOfTransaction;
     @OneToOne(optional = true, mappedBy = "creditTransaction", fetch = FetchType.LAZY)
@@ -97,12 +99,30 @@ public class FinancialTransaction {
         return this;
     }
 
+    public Currency getFeeCurrency() {
+        return feeCurrency;
+    }
+
+    public FinancialTransaction setFeeCurrency(Currency feeCurrency) {
+        this.feeCurrency = feeCurrency;
+        return this;
+    }
+
     public BigDecimal getOtherFee() {
         return otherFee;
     }
 
     public FinancialTransaction setOtherFee(BigDecimal otherFee) {
         this.otherFee = otherFee;
+        return this;
+    }
+
+    public Currency getOtherFeeCurrency() {
+        return otherFeeCurrency;
+    }
+
+    public FinancialTransaction setOtherFeeCurrency(Currency otherFeeCurrency) {
+        this.otherFeeCurrency = otherFeeCurrency;
         return this;
     }
 
