@@ -142,7 +142,6 @@ public class NodrigenClient {
         }
     }
 
-
     private <T> Optional<T> logErrorCodeAndReturnOptional(RequestEntity<?> request, Class<T> entityClass, String requestDescription) {
         try {
             ResponseEntity<T> response = new RestTemplate().exchange(request, entityClass);

@@ -38,6 +38,8 @@ with tranasactions as (select a.id,
                                 join account a on ba.id = a.bank_account_id
                        where nt.credit_transaction_id is null
                          and nt.debit_transaction_id is null
+                         and reset_in_id is null
+                         and not ignored
                        order by id, time_of_transaction desc)
     (select nextval('nodrigen_transactions_to_import_sequence')   as id,
             domain_id,
@@ -66,8 +68,8 @@ union
         nt_debit.source_id                                                                        as source_id,
         nt_debit.credit_bank_account_id                                                           as credit_bank_account_id,
         nt_debit.debit_bank_account_id                                                            as debit_bank_account_id,
-        nt_credit.nodrigen_transaction_id                                                          as credit_nodrigen_transaction_id,
-        nt_debit.nodrigen_transaction_id                                                           as debit_nodrigen_transaction_id
+        nt_credit.nodrigen_transaction_id                                                         as credit_nodrigen_transaction_id,
+        nt_debit.nodrigen_transaction_id                                                          as debit_nodrigen_transaction_id
  from tranasactions nt_debit
           join tranasactions nt_credit on nt_debit.transaction_id = nt_credit.transaction_id
  where nt_debit.institution_id = 'REVOLUT_REVOGB21'

@@ -1,6 +1,7 @@
 package pl.sg.integrations.nodrigen.model;
 
 import org.hibernate.annotations.Immutable;
+import pl.sg.accountant.model.accounts.Account;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -21,6 +22,10 @@ public class NodrigenTransactionsToImport {
     private Instant timeOfTransaction;
     private Integer destinationId;
     private Integer sourceId;
+    @Transient
+    private Account destinationAccount;
+    @Transient
+    private Account sourceAccount;
     private Integer creditBankAccountId;
     private Integer debitBankAccountId;
     private Integer creditNodrigenTransactionId;
@@ -79,5 +84,23 @@ public class NodrigenTransactionsToImport {
     }
 
     protected NodrigenTransactionsToImport() {
+    }
+
+    public Account getDestinationAccount() {
+        return destinationAccount;
+    }
+
+    public NodrigenTransactionsToImport setDestinationAccount(Account destinationAccount) {
+        this.destinationAccount = destinationAccount;
+        return this;
+    }
+
+    public Account getSourceAccount() {
+        return sourceAccount;
+    }
+
+    public NodrigenTransactionsToImport setSourceAccount(Account sourceAccount) {
+        this.sourceAccount = sourceAccount;
+        return this;
     }
 }

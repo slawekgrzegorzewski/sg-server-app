@@ -3,6 +3,7 @@ package pl.sg.integrations.nodrigen.controller;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.sg.accountant.repository.AccountRepository;
 import pl.sg.application.model.Domain;
 import pl.sg.application.security.annotations.RequestDomain;
 import pl.sg.application.security.annotations.TokenBearerAuth;
@@ -18,20 +19,24 @@ import pl.sg.integrations.nodrigen.transport.NodrigenTransactionsToImportTO;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.Optional.ofNullable;
+
 @RestController
 @RequestMapping("/nodrigen")
 public class NodrigenControllerImpl implements NodrigenController {
 
+    private final AccountRepository accountRepository;
     private final ModelMapper modelMapper;
     private final NodrigenClient nodrigenClient;
     private final NodrigenBankPermissionRepository nodrigenBankPermissionRepository;
     private final NodrigenService nodrigenService;
     private final NodrigenTransactionsToImportRepository nodrigenTransactionsToImportRepository;
 
-    public NodrigenControllerImpl(ModelMapper modelMapper, NodrigenClient nodrigenClient,
+    public NodrigenControllerImpl(AccountRepository accountRepository, ModelMapper modelMapper, NodrigenClient nodrigenClient,
                                   NodrigenBankPermissionRepository nodrigenBankPermissionRepository,
                                   NodrigenService nodrigenService,
                                   NodrigenTransactionsToImportRepository nodrigenTransactionsToImportRepository) {
+        this.accountRepository = accountRepository;
         this.modelMapper = modelMapper;
         this.nodrigenClient = nodrigenClient;
         this.nodrigenBankPermissionRepository = nodrigenBankPermissionRepository;
@@ -94,39 +99,15 @@ public class NodrigenControllerImpl implements NodrigenController {
     public List<NodrigenTransactionsToImportTO> getNodrigenTransactionsToImport(@RequestDomain Domain domain) {
         return nodrigenTransactionsToImportRepository.findNodrigenTransactionsToImportByDomainId(domain.getId())
                 .stream()
+                .peek(t -> {
+                    ofNullable(t.getSourceId())
+                            .map(accountRepository::getOne)
+                            .ifPresent(t::setSourceAccount);
+                    ofNullable(t.getDestinationId())
+                            .map(accountRepository::getOne)
+                            .ifPresent(t::setDestinationAccount);
+                })
                 .map(t -> modelMapper.map(t, NodrigenTransactionsToImportTO.class))
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    @PutMapping("/nodrigen_transaction_to_import/{nodrigenTransactionId}/{financialTransactionId}/{matchingMode}")
-    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public List<NodrigenTransactionsToImportTO> matchNodrigenTransactionsToImport(
-            @RequestDomain Domain domain,
-            @PathVariable int nodrigenTransactionId,
-            @PathVariable int financialTransactionId,
-            @PathVariable MatchingMode matchingMode) {
-        return nodrigenService.matchNodrigenTransactionsToImport(domain, nodrigenTransactionId, financialTransactionId, matchingMode);
-    }
-
-    @Override
-    @PutMapping("/nodrigen_transactions_to_import/{nodrigenTransactionId}/{secondNodrigenTransactionId}/{financialTransactionId}")
-    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public List<NodrigenTransactionsToImportTO> matchNodrigenTransactionsToImport(
-            @RequestDomain Domain domain,
-            @PathVariable int nodrigenTransactionId,
-            @PathVariable int secondNodrigenTransactionId,
-            @PathVariable int financialTransactionId) {
-        return nodrigenService.matchNodrigenTransactionsToImport(domain, nodrigenTransactionId, secondNodrigenTransactionId, financialTransactionId);
-    }
-
-    @Override
-    @PutMapping("/nodrigen_transactions_to_import/{nodrigenTransactionId}/{financialTransactionId}")
-    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public List<NodrigenTransactionsToImportTO> matchNodrigenTransactionsToImport(
-            @RequestDomain Domain domain,
-            @PathVariable int nodrigenTransactionId,
-            @PathVariable int financialTransactionId) {
-        return nodrigenService.matchNodrigenTransactionsToImport(domain, nodrigenTransactionId, financialTransactionId);
     }
 }

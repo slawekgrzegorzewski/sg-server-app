@@ -87,6 +87,10 @@ public class NodrigenTransaction {
     private FinancialTransaction creditTransaction;
     @OneToOne(optional = true, fetch = FetchType.LAZY)
     private FinancialTransaction debitTransaction;
+    @OneToOne(optional = true, fetch = FetchType.LAZY)
+    private NodrigenTransaction resetIn;
+    @Column(columnDefinition = "boolean not null default false")
+    private boolean ignored;
 
     public Integer getId() {
         return id;
@@ -390,6 +394,9 @@ public class NodrigenTransaction {
     }
 
     public NodrigenTransaction setCreditTransaction(FinancialTransaction creditTransaction) {
+        if (resetIn != null && resetIn.isHandled()) {
+            throw new RuntimeException("Can not setCreditTransaction on handled transaction");
+        }
         this.creditTransaction = creditTransaction;
         return this;
     }
@@ -399,7 +406,41 @@ public class NodrigenTransaction {
     }
 
     public NodrigenTransaction setDebitTransaction(FinancialTransaction debitTransaction) {
+        if (resetIn != null && resetIn.isHandled()) {
+            throw new RuntimeException("Can not setDebitTransaction on handled transaction");
+        }
         this.debitTransaction = debitTransaction;
         return this;
+    }
+
+    public NodrigenTransaction getResetIn() {
+        return resetIn;
+    }
+
+    public NodrigenTransaction setResetIn(NodrigenTransaction resetIn) {
+        if (resetIn != null && resetIn.isHandled() && (resetIn.getResetIn() == null || resetIn.getResetIn() != this)) {
+            throw new RuntimeException("Can not reset handled transaction");
+        }
+        this.resetIn = resetIn;
+        if (resetIn != null) {
+            resetIn.setResetIn(this);
+        }
+        return this;
+    }
+
+    public boolean isIgnored() {
+        return ignored;
+    }
+
+    public NodrigenTransaction setIgnored(boolean ignored) {
+        if (resetIn != null && resetIn.isHandled()) {
+            throw new RuntimeException("Can not setIgnored on handled transaction");
+        }
+        this.ignored = ignored;
+        return this;
+    }
+
+    public boolean isHandled() {
+        return getDebitTransaction() != null || getCreditTransaction() != null || isIgnored() || getResetIn() != null;
     }
 }

@@ -27,18 +27,4 @@ public interface NodrigenController {
     List<NodrigenBankPermissionTO> getPermissionToProceed(Domain domain, NodrigenPermissionRequest nodrigenPermissionRequest);
 
     List<NodrigenTransactionsToImportTO> getNodrigenTransactionsToImport(Domain domain);
-
-    List<NodrigenTransactionsToImportTO> matchNodrigenTransactionsToImport(
-            Domain domain,
-            int nodrigenTransactionId,
-            int financialTransactionId,
-            MatchingMode matchingMode);
-
-    List<NodrigenTransactionsToImportTO> matchNodrigenTransactionsToImport(
-            Domain domain, int nodrigenTransactionId, int secondNodrigenTransactionId,
-            int financialTransactionId);
-
-    List<NodrigenTransactionsToImportTO> matchNodrigenTransactionsToImport(
-            Domain domain, int nodrigenTransactionId,
-            int financialTransactionId);
 }

@@ -1,13 +1,7 @@
 package pl.sg.integrations.nodrigen.transport;
 
-import pl.sg.application.model.Domain;
-import pl.sg.application.transport.DomainTO;
-import pl.sg.application.transport.WithDomainTO;
+import pl.sg.accountant.transport.accounts.AccountTO;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
 import java.math.BigDecimal;
 import java.time.Instant;
 
@@ -19,8 +13,8 @@ public class NodrigenTransactionsToImportTO {
     private BigDecimal debit;
     private String description;
     private Instant timeOfTransaction;
-    private Integer destinationId;
-    private Integer sourceId;
+    private AccountTO destinationAccount;
+    private AccountTO sourceAccount;
     private Integer creditBankAccountId;
     private Integer debitBankAccountId;
     private Integer creditNodrigenTransactionId;
@@ -29,7 +23,7 @@ public class NodrigenTransactionsToImportTO {
     public NodrigenTransactionsToImportTO() {
     }
 
-    public NodrigenTransactionsToImportTO(Long id, Integer domainId, BigDecimal conversionRate, BigDecimal credit, BigDecimal debit, String description, Instant timeOfTransaction, Integer destinationId, Integer sourceId, Integer creditBankAccountId, Integer debitBankAccountId, Integer creditNodrigenTransactionId, Integer debitNodrigenTransactionId) {
+    public NodrigenTransactionsToImportTO(Long id, Integer domainId, BigDecimal conversionRate, BigDecimal credit, BigDecimal debit, String description, Instant timeOfTransaction, AccountTO destinationAccount, AccountTO sourceAccount, Integer creditBankAccountId, Integer debitBankAccountId, Integer creditNodrigenTransactionId, Integer debitNodrigenTransactionId) {
         this.id = id;
         this.domainId = domainId;
         this.conversionRate = conversionRate;
@@ -37,8 +31,8 @@ public class NodrigenTransactionsToImportTO {
         this.debit = debit;
         this.description = description;
         this.timeOfTransaction = timeOfTransaction;
-        this.destinationId = destinationId;
-        this.sourceId = sourceId;
+        this.destinationAccount = destinationAccount;
+        this.sourceAccount = sourceAccount;
         this.creditBankAccountId = creditBankAccountId;
         this.debitBankAccountId = debitBankAccountId;
         this.creditNodrigenTransactionId = creditNodrigenTransactionId;
@@ -108,21 +102,21 @@ public class NodrigenTransactionsToImportTO {
         return this;
     }
 
-    public Integer getDestinationId() {
-        return destinationId;
+    public AccountTO getDestinationAccount() {
+        return destinationAccount;
     }
 
-    public NodrigenTransactionsToImportTO setDestinationId(Integer destinationId) {
-        this.destinationId = destinationId;
+    public NodrigenTransactionsToImportTO setDestinationAccount(AccountTO destinationAccount) {
+        this.destinationAccount = destinationAccount;
         return this;
     }
 
-    public Integer getSourceId() {
-        return sourceId;
+    public AccountTO getSourceAccount() {
+        return sourceAccount;
     }
 
-    public NodrigenTransactionsToImportTO setSourceId(Integer sourceId) {
-        this.sourceId = sourceId;
+    public NodrigenTransactionsToImportTO setSourceAccount(AccountTO sourceAccount) {
+        this.sourceAccount = sourceAccount;
         return this;
     }
 

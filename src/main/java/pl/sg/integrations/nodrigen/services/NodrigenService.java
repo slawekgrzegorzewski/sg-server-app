@@ -15,14 +15,4 @@ public interface NodrigenService {
     NodrigenBankPermission createRequisition(Domain domain, NodrigenPermissionRequest nodrigenPermissionRequest);
 
     void confirmPermission(Domain domain, String reference);
-
-    List<NodrigenTransactionsToImportTO> matchNodrigenTransactionsToImport(Domain domain,
-                                                                           int nodrigenTransactionId,
-                                                                           int financialTransactionId,
-                                                                           MatchingMode matchingMode);
-
-    List<NodrigenTransactionsToImportTO> matchNodrigenTransactionsToImport(Domain domain, int nodrigenTransactionId,
-                                                                           int secondNodrigenTransactionId, int financialTransactionId);
-    List<NodrigenTransactionsToImportTO> matchNodrigenTransactionsToImport(Domain domain, int nodrigenTransactionId,
-                                                                           int financialTransactionId);
 }

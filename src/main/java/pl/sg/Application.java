@@ -168,6 +168,9 @@ public class Application {
         modelMapper.typeMap(NodrigenBankPermission.class, NodrigenBankPermissionTO.class);
         modelMapper.typeMap(BankAccount.class, BankAccountTO.class);
         modelMapper.typeMap(NodrigenTransactionsToImport.class, NodrigenTransactionsToImportTO.class);
+//                .addMappings(mp -> {
+//                    mp.skip(NodrigenTransactionsToImport::getDestinationId, N);
+//                });
         modelMapper.typeMap(FinancialTransaction.class, FinancialTransactionTO.class);
 
         return modelMapper;
