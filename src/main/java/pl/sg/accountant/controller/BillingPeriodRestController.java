@@ -85,11 +85,31 @@ public class BillingPeriodRestController implements BillingPeriodController {
     }
 
     @Override
+    @PutMapping("/income/{account}/{nodrigenTransactionId}")
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
+    public String createIncome(@PathVariableWithDomain Account account,
+                               @MapRequestBody(transportClass = IncomeTO.class) Income income,
+                               @PathVariable int nodrigenTransactionId) {
+        billingPeriodsService.addIncome(account, income, nodrigenTransactionId);
+        return "OK";
+    }
+
+    @Override
     @PutMapping("/expense/{account}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public String createExpense(@PathVariableWithDomain Account account,
                                 @MapRequestBody(transportClass = ExpenseTO.class) Expense expense) {
         billingPeriodsService.addExpense(account, expense);
+        return "OK";
+    }
+
+    @Override
+    @PutMapping("/expense/{account}/{nodrigenTransactionId}")
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
+    public String createExpense(@PathVariableWithDomain Account account,
+                                @MapRequestBody(transportClass = ExpenseTO.class) Expense expense,
+                                @PathVariable int nodrigenTransactionId) {
+        billingPeriodsService.addExpense(account, expense, nodrigenTransactionId);
         return "OK";
     }
 

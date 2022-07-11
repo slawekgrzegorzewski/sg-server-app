@@ -22,5 +22,9 @@ public interface BillingPeriodController {
 
     String createIncome(Account account, Income income);
 
+    String createIncome(Account account, Income income, int nodrigenTransactionId);
+
     String createExpense(Account account, Expense expense);
+
+    String createExpense(Account account, Expense expense, int nodrigenTransactionId);
 }

@@ -15,4 +15,6 @@ public interface NodrigenService {
     NodrigenBankPermission createRequisition(Domain domain, NodrigenPermissionRequest nodrigenPermissionRequest);
 
     void confirmPermission(Domain domain, String reference);
+
+    void mutuallyCancelTransactions(Domain domain, int firstTransactionId, int secondTransactionId);
 }

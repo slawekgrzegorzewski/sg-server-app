@@ -99,4 +99,21 @@ public class NodrigenServiceImpl implements NodrigenService {
                 }).collect(Collectors.toList());
         bankAccountRepository.saveAll(bankAccountsToCreate);
     }
+
+    @Override
+    public void mutuallyCancelTransactions(Domain domain, int firstTransactionId, int secondTransactionId) {
+        NodrigenTransaction firstTransaction = nodrigenTransactionRepository.getOne(firstTransactionId);
+        NodrigenTransaction secondTransaction = nodrigenTransactionRepository.getOne(secondTransactionId);
+        validateSameDomain(domain, firstTransaction.getBankAccount().getDomain());
+        validateSameDomain(domain, secondTransaction.getBankAccount().getDomain());
+        firstTransaction.setResetIn(secondTransaction);
+        nodrigenTransactionRepository.save(firstTransaction);
+        nodrigenTransactionRepository.save(secondTransaction);
+    }
+
+    private void validateSameDomain(Domain first, Domain second) {
+        if (!Objects.equals(first.getId(), second.getId())) {
+            throw new AccountsException("Payment has to be for the same currency.");
+        }
+    }
 }

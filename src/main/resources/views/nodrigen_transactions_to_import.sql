@@ -27,7 +27,11 @@ with tranasactions as (select a.id,
                               coalesce(remittance_information_unstructured_array,
                                        remittance_information_structured_array,
                                        remittance_information_unstructured,
-                                       remittance_information_structured)              as description,
+                                       remittance_information_structured)
+                                  || ': '
+                                  || coalesce(debtor_name, '')
+                                  || ' => '
+                                  || coalesce(creditor_name, '')                       as description,
                               least(coalesce(booking_date_time, booking_date),
                                     coalesce(value_date_time, value_date))::timestamp  as time_of_transaction,
                               (case when transaction_amount_amount > 0 then a.id end)  as destination_id,

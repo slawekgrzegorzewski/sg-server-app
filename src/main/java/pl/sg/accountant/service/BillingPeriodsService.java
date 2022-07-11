@@ -26,5 +26,9 @@ public interface BillingPeriodsService {
 
     void addIncome(Account account, Income income);
 
+    void addIncome(Account account, Income income, int nodrigenTransactionId);
+
     void addExpense(Account account, Expense expense);
+
+    void addExpense(Account account, Expense expense, int nodrigenTransactionId);
 }

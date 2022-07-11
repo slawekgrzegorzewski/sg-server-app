@@ -3,6 +3,7 @@ package pl.sg.accountant.service;
 import org.springframework.stereotype.Component;
 import pl.sg.accountant.model.AccountsException;
 import pl.sg.accountant.model.accounts.Account;
+import pl.sg.accountant.model.accounts.FinancialTransaction;
 import pl.sg.accountant.model.billings.BillingPeriod;
 import pl.sg.accountant.model.billings.Expense;
 import pl.sg.accountant.model.billings.Income;
@@ -14,12 +15,12 @@ import pl.sg.accountant.repository.IncomeRepository;
 import pl.sg.accountant.repository.MonthlySummaryRepository;
 import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.Domain;
-import pl.sg.application.service.DomainService;
+import pl.sg.integrations.nodrigen.model.transcations.NodrigenTransaction;
+import pl.sg.integrations.nodrigen.repository.NodrigenTransactionRepository;
 
 import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.Currency;
 import java.util.List;
@@ -33,26 +34,25 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
     private final ExpenseRepository expenseRepository;
 
     private final AccountsService accountsService;
-    private final DomainService domainService;
     private final TransactionsService transactionsService;
     private final MonthlySummaryRepository monthlySummaryRepository;
+    private final NodrigenTransactionRepository nodrigenTransactionRepository;
     private final PiggyBanksService piggyBanksService;
 
     public BillingPeriodsJPAService(BillingPeriodRepository billingPeriodRepository,
                                     IncomeRepository incomeRepository,
                                     ExpenseRepository expenseRepository,
                                     AccountsService accountsService,
-                                    DomainService domainService,
                                     TransactionsService transactionsService,
                                     MonthlySummaryRepository monthlySummaryRepository,
-                                    PiggyBanksService piggyBanksService) {
+                                    NodrigenTransactionRepository nodrigenTransactionRepository, PiggyBanksService piggyBanksService) {
         this.accountsService = accountsService;
         this.billingPeriodRepository = billingPeriodRepository;
         this.incomeRepository = incomeRepository;
         this.expenseRepository = expenseRepository;
-        this.domainService = domainService;
         this.transactionsService = transactionsService;
         this.monthlySummaryRepository = monthlySummaryRepository;
+        this.nodrigenTransactionRepository = nodrigenTransactionRepository;
         this.piggyBanksService = piggyBanksService;
     }
 
@@ -113,31 +113,57 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
 
     @Override
     public void addIncome(Account account, Income income) {
+        addIncome2(account, income);
+    }
+
+    @Override
+    public void addIncome(Account account, Income income, int nodrigenTransactionId) {
+        NodrigenTransaction nodrigenTransaction = nodrigenTransactionRepository.getOne(nodrigenTransactionId);
+        validateNodrigenTransactionBelongsToAnAccount(account, nodrigenTransaction);
+        nodrigenTransaction.setCreditTransaction(addIncome2(account, income));
+        nodrigenTransactionRepository.save(nodrigenTransaction);
+    }
+
+    private FinancialTransaction addIncome2(Account account, Income income) {
         BillingPeriod billingPeriod = unfinishedCurrentBillingPeriod(account.getDomain());
 
         validateCurrency(account, income.getCurrency());
 
-        transactionsService.credit(account, income.getAmount(), income.getIncomeDate().atStartOfDay(), income.getDescription());
+        FinancialTransaction ft = transactionsService.credit(account, income.getAmount(), income.getIncomeDate().atStartOfDay(), income.getDescription());
         income.setBillingPeriod(billingPeriod);
         if (income.getIncomeDate() == null) {
             income.setIncomeDate(LocalDate.now());
         }
         incomeRepository.save(income);
+        return ft;
     }
 
     @Override
     public void addExpense(Account account, Expense expense) {
+        addExpense2(account, expense);
+    }
+
+    @Override
+    public void addExpense(Account account, Expense expense, int nodrigenTransactionId) {
+        NodrigenTransaction nodrigenTransaction = nodrigenTransactionRepository.getOne(nodrigenTransactionId);
+        validateNodrigenTransactionBelongsToAnAccount(account, nodrigenTransaction);
+        nodrigenTransaction.setDebitTransaction(addExpense2(account, expense));
+        nodrigenTransactionRepository.save(nodrigenTransaction);
+    }
+
+    private FinancialTransaction addExpense2(Account account, Expense expense) {
         BillingPeriod billingPeriod = unfinishedCurrentBillingPeriod(account.getDomain());
 
         validateCurrency(account, expense.getCurrency());
         validateAmount(account, expense.getAmount());
 
-        transactionsService.debit(account, expense.getAmount(), expense.getExpenseDate().atStartOfDay(), expense.getDescription());
+        FinancialTransaction ft = transactionsService.debit(account, expense.getAmount(), expense.getExpenseDate().atStartOfDay(), expense.getDescription());
         expense.setBillingPeriod(billingPeriod);
         if (expense.getDescription() == null) {
             expense.setExpenseDate(LocalDate.now());
         }
         expenseRepository.save(expense);
+        return ft;
     }
 
     private BillingPeriod unfinishedCurrentBillingPeriod(Domain domain) {
@@ -155,5 +181,12 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
         if (!account.getCurrency().equals(currency)) {
             throw new AccountsException("Account and income currencies differ");
         }
+    }
+
+    private void validateNodrigenTransactionBelongsToAnAccount(Account account, NodrigenTransaction nodrigenTransaction) {
+        if (!account.getId().equals(nodrigenTransaction.getBankAccount().getAccount().getId())) {
+            throw new AccountsException("Nodrigen transaction not for the same acconut");
+        }
+
     }
 }

@@ -418,11 +418,11 @@ public class NodrigenTransaction {
     }
 
     public NodrigenTransaction setResetIn(NodrigenTransaction resetIn) {
-        if (resetIn != null && resetIn.isHandled() && (resetIn.getResetIn() == null || resetIn.getResetIn() != this)) {
+        if (resetIn != null && (resetIn.isHandled() && resetIn.getResetIn() == null && resetIn.getResetIn() != this)) {
             throw new RuntimeException("Can not reset handled transaction");
         }
         this.resetIn = resetIn;
-        if (resetIn != null) {
+        if (resetIn.getResetIn() == null) {
             resetIn.setResetIn(this);
         }
         return this;
