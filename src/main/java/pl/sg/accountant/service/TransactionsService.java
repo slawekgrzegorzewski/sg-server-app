@@ -2,7 +2,6 @@ package pl.sg.accountant.service;
 
 import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.model.accounts.FinancialTransaction;
-import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.Domain;
 
 import java.math.BigDecimal;
@@ -14,11 +13,15 @@ public interface TransactionsService {
 
     FinancialTransaction transferMoneyWithoutConversion(Account source, Account destination, BigDecimal amount,
                                                         String description);
+
+    FinancialTransaction transferCashWithoutConversionWithBankTransactions(Account source, Account destination, BigDecimal amount, String description, int firstBankTransactionId);
     FinancialTransaction transferMoneyWithoutConversionWithBankTransactions(Account source, Account destination, BigDecimal amount,
                                                         String description, int firstBankTransactionId, int secondBankTransactionId);
 
     FinancialTransaction transferMoneyWithConversion(Account source, Account destination, BigDecimal amount, BigDecimal targetAmount,
                                                      BigDecimal rate, String description);
+
+    FinancialTransaction transferCashWithConversionWithBankTransactions(Account source, Account destination, BigDecimal amount, BigDecimal targetAmount, BigDecimal rate, String description, int firstBankTransactionId);
     FinancialTransaction transferMoneyWithConversionWithBankTransactions(Account source, Account destination, BigDecimal amount, BigDecimal targetAmount,
                                                      BigDecimal rate, String description, int firstBankTransactionId, int secondBankTransactionId);
 
@@ -29,5 +32,4 @@ public interface TransactionsService {
     FinancialTransaction debit(Account account, BigDecimal amount, String description);
 
     FinancialTransaction debit(Account account, BigDecimal amount, LocalDateTime transactionDate, String description);
-
 }

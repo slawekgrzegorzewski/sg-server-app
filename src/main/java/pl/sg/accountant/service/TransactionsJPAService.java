@@ -47,8 +47,18 @@ public class TransactionsJPAService implements TransactionsService {
     }
 
     @Override
-    public FinancialTransaction transferMoneyWithoutConversionWithBankTransactions(Account source, Account destination, BigDecimal amount, String description, int firstBankTransactionId, int secondBankTransactionId) {
+    public FinancialTransaction transferCashWithoutConversionWithBankTransactions(Account source, Account destination, BigDecimal amount, String description, int firstBankTransactionId) {
+        NodrigenTransaction firstTransaction = nodrigenTransactionRepository.getOne(firstBankTransactionId);
+        validateSameDomain(source.getDomain(), destination.getDomain());
+        validateSameDomain(source.getDomain(), firstTransaction.getBankAccount().getDomain());
+        FinancialTransaction transfer = transfer(source, destination, description, amount, amount, BigDecimal.ONE);
+        firstTransaction.setDebitTransaction(transfer);
+        nodrigenTransactionRepository.save(firstTransaction);
+        return transfer;
+    }
 
+    @Override
+    public FinancialTransaction transferMoneyWithoutConversionWithBankTransactions(Account source, Account destination, BigDecimal amount, String description, int firstBankTransactionId, int secondBankTransactionId) {
         NodrigenTransaction firstTransaction = nodrigenTransactionRepository.getOne(firstBankTransactionId);
         NodrigenTransaction secondTransaction = nodrigenTransactionRepository.getOne(secondBankTransactionId);
         validateSameDomain(source.getDomain(), destination.getDomain());
@@ -76,6 +86,17 @@ public class TransactionsJPAService implements TransactionsService {
                                                             BigDecimal targetAmount, BigDecimal rate, String description) {
         validateSameDomain(source.getDomain(), destination.getDomain());
         return transfer(source, destination, description, amount, targetAmount, rate);
+    }
+
+    @Override
+    public FinancialTransaction transferCashWithConversionWithBankTransactions(Account source, Account destination, BigDecimal amount, BigDecimal targetAmount, BigDecimal rate, String description, int firstBankTransactionId) {
+        NodrigenTransaction firstTransaction = nodrigenTransactionRepository.getOne(firstBankTransactionId);
+        validateSameDomain(source.getDomain(), destination.getDomain());
+        validateSameDomain(source.getDomain(), firstTransaction.getBankAccount().getDomain());
+        FinancialTransaction transfer = transfer(source, destination, description, amount, targetAmount, rate);
+        firstTransaction.setDebitTransaction(transfer);
+        nodrigenTransactionRepository.save(firstTransaction);
+        return transfer;
     }
 
     @Override
