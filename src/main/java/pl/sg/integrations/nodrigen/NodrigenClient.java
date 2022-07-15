@@ -187,7 +187,7 @@ public class NodrigenClient {
     }
 
     private boolean refreshTokenExpired(LocalDateTime now, NodrigenAccess nodrigenAccess) {
-        return nodrigenAccess.getRefreshExpiresAt().map(d -> d.isBefore(now)).orElse(false);
+        return nodrigenAccess.getRefreshExpiresAt().map(d -> d.minusHours(1).isBefore(now)).orElse(false);
     }
 
     private String refresh(NodrigenAccess nodrigenAccess) {

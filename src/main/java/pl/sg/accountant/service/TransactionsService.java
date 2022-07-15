@@ -14,9 +14,13 @@ public interface TransactionsService {
 
     FinancialTransaction transferMoneyWithoutConversion(Account source, Account destination, BigDecimal amount,
                                                         String description);
+    FinancialTransaction transferMoneyWithoutConversionWithBankTransactions(Account source, Account destination, BigDecimal amount,
+                                                        String description, int firstBankTransactionId, int secondBankTransactionId);
 
     FinancialTransaction transferMoneyWithConversion(Account source, Account destination, BigDecimal amount, BigDecimal targetAmount,
                                                      BigDecimal rate, String description);
+    FinancialTransaction transferMoneyWithConversionWithBankTransactions(Account source, Account destination, BigDecimal amount, BigDecimal targetAmount,
+                                                     BigDecimal rate, String description, int firstBankTransactionId, int secondBankTransactionId);
 
     FinancialTransaction credit(Account account, BigDecimal amount, String description);
 

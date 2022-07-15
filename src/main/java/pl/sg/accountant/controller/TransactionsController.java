@@ -14,11 +14,19 @@ public interface TransactionsController {
 
     List<FinancialTransactionTO> getUserTransactions(Domain domain);
 
-    FinancialTransactionTO transfer(Account from, Account to, @PositiveOrZero BigDecimal amount, String description) ;
+    FinancialTransactionTO transfer(Account from, Account to, @PositiveOrZero BigDecimal amount, String description);
 
-    FinancialTransactionTO transferWithConversion(Account from, Account to, @PositiveOrZero BigDecimal amount, @PositiveOrZero BigDecimal targetAmount, @Positive BigDecimal rate, String description) ;
+    FinancialTransactionTO transferWithBankTransactions(
+            Account from, Account to, @PositiveOrZero BigDecimal amount,
+            String description, int firstBankTransactionId, int secondBankTransactionId);
 
-    FinancialTransactionTO credit(Account account, @PositiveOrZero BigDecimal amount, String description) ;
+    FinancialTransactionTO transferWithConversion(Account from, Account to, @PositiveOrZero BigDecimal amount, @PositiveOrZero BigDecimal targetAmount, @Positive BigDecimal rate, String description);
 
-    FinancialTransactionTO debit(Account account, @PositiveOrZero BigDecimal amount, String description) ;
+    FinancialTransactionTO transferWithConversionWithBankTransactions(
+            Account from, Account to, @PositiveOrZero BigDecimal amount, @PositiveOrZero BigDecimal targetAmount,
+            @Positive BigDecimal rate, String description, int firstBankTransactionId, int secondBankTransactionId);
+
+    FinancialTransactionTO credit(Account account, @PositiveOrZero BigDecimal amount, String description);
+
+    FinancialTransactionTO debit(Account account, @PositiveOrZero BigDecimal amount, String description);
 }
