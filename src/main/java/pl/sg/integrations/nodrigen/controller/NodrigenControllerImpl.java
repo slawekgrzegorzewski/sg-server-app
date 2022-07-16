@@ -5,10 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.sg.accountant.repository.AccountRepository;
 import pl.sg.application.model.Domain;
-import pl.sg.application.security.annotations.PathVariableWithDomain;
 import pl.sg.application.security.annotations.RequestDomain;
 import pl.sg.application.security.annotations.TokenBearerAuth;
-import pl.sg.integrations.nodrigen.model.transcations.NodrigenTransaction;
 import pl.sg.integrations.nodrigen.repository.NodrigenTransactionsToImportRepository;
 import pl.sg.integrations.nodrigen.services.NodrigenService;
 import pl.sg.integrations.nodrigen.NodrigenClient;
@@ -119,5 +117,12 @@ public class NodrigenControllerImpl implements NodrigenController {
     public void mutuallyCancelTransactions(
             @RequestDomain Domain domain, @PathVariable int firstTransactionId, @PathVariable int secondTransactionId) {
         this.nodrigenService.mutuallyCancelTransactions(domain, firstTransactionId, secondTransactionId);
+    }
+
+    @Override
+    @PostMapping("/fetch/{bankAccountExternalId}")
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
+    public void fetch(@RequestDomain Domain domain, @PathVariable String bankAccountExternalId) {
+        this.nodrigenService.fetch(domain, bankAccountExternalId);
     }
 }

@@ -2,6 +2,7 @@ package pl.sg.integrations.nodrigen.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import pl.sg.accountant.model.accounts.FinancialTransaction;
 import pl.sg.application.model.Domain;
@@ -28,4 +29,6 @@ public interface NodrigenController {
 
     List<NodrigenTransactionsToImportTO> getNodrigenTransactionsToImport(Domain domain);
     void mutuallyCancelTransactions(Domain domain, int firstTransactionId, int secondTransactionId);
+
+    void fetch(Domain domain, String bankAccountExternalId);
 }

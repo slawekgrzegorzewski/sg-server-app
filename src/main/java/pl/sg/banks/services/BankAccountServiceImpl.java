@@ -1,5 +1,6 @@
 package pl.sg.banks.services;
 
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.stereotype.Controller;
 import pl.sg.accountant.model.AccountsException;
 import pl.sg.accountant.model.accounts.Account;
@@ -61,24 +62,20 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     @Override
     public void fetchAllTransactions(Domain domain) {
+        bankAccountRepository.findAllBankAccounts(domain).forEach(this::fetchAccountTransactions);
+    }
 
-        Map<BankAccount, Transactions> allTransactionsFromNodrigen = bankAccountRepository.findAllBankAccounts(domain)
-                .stream()
-                .map(bankAccount ->
-                        new AbstractMap.SimpleEntry<>(
-                                bankAccount,
-                                nodrigenClient.getTransactions(UUID.fromString(bankAccount.getExternalId()))
-                                        .map(t -> t.transactions).orElse(null)
-                        ))
-                .filter(bankAccountOptionalSimpleEntry -> bankAccountOptionalSimpleEntry.getValue() != null)
-                .collect(Collectors.toMap(
-                        AbstractMap.SimpleEntry::getKey,
-                        AbstractMap.SimpleEntry::getValue
-                ));
+    @Override
+    public void fetchAccountTransactions(BankAccount bankAccount) {
+        Transactions allTransactionsFromNodrigen =
+                nodrigenClient.getTransactions(UUID.fromString(bankAccount.getExternalId()))
+                        .map(t -> t.transactions)
+                        .orElseGet(Transactions::new);
 
-        List<String> allNodrigenTransactionIds = allTransactionsFromNodrigen.values()
-                .stream()
-                .flatMap(transactions -> Stream.concat(transactions.booked.stream(), transactions.pending.stream()))
+        List<String> allNodrigenTransactionIds = Stream.concat(
+                        allTransactionsFromNodrigen.booked.stream(),
+                        allTransactionsFromNodrigen.pending.stream()
+                )
                 .map(transaction -> transaction.transactionId)
                 .collect(Collectors.toList());
 
@@ -91,17 +88,16 @@ public class BankAccountServiceImpl implements BankAccountService {
 
         LocalDateTime now = LocalDateTime.now();
         List<NodrigenTransaction> toSave = new ArrayList<>();
-        allTransactionsFromNodrigen.forEach((bankAccount, transactions) -> {
-            transactions.booked.stream()
-                    .filter(transaction -> !transactionsExists(existingTransactions, transaction, bankAccount))
-                    .map(transaction -> mapToDb(transaction, bankAccount, now, NodrigenPhase.BOOKED))
-                    .collect(Collectors.toCollection(() -> toSave));
-            transactions.pending.stream()
-                    .filter(transaction -> !transactionsExists(existingTransactions, transaction, bankAccount))
-                    .map(transaction -> mapToDb(transaction, bankAccount, now, NodrigenPhase.PENDING))
-                    .collect(Collectors.toCollection(() -> toSave));
-        });
+        allTransactionsFromNodrigen.booked.stream()
+                .filter(transaction -> !transactionsExists(existingTransactions, transaction, bankAccount))
+                .map(transaction -> mapToDb(transaction, bankAccount, now, NodrigenPhase.BOOKED))
+                .collect(Collectors.toCollection(() -> toSave));
+        allTransactionsFromNodrigen.pending.stream()
+                .filter(transaction -> !transactionsExists(existingTransactions, transaction, bankAccount))
+                .map(transaction -> mapToDb(transaction, bankAccount, now, NodrigenPhase.PENDING))
+                .collect(Collectors.toCollection(() -> toSave));
         nodrigenTransactionRepository.saveAll(toSave);
+
     }
 
     private boolean transactionsExists(Map<String, List<NodrigenTransaction>> existingTransactions, Transaction transaction, BankAccount bankAccount) {
@@ -193,25 +189,21 @@ public class BankAccountServiceImpl implements BankAccountService {
     @Override
     public void fetchAllBalances(Domain domain) {
 
-        Map<BankAccount, Balance[]> allTransactionsFromNodrigen = bankAccountRepository.findAllBankAccounts(domain)
-                .stream()
-                .map(bankAccount ->
-                        new AbstractMap.SimpleEntry<>(
-                                bankAccount,
-                                nodrigenClient.getBalances(UUID.fromString(bankAccount.getExternalId())).map(b -> b.balances).orElse(null)
-                        ))
-                .filter(bankAccountSimpleEntry -> bankAccountSimpleEntry.getValue() != null)
-                .collect(Collectors.toMap(
-                        AbstractMap.SimpleEntry::getKey,
-                        AbstractMap.SimpleEntry::getValue
-                ));
+        bankAccountRepository.findAllBankAccounts(domain).forEach(this::fetchAccountBalances);
+    }
+
+    @Override
+    public void fetchAccountBalances(BankAccount bankAccount) {
+
+        Balance[] allTransactionsFromNodrigen = nodrigenClient
+                .getBalances(UUID.fromString(bankAccount.getExternalId()))
+                .map(b -> b.balances)
+                .orElseGet(() -> new Balance[0]);
         LocalDateTime now = LocalDateTime.now();
         List<NodrigenBankAccountBalance> toSave = new ArrayList<>();
-        allTransactionsFromNodrigen.forEach((bankAccount, balances) -> {
-            Arrays.stream(balances)
-                    .map(balance -> mapBalance(balance, bankAccount, now))
-                    .collect(Collectors.toCollection(() -> toSave));
-        });
+        Arrays.stream(allTransactionsFromNodrigen)
+                .map(balance -> mapBalance(balance, bankAccount, now))
+                .collect(Collectors.toCollection(() -> toSave));
         nodrigenBankAccountBalanceRepository.saveAll(toSave);
     }
 

@@ -4,6 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.http.client.BufferingClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -13,6 +16,7 @@ import pl.sg.integrations.nodrigen.model.rest.balances.BalancesMain;
 import pl.sg.integrations.nodrigen.model.rest.transactions.TransactionsMain;
 import pl.sg.integrations.nodrigen.repository.NodrigenAccessRepository;
 import pl.sg.integrations.nodrigen.transport.NodrigenPermissionRequest;
+import pl.sg.utils.DebugRestTemplateInterceptor;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -44,7 +48,10 @@ public class NodrigenClient {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(ensureAccess());
-            ResponseEntity<String> response = new RestTemplate().exchange(RequestEntity.get(new URI(nodrigenUrl + "institutions/?country=" + country)).headers(headers).build(), String.class);
+            ResponseEntity<String> response = createDebuggingRestTemplate()
+                    .exchange(
+                            RequestEntity.get(new URI(nodrigenUrl + "institutions/?country=" + country)).headers(headers).build(),
+                            String.class);
             return returnOkIf429(response, "list institutions" + country, "");
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
@@ -58,12 +65,11 @@ public class NodrigenClient {
             agreementHeaders.setBearerAuth(token);
             agreementHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
             AgreementCreationRequest agreementCreationRequest = new AgreementCreationRequest(nodrigenPermissionRequest.getMaxHistoricalDays(), 90, new String[]{"balances", "details", "transactions"}, nodrigenPermissionRequest.getInstitutionId());
-            HttpEntity<AgreementCreationRequest> agreementRequest = new HttpEntity<>(agreementCreationRequest, agreementHeaders);
             return logErrorCodeAndReturnOptional(
-                    RequestEntity.post(new URI(nodrigenUrl + "/agreements/enduser/"))
-                            .body(agreementRequest),
+                    RequestEntity.post(new URI(nodrigenUrl + "agreements/enduser/")).headers(agreementHeaders).body(agreementCreationRequest),
                     AgreementCreationResponse.class,
-                    "create agreement " + agreementCreationRequest);
+                    "create agreement " + agreementCreationRequest,
+                    createDebuggingRestTemplate());
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -77,11 +83,11 @@ public class NodrigenClient {
             headers.setAccept(List.of(MediaType.APPLICATION_JSON));
             headers.setBearerAuth(token);
             RequisitionCreationRequest requisitionCreationRequest = new RequisitionCreationRequest(nodrigenPermissionRequest.getRedirect(), nodrigenPermissionRequest.getInstitutionId(), requisitionId, reference, nodrigenPermissionRequest.getUserLanguage(), false, false);
-            HttpEntity<RequisitionCreationRequest> requisitionRequest = new HttpEntity<>(requisitionCreationRequest, headers);
             return logErrorCodeAndReturnOptional(
-                    RequestEntity.post(new URI(nodrigenUrl + "/requisitions/")).body(requisitionRequest),
+                    RequestEntity.post(new URI(nodrigenUrl + "requisitions/")).headers(headers).body(requisitionCreationRequest),
                     Requisition.class,
-                    "create requisition " + requisitionCreationRequest);
+                    "create requisition " + requisitionCreationRequest,
+                    createDebuggingRestTemplate());
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -93,8 +99,8 @@ public class NodrigenClient {
             headers.setBearerAuth(ensureAccess());
             return logErrorCodeAndReturnOptional(
                     RequestEntity.get(new URI(nodrigenUrl + "requisitions/" + requisitionId + "/")).headers(headers).build(),
-                    Requisition.class,
-                    "get requisituion " + requisitionId);
+                    Requisition.class, "get requisituion " + requisitionId,
+                    createDebuggingRestTemplate());
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -107,7 +113,8 @@ public class NodrigenClient {
             return logErrorCodeAndReturnOptional(
                     RequestEntity.get(new URI(nodrigenUrl + "accounts/" + bankAccountId + "/details")).headers(headers).build(),
                     AccountDetails.class,
-                    "get account details " + bankAccountId);
+                    "get account details " + bankAccountId,
+                    createDebuggingRestTemplate());
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -118,10 +125,8 @@ public class NodrigenClient {
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(ensureAccess());
             return logErrorCodeAndReturnOptional(
-                    RequestEntity.get(new URI(nodrigenUrl + "accounts/" + bankAccountId + "/transactions/"))
-                            .headers(headers).build(),
-                    TransactionsMain.class,
-                    "get transactions " + bankAccountId);
+                    RequestEntity.get(new URI(nodrigenUrl + "accounts/" + bankAccountId + "/transactions/")).headers(headers).build(),
+                    TransactionsMain.class, "get transactions " + bankAccountId, createDebuggingRestTemplate());
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -132,19 +137,18 @@ public class NodrigenClient {
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(ensureAccess());
             return logErrorCodeAndReturnOptional(
-                    RequestEntity.get(new URI(nodrigenUrl + "accounts/" + bankAccountId + "/balances/"))
-                            .headers(headers)
-                            .build(),
+                    RequestEntity.get(new URI(nodrigenUrl + "accounts/" + bankAccountId + "/balances/")).headers(headers).build(),
                     BalancesMain.class,
-                    "get balances " + bankAccountId);
+                    "get balances " + bankAccountId,
+                    createDebuggingRestTemplate());
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private <T> Optional<T> logErrorCodeAndReturnOptional(RequestEntity<?> request, Class<T> entityClass, String requestDescription) {
+    private <T> Optional<T> logErrorCodeAndReturnOptional(RequestEntity<?> request, Class<T> entityClass, String requestDescription, RestTemplate restTemplate) {
         try {
-            ResponseEntity<T> response = new RestTemplate().exchange(request, entityClass);
+            ResponseEntity<T> response = restTemplate.exchange(request, entityClass);
             if (!response.getStatusCode().is2xxSuccessful()) {
                 LOG.warn("Problem with " + requestDescription + ofNullable(response.getBody()).map(v -> " - " + v).orElse(""));
                 return empty();
@@ -191,11 +195,11 @@ public class NodrigenClient {
     }
 
     private String refresh(NodrigenAccess nodrigenAccess) {
-        RestTemplate restTemplate = new RestTemplate();
+        RestTemplate restTemplate = createDebuggingRestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         HttpEntity<RefreshTokenRequest> request = new HttpEntity<>(new RefreshTokenRequest(nodrigenAccess.getRefreshToken().orElseThrow()), headers);
-        ResponseEntity<RefreshTokenResponse> response = restTemplate.postForEntity(nodrigenUrl + "/token/refresh/", request, RefreshTokenResponse.class);
+        ResponseEntity<RefreshTokenResponse> response = restTemplate.postForEntity(nodrigenUrl + "token/refresh/", request, RefreshTokenResponse.class);
 
         if (response.getStatusCode().is2xxSuccessful()) {
             nodrigenAccess.setAccessToken(response.getBody().getAccess());
@@ -211,11 +215,11 @@ public class NodrigenClient {
     private String getNew() {
         nodrigenAccessRepository.archiveAll(LocalDateTime.now());
 
-        RestTemplate restTemplate = new RestTemplate();
+        RestTemplate restTemplate = createDebuggingRestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         HttpEntity<NewTokenRequest> request = new HttpEntity<>(new NewTokenRequest(nordigenSecretId, nordigenSecretKey), headers);
-        ResponseEntity<NewTokenResponse> response = restTemplate.postForEntity(nodrigenUrl + "/token/new/", request, NewTokenResponse.class);
+        ResponseEntity<NewTokenResponse> response = restTemplate.postForEntity(nodrigenUrl + "token/new/", request, NewTokenResponse.class);
 
         if (response.getStatusCode().is2xxSuccessful()) {
             NodrigenAccess nodrigenAccess = new NodrigenAccess();
@@ -230,5 +234,16 @@ public class NodrigenClient {
         } else {
             throw new RuntimeException("Could not get nodrigen access token");
         }
+    }
+
+    private RestTemplate createRestTemplate() {
+        return new RestTemplate();
+    }
+
+    private RestTemplate createDebuggingRestTemplate() {
+        ClientHttpRequestFactory factory = new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory());
+        RestTemplate restTemplate = new RestTemplate(factory);
+        restTemplate.setInterceptors(List.of(new DebugRestTemplateInterceptor()));
+        return restTemplate;
     }
 }

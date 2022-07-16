@@ -2,16 +2,14 @@ package pl.sg.integrations.nodrigen.services;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import pl.sg.accountant.model.AccountsException;
-import pl.sg.accountant.model.accounts.FinancialTransaction;
 import pl.sg.accountant.repository.FinancialTransactionRepository;
 import pl.sg.application.model.Domain;
 import pl.sg.banks.model.BankAccount;
 import pl.sg.banks.repositories.BankAccountRepository;
+import pl.sg.banks.services.BankAccountService;
 import pl.sg.integrations.nodrigen.NodrigenClient;
-import pl.sg.integrations.nodrigen.controller.MatchingMode;
 import pl.sg.integrations.nodrigen.model.NodrigenBankPermission;
 import pl.sg.integrations.nodrigen.model.rest.Account;
 import pl.sg.integrations.nodrigen.model.transcations.NodrigenTransaction;
@@ -19,19 +17,16 @@ import pl.sg.integrations.nodrigen.repository.NodrigenBankPermissionRepository;
 import pl.sg.integrations.nodrigen.repository.NodrigenTransactionRepository;
 import pl.sg.integrations.nodrigen.repository.NodrigenTransactionsToImportRepository;
 import pl.sg.integrations.nodrigen.transport.NodrigenPermissionRequest;
-import pl.sg.integrations.nodrigen.transport.NodrigenTransactionsToImportTO;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static java.util.Optional.ofNullable;
 
 @Controller
 public class NodrigenServiceImpl implements NodrigenService {
 
     private final BankAccountRepository bankAccountRepository;
+    private final BankAccountService bankAccountService;
     private final FinancialTransactionRepository financialTransactionRepository;
     private final ModelMapper modelMapper;
     private final NodrigenBankPermissionRepository nodrigenBankPermissionRepository;
@@ -39,8 +34,9 @@ public class NodrigenServiceImpl implements NodrigenService {
     private final NodrigenTransactionRepository nodrigenTransactionRepository;
     private final NodrigenTransactionsToImportRepository nodrigenTransactionsToImportRepository;
 
-    public NodrigenServiceImpl(BankAccountRepository bankAccountRepository, FinancialTransactionRepository financialTransactionRepository, ModelMapper modelMapper, NodrigenBankPermissionRepository nodrigenBankPermissionRepository, NodrigenClient nodrigenClient, NodrigenTransactionRepository nodrigenTransactionRepository, NodrigenTransactionsToImportRepository nodrigenTransactionsToImportRepository) {
+    public NodrigenServiceImpl(BankAccountRepository bankAccountRepository, BankAccountService bankAccountService, FinancialTransactionRepository financialTransactionRepository, ModelMapper modelMapper, NodrigenBankPermissionRepository nodrigenBankPermissionRepository, NodrigenClient nodrigenClient, NodrigenTransactionRepository nodrigenTransactionRepository, NodrigenTransactionsToImportRepository nodrigenTransactionsToImportRepository) {
         this.bankAccountRepository = bankAccountRepository;
+        this.bankAccountService = bankAccountService;
         this.financialTransactionRepository = financialTransactionRepository;
         this.modelMapper = modelMapper;
         this.nodrigenBankPermissionRepository = nodrigenBankPermissionRepository;
@@ -109,6 +105,15 @@ public class NodrigenServiceImpl implements NodrigenService {
         firstTransaction.setResetIn(secondTransaction);
         nodrigenTransactionRepository.save(firstTransaction);
         nodrigenTransactionRepository.save(secondTransaction);
+    }
+
+    @Override
+    public void fetch(Domain domain, String bankAccountExternalId) {
+        BankAccount bankAccount = bankAccountRepository.getBankAccountByExternalId(bankAccountExternalId);
+        validateSameDomain(bankAccount.getDomain(), domain);
+        bankAccountService.fetchAccountBalances(bankAccount);
+        bankAccountService.fetchAccountTransactions(bankAccount);
+
     }
 
     private void validateSameDomain(Domain first, Domain second) {
