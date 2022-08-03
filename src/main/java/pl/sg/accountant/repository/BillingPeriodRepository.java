@@ -19,7 +19,6 @@ public interface BillingPeriodRepository extends JpaRepository<BillingPeriod, In
     @Query("SELECT bp FROM BillingPeriod bp LEFT JOIN bp.monthSummary ms LEFT JOIN bp.domain d WHERE ms IS NULL AND d = ?1 and bp.period = ?2")
     Optional<BillingPeriod> unfinishedBillingPeriod(Domain domain, YearMonth month);
 
-    default Optional<BillingPeriod> unfinishedCurrentBillingPeriod(Domain domain) {
-        return this.unfinishedBillingPeriod(domain, YearMonth.now());
-    }
+    @Query("SELECT bp FROM BillingPeriod bp LEFT JOIN bp.monthSummary ms LEFT JOIN bp.domain d WHERE ms IS NULL AND d = ?1")
+    Optional<BillingPeriod> lastUnfinishedBillingPeriod(Domain domain);
 }

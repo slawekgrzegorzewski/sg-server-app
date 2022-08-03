@@ -125,15 +125,17 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
     }
 
     private FinancialTransaction addIncome2(Account account, Income income) {
-        BillingPeriod billingPeriod = unfinishedCurrentBillingPeriod(account.getDomain());
+        BillingPeriod billingPeriod = unfinishedCurrentOrPreviousMonthBillingPeriod(account.getDomain());
+        if (income.getIncomeDate() == null) {
+            income.setIncomeDate(billingPeriod.getPeriod().equals(YearMonth.now()) ? LocalDate.now() : billingPeriod.getPeriod().atEndOfMonth());
+        }
 
         validateCurrency(account, income.getCurrency());
+        validateAmount(account, income.getAmount());
+        validateDates(billingPeriod.getPeriod(), income.getIncomeDate());
 
         FinancialTransaction ft = transactionsService.credit(account, income.getAmount(), income.getIncomeDate().atStartOfDay(), income.getDescription());
         income.setBillingPeriod(billingPeriod);
-        if (income.getIncomeDate() == null) {
-            income.setIncomeDate(LocalDate.now());
-        }
         incomeRepository.save(income);
         return ft;
     }
@@ -152,22 +154,23 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
     }
 
     private FinancialTransaction addExpense2(Account account, Expense expense) {
-        BillingPeriod billingPeriod = unfinishedCurrentBillingPeriod(account.getDomain());
+        BillingPeriod billingPeriod = unfinishedCurrentOrPreviousMonthBillingPeriod(account.getDomain());
+        if (expense.getExpenseDate() == null) {
+            expense.setExpenseDate(billingPeriod.getPeriod().equals(YearMonth.now()) ? LocalDate.now() : billingPeriod.getPeriod().atEndOfMonth());
+        }
 
         validateCurrency(account, expense.getCurrency());
         validateAmount(account, expense.getAmount());
+        validateDates(billingPeriod.getPeriod(), expense.getExpenseDate());
 
         FinancialTransaction ft = transactionsService.debit(account, expense.getAmount(), expense.getExpenseDate().atStartOfDay(), expense.getDescription());
         expense.setBillingPeriod(billingPeriod);
-        if (expense.getDescription() == null) {
-            expense.setExpenseDate(LocalDate.now());
-        }
         expenseRepository.save(expense);
         return ft;
     }
 
-    private BillingPeriod unfinishedCurrentBillingPeriod(Domain domain) {
-        return this.billingPeriodRepository.unfinishedCurrentBillingPeriod(domain)
+    private BillingPeriod unfinishedCurrentOrPreviousMonthBillingPeriod(Domain domain) {
+        return this.billingPeriodRepository.lastUnfinishedBillingPeriod(domain)
                 .orElseThrow(() -> new EntityNotFoundException("No current billing period available to create an income"));
     }
 
@@ -187,6 +190,12 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
         if (!account.getId().equals(nodrigenTransaction.getBankAccount().getAccount().getId())) {
             throw new AccountsException("Nodrigen transaction not for the same acconut");
         }
+    }
 
+    private void validateDates(YearMonth period, LocalDate date) {
+        YearMonth dateYearMonth = YearMonth.from(date);
+        if (period.equals(dateYearMonth)) {
+            throw new AccountsException("Expense/Income date must be in bounds of the most recent unfinished billing period");
+        }
     }
 }
