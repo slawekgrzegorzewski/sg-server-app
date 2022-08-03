@@ -194,7 +194,7 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
 
     private void validateDates(YearMonth period, LocalDate date) {
         YearMonth dateYearMonth = YearMonth.from(date);
-        if (period.equals(dateYearMonth)) {
+        if (!period.equals(dateYearMonth)) {
             throw new AccountsException("Expense/Income date must be in bounds of the most recent unfinished billing period");
         }
     }
