@@ -4,6 +4,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import pl.sg.application.repository.DomainRepository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
+
 @Component
 public class BankAccountsDataFetcher {
 
@@ -23,5 +27,12 @@ public class BankAccountsDataFetcher {
     @Scheduled(cron = "${cron.fetch-accounts}", zone = "Europe/Warsaw")
     public void fetchAllBalances() {
         domainRepository.findAll().forEach(bankAccountService::fetchAllBalances);
+    }
+
+    @Scheduled(cron = "${cron.fetch-accounts-monthly}", zone = "Europe/Warsaw")
+    public void fetchAllBalancesAtTheEndOfMonth() {
+        if (LocalDate.now().equals(YearMonth.now().atEndOfMonth())) {
+            domainRepository.findAll().forEach(bankAccountService::fetchAllBalances);
+        }
     }
 }
