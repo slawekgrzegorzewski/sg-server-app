@@ -30,6 +30,7 @@ public class NodrigenTransactionsToImport {
     private Integer debitBankAccountId;
     private Integer creditNodrigenTransactionId;
     private Integer debitNodrigenTransactionId;
+    private Integer nodrigenTransactionId;
 
     public Long getId() {
         return id;
@@ -88,6 +89,10 @@ public class NodrigenTransactionsToImport {
 
     public Account getDestinationAccount() {
         return destinationAccount;
+    }
+
+    public Integer getNodrigenTransactionId() {
+        return nodrigenTransactionId;
     }
 
     public NodrigenTransactionsToImport setDestinationAccount(Account destinationAccount) {

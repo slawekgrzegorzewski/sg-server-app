@@ -28,7 +28,10 @@ public interface NodrigenController {
     List<NodrigenBankPermissionTO> getPermissionToProceed(Domain domain, NodrigenPermissionRequest nodrigenPermissionRequest);
 
     List<NodrigenTransactionsToImportTO> getNodrigenTransactionsToImport(Domain domain);
+
     void mutuallyCancelTransactions(Domain domain, int firstTransactionId, int secondTransactionId);
+
+    void ignoreTransactions(Domain domain, int transactionId);
 
     void fetch(Domain domain, String bankAccountExternalId);
 }

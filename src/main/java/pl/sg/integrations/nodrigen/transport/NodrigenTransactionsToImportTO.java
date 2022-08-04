@@ -19,11 +19,12 @@ public class NodrigenTransactionsToImportTO {
     private Integer debitBankAccountId;
     private Integer creditNodrigenTransactionId;
     private Integer debitNodrigenTransactionId;
+    private Integer nodrigenTransactionId;
 
     public NodrigenTransactionsToImportTO() {
     }
 
-    public NodrigenTransactionsToImportTO(Long id, Integer domainId, BigDecimal conversionRate, BigDecimal credit, BigDecimal debit, String description, Instant timeOfTransaction, AccountTO destinationAccount, AccountTO sourceAccount, Integer creditBankAccountId, Integer debitBankAccountId, Integer creditNodrigenTransactionId, Integer debitNodrigenTransactionId) {
+    public NodrigenTransactionsToImportTO(Long id, Integer domainId, BigDecimal conversionRate, BigDecimal credit, BigDecimal debit, String description, Instant timeOfTransaction, AccountTO destinationAccount, AccountTO sourceAccount, Integer creditBankAccountId, Integer debitBankAccountId, Integer creditNodrigenTransactionId, Integer debitNodrigenTransactionId, Integer nodrigenTransactionId) {
         this.id = id;
         this.domainId = domainId;
         this.conversionRate = conversionRate;
@@ -37,6 +38,7 @@ public class NodrigenTransactionsToImportTO {
         this.debitBankAccountId = debitBankAccountId;
         this.creditNodrigenTransactionId = creditNodrigenTransactionId;
         this.debitNodrigenTransactionId = debitNodrigenTransactionId;
+        this.nodrigenTransactionId = nodrigenTransactionId;
     }
 
     public Long getId() {
@@ -153,6 +155,15 @@ public class NodrigenTransactionsToImportTO {
 
     public NodrigenTransactionsToImportTO setDebitNodrigenTransactionId(Integer debitNodrigenTransactionId) {
         this.debitNodrigenTransactionId = debitNodrigenTransactionId;
+        return this;
+    }
+
+    public Integer getNodrigenTransactionId() {
+        return nodrigenTransactionId;
+    }
+
+    public NodrigenTransactionsToImportTO setNodrigenTransactionId(Integer nodrigenTransactionId) {
+        this.nodrigenTransactionId = nodrigenTransactionId;
         return this;
     }
 }

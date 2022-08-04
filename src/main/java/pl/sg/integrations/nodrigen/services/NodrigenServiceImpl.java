@@ -108,6 +108,14 @@ public class NodrigenServiceImpl implements NodrigenService {
     }
 
     @Override
+    public void ignoreTransactions(Domain domain, int transactionId) {
+        NodrigenTransaction transaction = nodrigenTransactionRepository.getOne(transactionId);
+        validateSameDomain(domain, transaction.getBankAccount().getDomain());
+        transaction.setIgnored(true);
+        nodrigenTransactionRepository.save(transaction);
+    }
+
+    @Override
     public void fetch(Domain domain, String bankAccountExternalId) {
         BankAccount bankAccount = bankAccountRepository.getBankAccountByExternalId(bankAccountExternalId);
         validateSameDomain(bankAccount.getDomain(), domain);

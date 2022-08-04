@@ -119,6 +119,15 @@ public class NodrigenControllerImpl implements NodrigenController {
         this.nodrigenService.mutuallyCancelTransactions(domain, firstTransactionId, secondTransactionId);
     }
 
+
+    @Override
+    @PutMapping("/nodrigen_ignore_transaction/{transactionId}")
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
+    public void ignoreTransactions(
+            @RequestDomain Domain domain, @PathVariable int transactionId) {
+        this.nodrigenService.ignoreTransactions(domain, transactionId);
+    }
+
     @Override
     @PostMapping("/fetch/{bankAccountExternalId}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})

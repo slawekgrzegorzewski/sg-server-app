@@ -1,8 +1,6 @@
 package pl.sg;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializer;
+import com.google.gson.*;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.spi.SourceGetter;
 import org.springframework.boot.SpringApplication;
@@ -29,6 +27,7 @@ import pl.sg.integrations.nodrigen.model.NodrigenTransactionsToImport;
 import pl.sg.integrations.nodrigen.transport.NodrigenBankPermissionTO;
 import pl.sg.integrations.nodrigen.transport.NodrigenTransactionsToImportTO;
 
+import java.lang.reflect.Type;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -168,9 +167,6 @@ public class Application {
         modelMapper.typeMap(NodrigenBankPermission.class, NodrigenBankPermissionTO.class);
         modelMapper.typeMap(BankAccount.class, BankAccountTO.class);
         modelMapper.typeMap(NodrigenTransactionsToImport.class, NodrigenTransactionsToImportTO.class);
-//                .addMappings(mp -> {
-//                    mp.skip(NodrigenTransactionsToImport::getDestinationId, N);
-//                });
         modelMapper.typeMap(FinancialTransaction.class, FinancialTransactionTO.class);
 
         return modelMapper;
@@ -294,20 +290,9 @@ public class Application {
 
     @Bean
     public Gson deserializer() {
-        return new GsonBuilder().registerTypeAdapter(LocalDate.class, (JsonDeserializer<LocalDate>) (json, type, jsonDeserializationContext) -> {
-            final String stringValue = json.getAsJsonPrimitive().getAsString();
-            try {
-                return LocalDate.parse(stringValue, DateTimeFormatter.ISO_LOCAL_DATE);
-            } catch (DateTimeParseException ex) {
-                return LocalDate.parse(stringValue, DateTimeFormatter.ISO_DATE_TIME);
-            }
-        }).registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>) (json, type, jsonDeserializationContext) -> {
-            final String stringValue = json.getAsJsonPrimitive().getAsString();
-            try {
-                return LocalDateTime.parse(stringValue, DateTimeFormatter.ISO_LOCAL_DATE);
-            } catch (DateTimeParseException ex) {
-                return LocalDateTime.parse(stringValue, DateTimeFormatter.ISO_DATE_TIME);
-            }
-        }).create();
+        return new GsonBuilder()
+                .registerTypeAdapter(LocalDate.class, new LocalDateJsonDeserializer())
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeJsonDeserializer())
+                .create();
     }
 }

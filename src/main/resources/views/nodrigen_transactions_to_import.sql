@@ -57,7 +57,8 @@ with tranasactions as (select a.id,
             credit_bank_account_id,
             debit_bank_account_id,
             case when credit > 0 then nodrigen_transaction_id end as credit_nodrigen_transaction_id,
-            case when debit > 0 then nodrigen_transaction_id end  as debit_nodrigen_transaction_id
+            case when debit > 0 then nodrigen_transaction_id end  as debit_nodrigen_transaction_id,
+            nodrigen_transaction_id
      from tranasactions
      where (institution_id <> 'REVOLUT_REVOGB21' or proprietary_bank_transaction_code <> 'EXCHANGE'))
 union
@@ -73,7 +74,8 @@ union
         nt_debit.credit_bank_account_id                                                           as credit_bank_account_id,
         nt_debit.debit_bank_account_id                                                            as debit_bank_account_id,
         nt_credit.nodrigen_transaction_id                                                         as credit_nodrigen_transaction_id,
-        nt_debit.nodrigen_transaction_id                                                          as debit_nodrigen_transaction_id
+        nt_debit.nodrigen_transaction_id                                                          as debit_nodrigen_transaction_id,
+        null
  from tranasactions nt_debit
           join tranasactions nt_credit on nt_debit.transaction_id = nt_credit.transaction_id
  where nt_debit.institution_id = 'REVOLUT_REVOGB21'
@@ -96,7 +98,8 @@ union
         null                                                                 as credit_bank_account_id,
         nt_debit.credit_bank_account_id                                      as debit_bank_account_id,
         null                                                                 as credit_nodrigen_transaction_id,
-        nt_debit.credit_bank_account_id                                      as debit_nodrigen_transaction_i
+        nt_debit.credit_bank_account_id                                      as debit_nodrigen_transaction_id,
+        null
  from tranasactions nt_debit
           join tranasactions nt_credit on nt_debit.transaction_id = nt_credit.transaction_id
  where nt_debit.institution_id = 'REVOLUT_REVOGB21'

@@ -17,5 +17,7 @@ public interface NodrigenService {
     void confirmPermission(Domain domain, String reference);
 
     void mutuallyCancelTransactions(Domain domain, int firstTransactionId, int secondTransactionId);
+    void ignoreTransactions(Domain domain, int transactionId);
+
     void fetch(Domain domain, String bankAccountExternalId);
 }
