@@ -160,7 +160,7 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
         }
 
         validateCurrency(account, expense.getCurrency());
-        validateAmount(account, expense.getAmount());
+        validateAmount(account, expense.getAmount().negate());
         validateDates(billingPeriod.getPeriod(), expense.getExpenseDate());
 
         FinancialTransaction ft = transactionsService.debit(account, expense.getAmount(), expense.getExpenseDate().atStartOfDay(), expense.getDescription());
@@ -175,7 +175,7 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
     }
 
     private void validateAmount(Account account, BigDecimal amount) {
-        if (account.getCurrentBalance().compareTo(amount) < 0) {
+        if (account.getCurrentBalance().add(amount).compareTo(BigDecimal.ZERO) < 0) {
             throw new AccountsException("There is not enough money for that expense.");
         }
     }
