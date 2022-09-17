@@ -1,6 +1,7 @@
 package pl.sg.checker.engine;
 
 import org.springframework.stereotype.Component;
+import pl.sg.application.configuration.Configuration;
 import pl.sg.checker.PageElementExtractor;
 import pl.sg.utils.PageFetcher;
 import pl.sg.checker.model.*;
@@ -18,7 +19,7 @@ public class CheckerProcessor implements CheckerContext {
     private final Map<Class<? extends CheckerStep>, Supplier<StepProcessor<? extends CheckerStep>>> processors = new HashMap<>();
     private CheckerTask task;
 
-    public CheckerProcessor(PageFetcher fetcher, PageElementExtractor pageElementExtractor, PageVersionsService pageVersionsService) {
+    public CheckerProcessor(PageFetcher fetcher, PageElementExtractor pageElementExtractor, PageVersionsService pageVersionsService, Configuration configuration) {
         this.fetcher = fetcher;
         this.pageElementExtractor = pageElementExtractor;
         processors.put(GetPageContentStep.class, () -> new GetPageStepProcessor(this, this.fetcher));
@@ -27,7 +28,7 @@ public class CheckerProcessor implements CheckerContext {
         processors.put(ExtractPageElementsStep.class, () -> new ExtractPageElementsStepProcessor(this, this.pageElementExtractor));
         processors.put(FilterElementsStep.class, () -> new FilterElementsStepProcessor(this));
         processors.put(StoreResultStep.class, () -> new StoreResultStepProcessor(this));
-        processors.put(SaveResultStep.class, () -> new SaveResultStepProcessor(this, pageVersionsService));
+        processors.put(SaveResultStep.class, () -> new SaveResultStepProcessor(this, pageVersionsService, configuration.getSendgridApiKey()));
     }
 
     public void clearContext() {

@@ -22,12 +22,14 @@ import java.util.stream.Collectors;
 public class SaveResultStepProcessor implements StepProcessor<SaveResultStep> {
     private final CheckerContext context;
     private final PageVersionsService pageVersionsService;
+    private final String sendgridApiKey;
     private final List<String> messages = new ArrayList<>();
     private Result result;
 
-    public SaveResultStepProcessor(CheckerContext context, PageVersionsService pageVersionsService) {
+    public SaveResultStepProcessor(CheckerContext context, PageVersionsService pageVersionsService, String sendgridApiKey) {
         this.context = context;
         this.pageVersionsService = pageVersionsService;
+        this.sendgridApiKey = sendgridApiKey;
     }
 
     public void process(SaveResultStep step) {
@@ -67,7 +69,7 @@ public class SaveResultStepProcessor implements StepProcessor<SaveResultStep> {
                 .forEach(personalization::addCc);
         mail.addPersonalization(personalization);
 
-        SendGrid sg = new SendGrid(System.getenv("SENDGRID_API_KEY"));
+        SendGrid sg = new SendGrid(sendgridApiKey);
         Request request = new Request();
         try {
             request.setMethod(Method.POST);

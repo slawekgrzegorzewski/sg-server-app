@@ -10,6 +10,7 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import pl.sg.application.configuration.Configuration;
 import pl.sg.integrations.nodrigen.model.NodrigenAccess;
 import pl.sg.integrations.nodrigen.model.rest.*;
 import pl.sg.integrations.nodrigen.model.rest.balances.BalancesMain;
@@ -32,16 +33,14 @@ import static java.util.Optional.ofNullable;
 public class NodrigenClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(NodrigenClient.class);
-    @Value("#{environment.NORDIGEN_SECRET_ID}")
-    private String nordigenSecretId;
-    @Value("#{environment.NORDIGEN_SECRET_KEY}")
-    private String nordigenSecretKey;
     @Value("${nodrigen.service-url}")
     private String nodrigenUrl;
     private final NodrigenAccessRepository nodrigenAccessRepository;
+    private final Configuration configuration;
 
-    public NodrigenClient(NodrigenAccessRepository nodrigenAccessRepository) {
+    public NodrigenClient(NodrigenAccessRepository nodrigenAccessRepository, Configuration configuration) {
         this.nodrigenAccessRepository = nodrigenAccessRepository;
+        this.configuration = configuration;
     }
 
     public ResponseEntity<String> listInstitutions(String country) {
@@ -218,7 +217,7 @@ public class NodrigenClient {
         RestTemplate restTemplate = createDebuggingRestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-        HttpEntity<NewTokenRequest> request = new HttpEntity<>(new NewTokenRequest(nordigenSecretId, nordigenSecretKey), headers);
+        HttpEntity<NewTokenRequest> request = new HttpEntity<>(new NewTokenRequest(configuration.getNordigenSecretId(), configuration.getNordigenSecretKey()), headers);
         ResponseEntity<NewTokenResponse> response = restTemplate.postForEntity(nodrigenUrl + "token/new/", request, NewTokenResponse.class);
 
         if (response.getStatusCode().is2xxSuccessful()) {
