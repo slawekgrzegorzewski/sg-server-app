@@ -1,2 +1,2 @@
-scp slag@grzegorzewski.org:/home/slag/sg-application/database-backups/* "D:\Development\Zrzut produkcji\database-backups"
-ssh slag@grzegorzewski.org rm -rf /home/slag/sg-application/database-backups/*
+scp slawek@grzegorzewski.org:/home/slawek/management/database-backups/* "D:\Development\Zrzut produkcji\database-backups"
+ssh slawek@grzegorzewski.org rm -rf /home/slawek/management/database-backups/*
