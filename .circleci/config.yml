@@ -11,11 +11,10 @@ workfolows:
 jobs:
   build:
     docker:
-      - image: cimg/base:stable
+      - image: circleci/openjdk:17-jdk-buster
     steps:
       - checkout
-      - gradle/run:
-          command: build 
+      - gradle/run 
       - aws-ecr/build-and-push-image:
           repo: '215372400964.dkr.ecr.eu-central-1.amazonaws.com' 
           assume-web-identity: false 
