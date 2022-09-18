@@ -54,10 +54,6 @@ jobs:
           dockerfile: docker/production/Dockerfile-debug
           platform: linux/amd64 
           region: eu-central-1
-      - persist_to_workspace:
-          root: /tmp/workspace
-          paths:
-            - env_vars
 
 workflows:
   workflow:
