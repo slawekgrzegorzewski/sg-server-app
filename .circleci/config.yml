@@ -54,7 +54,7 @@ jobs:
           dockerfile: docker/production/Dockerfile-debug
           platform: linux/amd64
           region: eu-central-1
-      - run: ssh -o "StrictHostKeyChecking no" $SSH_USER@$SSH_HOST "/home/slawek/deploy/start.sh"
+      - run: ssh -o "StrictHostKeyChecking no" $SSH_USER@$SSH_HOST "cd /home/slawek/deploy && ./start.sh"
 
 workflows:
   workflow:
