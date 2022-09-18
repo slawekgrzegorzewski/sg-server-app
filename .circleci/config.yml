@@ -7,6 +7,12 @@ jobs:
     docker:
       - image: cimg/openjdk:17.0.4
     steps:
+      - run: mkdir -p /tmp/workspace
+      - run: echo "" >> /tmp/workspace/env_vars
+      - run: sed -i '/^$/d' /tmp/workspace/env_vars
+      - run: source /tmp/workspace/env_vars
+      - run: let "VERSION=VERSION+1"
+      - run: echo "export VERSION=\"$VERSION\"" >> /tmp/workspace/env_vars
       - checkout
       - restore_cache:
           keys:
@@ -21,6 +27,7 @@ jobs:
       - setup_remote_docker
       - aws-ecr/build-and-push-image:
           repo: 'backend' 
+          tag: latest, 1.0.$(VERSION)
           assume-web-identity: false 
           attach-workspace: false 
           create-repo: false 
@@ -34,9 +41,12 @@ jobs:
           dockerfile: docker/production/Dockerfile 
           platform: linux/amd64 
           region: eu-central-1
+      - run:
+          name: remove existing Docker context
+          command: docker context rm -f builder
       - aws-ecr/build-and-push-image:
           repo: 'backend' 
-          tag: latest-debug 
+          tag: latest-debug, 1.0.$(VERSION)-debug
           assume-web-identity: false 
           attach-workspace: false 
           create-repo: false 
@@ -50,6 +60,10 @@ jobs:
           dockerfile: docker/production/Dockerfile-debug
           platform: linux/amd64 
           region: eu-central-1
+      - persist_to_workspace:
+          root: /tmp/workspace
+          paths:
+            - /tmp/workspace/env_vars
 
 workflows:
   workflow:
