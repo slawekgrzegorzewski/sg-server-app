@@ -1,11 +1,6 @@
-version: 2.0
+version: 2.1
 orbs:
   aws-ecr: circleci/aws-ecr@8.1.2
-
-workfolows:
-  workflow:
-    jobs:
-      - build
 
 jobs:
   build:
@@ -27,3 +22,8 @@ jobs:
           dockerfile: docker/production/Dockerfile 
           platform: linux/amd64 
           region: eu-central-1
+
+workflows:
+  workflow:
+    jobs:
+      - build
