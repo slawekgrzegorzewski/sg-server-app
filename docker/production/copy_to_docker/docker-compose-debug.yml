@@ -3,10 +3,11 @@ version: '3.8'
 services:
 
   app:
-    image: 215372400964.dkr.ecr.eu-central-1.amazonaws.com/backend:latest
+    image: 215372400964.dkr.ecr.eu-central-1.amazonaws.com/backend:latest-debug
     container_name: backend
     ports:
       - "8090:8443"
+      - "5005:5005"
     environment:
       spring_profiles_active: https
     configs:
