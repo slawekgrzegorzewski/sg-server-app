@@ -7,6 +7,9 @@ jobs:
     docker:
       - image: cimg/openjdk:17.0.4
     steps:
+      - checkout
+      - run: gradle clean build
+      - run: docker --help
       - aws-ecr/build-and-push-image:
           repo: 'dkr.ecr.eu-central-1.amazonaws.com' 
           assume-web-identity: false 
