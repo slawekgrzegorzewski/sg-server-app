@@ -20,7 +20,7 @@ jobs:
       - run: gradle clean build
       - setup_remote_docker
       - aws-ecr/build-and-push-image:
-          repo: 'dkr.ecr.eu-central-1.amazonaws.com' 
+          repo: 'backend' 
           assume-web-identity: false 
           attach-workspace: false 
           create-repo: false 
