@@ -63,7 +63,7 @@ jobs:
       - persist_to_workspace:
           root: /tmp/workspace
           paths:
-            - /tmp/workspace/env_vars
+            - env_vars
 
 workflows:
   workflow:
