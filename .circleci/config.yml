@@ -34,6 +34,22 @@ jobs:
           dockerfile: docker/production/Dockerfile 
           platform: linux/amd64 
           region: eu-central-1
+      - aws-ecr/build-and-push-image:
+          repo: 'backend' 
+          tag: latest-debug 
+          assume-web-identity: false 
+          attach-workspace: false 
+          create-repo: false 
+          docker-login: false 
+          public-registry: false 
+          push-image: true 
+          remote-docker-layer-caching: false 
+          repo-scan-on-push: true 
+          setup-remote-docker: false 
+          skip-when-tags-exist: false 
+          dockerfile: docker/production/Dockerfile-debug
+          platform: linux/amd64 
+          region: eu-central-1
 
 workflows:
   workflow:
