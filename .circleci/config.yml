@@ -3,8 +3,13 @@ orbs:
   gradle: circleci/gradle@3.0.0
   aws-ecr: circleci/aws-ecr@8.1.2
 
+workfolows:
+  workflow:
+    jobs:
+      - build
+
 jobs:
-  build-and-push-image:
+  build:
     docker:
       - image: cimg/base:stable
     steps:
