@@ -1,6 +1,5 @@
 version: 2.0
 orbs:
-  gradle: circleci/gradle@3.0.0
   aws-ecr: circleci/aws-ecr@8.1.2
 
 workfolows:
@@ -11,10 +10,10 @@ workfolows:
 jobs:
   build:
     docker:
-      - image: circleci/openjdk:17-jdk-buster
+      - image: cimg/openjdk:17.0.4
     steps:
       - checkout
-      - gradle/run 
+      - run: gradle clean build
       - aws-ecr/build-and-push-image:
           repo: '215372400964.dkr.ecr.eu-central-1.amazonaws.com' 
           assume-web-identity: false 
