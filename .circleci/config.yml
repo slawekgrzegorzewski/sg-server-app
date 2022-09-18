@@ -7,7 +7,54 @@ jobs:
     docker:
       - image: cimg/openjdk:17.0.4
     steps:
-      - run: ssh -o "StrictHostKeyChecking no" $SSH_USER@$SSH_HOST "ls /home/slawek"
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle.kts" }}
+            - v1-dependencies-
+      - run: gradle dependencies
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies-{{ checksum "build.gradle.kts" }}
+      - run: gradle clean build
+      - setup_remote_docker
+      - aws-ecr/build-and-push-image:
+          repo: 'backend' 
+          tag: latest,1.0.0
+          assume-web-identity: false 
+          attach-workspace: false 
+          create-repo: false 
+          docker-login: false 
+          public-registry: false 
+          push-image: true 
+          remote-docker-layer-caching: false 
+          repo-scan-on-push: true 
+          setup-remote-docker: false 
+          skip-when-tags-exist: false 
+          dockerfile: docker/production/Dockerfile 
+          platform: linux/amd64 
+          region: eu-central-1
+      - run:
+          name: remove existing Docker context
+          command: docker context rm -f builder
+      - aws-ecr/build-and-push-image:
+          repo: 'backend' 
+          tag: latest-debug,1.0.0-debug
+          assume-web-identity: false 
+          attach-workspace: false 
+          create-repo: false 
+          docker-login: false 
+          public-registry: false 
+          push-image: true 
+          remote-docker-layer-caching: false 
+          repo-scan-on-push: true 
+          setup-remote-docker: false 
+          skip-when-tags-exist: false 
+          dockerfile: docker/production/Dockerfile-debug
+          platform: linux/amd64 
+          region: eu-central-1
+      - run: ssh -o "StrictHostKeyChecking no" $SSH_USER@$SSH_HOST "/home/slawek/deploy/start.sh"
 
 workflows:
   workflow:
