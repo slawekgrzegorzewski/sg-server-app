@@ -7,7 +7,7 @@ jobs:
     docker:
       - image: cimg/openjdk:17.0.4
     steps:
-      - run: ssh $SSH_USER@$SSH_HOST "ls /home/slawek"
+      - run: ssh -o "StrictHostKeyChecking no" $SSH_USER@$SSH_HOST "ls /home/slawek"
 
 workflows:
   workflow:
