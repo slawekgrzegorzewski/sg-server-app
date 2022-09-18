@@ -8,8 +8,17 @@ jobs:
       - image: cimg/openjdk:17.0.4
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle.kts" }}
+            - v1-dependencies-
+      - run: gradle dependencies
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies-{{ checksum "build.gradle.kts" }}
       - run: gradle clean build
-      - run: docker --help
+      - setup_remote_docker
       - aws-ecr/build-and-push-image:
           repo: 'dkr.ecr.eu-central-1.amazonaws.com' 
           assume-web-identity: false 
