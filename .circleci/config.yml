@@ -7,12 +7,6 @@ jobs:
     docker:
       - image: cimg/openjdk:17.0.4
     steps:
-      - run: mkdir -p /tmp/workspace
-      - run: echo "" >> /tmp/workspace/env_vars
-      - run: sed -i '/^$/d' /tmp/workspace/env_vars
-      - run: source /tmp/workspace/env_vars
-      - run: let "VERSION=VERSION+1"
-      - run: echo "export VERSION=\"$VERSION\"" >> /tmp/workspace/env_vars
       - checkout
       - restore_cache:
           keys:
@@ -27,7 +21,7 @@ jobs:
       - setup_remote_docker
       - aws-ecr/build-and-push-image:
           repo: 'backend' 
-          tag: latest,1.0.${VERSION}
+          tag: latest,1.0.0
           assume-web-identity: false 
           attach-workspace: false 
           create-repo: false 
@@ -46,7 +40,7 @@ jobs:
           command: docker context rm -f builder
       - aws-ecr/build-and-push-image:
           repo: 'backend' 
-          tag: latest-debug,1.0.${VERSION}-debug
+          tag: latest-debug,1.0.0-debug
           assume-web-identity: false 
           attach-workspace: false 
           create-repo: false 
