@@ -27,7 +27,7 @@ jobs:
       - setup_remote_docker
       - aws-ecr/build-and-push-image:
           repo: 'backend' 
-          tag: latest, 1.0.${VERSION}
+          tag: latest,1.0.$VERSION
           assume-web-identity: false 
           attach-workspace: false 
           create-repo: false 
@@ -46,7 +46,7 @@ jobs:
           command: docker context rm -f builder
       - aws-ecr/build-and-push-image:
           repo: 'backend' 
-          tag: latest-debug, 1.0.${VERSION}-debug
+          tag: latest-debug,1.0.$VERSION-debug
           assume-web-identity: false 
           attach-workspace: false 
           create-repo: false 
