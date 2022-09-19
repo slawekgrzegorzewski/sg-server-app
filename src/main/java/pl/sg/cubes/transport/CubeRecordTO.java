@@ -1,5 +1,6 @@
 package pl.sg.cubes.transport;
 
+import pl.sg.application.security.annotations.AddZoneIdOffsetDuringDeserialization;
 import pl.sg.application.transport.DomainTO;
 import pl.sg.application.transport.WithDomainTO;
 import pl.sg.cubes.model.CubesType;
@@ -12,6 +13,7 @@ public class CubeRecordTO implements WithDomainTO {
     private CubesType cubesType;
     private double time;
     private String scramble;
+    @AddZoneIdOffsetDuringDeserialization
     private LocalDateTime recordTime;
     private DomainTO domain;
 

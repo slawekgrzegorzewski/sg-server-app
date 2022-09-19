@@ -2,6 +2,8 @@ package pl.sg.application.security.annotations;
 
 import com.google.gson.Gson;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -18,9 +20,14 @@ import pl.sg.application.transport.WithDomainTO;
 
 import javax.persistence.EntityManager;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static java.util.Optional.ofNullable;
 
 @Component
 public class RequestBodyWithDomainResolver implements HandlerMethodArgumentResolver {
@@ -48,15 +55,15 @@ public class RequestBodyWithDomainResolver implements HandlerMethodArgumentResol
     public Object resolveArgument(MethodParameter parameter,
                                   ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest,
-                                  WebDataBinderFactory binderFactory) throws IOException {
+                                  WebDataBinderFactory binderFactory) throws IOException, IllegalAccessException {
         final String body = ((ServletWebRequest) webRequest).getRequest()
                 .getReader()
                 .lines()
                 .collect(Collectors.joining("\n"));
-
         final RequestBodyWithDomain ann = parameter.getParameterAnnotation(RequestBodyWithDomain.class);
         Domain domain;
         WithDomainTO withDomainTO = gson.fromJson(body, ann.transportClass());
+        handleWithZoneId((ServletWebRequest) webRequest, withDomainTO);
         WithDomain withDomain;
         if (ann.create()) {
             withDomain = map(withDomainTO, parameter.getParameterType(), ann);
@@ -78,6 +85,20 @@ public class RequestBodyWithDomainResolver implements HandlerMethodArgumentResol
             user.validateAdminDomain(withDomain.getDomain());
         }
         return withDomain;
+    }
+
+    private static void handleWithZoneId(ServletWebRequest webRequest, WithDomainTO withDomainTO) throws IllegalAccessException {
+        for (Field field : withDomainTO.getClass().getDeclaredFields()) {
+            if (field.getType().equals(LocalDateTime.class) && field.isAnnotationPresent(AddZoneIdOffsetDuringDeserialization.class)) {
+                ZoneId zoneId = ofNullable(webRequest.getRequest().getHeader("x-timezone-id"))
+                        .map(ZoneId::of)
+                        .orElseGet(ZoneId::systemDefault);
+                BeanWrapper wrapper = new BeanWrapperImpl(withDomainTO);
+                ofNullable((LocalDateTime) wrapper.getPropertyValue(field.getName()))
+                        .map(localDateTime -> localDateTime.atZone(ZoneId.of("UTC")).withZoneSameInstant(zoneId).toLocalDateTime())
+                        .ifPresent(localDateTime -> wrapper.setPropertyValue(field.getName(), localDateTime));
+            }
+        }
     }
 
     private WithDomain map(WithDomainTO source, Class<?> destType, RequestBodyWithDomain ann) {

@@ -1,6 +1,3 @@
-import java.nio.file.Path
-import java.nio.file.Paths
-
 plugins {
     id("org.springframework.boot") version "2.3.3.RELEASE" apply true
     java apply true
@@ -68,21 +65,6 @@ dependencies {
     testRuntimeOnly("org.springframework.security:spring-security-test:5.1.5.RELEASE")
 }
 
-
-tasks.clean.get().doFirst {
-    var dockerDir = Paths.get(project.rootDir.absolutePath, "docker", "production", "raspberry");
-    cleanDockerDir(dockerDir)
-    dockerDir = Paths.get(project.rootDir.absolutePath, "docker", "production", "pc");
-    cleanDockerDir(dockerDir)
-}
-
-fun Build_gradle.cleanDockerDir(dockerDir: Path) {
-    delete(dockerDir.resolve("application.yml"))
-    delete(dockerDir.resolve("accountant.jar"))
-    delete(dockerDir.resolve("data.sql"))
-}
-
-
 tasks.withType<Jar> {
     exclude(
             "ovh",
@@ -90,141 +72,6 @@ tasks.withType<Jar> {
             "application-pc-docker.yml",
             "application-raspberry-docker.yml",
             "data.sql")
-}
-
-val jar by tasks.getting(Jar::class);
-
-tasks.register<Copy>("toDockerRaspberry") {
-    dependsOn.add(tasks.build)
-    group = "docker"
-    from(jar.archiveFile) {
-        rename { "accountant.jar" }
-    }
-    from(Paths.get(project.rootDir.absolutePath, "src", "main", "resources", "application-raspberry-docker.yml")) {
-        rename { "application.yml" }
-    }
-    from(Paths.get(project.rootDir.absolutePath, "src", "main", "resources", "data.sql")) {
-        rename { "data.sql" }
-    }
-    destinationDir = Paths.get(project.rootDir.absolutePath, "docker", "production", "raspberry").toFile()
-}
-
-tasks.register<Copy>("toDockerPC") {
-    dependsOn.add(tasks.build)
-    group = "docker"
-
-    val appProject = Paths.get(project.rootDir.absolutePath, "src", "main", "resources")
-    val clientProject = Paths.get(project.rootDir.absolutePath, "..", "sg-client-app")
-    val destination = Paths.get("E:", "docker")
-
-    doFirst {
-        delete("${destination}")
-    }
-
-    doLast {
-        val files = pl.sg.build.FilesToConvertingToUnixFilter(listOf("yml", "Dockerfile", "sql", "sh", "json", "conf"))
-                .textFiles(destination)
-        val convertToUnixLineEndings = pl.sg.build.ConvertToUnixLineEndings()
-        files.forEach { file -> convertToUnixLineEndings.forFile(file) }
-        convertToUnixLineEndings.convert();
-
-        pl.sg.build.GenerateJwtToken().forFile(destination.resolve("docker-compose.yml")).convert()
-    }
-
-    from(jar.archiveFile) {
-        rename { "backend/accountant.jar" }
-    }
-    from(appProject.resolve("application-pc-docker.yml")) {
-        rename { "backend/application.yml" }
-    }
-    from(appProject.resolve("data.sql")) {
-        rename { "backend/data.sql" }
-    }
-    from(clientProject.resolve("Dockerfile")) {
-        rename { "client/Dockerfile" }
-    }
-    from(clientProject.resolve("angular.json")) {
-        into("client")
-    }
-    from(clientProject.resolve("nginx.conf")) {
-        into("client")
-    }
-    from(clientProject.resolve("package.json")) {
-        into("client")
-    }
-    from(clientProject.resolve("tsconfig.app.json")) {
-        into("client")
-    }
-    from(clientProject.resolve("tsconfig.base.json")) {
-        into("client")
-    }
-    from(clientProject.resolve("tsconfig.json")) {
-        into("client")
-    }
-    from(clientProject.resolve("src")) {
-        into("client/src")
-    }
-    from(Paths.get(project.rootDir.absolutePath, "docker", "production", "pc"))
-    destinationDir = destination.toFile()
-}
-
-tasks.register<Copy>("toOVH") {
-    dependsOn.add(tasks.build)
-    group = "docker"
-
-    val appProject = Paths.get(project.rootDir.absolutePath, "src", "main", "resources")
-    val clientProject = Paths.get(project.rootDir.absolutePath, "..", "..", "WWW Projects", "sg-client-app")
-    val destination = Paths.get("E:", "docker")
-
-    doFirst {
-        delete("${destination}")
-    }
-
-    doLast {
-        val files = pl.sg.build.FilesToConvertingToUnixFilter(listOf("yml", "Dockerfile", "sql", "sh", "json", "conf", "browserslistrc"))
-                .textFiles(destination)
-        val convertToUnixLineEndings = pl.sg.build.ConvertToUnixLineEndings()
-        files.forEach { file -> convertToUnixLineEndings.forFile(file) }
-        convertToUnixLineEndings.convert();
-    }
-
-    from(jar.archiveFile) {
-        rename { "backend/accountant.jar" }
-    }
-    from(appProject.resolve("ovh").resolve("application.yml")) {
-        rename { "backend/application.yml" }
-    }
-    from(clientProject.resolve(".browserslistrc")) {
-        into("client")
-    }
-    from(clientProject.resolve("angular.json")) {
-        into("client")
-    }
-    from(clientProject.resolve("nginx.conf")) {
-        into("client")
-    }
-    from(clientProject.resolve("mime.types")) {
-        into("client")
-    }
-    from(clientProject.resolve("package.json")) {
-        into("client")
-    }
-    from(clientProject.resolve("tsconfig.app.json")) {
-        into("client")
-    }
-    from(clientProject.resolve("tsconfig.base.json")) {
-        into("client")
-    }
-    from(clientProject.resolve("tsconfig.json")) {
-        into("client")
-    }
-    from(clientProject.resolve("src")) {
-        into("client/src")
-    }
-    from(appProject.resolve("ovh")) {
-        exclude("application.yml")
-    }
-    destinationDir = destination.toFile()
 }
 
 apply(from = "$rootDir/integrationTest.gradle.kts")

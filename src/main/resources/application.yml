@@ -4,7 +4,7 @@ spring:
       connectionTimeout: 20000
       maximumPoolSize: 5
     password: SLAwek1!
-    url: jdbc:postgresql://192.168.52.98:5432/accountant
+    url: jdbc:postgresql://localhost:5432/accountant
     username: postgres
     initialization-mode: always
   jpa:
