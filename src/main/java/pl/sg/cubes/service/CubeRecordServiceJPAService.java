@@ -7,7 +7,6 @@ import pl.sg.cubes.model.CubeStatistics;
 import pl.sg.cubes.model.CubesType;
 import pl.sg.cubes.repository.CubeRecordRepository;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;

@@ -3,6 +3,13 @@ version: '3.8'
 services:
 
   db:
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: eu-central-1
+        awslogs-group: /app
+        awslogs-stream: db
+        awslogs-create-group: 'true'
     image: postgres:14.5
     container_name: db
     ports:

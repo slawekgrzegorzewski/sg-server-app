@@ -9,9 +9,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -30,10 +30,10 @@ import java.util.List;
         jsr250Enabled = true)
 @EnableScheduling
 @Profile("https")
-public class WebSecurityConfigurationHttps extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfigurationHttps {
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests().anyRequest().permitAll()
                 .and().cors()
@@ -41,12 +41,14 @@ public class WebSecurityConfigurationHttps extends WebSecurityConfigurerAdapter 
                 .requiresChannel()
                 .anyRequest()
                 .requiresSecure();
+        return http.build();
     }
 
 
     @Bean
     public WebMvcConfigurer corsConfigurer(AuthorizationService authorizationService, Gson gson,
                                            EntityManager entityManager, ModelMapper modelMapper,
+                                           AddMDCRequestInterceptor addMDCRequestInterceptor,
                                            SavingRequestsInterceptor savingRequestsInterceptor) {
         return new WebMvcConfigurer() {
             @Override
@@ -67,6 +69,7 @@ public class WebSecurityConfigurationHttps extends WebSecurityConfigurerAdapter 
 
             @Override
             public void addInterceptors(InterceptorRegistry registry) {
+                registry.addWebRequestInterceptor(addMDCRequestInterceptor);
                 registry.addWebRequestInterceptor(savingRequestsInterceptor);
             }
         };

@@ -1,0 +1,26 @@
+<configuration>
+    <appender name="STDOUT-JSON" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <includeMdcKeyName>correlationID</includeMdcKeyName>
+            <fieldNames>
+                <timestamp>timeStamp</timestamp>
+                <message>message</message>
+                <logger>logger</logger>
+                <thread>thread</thread>
+                <level>level</level>
+                <levelValue>[ignore]</levelValue>
+                <version>[ignore]</version>
+                <stackTrace>stackTrace</stackTrace>
+            </fieldNames>
+        </encoder>
+    </appender>
+
+    <logger name="org" level="INFO" />
+    <logger name="com" level="INFO" />
+    <logger name="net" level="INFO" />
+    <logger name="pl" level="DEBUG" />
+
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT-JSON" />
+    </root>
+</configuration>

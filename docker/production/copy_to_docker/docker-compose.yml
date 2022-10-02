@@ -3,6 +3,13 @@ version: '3.8'
 services:
 
   app:
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: eu-central-1
+        awslogs-group: /app
+        awslogs-stream: backend
+        awslogs-create-group: 'true'
     image: 215372400964.dkr.ecr.eu-central-1.amazonaws.com/backend:latest
     container_name: backend
     ports:
@@ -23,6 +30,13 @@ services:
       - key_password
 
   client:
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: eu-central-1
+        awslogs-group: /app
+        awslogs-stream: client
+        awslogs-create-group: 'true'
     image: 215372400964.dkr.ecr.eu-central-1.amazonaws.com/client:latest
     container_name: client
     ports:
@@ -35,6 +49,13 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
 
   db:
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: eu-central-1
+        awslogs-group: /app
+        awslogs-stream: db
+        awslogs-create-group: 'true'
     image: postgres:14.5
     container_name: db
     ports:

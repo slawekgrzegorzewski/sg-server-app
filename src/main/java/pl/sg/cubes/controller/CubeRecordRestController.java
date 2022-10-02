@@ -23,6 +23,7 @@ import static pl.sg.Application.CREATE_CUBE_RECORD;
 @RequestMapping("/cube-record")
 @Validated
 public class CubeRecordRestController implements CubeRecordController {
+
     private final CubeRecordService cubeRecordService;
     private final ModelMapper mapper;
 
@@ -58,7 +59,7 @@ public class CubeRecordRestController implements CubeRecordController {
                     mapperName = CREATE_CUBE_RECORD,
                     create = true,
                     domainAdmin = true)
-                    CubeRecord record
+            CubeRecord record
     ) {
         return mapper.map(this.cubeRecordService.record(record), CubeRecordTO.class);
     }
