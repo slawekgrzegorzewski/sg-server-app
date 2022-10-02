@@ -47,7 +47,8 @@ class ApplicationUserFieldExtractorTest {
                 Arguments.of(RequestUser.LAST_NAME, String.class, LAST_NAME),
                 Arguments.of(RequestUser.EMAIL, String.class, EMAIL),
                 Arguments.of(RequestUser.LOGIN, String.class, LOGIN),
-                Arguments.of(RequestUser.NO_FIELD, ApplicationUser.class, applicationUser)
+                Arguments.of(RequestUser.NO_FIELD, ApplicationUser.class, applicationUser),
+                Arguments.of(RequestUser.ROLES, List.class, ROLES)
 
         );
     }
@@ -67,8 +68,7 @@ class ApplicationUserFieldExtractorTest {
         return Stream.of(
                 Arguments.of("password", String.class),
                 Arguments.of("isUsing2FA", Boolean.class),
-                Arguments.of("secret", String.class),
-                Arguments.of("roles", List.class)
+                Arguments.of("secret", String.class)
         );
     }
 
