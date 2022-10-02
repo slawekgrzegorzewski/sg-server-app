@@ -1,11 +1,13 @@
 package pl.sg.banks.services;
 
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.stereotype.Controller;
 import pl.sg.accountant.model.AccountsException;
 import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.repository.AccountRepository;
 import pl.sg.application.model.Domain;
+import pl.sg.banks.model.BankAccount;
+import pl.sg.banks.repositories.BankAccountRepository;
+import pl.sg.integrations.nodrigen.EUAEndedException;
 import pl.sg.integrations.nodrigen.NodrigenClient;
 import pl.sg.integrations.nodrigen.model.balances.NodrigenAmount;
 import pl.sg.integrations.nodrigen.model.balances.NodrigenBalanceEmbeddable;
@@ -21,8 +23,7 @@ import pl.sg.integrations.nodrigen.model.transcations.NodrigenPhase;
 import pl.sg.integrations.nodrigen.model.transcations.NodrigenTransaction;
 import pl.sg.integrations.nodrigen.repository.NodrigenBankAccountBalanceRepository;
 import pl.sg.integrations.nodrigen.repository.NodrigenTransactionRepository;
-import pl.sg.banks.model.BankAccount;
-import pl.sg.banks.repositories.BankAccountRepository;
+import pl.sg.integrations.nodrigen.services.NodrigenService;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -39,13 +40,15 @@ public class BankAccountServiceImpl implements BankAccountService {
     private final NodrigenClient nodrigenClient;
     private final NodrigenBankAccountBalanceRepository nodrigenBankAccountBalanceRepository;
     private final NodrigenTransactionRepository nodrigenTransactionRepository;
+    private final NodrigenService nodrigenService;
 
-    public BankAccountServiceImpl(AccountRepository accountRepository, BankAccountRepository bankAccountRepository, NodrigenClient nodrigenClient, NodrigenBankAccountBalanceRepository nodrigenBankAccountBalanceRepository, NodrigenTransactionRepository nodrigenTransactionRepository) {
+    public BankAccountServiceImpl(AccountRepository accountRepository, BankAccountRepository bankAccountRepository, NodrigenClient nodrigenClient, NodrigenBankAccountBalanceRepository nodrigenBankAccountBalanceRepository, NodrigenTransactionRepository nodrigenTransactionRepository, NodrigenService nodrigenService) {
         this.accountRepository = accountRepository;
         this.bankAccountRepository = bankAccountRepository;
         this.nodrigenClient = nodrigenClient;
         this.nodrigenBankAccountBalanceRepository = nodrigenBankAccountBalanceRepository;
         this.nodrigenTransactionRepository = nodrigenTransactionRepository;
+        this.nodrigenService = nodrigenService;
     }
 
     @Override
@@ -67,36 +70,41 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     @Override
     public void fetchAccountTransactions(BankAccount bankAccount) {
-        Transactions allTransactionsFromNodrigen =
-                nodrigenClient.getTransactions(UUID.fromString(bankAccount.getExternalId()))
-                        .map(t -> t.transactions)
-                        .orElseGet(Transactions::new);
+        try {
+            Transactions allTransactionsFromNodrigen =
+                    nodrigenClient.getTransactions(UUID.fromString(bankAccount.getExternalId()))
+                            .map(t -> t.transactions)
+                            .orElseGet(Transactions::new);
+            List<String> allNodrigenTransactionIds = Stream.concat(
+                            allTransactionsFromNodrigen.booked.stream(),
+                            allTransactionsFromNodrigen.pending.stream()
+                    )
+                    .map(transaction -> transaction.transactionId)
+                    .collect(Collectors.toList());
 
-        List<String> allNodrigenTransactionIds = Stream.concat(
-                        allTransactionsFromNodrigen.booked.stream(),
-                        allTransactionsFromNodrigen.pending.stream()
-                )
-                .map(transaction -> transaction.transactionId)
-                .collect(Collectors.toList());
+            Map<String, List<NodrigenTransaction>> existingTransactions = nodrigenTransactionRepository.findAllByTransactionIdIn(allNodrigenTransactionIds)
+                    .stream()
+                    .collect(Collectors.groupingBy(
+                            NodrigenTransaction::getTransactionId,
+                            Collectors.toList()
+                    ));
 
-        Map<String, List<NodrigenTransaction>> existingTransactions = nodrigenTransactionRepository.findAllByTransactionIdIn(allNodrigenTransactionIds)
-                .stream()
-                .collect(Collectors.groupingBy(
-                        NodrigenTransaction::getTransactionId,
-                        Collectors.toList()
-                ));
+            LocalDateTime now = LocalDateTime.now();
+            List<NodrigenTransaction> toSave = new ArrayList<>();
+            allTransactionsFromNodrigen.booked.stream()
+                    .filter(transaction -> !transactionsExists(existingTransactions, transaction, bankAccount))
+                    .map(transaction -> mapToDb(transaction, bankAccount, now, NodrigenPhase.BOOKED))
+                    .collect(Collectors.toCollection(() -> toSave));
+            allTransactionsFromNodrigen.pending.stream()
+                    .filter(transaction -> !transactionsExists(existingTransactions, transaction, bankAccount))
+                    .map(transaction -> mapToDb(transaction, bankAccount, now, NodrigenPhase.PENDING))
+                    .collect(Collectors.toCollection(() -> toSave));
+            nodrigenTransactionRepository.saveAll(toSave);
 
-        LocalDateTime now = LocalDateTime.now();
-        List<NodrigenTransaction> toSave = new ArrayList<>();
-        allTransactionsFromNodrigen.booked.stream()
-                .filter(transaction -> !transactionsExists(existingTransactions, transaction, bankAccount))
-                .map(transaction -> mapToDb(transaction, bankAccount, now, NodrigenPhase.BOOKED))
-                .collect(Collectors.toCollection(() -> toSave));
-        allTransactionsFromNodrigen.pending.stream()
-                .filter(transaction -> !transactionsExists(existingTransactions, transaction, bankAccount))
-                .map(transaction -> mapToDb(transaction, bankAccount, now, NodrigenPhase.PENDING))
-                .collect(Collectors.toCollection(() -> toSave));
-        nodrigenTransactionRepository.saveAll(toSave);
+        } catch (EUAEndedException exception) {
+            nodrigenService.recreateRequisitionIfNeeded(bankAccount);
+        }
+
 
     }
 
@@ -187,24 +195,35 @@ public class BankAccountServiceImpl implements BankAccountService {
     }
 
     @Override
-    public void fetchAllBalances(Domain domain) {
+    public void fetch(Domain domain, String bankAccountExternalId) {
+        BankAccount bankAccount = bankAccountRepository.getBankAccountByExternalId(bankAccountExternalId);
+        validateTheSameDomain(bankAccount.getDomain(), domain);
+        fetchAccountBalances(bankAccount);
+        fetchAccountTransactions(bankAccount);
+    }
 
+    @Override
+    public void fetchAllBalances(Domain domain) {
         bankAccountRepository.findAllBankAccounts(domain).forEach(this::fetchAccountBalances);
     }
 
     @Override
     public void fetchAccountBalances(BankAccount bankAccount) {
+        try {
+            Balance[] allTransactionsFromNodrigen = nodrigenClient
+                    .getBalances(UUID.fromString(bankAccount.getExternalId()))
+                    .map(b -> b.balances)
+                    .orElseGet(() -> new Balance[0]);
+            LocalDateTime now = LocalDateTime.now();
+            List<NodrigenBankAccountBalance> toSave = new ArrayList<>();
+            Arrays.stream(allTransactionsFromNodrigen)
+                    .map(balance -> mapBalance(balance, bankAccount, now))
+                    .collect(Collectors.toCollection(() -> toSave));
+            nodrigenBankAccountBalanceRepository.saveAll(toSave);
+        } catch (EUAEndedException exception) {
+            nodrigenService.recreateRequisitionIfNeeded(bankAccount);
+        }
 
-        Balance[] allTransactionsFromNodrigen = nodrigenClient
-                .getBalances(UUID.fromString(bankAccount.getExternalId()))
-                .map(b -> b.balances)
-                .orElseGet(() -> new Balance[0]);
-        LocalDateTime now = LocalDateTime.now();
-        List<NodrigenBankAccountBalance> toSave = new ArrayList<>();
-        Arrays.stream(allTransactionsFromNodrigen)
-                .map(balance -> mapBalance(balance, bankAccount, now))
-                .collect(Collectors.toCollection(() -> toSave));
-        nodrigenBankAccountBalanceRepository.saveAll(toSave);
     }
 
     private NodrigenBankAccountBalance mapBalance(Balance balance, BankAccount bankAccount, LocalDateTime now) {

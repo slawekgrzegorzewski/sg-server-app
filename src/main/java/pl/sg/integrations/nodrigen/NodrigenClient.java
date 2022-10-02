@@ -3,6 +3,7 @@ package pl.sg.integrations.nodrigen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestFactory;
@@ -22,9 +23,11 @@ import pl.sg.utils.DebugRestTemplateInterceptor;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
@@ -43,15 +46,30 @@ public class NodrigenClient {
         this.configuration = configuration;
     }
 
-    public ResponseEntity<String> listInstitutions(String country) {
+    public List<NodrigenInstitution> listInstitutions(String country) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(ensureAccess());
-            ResponseEntity<String> response = createDebuggingRestTemplate()
+            ResponseEntity<List<NodrigenInstitution>> response = createDebuggingRestTemplate()
                     .exchange(
                             RequestEntity.get(new URI(nodrigenUrl + "institutions/?country=" + country)).headers(headers).build(),
-                            String.class);
-            return returnOkIf429(response, "list institutions" + country, "");
+                            new ParameterizedTypeReference<>() {
+                            });
+            return returnOkIf429(response, "list institutions " + country, new ArrayList<>());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public NodrigenInstitution getInstitution(String institutionId) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(ensureAccess());
+            ResponseEntity<NodrigenInstitution> response = createDebuggingRestTemplate()
+                    .exchange(
+                            RequestEntity.get(new URI(nodrigenUrl + "institutions/" + institutionId)).headers(headers).build(),
+                            NodrigenInstitution.class);
+            return returnOkIf429(response, "get institution " + institutionId, null);
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -109,11 +127,12 @@ public class NodrigenClient {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(ensureAccess());
-            return logErrorCodeAndReturnOptional(
+            return logErrorCodeAndThrowException(
                     RequestEntity.get(new URI(nodrigenUrl + "accounts/" + bankAccountId + "/details")).headers(headers).build(),
                     AccountDetails.class,
                     "get account details " + bankAccountId,
-                    createDebuggingRestTemplate());
+                    createDebuggingRestTemplate(),
+                    EUAEndedException::new);
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -123,9 +142,10 @@ public class NodrigenClient {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(ensureAccess());
-            return logErrorCodeAndReturnOptional(
+            return logErrorCodeAndThrowException(
                     RequestEntity.get(new URI(nodrigenUrl + "accounts/" + bankAccountId + "/transactions/")).headers(headers).build(),
-                    TransactionsMain.class, "get transactions " + bankAccountId, createDebuggingRestTemplate());
+                    TransactionsMain.class, "get transactions " + bankAccountId, createDebuggingRestTemplate(),
+                    EUAEndedException::new);
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -135,13 +155,32 @@ public class NodrigenClient {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(ensureAccess());
-            return logErrorCodeAndReturnOptional(
+            return logErrorCodeAndThrowException(
                     RequestEntity.get(new URI(nodrigenUrl + "accounts/" + bankAccountId + "/balances/")).headers(headers).build(),
                     BalancesMain.class,
                     "get balances " + bankAccountId,
-                    createDebuggingRestTemplate());
+                    createDebuggingRestTemplate(),
+                    EUAEndedException::new);
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private <T> Optional<T> logErrorCodeAndThrowException(RequestEntity<?> request,
+                                                          Class<T> entityClass,
+                                                          String requestDescription,
+                                                          RestTemplate restTemplate,
+                                                          Supplier<RuntimeException> exceptionSupplier) {
+        try {
+            ResponseEntity<T> response = restTemplate.exchange(request, entityClass);
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                LOG.error("Problem with " + requestDescription + ofNullable(response.getBody()).map(v -> " - " + v).orElse(""));
+                throw exceptionSupplier.get();
+            }
+            return ofNullable(response.getBody());
+        } catch (HttpClientErrorException ex) {
+            LOG.warn("Problem with " + requestDescription, ex);
+            throw exceptionSupplier.get();
         }
     }
 
@@ -159,12 +198,12 @@ public class NodrigenClient {
         }
     }
 
-    private <T> ResponseEntity<T> returnOkIf429(ResponseEntity<T> response, String requestDescription, T defaultValue) {
+    private <T> T returnOkIf429(ResponseEntity<T> response, String requestDescription, T defaultValue) {
         if (response.getStatusCode().value() == 429) {
             LOG.warn("Quota exceeded - " + requestDescription);
-            return ResponseEntity.ok(ofNullable(response.getBody()).orElse(defaultValue));
+            return ofNullable(response.getBody()).orElse(defaultValue);
         }
-        return response;
+        return response.getBody();
     }
 
     private String ensureAccess() {

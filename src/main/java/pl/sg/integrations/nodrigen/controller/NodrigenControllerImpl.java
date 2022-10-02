@@ -1,12 +1,13 @@
 package pl.sg.integrations.nodrigen.controller;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.sg.accountant.repository.AccountRepository;
 import pl.sg.application.model.Domain;
 import pl.sg.application.security.annotations.RequestDomain;
 import pl.sg.application.security.annotations.TokenBearerAuth;
+import pl.sg.banks.services.BankAccountService;
+import pl.sg.integrations.nodrigen.model.rest.NodrigenInstitution;
 import pl.sg.integrations.nodrigen.repository.NodrigenTransactionsToImportRepository;
 import pl.sg.integrations.nodrigen.services.NodrigenService;
 import pl.sg.integrations.nodrigen.NodrigenClient;
@@ -26,17 +27,19 @@ import static java.util.Optional.ofNullable;
 public class NodrigenControllerImpl implements NodrigenController {
 
     private final AccountRepository accountRepository;
+    private final BankAccountService bankAccountService;
     private final ModelMapper modelMapper;
     private final NodrigenClient nodrigenClient;
     private final NodrigenBankPermissionRepository nodrigenBankPermissionRepository;
     private final NodrigenService nodrigenService;
     private final NodrigenTransactionsToImportRepository nodrigenTransactionsToImportRepository;
 
-    public NodrigenControllerImpl(AccountRepository accountRepository, ModelMapper modelMapper, NodrigenClient nodrigenClient,
+    public NodrigenControllerImpl(AccountRepository accountRepository, BankAccountService bankAccountService, ModelMapper modelMapper, NodrigenClient nodrigenClient,
                                   NodrigenBankPermissionRepository nodrigenBankPermissionRepository,
                                   NodrigenService nodrigenService,
                                   NodrigenTransactionsToImportRepository nodrigenTransactionsToImportRepository) {
         this.accountRepository = accountRepository;
+        this.bankAccountService = bankAccountService;
         this.modelMapper = modelMapper;
         this.nodrigenClient = nodrigenClient;
         this.nodrigenBankPermissionRepository = nodrigenBankPermissionRepository;
@@ -47,8 +50,16 @@ public class NodrigenControllerImpl implements NodrigenController {
     @Override
     @GetMapping("/institutions/{country}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public ResponseEntity<String> getInstitution(@PathVariable String country) {
+    public List<NodrigenInstitution> getInstitutions(@PathVariable String country) {
         return nodrigenClient.listInstitutions(country);
+    }
+
+    @Override
+    @GetMapping("/institutions_to_recreate")
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
+    public List<NodrigenInstitution> getInstitutionsToRecreate(@RequestDomain Domain domain) {
+        return nodrigenService.getInstitutionsToRecreate(domain)
+                .stream().map(nodrigenClient::getInstitution).collect(Collectors.toList());
     }
 
     @Override
@@ -132,6 +143,6 @@ public class NodrigenControllerImpl implements NodrigenController {
     @PostMapping("/fetch/{bankAccountExternalId}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public void fetch(@RequestDomain Domain domain, @PathVariable String bankAccountExternalId) {
-        this.nodrigenService.fetch(domain, bankAccountExternalId);
+        this.bankAccountService.fetch(domain, bankAccountExternalId);
     }
 }
