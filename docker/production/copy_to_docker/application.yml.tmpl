@@ -1,7 +1,7 @@
 spring:
   datasource:
     hikari:
-      connectionTimeout: 20000
+      connectionTimeout: 15000
       maximumPoolSize: 5
     password: {{ secret "postgres_password" }}
     url: jdbc:postgresql://db:5432/accountant
