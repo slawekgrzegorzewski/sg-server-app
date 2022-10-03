@@ -7,7 +7,7 @@ services:
       driver: awslogs
       options:
         awslogs-region: eu-central-1
-        awslogs-group: /app
+        awslogs-group: app
         awslogs-stream: db
         awslogs-create-group: 'true'
     image: postgres:14.5

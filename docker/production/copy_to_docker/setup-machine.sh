@@ -8,6 +8,8 @@ echo "\$3 - aws_access_key_id"
 echo "\$4 - aws_secret_access_key"
 echo "            of account in AWS having logs:CreateLogStream and logs:PutLogEvents permissions"
 
+mkdir -p /home/slawek/docker/volumes/postgres
+mkdir -p /home/slawek/docker/volumes/logs
 mkdir -p /home/slawek/.aws
 echo "[default]" > /home/slawek/.aws/credentials
 echo "aws_access_key_id = $1" >> /home/slawek/.aws/credentials
