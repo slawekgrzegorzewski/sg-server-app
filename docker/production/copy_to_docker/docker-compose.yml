@@ -28,6 +28,8 @@ services:
       - postgres_password
       - key_store_password
       - key_password
+    volumes:
+      - $HOME/docker/volumes/logs:/app/logs/
 
   client:
     logging:

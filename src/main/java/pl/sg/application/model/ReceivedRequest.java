@@ -1,33 +1,17 @@
 package pl.sg.application.model;
 
-import javax.persistence.*;
 import java.util.Date;
 
-@Entity
 public class ReceivedRequest {
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "requests_sequence")
-    private Integer id;
     String remoteAddress;
     String method;
     String requestURI;
-    @Column(length = 200_000)
     String headers;
-    @Column(length = 200_000)
     String body;
     String login;
     Date requestTime = new Date();
 
     public ReceivedRequest() {
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public ReceivedRequest setId(Integer id) {
-        this.id = id;
-        return this;
     }
 
     public String getRemoteAddress() {
@@ -83,4 +67,5 @@ public class ReceivedRequest {
         this.login = login;
         return this;
     }
+
 }

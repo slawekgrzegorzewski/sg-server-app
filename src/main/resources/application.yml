@@ -6,7 +6,6 @@ spring:
     password: SLAwek1!
     url: jdbc:postgresql://localhost:5432/accountant
     username: postgres
-    initialization-mode: always
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -19,6 +18,11 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
+  main:
+    banner-mode: off
+  sql:
+    init:
+      mode: always
 nodrigen:
   service-url: https://ob.nordigen.com/api/v2/
 

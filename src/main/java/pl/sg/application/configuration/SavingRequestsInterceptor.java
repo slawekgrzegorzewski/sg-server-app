@@ -1,5 +1,8 @@
 package pl.sg.application.configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.context.request.WebRequest;
@@ -7,7 +10,6 @@ import org.springframework.web.context.request.WebRequestInterceptor;
 import org.springframework.web.servlet.handler.DispatcherServletWebRequest;
 import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.ReceivedRequest;
-import pl.sg.application.repository.ReceivedRequestRepository;
 import pl.sg.application.service.AuthorizationService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,12 +21,14 @@ import java.util.stream.Collectors;
 @Component
 public class SavingRequestsInterceptor implements WebRequestInterceptor {
 
-    private final AuthorizationService authorizationService;
-    private final ReceivedRequestRepository receivedRequestRepository;
+    private static final Logger LOG = LoggerFactory.getLogger(SavingRequestsInterceptor.class);
 
-    public SavingRequestsInterceptor(AuthorizationService authorizationService, ReceivedRequestRepository receivedRequestRepository) {
+    private final AuthorizationService authorizationService;
+    private final ObjectMapper objectMapper;
+
+    public SavingRequestsInterceptor(AuthorizationService authorizationService, ObjectMapper objectMapper) {
         this.authorizationService = authorizationService;
-        this.receivedRequestRepository = receivedRequestRepository;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -40,7 +44,11 @@ public class SavingRequestsInterceptor implements WebRequestInterceptor {
             Enumeration<String> headerNames = r.getHeaderNames();
             while (headerNames.hasMoreElements()) {
                 String name = headerNames.nextElement();
-                headers.put(name, r.getHeader(name));
+                if (name.equals("authorization")) {
+                    headers.put(name, "***redacted***");
+                } else {
+                    headers.put(name, r.getHeader(name));
+                }
             }
             String body = r.getReader().lines().collect(Collectors.joining("\n"));
             if ("/login".equals(requestURI)) {
@@ -61,15 +69,15 @@ public class SavingRequestsInterceptor implements WebRequestInterceptor {
                     .setRemoteAddress(remoteAddr)
                     .setLogin(login)
                     .setBody(body);
-            this.receivedRequestRepository.save(receivedRequest);
+            LOG.trace(this.objectMapper.writeValueAsString(receivedRequest));
         }
     }
 
     @Override
-    public void postHandle(WebRequest request, ModelMap model) throws Exception {
+    public void postHandle(WebRequest request, ModelMap model) {
     }
 
     @Override
-    public void afterCompletion(WebRequest request, Exception ex) throws Exception {
+    public void afterCompletion(WebRequest request, Exception ex) {
     }
 }

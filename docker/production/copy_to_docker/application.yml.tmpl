@@ -6,7 +6,6 @@ spring:
     password: {{ secret "postgres_password" }}
     url: jdbc:postgresql://db:5432/accountant
     username: postgres
-    initialization-mode: always
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -16,6 +15,11 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
+  main:
+    banner-mode: off
+  sql:
+    init:
+      mode: always
 
 server:
   ssl:
