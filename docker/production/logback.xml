@@ -14,6 +14,9 @@
                 <stackTrace>stackTrace</stackTrace>
             </fieldNames>
         </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
     </appender>
 
     <appender name="FILE2" class="ch.qos.logback.core.FileAppender">
