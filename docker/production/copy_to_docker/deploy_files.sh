@@ -1,7 +1,3 @@
-echo "$1 - postgres password"
-
-echo "localhost:5432:accountant:postgres:$1" > ~/.pgpass
-echo "localhost:5432:postgres:postgres:$1" >> ~/.pgpass
 chmod 400  ~/.pgpass
 
 dos2unix *
