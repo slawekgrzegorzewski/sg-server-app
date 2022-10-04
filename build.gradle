@@ -77,4 +77,12 @@ jar {
             'data.sql')
 }
 
+task dockerPackage(type: Zip) {
+    from 'docker/production/copy_to_docker/'
+    include '*'
+    archiveName 'docker.zip'
+}
+
+build.dependsOn dockerPackage
+
 apply from:'integrationTest.gradle'
