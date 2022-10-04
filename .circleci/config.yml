@@ -55,7 +55,8 @@ jobs:
           platform: linux/amd64
           region: eu-central-1
       - run: scp -o "StrictHostKeyChecking no" build/distributions/docker.zip $SSH_USER@$SSH_HOST:/home/slawek/
-      - run: ssh -o "StrictHostKeyChecking no" $SSH_USER@$SSH_HOST "cd /home/slawek && unzip docker.zip -d tmp && cd tmp && dos2unix deploy_files.sh && chmod +x deploy_files.sh && ./deploy_files.sh && cd /home/slawek/deploy && ./stop.sh && sleep 20 && ./start.sh"
+      - run: ssh -o "StrictHostKeyChecking no" $SSH_USER@$SSH_HOST "cd /home/slawek && unzip docker.zip -d tmp && cd tmp && dos2unix deploy_files.sh && chmod +x deploy_files.sh && ./deploy_files.sh"
+      - run: ssh -o "StrictHostKeyChecking no" $SSH_USER@$SSH_HOST "cd /home/slawek/deploy && ./stop.sh && sleep 20 && ./start.sh"
 
 workflows:
   workflow:
