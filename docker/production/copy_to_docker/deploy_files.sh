@@ -5,19 +5,23 @@ dos2unix *
 mkdir deploy
 mkdir management
 
-cp application.yml.tmpl deploy
-chmod 644 deploy/application.yml.tmpl
-cp docker-compose* deploy
-chmod 644 deploy/docker-compose*
-cp start*.sh deploy
-cp stop.sh deploy
+DEPLOY_DIR=../deploy
+MANAGEMENT_DIR=../management
 
-chmod 755 deploy/*.sh
+cp application.yml.tmpl $DEPLOY_DIR
+chmod 644 $DEPLOY_DIR/application.yml.tmpl
+cp docker-compose* $DEPLOY_DIR
+chmod 644 $DEPLOY_DIR/docker-compose*
+cp start*.sh $DEPLOY_DIR
+cp stop.sh $DEPLOY_DIR
 
-cp backup_data.sh management/
-cp restore_data.sh management/
-cp setup_machine.sh management/
-chmod 755 management/*.sh
+chmod 755 $DEPLOY_DIR/*.sh
+
+cp backup_data.sh $MANAGEMENT_DIR/
+cp restore_data.sh $MANAGEMENT_DIR/
+cp setup_machine.sh $MANAGEMENT_DIR/
+chmod 755 $MANAGEMENT_DIR/*.sh
 
 cd ../
 rm -rf tmp
+rm docker.zip
