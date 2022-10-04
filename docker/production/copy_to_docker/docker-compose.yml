@@ -67,7 +67,7 @@ configs:
   application.yml:
     template_driver: golang
     file: application.yml.tmpl
-    name: myapp.application.yml
+    name: myapp.application.yml${APPLICATION_YML_VERSION:-0}
     
 secrets:
   jwt_secret_code:
