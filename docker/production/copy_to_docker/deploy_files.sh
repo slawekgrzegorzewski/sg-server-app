@@ -20,6 +20,7 @@ chmod 755 $DEPLOY_DIR/*.sh
 cp backup_data.sh $MANAGEMENT_DIR/
 cp restore_data.sh $MANAGEMENT_DIR/
 cp setup_machine.sh $MANAGEMENT_DIR/
+mkdir $MANAGEMENT_DIR/database-backups
 chmod 755 $MANAGEMENT_DIR/*.sh
 
 cd ../
