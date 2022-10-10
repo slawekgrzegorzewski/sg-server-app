@@ -1,4 +1,4 @@
-FROM openjdk:17.0.2-jdk
+FROM openjdk:19-jdk
 COPY build/libs/accountant-0.0.1-SNAPSHOT.jar /app/accountant.jar
 COPY docker/production/logback.xml /app/logback.xml
 RUN mkdir -p /app/logs

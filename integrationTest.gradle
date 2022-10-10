@@ -31,7 +31,7 @@ task runIntegrationTest(type:Test) {
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
 
-    binResultsDir = file("$buildDir/integration-test-results/binary/integration-test")
+    getBinaryResultsDirectory().set(file("$buildDir/integration-test-results/binary/integration-test"))
 
     reports {
         html.destination file("$buildDir/reports/integration-test")
