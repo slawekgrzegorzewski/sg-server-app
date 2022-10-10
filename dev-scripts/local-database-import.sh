@@ -1,9 +1,15 @@
 #!/bin/bash
 #scp -r slag@grzegorzewski.org:/home/slag/sg-application/database-backups /Users/slag/Projects/database-backups
 
-set PGPASSWORD=SLAwek1!
-file=$(ls /Users/slag/Projects/database-backups/current/)
-echo $file``
+file=$(ls ~/Development/Slawek/backups/current/)
+
+PGPASSWORD=SLAwek1!
+
+echo "*:*:*:postgres:SLAwek1!" | tee ~/.pgpass
+chmod 400 ~/.pgpass
+
+ echo "$HOME/Development/Slawek/backups/current/$file"
+
 psql -h localhost -p 5432 -w -U postgres -c "DROP DATABASE accountant;" postgres
 psql -h localhost -p 5432 -w -U postgres -c "CREATE DATABASE accountant;" postgres
-psql -h localhost -U postgres -w accountant < "/Users/slag/Projects/database-backups/current/$file"
+psql -h localhost -U postgres -w accountant < "$HOME/Development/Slawek/backups/current/$file"

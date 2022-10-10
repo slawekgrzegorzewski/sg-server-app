@@ -7,8 +7,10 @@ HOME_DIR=/home/$USERNAME
 sudo mkdir -p /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
 sudo apt-get update
-sudo apt-get install -y unzip ca-certificates curl gnupg lsb-release postgresql-client docker-ce docker-ce-cli containerd.io docker-compose-plugin dos2unix
+sudo apt-get install -y unzip ca-certificates curl gnupg lsb-release postgresql-client-14 docker-ce docker-ce-cli containerd.io docker-compose-plugin dos2unix
 
 unzip $HOME_DIR/docker-ovh.zip -d $HOME_DIR/docker_files
 mv $HOME_DIR/docker_files/docker\ -\ ovh $HOME_DIR/docker_files/dockerFiles
