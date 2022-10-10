@@ -10,7 +10,7 @@ jobs:
       - checkout
       - when:
           condition:
-            equal: [ master ]
+            equal: [ master, << pipeline.git.branch >> ]
           steps:
             - restore_cache:
                 keys:
