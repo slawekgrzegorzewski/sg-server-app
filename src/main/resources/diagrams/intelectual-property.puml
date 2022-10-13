@@ -1,0 +1,22 @@
+@startuml
+
+object IntellectualProperty {
+    startDate: LocalDate
+    endDate: LocalDate
+    description: String(10 000)
+}
+
+object Task {
+    description: String(10 000)
+    coAuthor: String(200)
+}
+
+object TimeRecord {
+    date: LocalDate
+    numberOfHours: Int
+}
+
+IntellectualProperty --> Task: 1:N
+Task --> TimeRecord: 1:N
+
+@enduml
