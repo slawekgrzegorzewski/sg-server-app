@@ -9,11 +9,13 @@ object IntellectualProperty {
 object Task {
     description: String(10 000)
     coAuthor: String(200)
+    attachments: List<File>
 }
 
 object TimeRecord {
     date: LocalDate
     numberOfHours: Int
+    description: String(10 000)
 }
 
 IntellectualProperty --> Task: 1:N

@@ -1,0 +1,85 @@
+@startuml
+left to right direction
+
+(Adds new intellectual property) as (addIPR)
+(Updates existing intellectual property) as (updateIPR)
+(Deletes existing intellectual property) as (delIPR)
+
+(Adds new Task to an existing IPR) as (addtask)
+(Updates existging Task) as (updatetask)
+(Deletes existing Task) as (deltask)
+
+(Adds an attachment to an existing Task to an existing IPR) as (addattch)
+(Deletes an attachment to an existing Task to an existing IPR) as (delattch)
+
+(Adds new TimeRecord to existing Task) as (addtimerecord1)
+(Adds new TimeRecord not associated with Task) as (addtimerecord2)
+(Updates existing TimeRecord) as (updatetimerecord)
+(Deletes existing TimeRecord) as (deltimerecord)
+
+note "Any action on this element should trigger IPR dates update,\n\
+according to a general note above" as N7
+
+TimeRecord -> (deltimerecord)
+(deltimerecord) --> N7
+
+TimeRecord -> (updatetimerecord)
+(updatetimerecord) --> N7
+
+TimeRecord -> (addtimerecord1)
+(addtimerecord1) --> N7
+note right of (addtimerecord1): "Following data is needed:\n\
+a) date\n\
+b) description\n\
+c) related Task"
+
+TimeRecord -> (addtimerecord2)
+(addtimerecord2) --> N7
+note right of (addtimerecord1): "Following data is needed:\n\
+a) date\n\
+b) description\n"
+
+note right of User: "Whenever user updates/creates/deletes\n\
+IPR or TimeRecord IPR times should be to contain all dates\n\
+from relating TimeRecords"
+
+Task -> (delattch)
+Task -> (addattch)
+
+note "Deletion is only possible\n\
+when no TimeRecord is assigned.\n\
+All attachments should be deleted." as N5
+Task -> (deltask)
+(deltask) --> N5
+
+note "User can update description and coAuthor fields." as N6
+Task -> (updatetask)
+(updatetask) --> N6
+
+note "Required data to create a new Task\n\
+a) IPR under which a Task was performed\n\
+b) coAuthor\n\
+c) attachments\n" as N1
+Task -> (addtask)
+(addtask) --> N1
+
+note "Deletion is only possible\n\
+when no Task is assigned" as N2
+IPR -> (delIPR)
+(delIPR) --> N2
+
+note "User can modify following fields\n\
+a) start date\n\
+b) end date\n\
+c) description" as N3
+IPR -> (updateIPR)
+(updateIPR) --> N3
+
+note "Provide following data\n\
+a) start date\n\
+b) end date\n\
+c) description" as N4
+IPR -> (addIPR)
+(addIPR) --> N4
+
+@enduml
