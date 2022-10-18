@@ -39,6 +39,8 @@ dependencies {
     implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.3'
     implementation 'org.jsoup:jsoup:1.15.3'
     implementation 'com.sendgrid:sendgrid-java:4.9.3'
+    implementation("io.springfox:springfox-boot-starter:3.0.0")
+
 
     implementation 'org.apache.poi:poi:5.2.2'
     implementation 'org.apache.poi:poi-ooxml:5.2.2'

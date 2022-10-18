@@ -23,6 +23,12 @@ spring:
   sql:
     init:
       mode: always
+
+  mvc:
+    pathmatch:
+      matching-strategy:
+        ant-path-matcher
+
 nodrigen:
   service-url: https://ob.nordigen.com/api/v2/
 
@@ -30,3 +36,4 @@ cron:
   fetch-accounts: "-"
   fetch-accounts-monthly: "-"
   fetch-transactions: "-"
+
