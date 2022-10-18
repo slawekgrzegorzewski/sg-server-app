@@ -4,6 +4,7 @@ object IntellectualProperty {
     startDate: LocalDate
     endDate: LocalDate
     description: String(10 000)
+    domain: Domain
 }
 
 object Task {
@@ -16,6 +17,7 @@ object TimeRecord {
     date: LocalDate
     numberOfHours: Int
     description: String(10 000)
+    domain: Domain
 }
 
 IntellectualProperty --> Task: 1:N
