@@ -1,12 +1,11 @@
 package pl.sg.banks.transport;
 
-import pl.sg.application.transport.DomainTO;
-import pl.sg.application.transport.WithDomainTO;
+import pl.sg.application.api.DomainSimple;
+import pl.sg.application.api.WithDomain;
 
-import javax.persistence.Entity;
 import java.util.Currency;
 
-public class BankAccountTO implements WithDomainTO {
+public class BankAccount implements WithDomain {
     private Integer id;
     private String iban;
     private Currency currency;
@@ -14,13 +13,13 @@ public class BankAccountTO implements WithDomainTO {
     private String product;
     private String bic;
     private String externalId;
-    private DomainTO domain;
+    private DomainSimple domain;
 
     public Integer getId() {
         return id;
     }
 
-    public BankAccountTO setId(Integer id) {
+    public BankAccount setId(Integer id) {
         this.id = id;
         return this;
     }
@@ -29,7 +28,7 @@ public class BankAccountTO implements WithDomainTO {
         return iban;
     }
 
-    public BankAccountTO setIban(String iban) {
+    public BankAccount setIban(String iban) {
         this.iban = iban;
         return this;
     }
@@ -38,7 +37,7 @@ public class BankAccountTO implements WithDomainTO {
         return currency;
     }
 
-    public BankAccountTO setCurrency(Currency currency) {
+    public BankAccount setCurrency(Currency currency) {
         this.currency = currency;
         return this;
     }
@@ -47,7 +46,7 @@ public class BankAccountTO implements WithDomainTO {
         return owner;
     }
 
-    public BankAccountTO setOwner(String owner) {
+    public BankAccount setOwner(String owner) {
         this.owner = owner;
         return this;
     }
@@ -56,7 +55,7 @@ public class BankAccountTO implements WithDomainTO {
         return product;
     }
 
-    public BankAccountTO setProduct(String product) {
+    public BankAccount setProduct(String product) {
         this.product = product;
         return this;
     }
@@ -65,7 +64,7 @@ public class BankAccountTO implements WithDomainTO {
         return bic;
     }
 
-    public BankAccountTO setBic(String bic) {
+    public BankAccount setBic(String bic) {
         this.bic = bic;
         return this;
     }
@@ -74,17 +73,17 @@ public class BankAccountTO implements WithDomainTO {
         return externalId;
     }
 
-    public BankAccountTO setExternalId(String externalId) {
+    public BankAccount setExternalId(String externalId) {
         this.externalId = externalId;
         return this;
     }
 
     @Override
-    public DomainTO getDomain() {
+    public DomainSimple getDomain() {
         return domain;
     }
 
-    public BankAccountTO setDomain(DomainTO domain) {
+    public BankAccount setDomain(DomainSimple domain) {
         this.domain = domain;
         return this;
     }

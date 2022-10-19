@@ -2,9 +2,8 @@ package pl.sg.accountant.controller;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.web.bind.annotation.*;
-import pl.sg.accountant.model.billings.Category;
 import pl.sg.accountant.service.CategoryService;
-import pl.sg.accountant.transport.billings.CategoryTO;
+import pl.sg.accountant.transport.billings.Category;
 import pl.sg.application.model.Domain;
 import pl.sg.application.security.annotations.RequestBodyWithDomain;
 import pl.sg.application.security.annotations.RequestDomain;
@@ -32,34 +31,34 @@ public class CategoryRestController implements CategoryController {
     @Override
     @GetMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public List<CategoryTO> getCategories(@RequestDomain Domain domain) {
+    public List<Category> getCategories(@RequestDomain Domain domain) {
         return categoryService.getForDomain(domain).stream()
-                .map(category -> mapper.map(category, CategoryTO.class))
+                .map(category -> mapper.map(category, Category.class))
                 .collect(Collectors.toList());
     }
 
     @Override
     @PutMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public CategoryTO addCategory(
+    public Category addCategory(
             @RequestBodyWithDomain(
                     create = true,
-                    transportClass = CategoryTO.class,
+                    transportClass = Category.class,
                     domainAdmin = true,
                     mapperName = CREATE_CATEGORY)
-            @Valid Category category) {
-        return mapper.map(categoryService.create(category), CategoryTO.class);
+            @Valid pl.sg.accountant.model.billings.Category category) {
+        return mapper.map(categoryService.create(category), Category.class);
     }
 
     @Override
     @PatchMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public CategoryTO updateCategory(
+    public Category updateCategory(
             @RequestBodyWithDomain(
-                    transportClass = CategoryTO.class,
+                    transportClass = Category.class,
                     domainAdmin = true,
                     mapperName = UPDATE_CATEGORY)
-            @Valid Category category) {
-        return mapper.map(categoryService.update(category), CategoryTO.class);
+            @Valid pl.sg.accountant.model.billings.Category category) {
+        return mapper.map(categoryService.update(category), Category.class);
     }
 }

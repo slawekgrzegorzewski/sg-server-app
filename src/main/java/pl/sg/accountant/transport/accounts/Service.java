@@ -1,19 +1,19 @@
 package pl.sg.accountant.transport.accounts;
 
-import pl.sg.application.transport.DomainTO;
-import pl.sg.application.transport.WithDomainTO;
+import pl.sg.application.api.DomainSimple;
+import pl.sg.application.api.WithDomain;
 
-public class ServiceTO implements WithDomainTO {
+public class Service implements WithDomain {
 
     private Integer id;
     String name;
-    DomainTO domain;
+    DomainSimple domain;
 
 
-    public ServiceTO() {
+    public Service() {
     }
 
-    public ServiceTO(int id, String name) {
+    public Service(int id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -22,7 +22,7 @@ public class ServiceTO implements WithDomainTO {
         return id;
     }
 
-    public ServiceTO setId(Integer id) {
+    public Service setId(Integer id) {
         this.id = id;
         return this;
     }
@@ -31,16 +31,16 @@ public class ServiceTO implements WithDomainTO {
         return name;
     }
 
-    public ServiceTO setName(String name) {
+    public Service setName(String name) {
         this.name = name;
         return this;
     }
 
-    public DomainTO getDomain() {
+    public DomainSimple getDomain() {
         return domain;
     }
 
-    public ServiceTO setDomain(DomainTO domain) {
+    public Service setDomain(DomainSimple domain) {
         this.domain = domain;
         return this;
     }

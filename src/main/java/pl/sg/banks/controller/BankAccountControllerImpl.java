@@ -5,10 +5,9 @@ import org.springframework.web.bind.annotation.*;
 import pl.sg.accountant.model.accounts.Account;
 import pl.sg.application.model.Domain;
 import pl.sg.application.security.annotations.*;
-import pl.sg.banks.model.BankAccount;
 import pl.sg.banks.repositories.BankAccountRepository;
 import pl.sg.banks.services.BankAccountService;
-import pl.sg.banks.transport.BankAccountTO;
+import pl.sg.banks.transport.BankAccount;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,10 +29,10 @@ public class BankAccountControllerImpl implements BankAccountController {
     @Override
     @GetMapping("/account_to_assign")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public List<BankAccountTO> getBankAccountsNotAssignedToAnyAccount(@RequestDomain Domain domain) {
+    public List<BankAccount> getBankAccountsNotAssignedToAnyAccount(@RequestDomain Domain domain) {
         return bankAccountRepository.findBankAccountsNotAssignedToAccount(domain)
                 .stream()
-                .map(bankAccount -> modelMapper.map(bankAccount, BankAccountTO.class))
+                .map(bankAccount -> modelMapper.map(bankAccount, BankAccount.class))
                 .collect(Collectors.toList());
     }
 
@@ -42,7 +41,7 @@ public class BankAccountControllerImpl implements BankAccountController {
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public void assignBankAccountToAnAccount(
             @RequestDomain Domain domain,
-            @PathVariableWithDomain(requireAdmin = true) BankAccount bankAccount,
+            @PathVariableWithDomain(requireAdmin = true) pl.sg.banks.model.BankAccount bankAccount,
             @RequestBodyIdWithDomain(domainAdmin = true, required = true) Account account) {
         this.bankAccountService.assignBankAccountToAnAccount(domain, bankAccount, account);
     }

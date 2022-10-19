@@ -1,12 +1,12 @@
 package pl.sg.accountant.transport;
 
-import pl.sg.application.transport.DomainTO;
-import pl.sg.application.transport.WithDomainTO;
+import pl.sg.application.api.DomainSimple;
+import pl.sg.application.api.WithDomain;
 
 import java.math.BigDecimal;
 import java.util.Currency;
 
-public class PiggyBankTO implements WithDomainTO {
+public class PiggyBank implements WithDomain {
     private Integer id;
     private String name;
     private String description;
@@ -14,13 +14,13 @@ public class PiggyBankTO implements WithDomainTO {
     private Currency currency;
     private boolean savings;
     private BigDecimal monthlyTopUp;
-    private DomainTO domain;
+    private DomainSimple domain;
 
-    public PiggyBankTO() {
+    public PiggyBank() {
     }
 
-    public PiggyBankTO(int id, String name, String description, BigDecimal balance, Currency currency, boolean savings,
-                       BigDecimal monthlyTopUp, DomainTO domain) {
+    public PiggyBank(int id, String name, String description, BigDecimal balance, Currency currency, boolean savings,
+                     BigDecimal monthlyTopUp, DomainSimple domain) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -35,7 +35,7 @@ public class PiggyBankTO implements WithDomainTO {
         return id;
     }
 
-    public PiggyBankTO setId(int id) {
+    public PiggyBank setId(int id) {
         this.id = id;
         return this;
     }
@@ -44,7 +44,7 @@ public class PiggyBankTO implements WithDomainTO {
         return name;
     }
 
-    public PiggyBankTO setName(String name) {
+    public PiggyBank setName(String name) {
         this.name = name;
         return this;
     }
@@ -53,7 +53,7 @@ public class PiggyBankTO implements WithDomainTO {
         return description;
     }
 
-    public PiggyBankTO setDescription(String description) {
+    public PiggyBank setDescription(String description) {
         this.description = description;
         return this;
     }
@@ -62,7 +62,7 @@ public class PiggyBankTO implements WithDomainTO {
         return balance;
     }
 
-    public PiggyBankTO setBalance(BigDecimal balance) {
+    public PiggyBank setBalance(BigDecimal balance) {
         this.balance = balance;
         return this;
     }
@@ -71,7 +71,7 @@ public class PiggyBankTO implements WithDomainTO {
         return currency;
     }
 
-    public PiggyBankTO setCurrency(Currency currency) {
+    public PiggyBank setCurrency(Currency currency) {
         this.currency = currency;
         return this;
     }
@@ -80,7 +80,7 @@ public class PiggyBankTO implements WithDomainTO {
         return savings;
     }
 
-    public PiggyBankTO setSavings(boolean savings) {
+    public PiggyBank setSavings(boolean savings) {
         this.savings = savings;
         return this;
     }
@@ -89,16 +89,16 @@ public class PiggyBankTO implements WithDomainTO {
         return monthlyTopUp;
     }
 
-    public PiggyBankTO setMonthlyTopUp(BigDecimal monthlyTopUp) {
+    public PiggyBank setMonthlyTopUp(BigDecimal monthlyTopUp) {
         this.monthlyTopUp = monthlyTopUp;
         return this;
     }
 
-    public DomainTO getDomain() {
+    public DomainSimple getDomain() {
         return domain;
     }
 
-    public PiggyBankTO setDomain(DomainTO domain) {
+    public PiggyBank setDomain(DomainSimple domain) {
         this.domain = domain;
         return this;
     }

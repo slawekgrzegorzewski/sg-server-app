@@ -3,15 +3,12 @@ package pl.sg.accountant.controller;
 import org.modelmapper.ModelMapper;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import pl.sg.accountant.model.accounts.Client;
 import pl.sg.accountant.service.ClientsService;
-import pl.sg.accountant.transport.accounts.ClientTO;
+import pl.sg.accountant.transport.accounts.Client;
 import pl.sg.application.model.Domain;
-import pl.sg.application.security.annotations.PathVariableWithDomain;
 import pl.sg.application.security.annotations.RequestBodyWithDomain;
 import pl.sg.application.security.annotations.RequestDomain;
 import pl.sg.application.security.annotations.TokenBearerAuth;
-import pl.sg.application.service.DomainService;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -35,34 +32,34 @@ public class ClientsRestController implements ClientsController {
     @Override
     @GetMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public List<ClientTO> clients(@RequestDomain Domain domain) {
+    public List<Client> clients(@RequestDomain Domain domain) {
         return clientsService.clients(domain).stream()
-                .map(c -> mapper.map(c, ClientTO.class))
+                .map(c -> mapper.map(c, Client.class))
                 .collect(Collectors.toList());
     }
 
     @Override
     @PutMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public ClientTO createClient(
+    public Client createClient(
             @RequestBodyWithDomain(
-                    transportClass = ClientTO.class,
+                    transportClass = Client.class,
                     mapperName = CREATE_CLIENT,
                     create = true
             )
-            @Valid Client client) {
-        return mapper.map(clientsService.create(client), ClientTO.class);
+            @Valid pl.sg.accountant.model.accounts.Client client) {
+        return mapper.map(clientsService.create(client), Client.class);
     }
 
     @Override
     @PatchMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public ClientTO updateClient(
+    public Client updateClient(
             @RequestBodyWithDomain(
-                    transportClass = ClientTO.class,
+                    transportClass = Client.class,
                     mapperName = UPDATE_CLIENT
             )
-            @Valid Client client) {
-        return mapper.map(clientsService.update(client), ClientTO.class);
+            @Valid pl.sg.accountant.model.accounts.Client client) {
+        return mapper.map(clientsService.update(client), Client.class);
     }
 }

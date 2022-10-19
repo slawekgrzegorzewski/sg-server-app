@@ -3,9 +3,8 @@ package pl.sg.accountant.controller;
 import org.modelmapper.ModelMapper;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import pl.sg.accountant.model.accounts.ClientPayment;
 import pl.sg.accountant.service.ClientPaymentsService;
-import pl.sg.accountant.transport.accounts.ClientPaymentTO;
+import pl.sg.accountant.transport.accounts.ClientPayment;
 import pl.sg.application.model.Domain;
 import pl.sg.application.security.annotations.RequestBodyWithDomain;
 import pl.sg.application.security.annotations.RequestDomain;
@@ -34,36 +33,36 @@ public class ClientPaymentRestController implements ClientPaymentController {
     @Override
     @GetMapping("/{forMonth}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public List<ClientPaymentTO> clientPayments(
+    public List<ClientPayment> clientPayments(
             @RequestDomain Domain domain,
             @PathVariable YearMonth forMonth) {
         return clientPaymentsService.clientPayments(domain, forMonth).stream()
-                .map(c -> mapper.map(c, ClientPaymentTO.class))
+                .map(c -> mapper.map(c, ClientPayment.class))
                 .collect(Collectors.toList());
     }
 
     @Override
     @PutMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public ClientPaymentTO createClientPayment(
+    public ClientPayment createClientPayment(
             @RequestBodyWithDomain(
-                    transportClass = ClientPaymentTO.class,
+                    transportClass = ClientPayment.class,
                     mapperName = CREATE_CLIENT_PAYMENT,
                     create = true
             )
-            @Valid ClientPayment clientPayment) {
-        return mapper.map(clientPaymentsService.create(clientPayment), ClientPaymentTO.class);
+            @Valid pl.sg.accountant.model.accounts.ClientPayment clientPayment) {
+        return mapper.map(clientPaymentsService.create(clientPayment), ClientPayment.class);
     }
 
     @Override
     @PatchMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public ClientPaymentTO updateClientPayment(
+    public ClientPayment updateClientPayment(
             @RequestBodyWithDomain(
-                    transportClass = ClientPaymentTO.class,
+                    transportClass = ClientPayment.class,
                     mapperName = UPDATE_CLIENT_PAYMENT
             )
-            @Valid ClientPayment clientPayment) {
-        return mapper.map(clientPaymentsService.update(clientPayment), ClientPaymentTO.class);
+            @Valid pl.sg.accountant.model.accounts.ClientPayment clientPayment) {
+        return mapper.map(clientPaymentsService.update(clientPayment), ClientPayment.class);
     }
 }

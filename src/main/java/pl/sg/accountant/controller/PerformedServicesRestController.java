@@ -3,9 +3,8 @@ package pl.sg.accountant.controller;
 import org.modelmapper.ModelMapper;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import pl.sg.accountant.model.accounts.PerformedService;
 import pl.sg.accountant.service.PerformedServicesService;
-import pl.sg.accountant.transport.accounts.PerformedServiceTO;
+import pl.sg.accountant.transport.accounts.PerformedService;
 import pl.sg.application.model.Domain;
 import pl.sg.application.security.annotations.RequestBodyWithDomain;
 import pl.sg.application.security.annotations.RequestDomain;
@@ -34,36 +33,36 @@ public class PerformedServicesRestController implements PerformedServicesControl
     @Override
     @GetMapping("/{forMonth}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public List<PerformedServiceTO> services(
+    public List<PerformedService> services(
             @RequestDomain Domain domain,
             @PathVariable YearMonth forMonth) {
         return performedServicesService.services(domain, forMonth).stream()
-                .map(c -> mapper.map(c, PerformedServiceTO.class))
+                .map(c -> mapper.map(c, PerformedService.class))
                 .collect(Collectors.toList());
     }
 
     @Override
     @PutMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public PerformedServiceTO createService(
+    public PerformedService createService(
             @RequestBodyWithDomain(
-                    transportClass = PerformedServiceTO.class,
+                    transportClass = PerformedService.class,
                     mapperName = CREATE_PERFORMED_SERVICE,
                     create = true
             )
-            @Valid PerformedService performedService) {
-        return mapper.map(performedServicesService.create(performedService), PerformedServiceTO.class);
+            @Valid pl.sg.accountant.model.accounts.PerformedService performedService) {
+        return mapper.map(performedServicesService.create(performedService), PerformedService.class);
     }
 
     @Override
     @PatchMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public PerformedServiceTO updateService(
+    public PerformedService updateService(
             @RequestBodyWithDomain(
-                    transportClass = PerformedServiceTO.class,
+                    transportClass = PerformedService.class,
                     mapperName = UPDATE_PERFORMED_SERVICE
             )
-            @Valid PerformedService service) {
-        return mapper.map(performedServicesService.update(service), PerformedServiceTO.class);
+            @Valid pl.sg.accountant.model.accounts.PerformedService service) {
+        return mapper.map(performedServicesService.update(service), PerformedService.class);
     }
 }

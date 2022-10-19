@@ -1,4 +1,4 @@
-package pl.sg.ipr.transport;
+package pl.sg.ipr.api;
 
 import java.time.LocalDate;
 

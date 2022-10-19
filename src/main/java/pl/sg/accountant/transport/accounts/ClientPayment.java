@@ -1,17 +1,17 @@
 package pl.sg.accountant.transport.accounts;
 
-import pl.sg.application.transport.DomainTO;
-import pl.sg.application.transport.WithDomainTO;
+import pl.sg.application.api.DomainSimple;
+import pl.sg.application.api.WithDomain;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Currency;
 import java.util.List;
 
-public class ClientPaymentTO implements WithDomainTO {
+public class ClientPayment implements WithDomain {
 
     private Integer id;
-    private ClientTO client;
+    private Client client;
     LocalDate date;
     BigDecimal price;
     Currency currency;
@@ -20,12 +20,12 @@ public class ClientPaymentTO implements WithDomainTO {
     boolean invoice;
     boolean notRegistered;
     List<PerformedServicePaymentSimpleTO> serviceRelations;
-    DomainTO domain;
+    DomainSimple domain;
 
-    public ClientPaymentTO() {
+    public ClientPayment() {
     }
 
-    public ClientPaymentTO(Integer id, ClientTO client, LocalDate date, BigDecimal price, Currency currency, boolean billOfSale, boolean billOfSaleAsInvoice, boolean invoice, boolean notRegistered, List<PerformedServicePaymentSimpleTO> serviceRelations, DomainTO domain) {
+    public ClientPayment(Integer id, Client client, LocalDate date, BigDecimal price, Currency currency, boolean billOfSale, boolean billOfSaleAsInvoice, boolean invoice, boolean notRegistered, List<PerformedServicePaymentSimpleTO> serviceRelations, DomainSimple domain) {
         this.id = id;
         this.client = client;
         this.date = date;
@@ -44,16 +44,16 @@ public class ClientPaymentTO implements WithDomainTO {
         return id;
     }
 
-    public ClientPaymentTO setId(Integer id) {
+    public ClientPayment setId(Integer id) {
         this.id = id;
         return this;
     }
 
-    public ClientTO getClient() {
+    public Client getClient() {
         return client;
     }
 
-    public ClientPaymentTO setClient(ClientTO client) {
+    public ClientPayment setClient(Client client) {
         this.client = client;
         return this;
     }
@@ -62,7 +62,7 @@ public class ClientPaymentTO implements WithDomainTO {
         return date;
     }
 
-    public ClientPaymentTO setDate(LocalDate date) {
+    public ClientPayment setDate(LocalDate date) {
         this.date = date;
         return this;
     }
@@ -71,7 +71,7 @@ public class ClientPaymentTO implements WithDomainTO {
         return price;
     }
 
-    public ClientPaymentTO setPrice(BigDecimal price) {
+    public ClientPayment setPrice(BigDecimal price) {
         this.price = price;
         return this;
     }
@@ -80,7 +80,7 @@ public class ClientPaymentTO implements WithDomainTO {
         return currency;
     }
 
-    public ClientPaymentTO setCurrency(Currency currency) {
+    public ClientPayment setCurrency(Currency currency) {
         this.currency = currency;
         return this;
     }
@@ -89,7 +89,7 @@ public class ClientPaymentTO implements WithDomainTO {
         return billOfSale;
     }
 
-    public ClientPaymentTO setBillOfSale(boolean billOfSale) {
+    public ClientPayment setBillOfSale(boolean billOfSale) {
         this.billOfSale = billOfSale;
         return this;
     }
@@ -98,7 +98,7 @@ public class ClientPaymentTO implements WithDomainTO {
         return billOfSaleAsInvoice;
     }
 
-    public ClientPaymentTO setBillOfSaleAsInvoice(boolean billOfSaleAsInvoice) {
+    public ClientPayment setBillOfSaleAsInvoice(boolean billOfSaleAsInvoice) {
         this.billOfSaleAsInvoice = billOfSaleAsInvoice;
         return this;
     }
@@ -107,7 +107,7 @@ public class ClientPaymentTO implements WithDomainTO {
         return invoice;
     }
 
-    public ClientPaymentTO setInvoice(boolean invoice) {
+    public ClientPayment setInvoice(boolean invoice) {
         this.invoice = invoice;
         return this;
     }
@@ -116,7 +116,7 @@ public class ClientPaymentTO implements WithDomainTO {
         return notRegistered;
     }
 
-    public ClientPaymentTO setNotRegistered(boolean notRegistered) {
+    public ClientPayment setNotRegistered(boolean notRegistered) {
         this.notRegistered = notRegistered;
         return this;
     }
@@ -125,17 +125,17 @@ public class ClientPaymentTO implements WithDomainTO {
         return serviceRelations;
     }
 
-    public ClientPaymentTO setServiceRelations(List<PerformedServicePaymentSimpleTO> serviceRelations) {
+    public ClientPayment setServiceRelations(List<PerformedServicePaymentSimpleTO> serviceRelations) {
         this.serviceRelations = serviceRelations;
         return this;
     }
 
     @Override
-    public DomainTO getDomain() {
+    public DomainSimple getDomain() {
         return domain;
     }
 
-    public ClientPaymentTO setDomain(DomainTO domain) {
+    public ClientPayment setDomain(DomainSimple domain) {
         this.domain = domain;
         return this;
     }

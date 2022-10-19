@@ -1,7 +1,6 @@
 package pl.sg.accountant.controller;
 
-import pl.sg.accountant.model.accounts.Client;
-import pl.sg.accountant.transport.accounts.ClientTO;
+import pl.sg.accountant.transport.accounts.Client;
 import pl.sg.application.model.Domain;
 
 import javax.validation.Valid;
@@ -9,9 +8,9 @@ import java.util.List;
 
 public interface ClientsController {
 
-    List<ClientTO> clients(Domain domain);
+    List<Client> clients(Domain domain);
 
-    ClientTO createClient(@Valid Client client);
+    Client createClient(@Valid pl.sg.accountant.model.accounts.Client client);
 
-    ClientTO updateClient(@Valid Client client);
+    Client updateClient(@Valid pl.sg.accountant.model.accounts.Client client);
 }

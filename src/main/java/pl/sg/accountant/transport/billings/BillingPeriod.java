@@ -1,23 +1,23 @@
 package pl.sg.accountant.transport.billings;
 
-import pl.sg.application.transport.DomainTO;
-import pl.sg.application.transport.WithDomainTO;
+import pl.sg.application.api.DomainSimple;
+import pl.sg.application.api.WithDomain;
 
 import java.time.YearMonth;
 import java.util.List;
 
-public class BillingPeriodTO implements WithDomainTO {
+public class BillingPeriod implements WithDomain {
     private Integer id;
     private String name;
     private YearMonth period;
     private List<IncomeTO> incomes;
     private List<ExpenseTO> expenses;
-    private DomainTO domain;
+    private DomainSimple domain;
 
-    public BillingPeriodTO() {
+    public BillingPeriod() {
     }
 
-    public BillingPeriodTO(int id, String name, YearMonth period, List<IncomeTO> incomes, List<ExpenseTO> expenses, DomainTO domain) {
+    public BillingPeriod(int id, String name, YearMonth period, List<IncomeTO> incomes, List<ExpenseTO> expenses, DomainSimple domain) {
         this.id = id;
         this.name = name;
         this.period = period;
@@ -67,11 +67,11 @@ public class BillingPeriodTO implements WithDomainTO {
     }
 
     @Override
-    public DomainTO getDomain() {
+    public DomainSimple getDomain() {
         return domain;
     }
 
-    public BillingPeriodTO setDomain(DomainTO domain) {
+    public BillingPeriod setDomain(DomainSimple domain) {
         this.domain = domain;
         return this;
     }

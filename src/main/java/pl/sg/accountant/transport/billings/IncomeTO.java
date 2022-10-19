@@ -9,13 +9,13 @@ public class IncomeTO {
     private String description;
     private BigDecimal amount;
     private Currency currency;
-    private CategoryTO category;
+    private Category category;
     private LocalDate incomeDate;
 
     public IncomeTO() {
     }
 
-    public IncomeTO(int id, String description, BigDecimal amount, Currency currency, CategoryTO category, LocalDate incomeDate) {
+    public IncomeTO(int id, String description, BigDecimal amount, Currency currency, Category category, LocalDate incomeDate) {
         this.id = id;
         this.description = description;
         this.amount = amount;
@@ -56,11 +56,11 @@ public class IncomeTO {
         this.currency = currency;
     }
 
-    public CategoryTO getCategory() {
+    public Category getCategory() {
         return category;
     }
 
-    public void setCategory(CategoryTO category) {
+    public void setCategory(Category category) {
         this.category = category;
     }
 

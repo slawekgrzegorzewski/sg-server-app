@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.sg.accountant.service.AccountantSettingsService;
-import pl.sg.accountant.transport.AccountantSettingsTO;
+import pl.sg.accountant.transport.AccountantSettings;
 import pl.sg.application.model.Domain;
 import pl.sg.application.security.annotations.RequestDomain;
 import pl.sg.application.security.annotations.TokenBearerAuth;
@@ -27,22 +27,22 @@ public class AccountantSettingsRestController implements AccountantSettingsContr
     @Override
     @GetMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public AccountantSettingsTO getForDomain(@RequestDomain Domain domain) {
-        return this.mapper.map(accountantSettingsService.getForDomain(domain), AccountantSettingsTO.class);
+    public AccountantSettings getForDomain(@RequestDomain Domain domain) {
+        return this.mapper.map(accountantSettingsService.getForDomain(domain), AccountantSettings.class);
     }
 
     @Override
     @PatchMapping("/is-company/enable")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public AccountantSettingsTO enableIsCompany(@RequestDomain Domain domain) {
-        return this.mapper.map(accountantSettingsService.enableIsCompany(domain), AccountantSettingsTO.class);
+    public AccountantSettings enableIsCompany(@RequestDomain Domain domain) {
+        return this.mapper.map(accountantSettingsService.enableIsCompany(domain), AccountantSettings.class);
     }
 
     @Override
     @PatchMapping("/is-company/disable")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public AccountantSettingsTO disableIsCompany(@RequestDomain Domain domain) {
-        return this.mapper.map(accountantSettingsService.disableIsCompany(domain), AccountantSettingsTO.class);
+    public AccountantSettings disableIsCompany(@RequestDomain Domain domain) {
+        return this.mapper.map(accountantSettingsService.disableIsCompany(domain), AccountantSettings.class);
     }
 
 }

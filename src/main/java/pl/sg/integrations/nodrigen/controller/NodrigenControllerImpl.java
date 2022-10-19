@@ -11,9 +11,8 @@ import pl.sg.integrations.nodrigen.model.rest.NodrigenInstitution;
 import pl.sg.integrations.nodrigen.repository.NodrigenTransactionsToImportRepository;
 import pl.sg.integrations.nodrigen.services.NodrigenService;
 import pl.sg.integrations.nodrigen.NodrigenClient;
-import pl.sg.integrations.nodrigen.model.NodrigenBankPermission;
 import pl.sg.integrations.nodrigen.repository.NodrigenBankPermissionRepository;
-import pl.sg.integrations.nodrigen.transport.NodrigenBankPermissionTO;
+import pl.sg.integrations.nodrigen.transport.NodrigenBankPermission;
 import pl.sg.integrations.nodrigen.transport.NodrigenPermissionRequest;
 import pl.sg.integrations.nodrigen.transport.NodrigenTransactionsToImportTO;
 
@@ -65,20 +64,20 @@ public class NodrigenControllerImpl implements NodrigenController {
     @Override
     @GetMapping("/permissions/granted")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public List<NodrigenBankPermissionTO> getPermissionsGranted(@RequestDomain Domain domain) {
+    public List<NodrigenBankPermission> getPermissionsGranted(@RequestDomain Domain domain) {
         return nodrigenBankPermissionRepository.findPermissionsGranted(domain)
                 .stream()
-                .map(nbp -> this.modelMapper.map(nbp, NodrigenBankPermissionTO.class))
+                .map(nbp -> this.modelMapper.map(nbp, NodrigenBankPermission.class))
                 .collect(Collectors.toList());
     }
 
     @Override
     @GetMapping("/permissions/to_proccess")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public List<NodrigenBankPermissionTO> getPermissionToProceed(@RequestDomain Domain domain) {
+    public List<NodrigenBankPermission> getPermissionToProceed(@RequestDomain Domain domain) {
         return nodrigenBankPermissionRepository.findPermissionsToConfirm(domain)
                 .stream()
-                .map(nbp -> this.modelMapper.map(nbp, NodrigenBankPermissionTO.class))
+                .map(nbp -> this.modelMapper.map(nbp, NodrigenBankPermission.class))
                 .collect(Collectors.toList());
     }
 
@@ -93,14 +92,14 @@ public class NodrigenControllerImpl implements NodrigenController {
     @Override
     @PostMapping("/permissions")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public List<NodrigenBankPermissionTO> getPermissionToProceed(
+    public List<NodrigenBankPermission> getPermissionToProceed(
             @RequestDomain Domain domain,
             @RequestBody NodrigenPermissionRequest nodrigenPermissionRequest) {
-        NodrigenBankPermission permission = nodrigenService.createRequisition(domain, nodrigenPermissionRequest);
+        pl.sg.integrations.nodrigen.model.NodrigenBankPermission permission = nodrigenService.createRequisition(domain, nodrigenPermissionRequest);
         nodrigenBankPermissionRepository.save(permission);
         return nodrigenBankPermissionRepository.findPermissionsToConfirm(domain)
                 .stream()
-                .map(nbp -> this.modelMapper.map(nbp, NodrigenBankPermissionTO.class))
+                .map(nbp -> this.modelMapper.map(nbp, NodrigenBankPermission.class))
                 .collect(Collectors.toList());
     }
 

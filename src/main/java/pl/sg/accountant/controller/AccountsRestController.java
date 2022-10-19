@@ -3,13 +3,12 @@ package pl.sg.accountant.controller;
 import org.modelmapper.ModelMapper;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.model.billings.BillingPeriod;
 import pl.sg.accountant.model.billings.summary.MonthSummaryPiggyBank;
 import pl.sg.accountant.service.AccountsService;
 import pl.sg.accountant.service.BillingPeriodsService;
 import pl.sg.accountant.service.MonthSummaryService;
-import pl.sg.accountant.transport.accounts.AccountTO;
+import pl.sg.accountant.transport.accounts.Account;
 import pl.sg.application.model.Domain;
 import pl.sg.application.security.annotations.PathVariableWithDomain;
 import pl.sg.application.security.annotations.RequestBodyWithDomain;
@@ -45,14 +44,14 @@ public class AccountsRestController implements AccountsController {
     @Override
     @GetMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN"})
-    public List<AccountTO> allAccounts() {
+    public List<Account> allAccounts() {
         return map(accountsService.getAll());
     }
 
     @Override
     @GetMapping("/mine")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public List<AccountTO> domainAccount(@RequestDomain Domain domain) {
+    public List<Account> domainAccount(@RequestDomain Domain domain) {
 
         Map<YearMonth, List<MonthSummaryPiggyBank>> piggyBanksHistory = monthSummaryService.getPiggyBanksHistory(domain, 24);
         Map<YearMonth, Map<Currency, BigDecimal>> savingsHistory = monthSummaryService.getSavingsHistory(domain, 24);
@@ -95,30 +94,30 @@ public class AccountsRestController implements AccountsController {
         return map(accountsService.getForDomain(domain));
     }
 
-    private List<AccountTO> map(List<Account> accounts) {
-        return accounts.stream().map(a -> mapper.map(a, AccountTO.class)).collect(Collectors.toList());
+    private List<Account> map(List<pl.sg.accountant.model.accounts.Account> accounts) {
+        return accounts.stream().map(a -> mapper.map(a, Account.class)).collect(Collectors.toList());
     }
 
     @Override
     @PutMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"}, domainAdmin = true)
-    public AccountTO createAccount(
+    public Account createAccount(
             @RequestBodyWithDomain(
-                    transportClass = AccountTO.class,
+                    transportClass = Account.class,
                     mapperName = CREATE_ACCOUNT,
                     create = true,
                     domainAdmin = true)
-            @Valid Account account
+            @Valid pl.sg.accountant.model.accounts.Account account
     ) {
         accountsService.createAccount(account);
-        return mapper.map(account, AccountTO.class);
+        return mapper.map(account, Account.class);
     }
 
     @Override
     @PatchMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public String updateAccount(
-            @RequestBodyWithDomain(transportClass = AccountTO.class, mapperName = UPDATE_ACCOUNT) @Valid Account account
+            @RequestBodyWithDomain(transportClass = Account.class, mapperName = UPDATE_ACCOUNT) @Valid pl.sg.accountant.model.accounts.Account account
     ) {
         accountsService.update(account);
         return "OK";
@@ -127,7 +126,7 @@ public class AccountsRestController implements AccountsController {
     @Override
     @DeleteMapping("/{account}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public String deleteAccount(@PathVariableWithDomain(requireAdmin = true) Account account) {
+    public String deleteAccount(@PathVariableWithDomain(requireAdmin = true) pl.sg.accountant.model.accounts.Account account) {
         accountsService.delete(account);
         return "Deleted.";
     }

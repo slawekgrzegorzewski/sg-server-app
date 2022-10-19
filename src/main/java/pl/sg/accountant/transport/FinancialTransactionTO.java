@@ -1,6 +1,6 @@
 package pl.sg.accountant.transport;
 
-import pl.sg.accountant.transport.accounts.AccountTO;
+import pl.sg.accountant.transport.accounts.Account;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 public class FinancialTransactionTO {
     private Integer id;
     String description;
-    AccountTO source;
-    AccountTO destination;
+    Account source;
+    Account destination;
     private BigDecimal debit;
     private BigDecimal credit;
     private LocalDateTime timeOfTransaction;
@@ -18,7 +18,7 @@ public class FinancialTransactionTO {
     public FinancialTransactionTO() {
     }
 
-    public FinancialTransactionTO(int id, String description, AccountTO source, AccountTO destination, BigDecimal debit, BigDecimal credit, LocalDateTime timeOfTransaction) {
+    public FinancialTransactionTO(int id, String description, Account source, Account destination, BigDecimal debit, BigDecimal credit, LocalDateTime timeOfTransaction) {
         this.id = id;
         this.description = description;
         this.source = source;
@@ -46,20 +46,20 @@ public class FinancialTransactionTO {
         return this;
     }
 
-    public AccountTO getSource() {
+    public Account getSource() {
         return source;
     }
 
-    public FinancialTransactionTO setSource(AccountTO source) {
+    public FinancialTransactionTO setSource(Account source) {
         this.source = source;
         return this;
     }
 
-    public AccountTO getDestination() {
+    public Account getDestination() {
         return destination;
     }
 
-    public FinancialTransactionTO setDestination(AccountTO destination) {
+    public FinancialTransactionTO setDestination(Account destination) {
         this.destination = destination;
         return this;
     }

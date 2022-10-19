@@ -1,17 +1,17 @@
 package pl.sg.integrations.nodrigen.transport;
 
-import pl.sg.application.transport.DomainTO;
-import pl.sg.application.transport.WithDomainTO;
-import pl.sg.banks.transport.BankAccountTO;
+import pl.sg.application.api.DomainSimple;
+import pl.sg.application.api.WithDomain;
+import pl.sg.banks.transport.BankAccount;
 
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class NodrigenBankPermissionTO implements WithDomainTO {
+public class NodrigenBankPermission implements WithDomain {
 
     private Integer id;
-    private DomainTO domain;
+    private DomainSimple domain;
     private String institutionId;
     private LocalDateTime createdAt;
     private LocalDateTime givenAt;
@@ -19,24 +19,24 @@ public class NodrigenBankPermissionTO implements WithDomainTO {
     private String reference;
     private String ssn;
     private URL confirmationLink;
-    private List<BankAccountTO> bankAccounts;
+    private List<BankAccount> bankAccounts;
 
     @Override
     public Integer getId() {
         return id;
     }
 
-    public NodrigenBankPermissionTO setId(Integer id) {
+    public NodrigenBankPermission setId(Integer id) {
         this.id = id;
         return this;
     }
 
     @Override
-    public DomainTO getDomain() {
+    public DomainSimple getDomain() {
         return domain;
     }
 
-    public NodrigenBankPermissionTO setDomain(DomainTO domain) {
+    public NodrigenBankPermission setDomain(DomainSimple domain) {
         this.domain = domain;
         return this;
     }
@@ -45,7 +45,7 @@ public class NodrigenBankPermissionTO implements WithDomainTO {
         return institutionId;
     }
 
-    public NodrigenBankPermissionTO setInstitutionId(String institutionId) {
+    public NodrigenBankPermission setInstitutionId(String institutionId) {
         this.institutionId = institutionId;
         return this;
     }
@@ -54,7 +54,7 @@ public class NodrigenBankPermissionTO implements WithDomainTO {
         return createdAt;
     }
 
-    public NodrigenBankPermissionTO setCreatedAt(LocalDateTime createdAt) {
+    public NodrigenBankPermission setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
         return this;
     }
@@ -63,7 +63,7 @@ public class NodrigenBankPermissionTO implements WithDomainTO {
         return givenAt;
     }
 
-    public NodrigenBankPermissionTO setGivenAt(LocalDateTime givenAt) {
+    public NodrigenBankPermission setGivenAt(LocalDateTime givenAt) {
         this.givenAt = givenAt;
         return this;
     }
@@ -72,7 +72,7 @@ public class NodrigenBankPermissionTO implements WithDomainTO {
         return withdrawnAt;
     }
 
-    public NodrigenBankPermissionTO setWithdrawnAt(LocalDateTime withdrawnAt) {
+    public NodrigenBankPermission setWithdrawnAt(LocalDateTime withdrawnAt) {
         this.withdrawnAt = withdrawnAt;
         return this;
     }
@@ -81,7 +81,7 @@ public class NodrigenBankPermissionTO implements WithDomainTO {
         return reference;
     }
 
-    public NodrigenBankPermissionTO setReference(String reference) {
+    public NodrigenBankPermission setReference(String reference) {
         this.reference = reference;
         return this;
     }
@@ -90,7 +90,7 @@ public class NodrigenBankPermissionTO implements WithDomainTO {
         return ssn;
     }
 
-    public NodrigenBankPermissionTO setSsn(String ssn) {
+    public NodrigenBankPermission setSsn(String ssn) {
         this.ssn = ssn;
         return this;
     }
@@ -99,16 +99,16 @@ public class NodrigenBankPermissionTO implements WithDomainTO {
         return confirmationLink;
     }
 
-    public NodrigenBankPermissionTO setConfirmationLink(URL confirmationLink) {
+    public NodrigenBankPermission setConfirmationLink(URL confirmationLink) {
         this.confirmationLink = confirmationLink;
         return this;
     }
 
-    public List<BankAccountTO> getBankAccounts() {
+    public List<BankAccount> getBankAccounts() {
         return bankAccounts;
     }
 
-    public NodrigenBankPermissionTO setBankAccounts(List<BankAccountTO> bankAccounts) {
+    public NodrigenBankPermission setBankAccounts(List<BankAccount> bankAccounts) {
         this.bankAccounts = bankAccounts;
         return this;
     }

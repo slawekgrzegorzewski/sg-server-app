@@ -1,28 +1,28 @@
 package pl.sg.accountant.transport.accounts;
 
-import pl.sg.application.transport.DomainTO;
-import pl.sg.application.transport.WithDomainTO;
+import pl.sg.application.api.DomainSimple;
+import pl.sg.application.api.WithDomain;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Currency;
 import java.util.List;
 
-public class PerformedServiceTO implements WithDomainTO {
+public class PerformedService implements WithDomain {
 
     private Integer id;
     LocalDate date;
-    ServiceTO service;
-    ClientTO client;
+    Service service;
+    Client client;
     BigDecimal price;
     Currency currency;
     List<PerformedServicePaymentSimpleTO> clientPaymentsRelations;
-    DomainTO domain;
+    DomainSimple domain;
 
-    public PerformedServiceTO() {
+    public PerformedService() {
     }
 
-    public PerformedServiceTO(Integer id, LocalDate date, ServiceTO service, ClientTO client, BigDecimal price, Currency currency, List<PerformedServicePaymentSimpleTO> clientPaymentsRelations, DomainTO domain) {
+    public PerformedService(Integer id, LocalDate date, Service service, Client client, BigDecimal price, Currency currency, List<PerformedServicePaymentSimpleTO> clientPaymentsRelations, DomainSimple domain) {
         this.id = id;
         this.date = date;
         this.service = service;
@@ -38,7 +38,7 @@ public class PerformedServiceTO implements WithDomainTO {
         return id;
     }
 
-    public PerformedServiceTO setId(Integer id) {
+    public PerformedService setId(Integer id) {
         this.id = id;
         return this;
     }
@@ -47,25 +47,25 @@ public class PerformedServiceTO implements WithDomainTO {
         return date;
     }
 
-    public PerformedServiceTO setDate(LocalDate date) {
+    public PerformedService setDate(LocalDate date) {
         this.date = date;
         return this;
     }
 
-    public ServiceTO getService() {
+    public Service getService() {
         return service;
     }
 
-    public PerformedServiceTO setService(ServiceTO service) {
+    public PerformedService setService(Service service) {
         this.service = service;
         return this;
     }
 
-    public ClientTO getClient() {
+    public Client getClient() {
         return client;
     }
 
-    public PerformedServiceTO setClient(ClientTO client) {
+    public PerformedService setClient(Client client) {
         this.client = client;
         return this;
     }
@@ -74,7 +74,7 @@ public class PerformedServiceTO implements WithDomainTO {
         return price;
     }
 
-    public PerformedServiceTO setPrice(BigDecimal price) {
+    public PerformedService setPrice(BigDecimal price) {
         this.price = price;
         return this;
     }
@@ -83,7 +83,7 @@ public class PerformedServiceTO implements WithDomainTO {
         return currency;
     }
 
-    public PerformedServiceTO setCurrency(Currency currency) {
+    public PerformedService setCurrency(Currency currency) {
         this.currency = currency;
         return this;
     }
@@ -92,17 +92,17 @@ public class PerformedServiceTO implements WithDomainTO {
         return clientPaymentsRelations;
     }
 
-    public PerformedServiceTO setClientPaymentsRelations(List<PerformedServicePaymentSimpleTO> clientPaymentsRelations) {
+    public PerformedService setClientPaymentsRelations(List<PerformedServicePaymentSimpleTO> clientPaymentsRelations) {
         this.clientPaymentsRelations = clientPaymentsRelations;
         return this;
     }
 
     @Override
-    public DomainTO getDomain() {
+    public DomainSimple getDomain() {
         return domain;
     }
 
-    public PerformedServiceTO setDomain(DomainTO domain) {
+    public PerformedService setDomain(DomainSimple domain) {
         this.domain = domain;
         return this;
     }

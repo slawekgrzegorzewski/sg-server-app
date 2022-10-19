@@ -9,13 +9,13 @@ public class ExpenseTO {
     private String description;
     private BigDecimal amount;
     private Currency currency;
-    private CategoryTO category;
+    private Category category;
     private LocalDate expenseDate;
 
     public ExpenseTO() {
     }
 
-    public ExpenseTO(int id, String description, BigDecimal amount, Currency currency, CategoryTO category, LocalDate expenseDate) {
+    public ExpenseTO(int id, String description, BigDecimal amount, Currency currency, Category category, LocalDate expenseDate) {
         this.id = id;
         this.description = description;
         this.amount = amount;
@@ -60,11 +60,11 @@ public class ExpenseTO {
         return this;
     }
 
-    public CategoryTO getCategory() {
+    public Category getCategory() {
         return category;
     }
 
-    public ExpenseTO setCategory(CategoryTO category) {
+    public ExpenseTO setCategory(Category category) {
         this.category = category;
         return this;
     }

@@ -1,17 +1,17 @@
-package pl.sg.application.transport;
+package pl.sg.application.api;
 
 import java.util.Map;
 
-public class DomainFullTO {
+public class Domain {
 
     private Integer id;
     String name;
     Map<String, String> usersAccessLevel;
 
-    public DomainFullTO() {
+    public Domain() {
     }
 
-    public DomainFullTO(Integer id, String name, Map<String, String> usersAccessLevel) {
+    public Domain(Integer id, String name, Map<String, String> usersAccessLevel) {
         this.id = id;
         this.name = name;
         this.usersAccessLevel = usersAccessLevel;
@@ -21,7 +21,7 @@ public class DomainFullTO {
         return id;
     }
 
-    public DomainFullTO setId(int id) {
+    public Domain setId(int id) {
         this.id = id;
         return this;
     }
@@ -30,7 +30,7 @@ public class DomainFullTO {
         return name;
     }
 
-    public DomainFullTO setName(String name) {
+    public Domain setName(String name) {
         this.name = name;
         return this;
     }
@@ -39,7 +39,7 @@ public class DomainFullTO {
         return usersAccessLevel;
     }
 
-    public DomainFullTO setUsersAccessLevel(Map<String, String> usersAccessLevel) {
+    public Domain setUsersAccessLevel(Map<String, String> usersAccessLevel) {
         this.usersAccessLevel = usersAccessLevel;
         return this;
     }

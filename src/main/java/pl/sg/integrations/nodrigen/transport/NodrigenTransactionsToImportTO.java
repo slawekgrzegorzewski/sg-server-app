@@ -1,6 +1,6 @@
 package pl.sg.integrations.nodrigen.transport;
 
-import pl.sg.accountant.transport.accounts.AccountTO;
+import pl.sg.accountant.transport.accounts.Account;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -13,8 +13,8 @@ public class NodrigenTransactionsToImportTO {
     private BigDecimal debit;
     private String description;
     private Instant timeOfTransaction;
-    private AccountTO destinationAccount;
-    private AccountTO sourceAccount;
+    private Account destinationAccount;
+    private Account sourceAccount;
     private Integer creditBankAccountId;
     private Integer debitBankAccountId;
     private Integer creditNodrigenTransactionId;
@@ -24,7 +24,7 @@ public class NodrigenTransactionsToImportTO {
     public NodrigenTransactionsToImportTO() {
     }
 
-    public NodrigenTransactionsToImportTO(Long id, Integer domainId, BigDecimal conversionRate, BigDecimal credit, BigDecimal debit, String description, Instant timeOfTransaction, AccountTO destinationAccount, AccountTO sourceAccount, Integer creditBankAccountId, Integer debitBankAccountId, Integer creditNodrigenTransactionId, Integer debitNodrigenTransactionId, Integer nodrigenTransactionId) {
+    public NodrigenTransactionsToImportTO(Long id, Integer domainId, BigDecimal conversionRate, BigDecimal credit, BigDecimal debit, String description, Instant timeOfTransaction, Account destinationAccount, Account sourceAccount, Integer creditBankAccountId, Integer debitBankAccountId, Integer creditNodrigenTransactionId, Integer debitNodrigenTransactionId, Integer nodrigenTransactionId) {
         this.id = id;
         this.domainId = domainId;
         this.conversionRate = conversionRate;
@@ -104,20 +104,20 @@ public class NodrigenTransactionsToImportTO {
         return this;
     }
 
-    public AccountTO getDestinationAccount() {
+    public Account getDestinationAccount() {
         return destinationAccount;
     }
 
-    public NodrigenTransactionsToImportTO setDestinationAccount(AccountTO destinationAccount) {
+    public NodrigenTransactionsToImportTO setDestinationAccount(Account destinationAccount) {
         this.destinationAccount = destinationAccount;
         return this;
     }
 
-    public AccountTO getSourceAccount() {
+    public Account getSourceAccount() {
         return sourceAccount;
     }
 
-    public NodrigenTransactionsToImportTO setSourceAccount(AccountTO sourceAccount) {
+    public NodrigenTransactionsToImportTO setSourceAccount(Account sourceAccount) {
         this.sourceAccount = sourceAccount;
         return this;
     }

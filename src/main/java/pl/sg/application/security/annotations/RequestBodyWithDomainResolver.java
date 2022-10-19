@@ -14,9 +14,8 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.Domain;
-import pl.sg.application.model.WithDomain;
 import pl.sg.application.service.AuthorizationService;
-import pl.sg.application.transport.WithDomainTO;
+import pl.sg.application.api.WithDomain;
 
 import javax.persistence.EntityManager;
 import java.io.IOException;
@@ -47,7 +46,7 @@ public class RequestBodyWithDomainResolver implements HandlerMethodArgumentResol
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         RequestBodyWithDomain ann = parameter.getParameterAnnotation(RequestBodyWithDomain.class);
-        final boolean isWithDomain = Arrays.asList(parameter.getParameterType().getInterfaces()).contains(WithDomain.class);
+        final boolean isWithDomain = Arrays.asList(parameter.getParameterType().getInterfaces()).contains(pl.sg.application.model.WithDomain.class);
         return ann != null && isWithDomain;
     }
 
@@ -62,14 +61,14 @@ public class RequestBodyWithDomainResolver implements HandlerMethodArgumentResol
                 .collect(Collectors.joining("\n"));
         final RequestBodyWithDomain ann = parameter.getParameterAnnotation(RequestBodyWithDomain.class);
         Domain domain;
-        WithDomainTO withDomainTO = gson.fromJson(body, ann.transportClass());
+        WithDomain withDomainTO = gson.fromJson(body, ann.transportClass());
         handleWithZoneId((ServletWebRequest) webRequest, withDomainTO);
-        WithDomain withDomain;
+        pl.sg.application.model.WithDomain withDomain;
         if (ann.create()) {
             withDomain = map(withDomainTO, parameter.getParameterType(), ann);
             domain = new DomainExtractor(this.entityManager).getDomain(webRequest.getHeader("domainId"));
         } else {
-            withDomain = (WithDomain) this.entityManager.find(parameter.getParameterType(), withDomainTO.getId());
+            withDomain = (pl.sg.application.model.WithDomain) this.entityManager.find(parameter.getParameterType(), withDomainTO.getId());
             domain = withDomain.getDomain();
             map(withDomainTO, withDomain, ann);
         }
@@ -87,13 +86,13 @@ public class RequestBodyWithDomainResolver implements HandlerMethodArgumentResol
         return withDomain;
     }
 
-    private static void handleWithZoneId(ServletWebRequest webRequest, WithDomainTO withDomainTO) throws IllegalAccessException {
-        for (Field field : withDomainTO.getClass().getDeclaredFields()) {
+    private static void handleWithZoneId(ServletWebRequest webRequest, WithDomain withDomain) throws IllegalAccessException {
+        for (Field field : withDomain.getClass().getDeclaredFields()) {
             if (field.getType().equals(LocalDateTime.class) && field.isAnnotationPresent(AddZoneIdOffsetDuringDeserialization.class)) {
                 ZoneId zoneId = ofNullable(webRequest.getRequest().getHeader("x-timezone-id"))
                         .map(ZoneId::of)
                         .orElseGet(ZoneId::systemDefault);
-                BeanWrapper wrapper = new BeanWrapperImpl(withDomainTO);
+                BeanWrapper wrapper = new BeanWrapperImpl(withDomain);
                 ofNullable((LocalDateTime) wrapper.getPropertyValue(field.getName()))
                         .map(localDateTime -> localDateTime.atZone(ZoneId.of("UTC")).withZoneSameInstant(zoneId).toLocalDateTime())
                         .ifPresent(localDateTime -> wrapper.setPropertyValue(field.getName(), localDateTime));
@@ -101,17 +100,17 @@ public class RequestBodyWithDomainResolver implements HandlerMethodArgumentResol
         }
     }
 
-    private WithDomain map(WithDomainTO source, Class<?> destType, RequestBodyWithDomain ann) {
-        WithDomain withDomain;
+    private pl.sg.application.model.WithDomain map(WithDomain source, Class<?> destType, RequestBodyWithDomain ann) {
+        pl.sg.application.model.WithDomain withDomain;
         if (StringUtils.hasText(ann.mapperName())) {
-            withDomain = (WithDomain) this.modelMapper.map(source, destType, ann.mapperName());
+            withDomain = (pl.sg.application.model.WithDomain) this.modelMapper.map(source, destType, ann.mapperName());
         } else {
-            withDomain = (WithDomain) this.modelMapper.map(source, destType);
+            withDomain = (pl.sg.application.model.WithDomain) this.modelMapper.map(source, destType);
         }
         return withDomain;
     }
 
-    private WithDomain map(WithDomainTO source, WithDomain dest, RequestBodyWithDomain ann) {
+    private pl.sg.application.model.WithDomain map(WithDomain source, pl.sg.application.model.WithDomain dest, RequestBodyWithDomain ann) {
         if (StringUtils.hasText(ann.mapperName())) {
             this.modelMapper.map(source, dest, ann.mapperName());
         } else {

@@ -4,17 +4,14 @@ import com.google.gson.Gson;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import pl.sg.application.model.ApplicationUser;
-import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;
 import pl.sg.application.service.AuthorizationService;
-import pl.sg.application.transport.WithDomainTO;
 
 import javax.persistence.EntityManager;
 import java.io.IOException;

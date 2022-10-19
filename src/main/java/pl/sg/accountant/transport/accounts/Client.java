@@ -1,21 +1,19 @@
 package pl.sg.accountant.transport.accounts;
 
-import pl.sg.application.transport.DomainTO;
-import pl.sg.application.transport.WithDomainTO;
+import pl.sg.application.api.DomainSimple;
+import pl.sg.application.api.WithDomain;
 
-import java.util.List;
-
-public class ClientTO implements WithDomainTO {
+public class Client implements WithDomain {
 
     private Integer id;
     String name;
-    DomainTO domain;
+    DomainSimple domain;
 
 
-    public ClientTO() {
+    public Client() {
     }
 
-    public ClientTO(Integer id, String name, DomainTO domain) {
+    public Client(Integer id, String name, DomainSimple domain) {
         this.id = id;
         this.name = name;
         this.domain = domain;
@@ -25,7 +23,7 @@ public class ClientTO implements WithDomainTO {
         return id;
     }
 
-    public ClientTO setId(Integer id) {
+    public Client setId(Integer id) {
         this.id = id;
         return this;
     }
@@ -34,16 +32,16 @@ public class ClientTO implements WithDomainTO {
         return name;
     }
 
-    public ClientTO setName(String name) {
+    public Client setName(String name) {
         this.name = name;
         return this;
     }
 
-    public DomainTO getDomain() {
+    public DomainSimple getDomain() {
         return domain;
     }
 
-    public ClientTO setDomain(DomainTO domain) {
+    public Client setDomain(DomainSimple domain) {
         this.domain = domain;
         return this;
     }

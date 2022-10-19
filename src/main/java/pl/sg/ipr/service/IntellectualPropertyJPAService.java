@@ -4,7 +4,9 @@ import org.springframework.stereotype.Component;
 import pl.sg.application.model.Domain;
 import pl.sg.ipr.model.IntellectualProperty;
 import pl.sg.ipr.repository.IntellectualPropertyRepository;
-import pl.sg.ipr.transport.IntellectualPropertyCreateData;
+import pl.sg.ipr.api.IntellectualPropertyCreateData;
+
+import java.util.List;
 
 @Component
 public class IntellectualPropertyJPAService implements IntellectualPropertyService {
@@ -13,6 +15,11 @@ public class IntellectualPropertyJPAService implements IntellectualPropertyServi
 
     public IntellectualPropertyJPAService(IntellectualPropertyRepository intellectualPropertyRepository) {
         this.intellectualPropertyRepository = intellectualPropertyRepository;
+    }
+
+    @Override
+    public List<IntellectualProperty> getAll(Domain domain) {
+        return intellectualPropertyRepository.findAllByDomain(domain);
     }
 
     @Override

@@ -1,15 +1,15 @@
-package pl.sg.application.transport;
+package pl.sg.application.api;
 
-public class DomainTO {
+public class DomainSimple {
 
     private Integer id;
     String name;
 
 
-    public DomainTO() {
+    public DomainSimple() {
     }
 
-    public DomainTO(Integer id, String name) {
+    public DomainSimple(Integer id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -18,7 +18,7 @@ public class DomainTO {
         return id;
     }
 
-    public DomainTO setId(int id) {
+    public DomainSimple setId(int id) {
         this.id = id;
         return this;
     }
@@ -27,7 +27,7 @@ public class DomainTO {
         return name;
     }
 
-    public DomainTO setName(String name) {
+    public DomainSimple setName(String name) {
         this.name = name;
         return this;
     }

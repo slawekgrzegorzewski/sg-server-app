@@ -1,21 +1,21 @@
 package pl.sg.accountant.transport;
 
-import pl.sg.application.transport.DomainTO;
-import pl.sg.application.transport.WithDomainTO;
+import pl.sg.application.api.DomainSimple;
+import pl.sg.application.api.WithDomain;
 
 import java.math.BigDecimal;
 
-public class HolidayCurrenciesTO implements WithDomainTO {
+public class HolidayCurrencies implements WithDomain {
 
     private Integer id;
     private BigDecimal euroConversionRate;
     private BigDecimal kunaConversionRate;
-    private DomainTO domain;
+    private DomainSimple domain;
 
-    public HolidayCurrenciesTO() {
+    public HolidayCurrencies() {
     }
 
-    public HolidayCurrenciesTO(Integer id, BigDecimal euroConversionRate, BigDecimal kunaConversionRate, DomainTO domain) {
+    public HolidayCurrencies(Integer id, BigDecimal euroConversionRate, BigDecimal kunaConversionRate, DomainSimple domain) {
         this.id = id;
         this.euroConversionRate = euroConversionRate;
         this.kunaConversionRate = kunaConversionRate;
@@ -26,7 +26,7 @@ public class HolidayCurrenciesTO implements WithDomainTO {
         return id;
     }
 
-    public HolidayCurrenciesTO setId(Integer id) {
+    public HolidayCurrencies setId(Integer id) {
         this.id = id;
         return this;
     }
@@ -35,7 +35,7 @@ public class HolidayCurrenciesTO implements WithDomainTO {
         return euroConversionRate;
     }
 
-    public HolidayCurrenciesTO setEuroConversionRate(BigDecimal euroConversionRate) {
+    public HolidayCurrencies setEuroConversionRate(BigDecimal euroConversionRate) {
         this.euroConversionRate = euroConversionRate;
         return this;
     }
@@ -44,16 +44,16 @@ public class HolidayCurrenciesTO implements WithDomainTO {
         return kunaConversionRate;
     }
 
-    public HolidayCurrenciesTO setKunaConversionRate(BigDecimal kunaConversionRate) {
+    public HolidayCurrencies setKunaConversionRate(BigDecimal kunaConversionRate) {
         this.kunaConversionRate = kunaConversionRate;
         return this;
     }
 
-    public DomainTO getDomain() {
+    public DomainSimple getDomain() {
         return domain;
     }
 
-    public HolidayCurrenciesTO setDomain(DomainTO domain) {
+    public HolidayCurrencies setDomain(DomainSimple domain) {
         this.domain = domain;
         return this;
     }

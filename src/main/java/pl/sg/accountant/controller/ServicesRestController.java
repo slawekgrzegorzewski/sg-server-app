@@ -3,9 +3,8 @@ package pl.sg.accountant.controller;
 import org.modelmapper.ModelMapper;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import pl.sg.accountant.model.accounts.Service;
 import pl.sg.accountant.service.ServicesService;
-import pl.sg.accountant.transport.accounts.ServiceTO;
+import pl.sg.accountant.transport.accounts.Service;
 import pl.sg.application.model.Domain;
 import pl.sg.application.security.annotations.RequestBodyWithDomain;
 import pl.sg.application.security.annotations.RequestDomain;
@@ -33,34 +32,34 @@ public class ServicesRestController implements ServicesController {
     @Override
     @GetMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public List<ServiceTO> services(@RequestDomain Domain domain) {
+    public List<Service> services(@RequestDomain Domain domain) {
         return servicesService.services(domain).stream()
-                .map(c -> mapper.map(c, ServiceTO.class))
+                .map(c -> mapper.map(c, Service.class))
                 .collect(Collectors.toList());
     }
 
     @Override
     @PutMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public ServiceTO createService(
+    public Service createService(
             @RequestBodyWithDomain(
-                    transportClass = ServiceTO.class,
+                    transportClass = Service.class,
                     mapperName = CREATE_CLIENT,
                     create = true
             )
-            @Valid Service service) {
-        return mapper.map(servicesService.create(service), ServiceTO.class);
+            @Valid pl.sg.accountant.model.accounts.Service service) {
+        return mapper.map(servicesService.create(service), Service.class);
     }
 
     @Override
     @PatchMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public ServiceTO updateService(
+    public Service updateService(
             @RequestBodyWithDomain(
-                    transportClass = ServiceTO.class,
+                    transportClass = Service.class,
                     mapperName = UPDATE_CLIENT
             )
-            @Valid Service service) {
-        return mapper.map(servicesService.update(service), ServiceTO.class);
+            @Valid pl.sg.accountant.model.accounts.Service service) {
+        return mapper.map(servicesService.update(service), Service.class);
     }
 }

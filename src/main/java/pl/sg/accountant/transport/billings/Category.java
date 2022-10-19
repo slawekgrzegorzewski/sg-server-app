@@ -1,18 +1,18 @@
 package pl.sg.accountant.transport.billings;
 
-import pl.sg.application.transport.DomainTO;
-import pl.sg.application.transport.WithDomainTO;
+import pl.sg.application.api.DomainSimple;
+import pl.sg.application.api.WithDomain;
 
-public class CategoryTO implements WithDomainTO {
+public class Category implements WithDomain {
     private Integer id;
     private String name;
     private String description;
-    private DomainTO domain;
+    private DomainSimple domain;
 
-    public CategoryTO() {
+    public Category() {
     }
 
-    public CategoryTO(int id, String name, String description, DomainTO domain) {
+    public Category(int id, String name, String description, DomainSimple domain) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -23,7 +23,7 @@ public class CategoryTO implements WithDomainTO {
         return id;
     }
 
-    public CategoryTO setId(Integer id) {
+    public Category setId(Integer id) {
         this.id = id;
         return this;
     }
@@ -32,7 +32,7 @@ public class CategoryTO implements WithDomainTO {
         return name;
     }
 
-    public CategoryTO setName(String name) {
+    public Category setName(String name) {
         this.name = name;
         return this;
     }
@@ -41,16 +41,16 @@ public class CategoryTO implements WithDomainTO {
         return description;
     }
 
-    public CategoryTO setDescription(String description) {
+    public Category setDescription(String description) {
         this.description = description;
         return this;
     }
 
-    public DomainTO getDomain() {
+    public DomainSimple getDomain() {
         return domain;
     }
 
-    public CategoryTO setDomain(DomainTO domain) {
+    public Category setDomain(DomainSimple domain) {
         this.domain = domain;
         return this;
     }

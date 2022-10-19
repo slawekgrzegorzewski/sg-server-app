@@ -3,12 +3,12 @@ package pl.sg.accountant.transport.billings;
 public class MonthSummaryTO {
     private Integer id;
     private String data;
-    private BillingPeriodTO billingPeriod;
+    private BillingPeriod billingPeriod;
 
     public MonthSummaryTO() {
     }
 
-    public MonthSummaryTO(int id, String data, BillingPeriodTO billingPeriod) {
+    public MonthSummaryTO(int id, String data, BillingPeriod billingPeriod) {
         this.id = id;
         this.data = data;
         this.billingPeriod = billingPeriod;
@@ -32,11 +32,11 @@ public class MonthSummaryTO {
         return this;
     }
 
-    public BillingPeriodTO getBillingPeriod() {
+    public BillingPeriod getBillingPeriod() {
         return billingPeriod;
     }
 
-    public MonthSummaryTO setBillingPeriod(BillingPeriodTO billingPeriod) {
+    public MonthSummaryTO setBillingPeriod(BillingPeriod billingPeriod) {
         this.billingPeriod = billingPeriod;
         return this;
     }

@@ -1,13 +1,13 @@
 package pl.sg.cubes.transport;
 
 import pl.sg.application.security.annotations.AddZoneIdOffsetDuringDeserialization;
-import pl.sg.application.transport.DomainTO;
-import pl.sg.application.transport.WithDomainTO;
+import pl.sg.application.api.DomainSimple;
+import pl.sg.application.api.WithDomain;
 import pl.sg.cubes.model.CubesType;
 
 import java.time.LocalDateTime;
 
-public class CubeRecordTO implements WithDomainTO {
+public class CubeRecord implements WithDomain {
 
     private Integer id;
     private CubesType cubesType;
@@ -15,14 +15,14 @@ public class CubeRecordTO implements WithDomainTO {
     private String scramble;
     @AddZoneIdOffsetDuringDeserialization
     private LocalDateTime recordTime;
-    private DomainTO domain;
+    private DomainSimple domain;
 
     @Override
     public Integer getId() {
         return id;
     }
 
-    public CubeRecordTO setId(Integer id) {
+    public CubeRecord setId(Integer id) {
         this.id = id;
         return this;
     }
@@ -31,7 +31,7 @@ public class CubeRecordTO implements WithDomainTO {
         return cubesType;
     }
 
-    public CubeRecordTO setCubesType(CubesType cubesType) {
+    public CubeRecord setCubesType(CubesType cubesType) {
         this.cubesType = cubesType;
         return this;
     }
@@ -40,7 +40,7 @@ public class CubeRecordTO implements WithDomainTO {
         return time;
     }
 
-    public CubeRecordTO setTime(double time) {
+    public CubeRecord setTime(double time) {
         this.time = time;
         return this;
     }
@@ -49,7 +49,7 @@ public class CubeRecordTO implements WithDomainTO {
         return scramble;
     }
 
-    public CubeRecordTO setScramble(String scramble) {
+    public CubeRecord setScramble(String scramble) {
         this.scramble = scramble;
         return this;
     }
@@ -58,17 +58,17 @@ public class CubeRecordTO implements WithDomainTO {
         return recordTime;
     }
 
-    public CubeRecordTO setRecordTime(LocalDateTime recordTime) {
+    public CubeRecord setRecordTime(LocalDateTime recordTime) {
         this.recordTime = recordTime;
         return this;
     }
 
     @Override
-    public DomainTO getDomain() {
+    public DomainSimple getDomain() {
         return domain;
     }
 
-    public CubeRecordTO setDomain(DomainTO domain) {
+    public CubeRecord setDomain(DomainSimple domain) {
         this.domain = domain;
         return this;
     }

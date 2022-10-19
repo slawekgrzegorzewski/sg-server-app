@@ -3,15 +3,13 @@ package pl.sg.accountant.controller;
 import org.modelmapper.ModelMapper;
 import org.springframework.web.bind.annotation.*;
 import pl.sg.accountant.model.accounts.Account;
-import pl.sg.accountant.model.billings.BillingPeriod;
 import pl.sg.accountant.model.billings.Expense;
 import pl.sg.accountant.model.billings.Income;
 import pl.sg.accountant.repository.BillingPeriodInfo;
 import pl.sg.accountant.service.BillingPeriodsService;
-import pl.sg.accountant.transport.billings.BillingPeriodTO;
+import pl.sg.accountant.transport.billings.BillingPeriod;
 import pl.sg.accountant.transport.billings.ExpenseTO;
 import pl.sg.accountant.transport.billings.IncomeTO;
-import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.Domain;
 import pl.sg.application.security.annotations.*;
 
@@ -53,7 +51,7 @@ public class BillingPeriodRestController implements BillingPeriodController {
     @PutMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"}, domainAdmin = true)
     public BillingPeriodInfo create(@RequestDomain Domain domain) {
-        final BillingPeriod newEntity = this.billingPeriodsService.create(domain, YearMonth.now());
+        final pl.sg.accountant.model.billings.BillingPeriod newEntity = this.billingPeriodsService.create(domain, YearMonth.now());
         return billingPeriodResponseCreator(domain).apply(newEntity);
     }
 
@@ -62,7 +60,7 @@ public class BillingPeriodRestController implements BillingPeriodController {
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"}, domainAdmin = true)
     public BillingPeriodInfo create(@RequestDomain Domain domain,
                                     @PathVariable YearMonth period) {
-        final BillingPeriod newEntity = this.billingPeriodsService.create(domain, period);
+        final pl.sg.accountant.model.billings.BillingPeriod newEntity = this.billingPeriodsService.create(domain, period);
         return billingPeriodResponseCreator(domain).apply(newEntity);
     }
 
@@ -116,22 +114,22 @@ public class BillingPeriodRestController implements BillingPeriodController {
 
     @NotNull
     private BillingPeriodInfo getBilling(Domain domain, YearMonth month) {
-        BillingPeriodTO periodTO = this.billingPeriodsService.findByPeriodAndDomain(domain, month)
-                .map(period -> mapper.map(period, BillingPeriodTO.class))
+        BillingPeriod periodTO = this.billingPeriodsService.findByPeriodAndDomain(domain, month)
+                .map(period -> mapper.map(period, BillingPeriod.class))
                 .orElse(null);
         return new BillingPeriodInfo(periodTO, getUnfinishedPeriods(domain));
     }
 
-    private Function<BillingPeriod, BillingPeriodInfo> billingPeriodResponseCreator(Domain domain) {
+    private Function<pl.sg.accountant.model.billings.BillingPeriod, BillingPeriodInfo> billingPeriodResponseCreator(Domain domain) {
         return billingPeriod -> {
-            final BillingPeriodTO byIdTO = mapper.map(billingPeriod, BillingPeriodTO.class);
+            final BillingPeriod byIdTO = mapper.map(billingPeriod, BillingPeriod.class);
             return new BillingPeriodInfo(byIdTO, getUnfinishedPeriods(domain));
         };
     }
 
-    private List<BillingPeriodTO> getUnfinishedPeriods(Domain domain) {
+    private List<BillingPeriod> getUnfinishedPeriods(Domain domain) {
         return this.billingPeriodsService.unfinishedBillingPeriods(domain).stream()
-                .map(period -> mapper.map(period, BillingPeriodTO.class))
+                .map(period -> mapper.map(period, BillingPeriod.class))
                 .collect(Collectors.toList());
     }
 }

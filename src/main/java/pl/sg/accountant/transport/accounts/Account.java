@@ -1,8 +1,8 @@
 package pl.sg.accountant.transport.accounts;
 
-import pl.sg.application.transport.DomainTO;
-import pl.sg.application.transport.WithDomainTO;
-import pl.sg.banks.transport.BankAccountTO;
+import pl.sg.application.api.DomainSimple;
+import pl.sg.application.api.WithDomain;
+import pl.sg.banks.transport.BankAccount;
 
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotBlank;
@@ -11,7 +11,7 @@ import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.util.Currency;
 
-public class AccountTO implements WithDomainTO {
+public class Account implements WithDomain {
     private Integer id;
     @NotBlank
     private String name;
@@ -23,13 +23,13 @@ public class AccountTO implements WithDomainTO {
     private BigDecimal currentBalance;
     private int balanceIndex;
     private boolean visible;
-    private BankAccountTO bankAccount;
-    private DomainTO domain;
+    private BankAccount bankAccount;
+    private DomainSimple domain;
 
-    public AccountTO() {
+    public Account() {
     }
 
-    public AccountTO(int id, String name, Currency currency, BigDecimal currentBalance, int balanceIndex, boolean visible, BankAccountTO bankAccount, DomainTO domain) {
+    public Account(int id, String name, Currency currency, BigDecimal currentBalance, int balanceIndex, boolean visible, BankAccount bankAccount, DomainSimple domain) {
         this.id = id;
         this.name = name;
         this.currency = currency;
@@ -44,7 +44,7 @@ public class AccountTO implements WithDomainTO {
         return id;
     }
 
-    public AccountTO setId(int id) {
+    public Account setId(int id) {
         this.id = id;
         return this;
     }
@@ -57,7 +57,7 @@ public class AccountTO implements WithDomainTO {
         return name;
     }
 
-    public AccountTO setName(String name) {
+    public Account setName(String name) {
         this.name = name;
         return this;
     }
@@ -66,7 +66,7 @@ public class AccountTO implements WithDomainTO {
         return currency;
     }
 
-    public AccountTO setCurrency(Currency currency) {
+    public Account setCurrency(Currency currency) {
         this.currency = currency;
         return this;
     }
@@ -75,7 +75,7 @@ public class AccountTO implements WithDomainTO {
         return currentBalance;
     }
 
-    public AccountTO setCurrentBalance(BigDecimal currentBalance) {
+    public Account setCurrentBalance(BigDecimal currentBalance) {
         this.currentBalance = currentBalance;
         return this;
     }
@@ -84,25 +84,25 @@ public class AccountTO implements WithDomainTO {
         return balanceIndex;
     }
 
-    public AccountTO setBalanceIndex(int balanceIndex) {
+    public Account setBalanceIndex(int balanceIndex) {
         this.balanceIndex = balanceIndex;
         return this;
     }
 
-    public BankAccountTO getBankAccount() {
+    public BankAccount getBankAccount() {
         return bankAccount;
     }
 
-    public AccountTO setBankAccount(BankAccountTO bankAccount) {
+    public Account setBankAccount(BankAccount bankAccount) {
         this.bankAccount = bankAccount;
         return this;
     }
 
-    public DomainTO getDomain() {
+    public DomainSimple getDomain() {
         return domain;
     }
 
-    public AccountTO setDomain(DomainTO domain) {
+    public Account setDomain(DomainSimple domain) {
         this.domain = domain;
         return this;
     }
@@ -111,7 +111,7 @@ public class AccountTO implements WithDomainTO {
         return visible;
     }
 
-    public AccountTO setVisible(boolean visible) {
+    public Account setVisible(boolean visible) {
         this.visible = visible;
         return this;
     }

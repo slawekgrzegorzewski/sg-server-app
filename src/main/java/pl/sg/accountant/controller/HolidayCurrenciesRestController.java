@@ -3,9 +3,8 @@ package pl.sg.accountant.controller;
 import org.modelmapper.ModelMapper;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import pl.sg.accountant.model.HolidayCurrencies;
 import pl.sg.accountant.service.HolidayCurrenciesService;
-import pl.sg.accountant.transport.HolidayCurrenciesTO;
+import pl.sg.accountant.transport.HolidayCurrencies;
 import pl.sg.application.model.Domain;
 import pl.sg.application.security.annotations.RequestBodyWithDomain;
 import pl.sg.application.security.annotations.RequestDomain;
@@ -31,36 +30,36 @@ public class HolidayCurrenciesRestController implements HolidayCurrenciesControl
     @Override
     @GetMapping()
     @TokenBearerAuth()
-    public HolidayCurrenciesTO get(@RequestDomain Domain domain) {
-        HolidayCurrencies forDomain = holidayCurrenciesService
+    public HolidayCurrencies get(@RequestDomain Domain domain) {
+        pl.sg.accountant.model.HolidayCurrencies forDomain = holidayCurrenciesService
                 .getForDomain(domain)
                 .orElseGet(() -> {
-                    HolidayCurrencies holidayCurrencies = new HolidayCurrencies().setDomain(domain);
+                    pl.sg.accountant.model.HolidayCurrencies holidayCurrencies = new pl.sg.accountant.model.HolidayCurrencies().setDomain(domain);
                     return this.holidayCurrenciesService.create(holidayCurrencies);
                 });
-        return mapper.map(forDomain, HolidayCurrenciesTO.class);
+        return mapper.map(forDomain, HolidayCurrencies.class);
     }
 
     @Override
     @PutMapping
     @TokenBearerAuth(domainAdmin = true)
-    public HolidayCurrenciesTO create(
+    public HolidayCurrencies create(
             @RequestBodyWithDomain(
-                    transportClass = HolidayCurrenciesTO.class,
+                    transportClass = HolidayCurrencies.class,
                     mapperName = CREATE_HOLIDAY_CURRENCIES,
                     create = true,
                     domainAdmin = true)
-            @Valid HolidayCurrencies holidayCurrencies) {
+            @Valid pl.sg.accountant.model.HolidayCurrencies holidayCurrencies) {
 
         holidayCurrencies = holidayCurrenciesService.create(holidayCurrencies);
-        return mapper.map(holidayCurrencies, HolidayCurrenciesTO.class);
+        return mapper.map(holidayCurrencies, HolidayCurrencies.class);
     }
 
     @PatchMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public String update(
-            @RequestBodyWithDomain(transportClass = HolidayCurrenciesTO.class, mapperName = UPDATE_HOLIDAY_CURRENCIES)
-            @Valid HolidayCurrencies holidayCurrencies) {
+            @RequestBodyWithDomain(transportClass = HolidayCurrencies.class, mapperName = UPDATE_HOLIDAY_CURRENCIES)
+            @Valid pl.sg.accountant.model.HolidayCurrencies holidayCurrencies) {
         holidayCurrenciesService.update(holidayCurrencies);
         return "OK";
     }

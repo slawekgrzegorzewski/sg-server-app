@@ -2,9 +2,8 @@ package pl.sg.accountant.controller;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.web.bind.annotation.*;
-import pl.sg.accountant.model.billings.PiggyBank;
 import pl.sg.accountant.service.PiggyBanksService;
-import pl.sg.accountant.transport.PiggyBankTO;
+import pl.sg.accountant.transport.PiggyBank;
 import pl.sg.application.model.Domain;
 import pl.sg.application.security.annotations.RequestBodyWithDomain;
 import pl.sg.application.security.annotations.RequestDomain;
@@ -32,9 +31,9 @@ public class PiggyBankRestController implements PiggyBankController {
     @Override
     @GetMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public List<PiggyBankTO> getAll(@RequestDomain Domain domain) {
+    public List<PiggyBank> getAll(@RequestDomain Domain domain) {
         return piggyBanksService.findByDomain(domain).stream()
-                .map(pb -> mapper.map(pb, PiggyBankTO.class))
+                .map(pb -> mapper.map(pb, PiggyBank.class))
                 .collect(Collectors.toList());
     }
 
@@ -43,11 +42,11 @@ public class PiggyBankRestController implements PiggyBankController {
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public Integer create(
             @RequestBodyWithDomain(
-                    transportClass = PiggyBankTO.class,
+                    transportClass = PiggyBank.class,
                     create = true,
                     mapperName = CREATE_PIGGY_BANK
             )
-            @Valid PiggyBank piggyBank) {
+            @Valid pl.sg.accountant.model.billings.PiggyBank piggyBank) {
         return piggyBanksService.create(piggyBank);
     }
 
@@ -56,10 +55,10 @@ public class PiggyBankRestController implements PiggyBankController {
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public String update(
             @RequestBodyWithDomain(
-                    transportClass = PiggyBankTO.class,
+                    transportClass = PiggyBank.class,
                     mapperName = UPDATE_PIGGY_BANK
             )
-            @Valid PiggyBank piggyBank) {
+            @Valid pl.sg.accountant.model.billings.PiggyBank piggyBank) {
         piggyBanksService.update(piggyBank);
         return "OK!";
     }

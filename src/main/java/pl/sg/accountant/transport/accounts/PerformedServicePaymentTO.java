@@ -7,8 +7,8 @@ import java.util.Currency;
 public class PerformedServicePaymentTO {
 
     private Integer id;
-    private PerformedServiceTO performedService;
-    private ClientPaymentTO clientPayment;
+    private PerformedService performedService;
+    private ClientPayment clientPayment;
     private LocalDate date;
     private BigDecimal price;
     Currency currency;
@@ -20,7 +20,7 @@ public class PerformedServicePaymentTO {
     public PerformedServicePaymentTO() {
     }
 
-    public PerformedServicePaymentTO(Integer id, PerformedServiceTO performedService, ClientPaymentTO clientPayment, LocalDate date, BigDecimal price, Currency currency, boolean billOfSale, boolean billOfSaleAsInvoice, boolean invoice, boolean notRegistered) {
+    public PerformedServicePaymentTO(Integer id, PerformedService performedService, ClientPayment clientPayment, LocalDate date, BigDecimal price, Currency currency, boolean billOfSale, boolean billOfSaleAsInvoice, boolean invoice, boolean notRegistered) {
         this.id = id;
         this.performedService = performedService;
         this.clientPayment = clientPayment;
@@ -42,20 +42,20 @@ public class PerformedServicePaymentTO {
         return this;
     }
 
-    public PerformedServiceTO getPerformedService() {
+    public PerformedService getPerformedService() {
         return performedService;
     }
 
-    public PerformedServicePaymentTO setPerformedService(PerformedServiceTO performedService) {
+    public PerformedServicePaymentTO setPerformedService(PerformedService performedService) {
         this.performedService = performedService;
         return this;
     }
 
-    public ClientPaymentTO getClientPayment() {
+    public ClientPayment getClientPayment() {
         return clientPayment;
     }
 
-    public PerformedServicePaymentTO setClientPayment(ClientPaymentTO clientPayment) {
+    public PerformedServicePaymentTO setClientPayment(ClientPayment clientPayment) {
         this.clientPayment = clientPayment;
         return this;
     }
