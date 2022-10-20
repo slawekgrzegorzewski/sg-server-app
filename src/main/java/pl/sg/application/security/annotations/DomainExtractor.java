@@ -13,19 +13,19 @@ public class DomainExtractor {
         this.entityManager = entityManager;
     }
 
-    public Domain getDomain(String domainIdHeader) {
-        if (domainIdHeader == null) {
-            throw new DomainException("No domainId in headers");
+    public Domain getDomain(String domainId) {
+        if (domainId == null) {
+            throw new DomainException("No domainId");
         }
-        final int domainId;
+        final int id;
         try {
-            domainId = Integer.parseInt(domainIdHeader);
+            id = Integer.parseInt(domainId);
         } catch (NumberFormatException ex) {
-            throw new DomainException(domainIdHeader + " can not be parsed to Domain ID");
+            throw new DomainException(domainId + " can not be parsed to Domain ID");
         }
-        Domain domain = this.entityManager.find(Domain.class, domainId);
+        Domain domain = this.entityManager.find(Domain.class, id);
         if (domain == null) {
-            throw new DomainException("There is no domain with ID " + domainIdHeader);
+            throw new DomainException("There is no domain with ID " + id);
         }
         return domain;
     }

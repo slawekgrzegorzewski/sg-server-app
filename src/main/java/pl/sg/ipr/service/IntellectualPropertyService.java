@@ -7,6 +7,6 @@ import pl.sg.ipr.api.IntellectualPropertyCreateData;
 import java.util.List;
 
 public interface IntellectualPropertyService {
-    List<IntellectualProperty> getAll(Domain domain);
+    List<IntellectualProperty> getAll(int domainId);
     IntellectualProperty create(IntellectualPropertyCreateData createData, Domain domain);
 }

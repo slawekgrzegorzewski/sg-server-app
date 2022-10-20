@@ -18,8 +18,8 @@ public class IntellectualPropertyJPAService implements IntellectualPropertyServi
     }
 
     @Override
-    public List<IntellectualProperty> getAll(Domain domain) {
-        return intellectualPropertyRepository.findAllByDomain(domain);
+    public List<IntellectualProperty> getAll(int domainId) {
+        return intellectualPropertyRepository.findAllByDomain_Id(domainId);
     }
 
     @Override

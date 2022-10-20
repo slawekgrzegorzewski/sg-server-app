@@ -3,6 +3,7 @@ package pl.sg.application.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.jboss.aerogear.security.otp.Totp;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
@@ -22,6 +23,7 @@ import java.io.IOException;
 @Slf4j
 @CrossOrigin
 @Validated
+@Profile("https")
 public class LoginController {
 
     private static final String TOKEN_PREFIX = "Bearer";
