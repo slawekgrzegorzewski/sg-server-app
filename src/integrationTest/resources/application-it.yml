@@ -1,12 +1,18 @@
 spring:
-    datasource:
-        hikari:
-            connectionTimeout: 20000
-            maximumPoolSize: 5
-        password: slawek
-        url: jdbc:postgresql://192.168.99.100:32768/postgres
-        username: postgres
-    jpa:
-        database-platform: org.hibernate.dialect.PostgreSQLDialect
-        hibernate:
-            ddl-auto: create
+  datasource:
+    hikari:
+      connectionTimeout: 20000
+      maximumPoolSize: 5
+    password: slawek
+    url: jdbc:postgresql://localhost:5432/accountant1
+    username: slawek
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: create
+nodrigen:
+  service-url: ""
+cron:
+  fetch-accounts: "-"
+  fetch-accounts-monthly: "-"
+  fetch-transactions: "-"

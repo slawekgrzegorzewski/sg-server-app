@@ -1,10 +1,5 @@
 package pl.sg.application.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -38,23 +33,8 @@ public class DevLoginController {
         this.authorizationService = authorizationService;
     }
 
-    @Operation(summary = "Creates a JWT token for user",
-            description = "",
-            tags = {})
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",
-                    description = "JWT Token",
-                    content = @Content(mediaType = "plain/text",
-                            schema = @Schema(implementation = String.class))),
-    })
     @PostMapping(produces = "plain/text")
-    public String login(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "User to create token for",
-                    required = true,
-                    content = @Content(mediaType = "plain/text",
-                            schema = @Schema(implementation = String.class)))
-            @RequestBody @NotBlank @Valid String user) {
+    public String login(@RequestBody @NotBlank @Valid String user) {
         ApplicationUser firstByLogin = applicationUserService.getByUserLogins(user);
         return authorizationService.generateJWTToken(
                 firstByLogin.getId() + ":" + user,
