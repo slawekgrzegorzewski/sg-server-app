@@ -1,5 +1,6 @@
 package pl.sg.accountant;
 
+import org.flywaydb.core.Flyway;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -13,11 +14,17 @@ public abstract class AbstractContainerBaseTest {
     static final PostgreSQLContainer POSTGRES;
 
     static {
-        POSTGRES = (PostgreSQLContainer) new PostgreSQLContainer("postgres:14.5")
+        POSTGRES = new PostgreSQLContainer("postgres:14.5")
                 .withDatabaseName("accountant")
-                .withUsername("postgres")
-                .withInitScript("db/init/data.sql");
+                .withUsername("postgres");
         POSTGRES.start();
+
+        Flyway flyway = Flyway.configure().dataSource(
+                        POSTGRES.getJdbcUrl(),
+                        POSTGRES.getUsername(),
+                        POSTGRES.getPassword())
+                .load();
+        flyway.migrate();
     }
 
     static class DockerPostgresDataSourceInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {

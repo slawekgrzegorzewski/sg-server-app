@@ -11,10 +11,12 @@ import java.time.LocalDate;
 public class TimeRecord implements WithDomain<TimeRecord> {
 
     @Id
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "time_record_id_sequence"
+    @SequenceGenerator(
+            name = "timeRecordIdGenerator",
+            sequenceName = "time_record_id_sequence",
+            allocationSize = 1
     )
+    @GeneratedValue(generator = "timeRecordIdGenerator")
     private Integer id;
     private LocalDate date;
     private int numberOfHours;

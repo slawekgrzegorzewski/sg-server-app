@@ -1,8 +1,15 @@
+buildscript {
+    dependencies {
+        classpath("org.postgresql:postgresql:42.5.0")
+    }
+}
+
 plugins {
     id("org.springframework.boot") version "2.7.4"
     id("io.spring.dependency-management") version "1.0.14.RELEASE"
     id("jvm-test-suite")
     id("java")
+    id("org.flywaydb.flyway") version "9.5.1"
 }
 
 group = "pl.sg"
@@ -99,9 +106,9 @@ dependencies {
     integrationTestImplementation("org.testcontainers:junit-jupiter:1.17.5")
     integrationTestImplementation("org.testcontainers:postgresql:1.17.5")
     integrationTestImplementation("org.testcontainers:testcontainers:1.17.5")
-
-
+    integrationTestImplementation("org.flywaydb:flyway-core:9.5.1")
 }
+
 tasks.jar {
     exclude(
         "ovh",
@@ -110,6 +117,18 @@ tasks.jar {
         "application-raspberry-docker.yml",
         "data.sql"
     )
+}
+
+val migrateLocal = tasks.register<org.flywaydb.gradle.task.FlywayMigrateTask>("migrateLocal") {
+    url = "jdbc:postgresql://localhost:5432/accountant"
+    user = "postgres"
+    password = "SLAwek1!"
+}
+
+val migrateProduction = tasks.register<org.flywaydb.gradle.task.FlywayMigrateTask>("migrateProduction") {
+    url = "jdbc:postgresql://grzegorzewski.org:5432/accountant"
+    user = "postgres"
+    password = ""
 }
 
 val dockerPackage = tasks.register<Zip>("dockerPackage") {

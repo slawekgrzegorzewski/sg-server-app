@@ -12,10 +12,12 @@ import java.util.List;
 public class IntellectualProperty implements WithDomain<IntellectualProperty> {
 
     @Id
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "intellectual_property_id_sequence"
+    @SequenceGenerator(
+            name = "intellectualPropertyIdGenerator",
+            sequenceName = "intellectual_property_id_sequence",
+            allocationSize = 1
     )
+    @GeneratedValue(generator = "intellectualPropertyIdGenerator")
     private Integer id;
     @NotNull
     private LocalDate startDate;

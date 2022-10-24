@@ -8,10 +8,12 @@ import java.util.List;
 public class Task {
 
     @Id
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "intellectual_property_task_id_sequence"
+    @SequenceGenerator(
+            name = "intellectualPropertyTaskIdGenerator",
+            sequenceName = "intellectual_property_task_id_sequence",
+            allocationSize = 1
     )
+    @GeneratedValue(generator = "intellectualPropertyTaskIdGenerator")
     private Integer id;
     @NotNull
     @Column(length = 10_000)
