@@ -1,3 +1,4 @@
-psql -h localhost -p 5432 -U postgres -w postgres -c 'truncate table flyway_schema_history,accountant_settings,application_user_domain_relation,application_user_roles,checker_task_history,checker_task_steps,country_names,cube_record,domain_invitation,expense,holiday_currencies,income,category,month_summary,billing_period,nodrigen_access,nodrigen_bank_account_balance,nodrigen_transaction,account, financial_transaction,bank_account,bank_permission,page_version_content,page_version_elements_added,page_version_elements_removed,page_version,checker_task,application_user,performed_service_payment,client_payment,performed_service,client,piggy_bank,save_result_step_email_ccs,save_result_step_email_tos,checker_step,service,domain,syr,country cascade;'
+psql -h localhost -p 5432 -U postgres -w postgres -c 'DROP DATABASE accountant;'
+psql -h localhost -p 5432 -U postgres -w postgres -c 'CREATE DATABASE accountant;'
 
 psql accountant -h localhost -U postgres < $1
