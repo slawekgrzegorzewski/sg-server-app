@@ -32,16 +32,10 @@ public class GenerateJwtToken {
     }
 
     private String randomString(int length) {
-        int leftLimit = 65;
-        int rightLimit = 90;
-        Random random = new Random();
-
-        String generatedString = random.ints(leftLimit, rightLimit + 1)
+        return new Random().ints(65, 90 + 1)
                 .limit(length)
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
-
-        return generatedString;
     }
 
     public GenerateJwtToken forFile(Path path) {

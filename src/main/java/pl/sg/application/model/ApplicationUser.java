@@ -5,7 +5,6 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.jboss.aerogear.security.otp.api.Base32;
 import pl.sg.application.ForbiddenException;
-import pl.sg.application.UnauthorizedException;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -108,7 +107,7 @@ public class ApplicationUser {
     }
 
     public void setRoles(String... roles) {
-        this.roles.addAll(Arrays.asList(roles));
+        this.roles = Arrays.asList(roles);
     }
 
     public List<ApplicationUserDomainRelation> getAssignedDomains() {
