@@ -1,9 +1,12 @@
 package pl.sg.application.model;
 
-import javax.persistence.*;
-import java.time.LocalDate;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Domain {
@@ -58,5 +61,18 @@ public class Domain {
         final ApplicationUserDomainRelation relation = new ApplicationUserDomainRelation(user, this, accessLevel);
         this.assignedUsers.add(relation);
         return relation;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Domain domain = (Domain) o;
+        return Objects.equals(id, domain.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

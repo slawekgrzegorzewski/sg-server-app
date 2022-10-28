@@ -1,32 +1,34 @@
 package pl.sg.accountant;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.entity.StringEntity;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.transaction.TestTransaction;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import pl.sg.application.model.Domain;
+import pl.sg.application.repository.DomainRepository;
 import pl.sg.ipr.api.IntellectualPropertyCreateData;
 import pl.sg.ipr.model.IntellectualProperty;
 import pl.sg.ipr.repository.IntellectualPropertyRepository;
+import pl.sg.ipr.service.IntellectualPropertyService;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {"spring.config.location=classpath:application-it.yml"})
@@ -35,102 +37,122 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Testcontainers
 public class IntellectualPropertyTest extends AbstractContainerBaseTest {
 
-    public static final String INTELLECTUAL_PROPERTY_DESCRIPTION = "description";
-    public static final int DOMAIN_ID = 1;
+    private static final String INTELLECTUAL_PROPERTY_DESCRIPTION = "description";
+    private static final int DOMAIN_ID = 1;
+    private static final int SECOND_DOMAIN_ID = 2;
+
+    @Autowired
+    DomainRepository domainRepository;
+    @Autowired
+    IntellectualPropertyService intellectualPropertyService;
+    @Autowired
+    IntellectualPropertyRepository intellectualPropertyRepository;
     @Autowired
     ObjectMapper objectMapper;
 
     @Autowired
-    IntellectualPropertyRepository intellectualPropertyRepository;
+    private TestRestTemplate restTemplate;
 
-    public IntellectualPropertyTest() {
+    @BeforeEach
+    public void setUp() {
+        if (TestTransaction.isActive()) {
+            TestTransaction.flagForRollback();
+            TestTransaction.end();
+        }
+        TestTransaction.start();
+        intellectualPropertyRepository.deleteAll();
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+        TestTransaction.start();
+    }
+
+    @ParameterizedTest
+    @MethodSource("rolesAndResponses")
+    public void shouldFailGettingWhenUserHasNoIPRRole(String[] roles, int expectedResponse) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        headers.set("domainId", String.valueOf(DOMAIN_ID));
+        headers.setBearerAuth(login(roles));
+        ResponseEntity<?> response = restTemplate.exchange(
+                "http://localhost:" + serverPort + "/ipr",
+                HttpMethod.GET,
+                new HttpEntity<String>(headers),
+                String.class);
+        assertEquals(expectedResponse, response.getStatusCode().value());
+    }
+
+    @ParameterizedTest
+    @MethodSource("rolesAndResponses")
+    public void shouldFailCreationWhenUserHasNotIPRRole(String[] roles, int expectedResponse) throws Exception {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("domainId", String.valueOf(DOMAIN_ID));
+        headers.setBearerAuth(login(roles));
+
+        IntellectualPropertyCreateData testIPRToCreate = new IntellectualPropertyCreateData(
+                LocalDate.now().minusDays(1),
+                LocalDate.now(),
+                "description");
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testIPRToCreate), headers);
+
+        ResponseEntity<?> response = restTemplate.exchange(
+                "http://localhost:" + serverPort + "/ipr",
+                HttpMethod.PUT,
+                requestEntity,
+                String.class);
+
+        assertEquals(expectedResponse, response.getStatusCode().value());
+    }
+
+    private static Stream<Arguments> rolesAndResponses() {
+        return Stream.of(
+                Arguments.of(new String[]{"ACCOUNTANT_ADMIN"}, 403),
+                Arguments.of(new String[]{"ACCOUNTANT_USER"}, 403),
+                Arguments.of(new String[]{"CHECKER_ADMIN"}, 403),
+                Arguments.of(new String[]{"CHECKER_USER"}, 403),
+                Arguments.of(new String[]{"SYR_USER"}, 403),
+                Arguments.of(new String[]{"SYR_ADMIN"}, 403),
+                Arguments.of(new String[]{"CUBES"}, 403),
+                Arguments.of(new String[]{"IPR"}, 200)
+        );
     }
 
     @Test
-    public void shouldFailGettingWhenUserHasNotIPRRole() throws Exception {
-        clearApplicationUserRoles();
-        runInTransaction(entityManager -> {
-            IntellectualProperty intellectualProperty = new IntellectualProperty();
-            intellectualProperty.setDomain(entityManager.getReference(Domain.class, 1));
-            intellectualProperty.setStartDate(LocalDate.now().minusDays(1));
-            intellectualProperty.setEndDate(LocalDate.now());
-            intellectualProperty.setDescription("description");
-            entityManager.persist(intellectualProperty);
-        });
-        Response response = get(1, "/ipr");
-        assertEquals(403, response.code());
+    public void shouldGetDomainOnlyData() {
+        IntellectualProperty intellectualProperty = new IntellectualProperty();
+        intellectualProperty.setDomain(domainRepository.getReferenceById(DOMAIN_ID));
+        intellectualProperty.setStartDate(LocalDate.now().minusDays(1));
+        intellectualProperty.setEndDate(LocalDate.now());
+        intellectualProperty.setDescription("description");
+        intellectualPropertyRepository.save(intellectualProperty);
+        IntellectualProperty intellectualPropertyForOtherDomain = new IntellectualProperty();
+        intellectualPropertyForOtherDomain.setDomain(domainRepository.getReferenceById(SECOND_DOMAIN_ID));
+        intellectualPropertyForOtherDomain.setStartDate(LocalDate.now().minusDays(2));
+        intellectualPropertyForOtherDomain.setEndDate(LocalDate.now().minusDays(1));
+        intellectualPropertyForOtherDomain.setDescription("description2");
+        intellectualPropertyRepository.save(intellectualProperty);
+
+        List<IntellectualProperty> intellectualProperties = intellectualPropertyService.getAll(DOMAIN_ID);
+        assertEquals(1, intellectualProperties.size());
+        assertEquals(intellectualProperty, intellectualProperties.get(0));
     }
 
     @Test
-    public void shouldGetDomainOnlyData() throws Exception {
-        setApplicationUserRoles("IPR");
-        List<Integer> idsToRemove = callInTransaction(entityManager -> {
-            List<Integer> ids = new ArrayList<>();
-            IntellectualProperty intellectualProperty = new IntellectualProperty();
-            intellectualProperty.setDomain(entityManager.getReference(Domain.class, 1));
-            intellectualProperty.setStartDate(LocalDate.now().minusDays(1));
-            intellectualProperty.setEndDate(LocalDate.now());
-            intellectualProperty.setDescription("description");
-            entityManager.persist(intellectualProperty);
-            ids.add(intellectualProperty.getId());
-            intellectualProperty = new IntellectualProperty();
-            intellectualProperty.setDomain(entityManager.getReference(Domain.class, 2));
-            intellectualProperty.setStartDate(LocalDate.now().minusDays(2));
-            intellectualProperty.setEndDate(LocalDate.now().minusDays(1));
-            intellectualProperty.setDescription("description2");
-            entityManager.persist(intellectualProperty);
-            ids.add(intellectualProperty.getId());
-            return ids;
-        });
-        Response response = get(1, "/ipr");
-        assertEquals(200, response.code());
-        List<pl.sg.ipr.api.IntellectualProperty> intellectualProperties = objectMapper.readValue(response.body(), new TypeReference<>() {
-        });
-        deleteIntellectualProperty(idsToRemove.toArray(Integer[]::new));
-    }
-
-    @Test
-    public void shouldFailCreationWhenUserHasNotIPRRole() throws Exception {
-        clearApplicationUserRoles();
-        Response response = put(1, "/ipr", put -> put.setEntity(new StringEntity(
-                objectMapper.writeValueAsString(
-                        new IntellectualPropertyCreateData(
-                                LocalDate.now().minusDays(1),
-                                LocalDate.now(),
-                                "description")))));
-
-        assertEquals(403, response.code());
-    }
-
-    @Test
-    public void shouldCreateIntellectualProperty() throws Exception {
-        setApplicationUserRoles("IPR");
+    public void shouldCreateIntellectualProperty() {
         LocalDate startDate = LocalDate.now();
         LocalDate endDate = startDate.minusDays(1);
-        Response response = put(DOMAIN_ID, "/ipr",
-                put -> put.setEntity(
-                        new StringEntity(
-                                objectMapper.writeValueAsString(
-                                        new IntellectualPropertyCreateData(
-                                                startDate,
-                                                endDate,
-                                                INTELLECTUAL_PROPERTY_DESCRIPTION)))));
+        IntellectualPropertyCreateData testIPRToCreate = new IntellectualPropertyCreateData(
+                startDate,
+                endDate,
+                INTELLECTUAL_PROPERTY_DESCRIPTION);
+        IntellectualProperty created = intellectualPropertyService.create(DOMAIN_ID, testIPRToCreate);
 
-        assertEquals(200, response.code());
         List<IntellectualProperty> all = intellectualPropertyRepository.findAll();
         assertEquals(1, all.size());
-        assertEquals(DOMAIN_ID, all.get(0).getDomain().getId());
-        assertEquals(startDate, all.get(0).getStartDate());
-        assertEquals(endDate, all.get(0).getEndDate());
-        assertEquals(INTELLECTUAL_PROPERTY_DESCRIPTION, all.get(0).getDescription());
-        deleteIntellectualProperty(all.get(0).getId());
-    }
-
-    private void deleteIntellectualProperty(Integer... ids) {
-        runInTransaction(entityManager -> {
-            for (Integer id : ids) {
-                entityManager.remove(entityManager.find(IntellectualProperty.class, id));
-            }
-        });
+        assertEquals(created, all.get(0));
     }
 }

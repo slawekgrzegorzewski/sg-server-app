@@ -26,7 +26,7 @@ public class ApplicationUser {
     private String lastName;
     private String email;
     @ElementCollection(fetch = FetchType.EAGER)
-    @Fetch(value = FetchMode.SUBSELECT)
+    @Fetch(value = FetchMode.JOIN)
     private List<String> roles;
 
     @OneToMany(mappedBy = "applicationUser")
@@ -107,7 +107,7 @@ public class ApplicationUser {
     }
 
     public void setRoles(String... roles) {
-        this.roles = Arrays.asList(roles);
+        this.roles = new ArrayList<>(Arrays.asList(roles));
     }
 
     public List<ApplicationUserDomainRelation> getAssignedDomains() {

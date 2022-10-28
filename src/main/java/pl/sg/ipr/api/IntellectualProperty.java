@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Data
 public class IntellectualProperty {
-    private long id;
+    private int id;
     private LocalDate startDate;
     private LocalDate endDate;
     private String description;
