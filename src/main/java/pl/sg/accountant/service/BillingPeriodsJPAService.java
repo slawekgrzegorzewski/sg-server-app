@@ -124,6 +124,19 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
         nodrigenTransactionRepository.save(nodrigenTransaction);
     }
 
+    @Override
+    public void addIncome(Account account, Income income, int nodrigenTransactionId, int nodrigenAlignmentTransactionId) {
+        NodrigenTransaction nodrigenTransaction = nodrigenTransactionRepository.getOne(nodrigenTransactionId);
+        NodrigenTransaction nodrigenAlignmentTransaction = nodrigenTransactionRepository.getOne(nodrigenAlignmentTransactionId);
+        validateNodrigenTransactionBelongsToAnAccount(account, nodrigenTransaction);
+        validateNodrigenTransactionBelongsToAnAccount(account, nodrigenAlignmentTransaction);
+        FinancialTransaction transaction = addIncome2(account, income);
+        nodrigenTransaction.setCreditTransaction(transaction);
+        nodrigenAlignmentTransaction.setDebitTransaction(transaction);
+        nodrigenTransactionRepository.save(nodrigenTransaction);
+        nodrigenTransactionRepository.save(nodrigenAlignmentTransaction);
+    }
+
     private FinancialTransaction addIncome2(Account account, Income income) {
         BillingPeriod billingPeriod = unfinishedCurrentOrPreviousMonthBillingPeriod(account.getDomain());
         if (income.getIncomeDate() == null) {
@@ -151,6 +164,20 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
         validateNodrigenTransactionBelongsToAnAccount(account, nodrigenTransaction);
         nodrigenTransaction.setDebitTransaction(addExpense2(account, expense));
         nodrigenTransactionRepository.save(nodrigenTransaction);
+    }
+
+    @Override
+    public void addExpense(Account account, Expense expense, int nodrigenTransactionId, int nodrigenAlignmentTransactionId) {
+        NodrigenTransaction nodrigenTransaction = nodrigenTransactionRepository.getOne(nodrigenTransactionId);
+        NodrigenTransaction nodrigenAlignmentTransaction = nodrigenTransactionRepository.getOne(nodrigenAlignmentTransactionId);
+        validateNodrigenTransactionBelongsToAnAccount(account, nodrigenTransaction);
+        validateNodrigenTransactionBelongsToAnAccount(account, nodrigenAlignmentTransaction);
+        FinancialTransaction transaction = addExpense2(account, expense);
+        nodrigenTransaction.setDebitTransaction(transaction);
+        nodrigenAlignmentTransaction.setCreditTransaction(transaction);
+        nodrigenTransactionRepository.save(nodrigenTransaction);
+        nodrigenTransactionRepository.save(nodrigenAlignmentTransaction);
+
     }
 
     private FinancialTransaction addExpense2(Account account, Expense expense) {
@@ -188,7 +215,7 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
 
     private void validateNodrigenTransactionBelongsToAnAccount(Account account, NodrigenTransaction nodrigenTransaction) {
         if (!account.getId().equals(nodrigenTransaction.getBankAccount().getAccount().getId())) {
-            throw new AccountsException("Nodrigen transaction not for the same acconut");
+            throw new AccountsException("Nodrigen transaction not for the same account");
         }
     }
 
