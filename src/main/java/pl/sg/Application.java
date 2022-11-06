@@ -24,7 +24,7 @@ import pl.sg.cubes.transport.CubeRecord;
 import pl.sg.integrations.nodrigen.model.NodrigenTransactionsToImport;
 import pl.sg.integrations.nodrigen.transport.NodrigenBankPermission;
 import pl.sg.integrations.nodrigen.transport.NodrigenTransactionsToImportTO;
-import pl.sg.ipr.model.IntellectualProperty;
+import pl.sg.ip.model.IntellectualProperty;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -164,7 +164,7 @@ public class Application {
         modelMapper.typeMap(pl.sg.banks.model.BankAccount.class, BankAccount.class);
         modelMapper.typeMap(NodrigenTransactionsToImport.class, NodrigenTransactionsToImportTO.class);
         modelMapper.typeMap(FinancialTransaction.class, FinancialTransactionTO.class);
-        modelMapper.typeMap(IntellectualProperty.class, pl.sg.ipr.api.IntellectualProperty.class);
+        modelMapper.typeMap(IntellectualProperty.class, pl.sg.ip.api.IntellectualProperty.class);
 
         return modelMapper;
     }

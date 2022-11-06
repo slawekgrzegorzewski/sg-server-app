@@ -1,4 +1,4 @@
-package pl.sg.ipr.model;
+package pl.sg.ip.model;
 
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;

@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.util.NoSuchElementException;
+
 @ControllerAdvice
 public class ErrorHandler extends ResponseEntityExceptionHandler {
 
@@ -22,5 +24,10 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = {DomainException.class})
     protected ResponseEntity<String> domainException(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(value = {NoSuchElementException.class})
+    protected ResponseEntity<String> notFoundException(RuntimeException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 }

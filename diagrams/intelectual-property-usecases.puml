@@ -1,6 +1,7 @@
 @startuml
 left to right direction
 
+(Get list of all intellectual properties) as (listIPR)
 (Adds new intellectual property) as (addIPR)
 (Updates existing intellectual property) as (updateIPR)
 (Deletes existing intellectual property) as (delIPR)
@@ -81,5 +82,9 @@ b) end date\n\
 c) description" as N4
 IPR -> (addIPR)
 (addIPR) --> N4
+
+note "Only for one domain" as N8
+IPR -> (listIPR)
+(listIPR) --> N8
 
 @enduml

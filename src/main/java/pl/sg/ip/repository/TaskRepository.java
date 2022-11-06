@@ -1,9 +1,9 @@
-package pl.sg.ipr.repository;
+package pl.sg.ip.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import pl.sg.application.model.Domain;
-import pl.sg.ipr.model.Task;
+import pl.sg.ip.model.Task;
 
 import java.util.List;
 

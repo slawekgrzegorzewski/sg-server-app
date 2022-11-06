@@ -1,7 +1,7 @@
-package pl.sg.ipr.repository;
+package pl.sg.ip.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import pl.sg.ipr.model.IntellectualProperty;
+import pl.sg.ip.model.IntellectualProperty;
 
 import java.util.List;
 

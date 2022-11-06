@@ -1,4 +1,4 @@
-package pl.sg.ipr.model;
+package pl.sg.ip.model;
 
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;
@@ -70,6 +70,15 @@ public class IntellectualProperty implements WithDomain<IntellectualProperty> {
 
     public IntellectualProperty setDescription(String description) {
         this.description = description;
+        return this;
+    }
+
+    public List<Task> tasks() {
+        return tasks;
+    }
+
+    public IntellectualProperty setTasks(List<Task> tasks) {
+        this.tasks = tasks;
         return this;
     }
 

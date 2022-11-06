@@ -1,4 +1,4 @@
-package pl.sg.ipr.model;
+package pl.sg.ip.model;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;

@@ -1,4 +1,4 @@
-package pl.sg.ipr.api;
+package pl.sg.ip.api;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

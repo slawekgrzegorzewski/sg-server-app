@@ -1,11 +1,11 @@
-package pl.sg.ipr.controller;
+package pl.sg.ip.controller;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.web.bind.annotation.*;
 import pl.sg.application.security.annotations.TokenBearerAuth;
-import pl.sg.ipr.api.IntellectualProperty;
-import pl.sg.ipr.api.IntellectualPropertyCreateData;
-import pl.sg.ipr.service.IntellectualPropertyService;
+import pl.sg.ip.api.IntellectualProperty;
+import pl.sg.ip.api.IntellectualPropertyData;
+import pl.sg.ip.service.IntellectualPropertyService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,10 +37,21 @@ public class IntellectualPropertyControllerImpl implements IntellectualPropertyC
     @TokenBearerAuth(any = "IPR")
     public IntellectualProperty create(
             @RequestHeader(value = "domainId") Integer domainId,
-            @RequestBody IntellectualPropertyCreateData createData) {
+            @RequestBody IntellectualPropertyData createData) {
         return modelMapper.map(
                 intellectualPropertyService.create(domainId, createData),
                 IntellectualProperty.class
         );
+    }
+
+    @Override
+    @RequestMapping("/{id}")
+    @PatchMapping(produces = {"application/json", "plain/text"})
+    @TokenBearerAuth(any = "IPR")
+    public void update(
+            @RequestHeader(value = "domainId") int domainId,
+            @PathVariable("id") int intellectualPropertyId,
+            @RequestBody IntellectualPropertyData createData) {
+        intellectualPropertyService.update(domainId, intellectualPropertyId, createData);
     }
 }
