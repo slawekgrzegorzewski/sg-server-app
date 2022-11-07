@@ -17,7 +17,6 @@ public class IPValidator {
         this.intellectualProperty = intellectualProperty;
     }
 
-
     public boolean validateDomain(int domainId) {
         return domainId == intellectualProperty.getDomain().getId();
     }
@@ -42,5 +41,9 @@ public class IPValidator {
                 .max(LocalDate::compareTo)
                 .map(max -> !max.isAfter(endDate))
                 .orElse(true);
+    }
+
+    public boolean validateDeletion() {
+        return ofNullable(intellectualProperty.tasks()).map(List::isEmpty).orElse(true);
     }
 }

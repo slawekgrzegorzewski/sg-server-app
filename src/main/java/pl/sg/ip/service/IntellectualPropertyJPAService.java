@@ -59,4 +59,17 @@ public class IntellectualPropertyJPAService implements IntellectualPropertyServi
         }
         this.intellectualPropertyRepository.save(toUpdate);
     }
+
+    @Override
+    public void delete(int domainId, int intellectualPropertyId) {
+        IntellectualProperty toDelete = intellectualPropertyRepository.findById(intellectualPropertyId).orElseThrow();
+        IPValidator validator = new IPValidator(toDelete);
+        if (!validator.validateDomain(domainId)) {
+            throw new IPException("Trying to update an IP for other domain.");
+        }
+        if (!validator.validateDeletion()) {
+            throw new IPException("This entity refers task and thus can not be deleted");
+        }
+        this.intellectualPropertyRepository.delete(toDelete);
+    }
 }

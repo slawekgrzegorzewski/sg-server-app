@@ -10,4 +10,7 @@ public interface IntellectualPropertyService {
     IntellectualProperty create(int domainId, IntellectualPropertyData createData);
 
     void update(int domainId, int intellectualPropertyId, IntellectualPropertyData createData);
+
+    void delete(int domainId, int intellectualPropertyId);
+
 }

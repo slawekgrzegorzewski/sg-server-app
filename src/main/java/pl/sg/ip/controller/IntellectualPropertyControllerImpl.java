@@ -45,13 +45,21 @@ public class IntellectualPropertyControllerImpl implements IntellectualPropertyC
     }
 
     @Override
-    @RequestMapping("/{id}")
-    @PatchMapping(produces = {"application/json", "plain/text"})
+    @PatchMapping(value = "/{id}", produces = {"application/json", "plain/text"})
     @TokenBearerAuth(any = "IPR")
     public void update(
             @RequestHeader(value = "domainId") int domainId,
             @PathVariable("id") int intellectualPropertyId,
             @RequestBody IntellectualPropertyData createData) {
         intellectualPropertyService.update(domainId, intellectualPropertyId, createData);
+    }
+
+    @Override
+    @DeleteMapping(value = "/{id}", produces = {"plain/text"})
+    @TokenBearerAuth(any = "IPR")
+    public void delete(
+            @RequestHeader(value = "domainId") int domainId,
+            @PathVariable("id") int intellectualPropertyId) {
+        intellectualPropertyService.delete(domainId, intellectualPropertyId);
     }
 }

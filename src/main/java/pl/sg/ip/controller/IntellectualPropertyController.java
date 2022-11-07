@@ -14,4 +14,5 @@ public interface IntellectualPropertyController {
 
     void update(int domainId, int intellectualPropertyId, IntellectualPropertyData createData);
 
+    void delete(int domainId, int intellectualPropertyId);
 }

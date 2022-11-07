@@ -133,4 +133,27 @@ class IPValidatorTest {
         assertTrue(validator.validateEndDate(now));
         assertTrue(validator.validateEndDate(now.plusDays(1)));
     }
+
+    @Test
+    void validateDeletion() {
+        //given
+        IPValidator validator = new IPValidator(new IntellectualProperty());
+        //when, then
+        assertTrue(validator.validateDeletion());
+
+        //given
+        IntellectualProperty intellectualProperty = new IntellectualProperty();
+        intellectualProperty.setTasks(List.of());
+        validator = new IPValidator(intellectualProperty);
+        //when, then
+        assertTrue(validator.validateDeletion());
+
+        //given
+        intellectualProperty = new IntellectualProperty();
+        Task task = new Task();
+        intellectualProperty.setTasks(List.of(task));
+        validator = new IPValidator(intellectualProperty);
+        //when, then
+        assertFalse(validator.validateDeletion());
+    }
 }

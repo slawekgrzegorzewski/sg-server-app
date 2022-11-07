@@ -56,9 +56,19 @@ public abstract class AbstractContainerBaseTest {
         return headers;
     }
 
+    static void rollbackAndStartTransaction() {
+        if (TestTransaction.isActive()) {
+            TestTransaction.flagForRollback();
+            TestTransaction.end();
+        }
+        TestTransaction.start();
+    }
+
     static void commitAndStartNewTransaction() {
-        TestTransaction.flagForCommit();
-        TestTransaction.end();
+        if (TestTransaction.isActive()) {
+            TestTransaction.flagForCommit();
+            TestTransaction.end();
+        }
         TestTransaction.start();
     }
 }
