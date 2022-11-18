@@ -1,11 +1,15 @@
 package pl.sg.ip.service;
 
 import org.springframework.stereotype.Component;
+import pl.sg.application.ForbiddenException;
 import pl.sg.application.repository.DomainRepository;
 import pl.sg.ip.api.IntellectualPropertyData;
+import pl.sg.ip.api.TaskData;
 import pl.sg.ip.model.IPException;
 import pl.sg.ip.model.IntellectualProperty;
+import pl.sg.ip.model.Task;
 import pl.sg.ip.repository.IntellectualPropertyRepository;
+import pl.sg.ip.repository.TaskRepository;
 
 import java.util.List;
 
@@ -14,10 +18,14 @@ public class IntellectualPropertyJPAService implements IntellectualPropertyServi
 
     private final DomainRepository domainRepository;
     private final IntellectualPropertyRepository intellectualPropertyRepository;
+    private final TaskRepository taskRepository;
 
-    public IntellectualPropertyJPAService(DomainRepository domainRepository, IntellectualPropertyRepository intellectualPropertyRepository) {
+    public IntellectualPropertyJPAService(DomainRepository domainRepository,
+                                          IntellectualPropertyRepository intellectualPropertyRepository,
+                                          TaskRepository taskRepository) {
         this.domainRepository = domainRepository;
         this.intellectualPropertyRepository = intellectualPropertyRepository;
+        this.taskRepository = taskRepository;
     }
 
     @Override
@@ -42,7 +50,7 @@ public class IntellectualPropertyJPAService implements IntellectualPropertyServi
         IntellectualProperty toUpdate = intellectualPropertyRepository.findById(intellectualPropertyId).orElseThrow();
         IPValidator validator = new IPValidator(toUpdate);
         if (!validator.validateDomain(domainId)) {
-            throw new IPException("Trying to update an IP for other domain.");
+            throw new ForbiddenException("Trying to update an IP for other domain.");
         }
         toUpdate.setDescription(updateData.description());
         if (!toUpdate.getStartDate().equals(updateData.startDate())) {
@@ -65,11 +73,24 @@ public class IntellectualPropertyJPAService implements IntellectualPropertyServi
         IntellectualProperty toDelete = intellectualPropertyRepository.findById(intellectualPropertyId).orElseThrow();
         IPValidator validator = new IPValidator(toDelete);
         if (!validator.validateDomain(domainId)) {
-            throw new IPException("Trying to update an IP for other domain.");
+            throw new ForbiddenException("Trying to update an IP for other domain.");
         }
         if (!validator.validateDeletion()) {
             throw new IPException("This entity refers task and thus can not be deleted");
         }
         this.intellectualPropertyRepository.delete(toDelete);
+    }
+
+    @Override
+    public void createTask(int domainId, int intellectualPropertyId, TaskData taskData) {
+        IntellectualProperty addTaskTo = intellectualPropertyRepository.findById(intellectualPropertyId).orElseThrow();
+        IPValidator validator = new IPValidator(addTaskTo);
+        if (!validator.validateDomain(domainId)) {
+            throw new ForbiddenException("Trying to add task to an IP from other domain.");
+        }
+        this.taskRepository.save(
+                new Task(taskData.description(), taskData.coAuthors(), List.of(), addTaskTo, List.of())
+        );
+        this.intellectualPropertyRepository.save(addTaskTo);
     }
 }

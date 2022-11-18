@@ -57,10 +57,9 @@ note "User can update description and coAuthor fields." as N6
 Task -> (updatetask)
 (updatetask) --> N6
 
-note "Required data to create a new Task\n\
+note "Required data to create a new Task (attachments can be added later)\n\
 a) IPR under which a Task was performed\n\
-b) coAuthor\n\
-c) attachments\n" as N1
+b) coAuthor" as N1
 Task -> (addtask)
 (addtask) --> N1
 

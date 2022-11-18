@@ -1,5 +1,6 @@
 package pl.sg.ip.service;
 
+import pl.sg.ip.api.TaskData;
 import pl.sg.ip.model.IntellectualProperty;
 import pl.sg.ip.api.IntellectualPropertyData;
 
@@ -13,4 +14,5 @@ public interface IntellectualPropertyService {
 
     void delete(int domainId, int intellectualPropertyId);
 
+    void createTask(int domainId, int intellectualPropertyId, TaskData taskData);
 }

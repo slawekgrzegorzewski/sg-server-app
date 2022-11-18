@@ -1,7 +1,9 @@
-package pl.sg.accountant;
+package pl.sg;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -22,15 +24,19 @@ public abstract class AbstractContainerBaseTest {
 
     static final PostgreSQLContainer POSTGRES;
 
-    static final int DEFAULT_DOMAIN_ID = 1;
-    static final int USER_ID = 1;
-    static final String USER_NAME = "slawek";
+    protected static final int DEFAULT_DOMAIN_ID = 1;
+    protected static final int USER_ID = 1;
+    protected static final String USER_NAME = "slawek";
 
     @LocalServerPort
-    int serverPort;
-
+    protected int serverPort;
     @Autowired
     private AuthorizationService authorizationService;
+    @Autowired
+    protected ObjectMapper objectMapper;
+    @Autowired
+    protected TestRestTemplate restTemplate;
+
 
     static {
         POSTGRES = new PostgreSQLContainer("postgres:14.5").withDatabaseName("accountant").withUsername("postgres");
@@ -49,14 +55,14 @@ public abstract class AbstractContainerBaseTest {
         }
     }
 
-    HttpHeaders headers(int domainId, String... roles) {
+    protected HttpHeaders headers(int domainId, String... roles) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("domainId", String.valueOf(domainId));
         headers.setBearerAuth(authorizationService.generateJWTToken(USER_ID + ":" + USER_NAME, List.of(roles), DEFAULT_DOMAIN_ID));
         return headers;
     }
 
-    static void rollbackAndStartTransaction() {
+    protected static void rollbackAndStartTransaction() {
         if (TestTransaction.isActive()) {
             TestTransaction.flagForRollback();
             TestTransaction.end();
@@ -64,7 +70,7 @@ public abstract class AbstractContainerBaseTest {
         TestTransaction.start();
     }
 
-    static void commitAndStartNewTransaction() {
+    protected static void commitAndStartNewTransaction() {
         if (TestTransaction.isActive()) {
             TestTransaction.flagForCommit();
             TestTransaction.end();
