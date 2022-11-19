@@ -1,6 +1,7 @@
 package pl.sg.ip;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +18,7 @@ import pl.sg.ip.api.TaskData;
 import pl.sg.ip.model.Task;
 
 import java.util.List;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -31,6 +33,20 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
     private static final int SECOND_DOMAIN_ID = 2;
     public static final String TASK_CO_AUTHORS = "author1, author2, author3";
     public static final String TASK_DESCRIPTION = "Description";
+    private static final List<String> TASK_ATTACHMENTS = List.of("url/to/file1", "url/to/file2", "url/to/file3");
+
+    @ParameterizedTest
+    @MethodSource("forbiddenRolesAndResponses")
+    public void getTaskRolesAccess(String[] roles, int expectedResponse) {
+
+        var intellectualProperty = createBasicIntellectualPropertyForDomain(DEFAULT_DOMAIN_ID);
+        ResponseEntity<?> response = restTemplate.exchange(
+                preparePath(intellectualProperty.getId()),
+                HttpMethod.GET,
+                new HttpEntity<String>(headers(DEFAULT_DOMAIN_ID, roles)),
+                String.class);
+        assertEquals(expectedResponse, response.getStatusCode().value());
+    }
 
     @ParameterizedTest
     @MethodSource("forbiddenRolesAndResponses")
@@ -89,6 +105,43 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
         assertEquals(1, tasks.size());
         assertEquals(TASK_CO_AUTHORS, tasks.get(0).getCoAuthors());
         assertEquals(TASK_DESCRIPTION, tasks.get(0).getDescription());
+    }
+
+    @Test
+    public void shouldGetTasksFromDomainToWhichUserHasAccessOnlyAndFromOnlyOneIP() throws JsonProcessingException {
+
+        var task = createTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID, TASK_DESCRIPTION, TASK_CO_AUTHORS, TASK_ATTACHMENTS);
+        createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
+        createBasicTaskWithIntellectualProperty(SECOND_DOMAIN_ID);
+
+        ResponseEntity<?> response = restTemplate.exchange(
+                preparePath(task.getIntellectualProperty().getId()),
+                HttpMethod.GET,
+                new HttpEntity<String>(headers(DEFAULT_DOMAIN_ID, "IPR")),
+                String.class);
+        assertEquals(200, response.getStatusCode().value());
+
+        Object body = response.getBody();
+
+        List<pl.sg.ip.api.Task> tasks = objectMapper.readValue(Objects.requireNonNull(body).toString(), new TypeReference<>() {
+        });
+        assertEquals(1, tasks.size());
+        assertEquals(TASK_DESCRIPTION, tasks.get(0).getDescription());
+        assertEquals(TASK_CO_AUTHORS, tasks.get(0).getCoAuthors());
+        assertEquals(TASK_ATTACHMENTS, tasks.get(0).getAttachments());
+    }
+
+    @Test
+    public void shouldFailGetForNotExistingIP() {
+
+        var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
+
+        ResponseEntity<?> response = restTemplate.exchange(
+                preparePath(task.getIntellectualProperty().getId() + 1),
+                HttpMethod.GET,
+                new HttpEntity<String>(headers(DEFAULT_DOMAIN_ID, "IPR")),
+                String.class);
+        assertEquals(404, response.getStatusCode().value());
     }
 
     @NotNull

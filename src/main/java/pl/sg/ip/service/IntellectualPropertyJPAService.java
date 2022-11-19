@@ -11,6 +11,7 @@ import pl.sg.ip.model.Task;
 import pl.sg.ip.repository.IntellectualPropertyRepository;
 import pl.sg.ip.repository.TaskRepository;
 
+import java.util.Collection;
 import java.util.List;
 
 @Component
@@ -29,7 +30,7 @@ public class IntellectualPropertyJPAService implements IntellectualPropertyServi
     }
 
     @Override
-    public List<IntellectualProperty> getAll(int domainId) {
+    public Collection<IntellectualProperty> getAll(int domainId) {
         return intellectualPropertyRepository.findAllByDomain_Id(domainId);
     }
 
@@ -79,6 +80,15 @@ public class IntellectualPropertyJPAService implements IntellectualPropertyServi
             throw new IPException("This entity refers task and thus can not be deleted");
         }
         this.intellectualPropertyRepository.delete(toDelete);
+    }
+
+    @Override
+    public Collection<Task> getTasksOfIntellectualProperty(int domainId, int intellectualPropertyId) {
+        IntellectualProperty ip = intellectualPropertyRepository.findById(intellectualPropertyId).orElseThrow();
+        if (!new IPValidator(ip).validateDomain(domainId)) {
+            throw new ForbiddenException("Trying to get tasks from IP from other domain.");
+        }
+        return taskRepository.findAllByIntellectualProperty(ip);
     }
 
     @Override

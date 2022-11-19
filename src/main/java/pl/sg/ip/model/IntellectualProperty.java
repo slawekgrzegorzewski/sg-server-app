@@ -6,6 +6,7 @@ import pl.sg.application.model.WithDomain;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -78,7 +79,7 @@ public class IntellectualProperty implements WithDomain<IntellectualProperty> {
     }
 
     public IntellectualProperty setTasks(List<Task> tasks) {
-        this.tasks = tasks;
+        this.tasks = new ArrayList<>(tasks);
         return this;
     }
 

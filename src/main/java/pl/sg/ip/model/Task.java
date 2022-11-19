@@ -2,6 +2,7 @@ package pl.sg.ip.model;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -33,9 +34,9 @@ public class Task {
     public Task(String description, String coAuthors, List<String> attachments, IntellectualProperty intellectualProperty, List<TimeRecord> timeRecords) {
         this.description = description;
         this.coAuthors = coAuthors;
-        this.attachments = attachments;
+        this.attachments = new ArrayList<>(attachments);
         this.intellectualProperty = intellectualProperty;
-        this.timeRecords = timeRecords;
+        this.timeRecords = new ArrayList<>(timeRecords);
     }
 
     public Integer getId() {
@@ -70,7 +71,7 @@ public class Task {
     }
 
     public Task setAttachments(List<String> attachments) {
-        this.attachments = attachments;
+        this.attachments = new ArrayList<>(attachments);
         return this;
     }
 
@@ -88,7 +89,7 @@ public class Task {
     }
 
     public Task setTimeRecords(List<TimeRecord> timeRecords) {
-        this.timeRecords = timeRecords;
+        this.timeRecords = new ArrayList<>(timeRecords);
         return this;
     }
 }

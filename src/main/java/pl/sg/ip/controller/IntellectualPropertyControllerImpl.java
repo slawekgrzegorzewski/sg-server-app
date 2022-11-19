@@ -5,10 +5,11 @@ import org.springframework.web.bind.annotation.*;
 import pl.sg.application.security.annotations.TokenBearerAuth;
 import pl.sg.ip.api.IntellectualProperty;
 import pl.sg.ip.api.IntellectualPropertyData;
+import pl.sg.ip.api.Task;
 import pl.sg.ip.api.TaskData;
 import pl.sg.ip.service.IntellectualPropertyService;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 @RestController
@@ -26,7 +27,7 @@ public class IntellectualPropertyControllerImpl implements IntellectualPropertyC
     @Override
     @GetMapping(produces = {"application/json", "plain/text"})
     @TokenBearerAuth(any = "IPR")
-    public List<IntellectualProperty> getAll(@RequestHeader(value = "domainId") Integer domainId) {
+    public Collection<IntellectualProperty> getAll(@RequestHeader(value = "domainId") Integer domainId) {
         return intellectualPropertyService.getAll(domainId)
                 .stream()
                 .map(intellectualProperty -> modelMapper.map(intellectualProperty, IntellectualProperty.class))
@@ -62,6 +63,17 @@ public class IntellectualPropertyControllerImpl implements IntellectualPropertyC
             @RequestHeader(value = "domainId") int domainId,
             @PathVariable("id") int intellectualPropertyId) {
         intellectualPropertyService.delete(domainId, intellectualPropertyId);
+    }
+
+    @Override
+    @GetMapping(path = "{id}/task", produces = {"application/json", "plain/text"})
+    @TokenBearerAuth(any = "IPR")
+    public Collection<Task> getAllTasks(
+            @RequestHeader(value = "domainId") int domainId,
+            @PathVariable("id") int intellectualPropertyId) {
+        return intellectualPropertyService.getTasksOfIntellectualProperty(domainId, intellectualPropertyId).stream()
+                .map(task -> modelMapper.map(task, Task.class))
+                .collect(Collectors.toList());
     }
 
     @Override

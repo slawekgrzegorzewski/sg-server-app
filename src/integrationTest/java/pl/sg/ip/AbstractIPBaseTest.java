@@ -1,5 +1,6 @@
 package pl.sg.ip;
 
+import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.params.provider.Arguments;
@@ -15,6 +16,7 @@ import pl.sg.ip.repository.TaskRepository;
 import pl.sg.ip.repository.TimeRecordRepository;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -40,6 +42,7 @@ public class AbstractIPBaseTest extends AbstractContainerBaseTest {
                 Arguments.of(new String[]{"CUBES"}, 403)
         );
     }
+
     @AfterEach
     public void clear() {
         rollbackAndStartTransaction();
@@ -51,7 +54,7 @@ public class AbstractIPBaseTest extends AbstractContainerBaseTest {
 
     @NotNull
     protected IntellectualProperty createBasicIntellectualPropertyForDomain(int domainId) {
-        return createIntellectualProperty(domainId, LocalDate.now(), LocalDate.now().minusDays(1), "");
+        return createIntellectualProperty(domainId, LocalDate.now(), LocalDate.now().plusDays(1), "");
     }
 
     @NotNull
@@ -70,17 +73,42 @@ public class AbstractIPBaseTest extends AbstractContainerBaseTest {
                 new TimeRecord(startDate, 8, description, domain, null),
                 new TimeRecord(endDate, 8, description, domain, null)));
 
-        Task task = taskRepository.save(new Task("", "", List.of(), null, timeRecords));
+        Task task = taskRepository.save(new Task("", "", Lists.newArrayList(), null, timeRecords));
         timeRecords.forEach(tr -> tr.setTask(task));
         timeRecordRepository.saveAllAndFlush(timeRecords);
 
         IntellectualProperty toCreate = new IntellectualProperty(startDate, endDate, description, domain);
-        toCreate.setTasks(List.of(task));
+        ArrayList<Task> tasks = Lists.newArrayList();
+        tasks.add(task);
+        toCreate.setTasks(tasks);
         IntellectualProperty intellectualProperty = intellectualPropertyRepository.save(toCreate);
         task.setIntellectualProperty(intellectualProperty);
         taskRepository.save(task);
 
         commitAndStartNewTransaction();
         return intellectualProperty;
+    }
+
+    @NotNull
+    protected Task createBasicTaskWithIntellectualProperty(int domainId) {
+        return createTaskWithIntellectualProperty(domainId, "", "", Lists.newArrayList());
+    }
+
+    @NotNull
+    protected Task createTaskWithIntellectualProperty(int domainId, String description, String coAuthors, List<String> attachments) {
+        Domain domain = this.domainRepository.getReferenceById(domainId);
+
+        Task task = taskRepository.save(new Task(description, coAuthors, attachments, null, Lists.newArrayList()));
+
+        IntellectualProperty intellectualProperty = intellectualPropertyRepository.save(new IntellectualProperty(LocalDate.now(), LocalDate.now().plusDays(1), "", domain));
+        ArrayList<Task> tasks = Lists.newArrayList();
+        tasks.add(task);
+        intellectualProperty.setTasks(tasks);
+        intellectualProperty = intellectualPropertyRepository.save(intellectualProperty);
+
+        task.setIntellectualProperty(intellectualProperty);
+        task = taskRepository.save(task);
+        commitAndStartNewTransaction();
+        return task;
     }
 }

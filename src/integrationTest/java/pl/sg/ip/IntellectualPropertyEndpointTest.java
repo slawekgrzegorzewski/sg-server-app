@@ -116,7 +116,7 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
         LocalDate startDate = endDate.minusDays(1);
 
         createIntellectualPropertyWithTaskAndTimeRecords(DEFAULT_DOMAIN_ID, startDate, endDate, INTELLECTUAL_PROPERTY_DESCRIPTION);
-        createIntellectualPropertyWithTaskAndTimeRecords(SECOND_DOMAIN_ID, startDate, startDate.minusDays(1), INTELLECTUAL_PROPERTY_DESCRIPTION);
+        createIntellectualPropertyWithTaskAndTimeRecords(SECOND_DOMAIN_ID, startDate.minusDays(1), startDate, INTELLECTUAL_PROPERTY_DESCRIPTION);
 
         HttpHeaders headers = headers(DEFAULT_DOMAIN_ID, "IPR");
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
