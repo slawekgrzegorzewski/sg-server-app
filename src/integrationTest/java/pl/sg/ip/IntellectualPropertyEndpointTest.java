@@ -37,7 +37,7 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
     @MethodSource("forbiddenRolesAndResponses")
     public void getIPRCheckRolesAccess(String[] roles, int expectedResponse) {
 
-        HttpHeaders headers = headers(DEFAULT_DOMAIN_ID, roles);
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, roles);
         ResponseEntity<?> response = restTemplate.exchange(
                 "http://localhost:" + serverPort + "/ipr",
                 HttpMethod.GET,
@@ -50,7 +50,7 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
     @MethodSource("forbiddenRolesAndResponses")
     public void createIPRCheckRolesAccess(String[] roles, int expectedResponse) throws Exception {
 
-        HttpHeaders headers = headers(DEFAULT_DOMAIN_ID, roles);
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, roles);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         IntellectualPropertyData testIPRToCreate = new IntellectualPropertyData(
@@ -73,7 +73,7 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
     @MethodSource("forbiddenRolesAndResponses")
     public void updateIPRCheckRolesAccess(String[] roles, int expectedResponse) throws Exception {
 
-        HttpHeaders headers = headers(DEFAULT_DOMAIN_ID, roles);
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, roles);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         IntellectualPropertyData testIPRToUpdate = new IntellectualPropertyData(
@@ -96,7 +96,7 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
     @MethodSource("forbiddenRolesAndResponses")
     public void deleteIPRCheckRolesAccess(String[] roles, int expectedResponse) {
 
-        HttpHeaders headers = headers(DEFAULT_DOMAIN_ID, roles);
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, roles);
 
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
@@ -118,7 +118,7 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
         createIntellectualPropertyWithTaskAndTimeRecords(DEFAULT_DOMAIN_ID, startDate, endDate, INTELLECTUAL_PROPERTY_DESCRIPTION);
         createIntellectualPropertyWithTaskAndTimeRecords(SECOND_DOMAIN_ID, startDate.minusDays(1), startDate, INTELLECTUAL_PROPERTY_DESCRIPTION);
 
-        HttpHeaders headers = headers(DEFAULT_DOMAIN_ID, "IPR");
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         ResponseEntity<?> response = restTemplate.exchange(
                 "http://localhost:" + serverPort + "/ipr",
@@ -140,7 +140,7 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
     @Test
     public void shouldCreateIntellectualProperty() throws JsonProcessingException {
 
-        HttpHeaders headers = headers(DEFAULT_DOMAIN_ID, "IPR");
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         LocalDate endDate = LocalDate.now();
@@ -177,7 +177,7 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
     @Test
     public void shouldFailUpdateWhenEntityDoesntExist() throws JsonProcessingException {
 
-        HttpHeaders headers = headers(DEFAULT_DOMAIN_ID, "IPR");
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         LocalDate endDate = LocalDate.now();
@@ -221,7 +221,7 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
 
         IntellectualProperty testIPRToUpdate = createIntellectualPropertyWithTaskAndTimeRecords(DEFAULT_DOMAIN_ID, startDate, endDate, INTELLECTUAL_PROPERTY_DESCRIPTION);
 
-        HttpHeaders headers = headers(DEFAULT_DOMAIN_ID, "IPR");
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
         headers.setContentType(MediaType.APPLICATION_JSON);
         LocalDate newStartDate = startDate.minusDays(1);
         LocalDate newEndDate = endDate.plusDays(1);
@@ -252,7 +252,7 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
     }
 
     private void tryToUpdateAndExceptResponseCode(int ipId, IntellectualPropertyData updateInfo, int responseCode) throws JsonProcessingException {
-        HttpHeaders headers = headers(DEFAULT_DOMAIN_ID, "IPR");
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(updateInfo), headers);
 
@@ -268,7 +268,7 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
     @Test
     public void shouldDeleteIntellectualProperty() {
 
-        HttpHeaders headers = headers(DEFAULT_DOMAIN_ID, "IPR");
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
 
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
@@ -286,7 +286,7 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
     @Test
     public void shouldFailDeletionIntellectualPropertyContainsAnyDependantEntities() {
 
-        HttpHeaders headers = headers(DEFAULT_DOMAIN_ID, "IPR");
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
 
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
@@ -305,7 +305,7 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
     @Test
     public void shouldFailDeletionIntellectualPropertyFromOtherDomain() {
 
-        HttpHeaders headers = headers(DEFAULT_DOMAIN_ID, "IPR");
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
 
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
@@ -324,7 +324,7 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
     @Test
     public void shouldFailDeletionIntellectualPropertyWhenEntityDoesntExist() {
 
-        HttpHeaders headers = headers(DEFAULT_DOMAIN_ID, "IPR");
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
 
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 

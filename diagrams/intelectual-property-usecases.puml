@@ -7,7 +7,7 @@ left to right direction
 (Deletes existing intellectual property) as (delIPR)
 
 (Adds new Task to an existing IPR) as (addtask)
-(Updates existging Task) as (updatetask)
+(Updates existing Task) as (updatetask)
 (Deletes existing Task) as (deltask)
 
 (Adds an attachment to an existing Task to an existing IPR) as (addattch)
@@ -41,7 +41,7 @@ a) date\n\
 b) description\n"
 
 note right of User: "Whenever user updates/creates/deletes\n\
-IPR or TimeRecord IPR times should be to contain all dates\n\
+IPR or TimeRecord IPR times should contain all dates\n\
 from relating TimeRecords"
 
 Task -> (delattch)

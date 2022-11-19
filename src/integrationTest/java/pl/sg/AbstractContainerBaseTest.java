@@ -55,10 +55,16 @@ public abstract class AbstractContainerBaseTest {
         }
     }
 
-    protected HttpHeaders headers(int domainId, String... roles) {
+    protected HttpHeaders authenticatedHeaders(int domainId, String... roles) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("domainId", String.valueOf(domainId));
         headers.setBearerAuth(authorizationService.generateJWTToken(USER_ID + ":" + USER_NAME, List.of(roles), DEFAULT_DOMAIN_ID));
+        return headers;
+    }
+
+    protected HttpHeaders headers(int domainId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("domainId", String.valueOf(domainId));
         return headers;
     }
 

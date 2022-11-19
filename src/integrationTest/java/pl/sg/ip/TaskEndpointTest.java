@@ -35,50 +35,116 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
     public static final String TASK_DESCRIPTION = "Description";
     private static final List<String> TASK_ATTACHMENTS = List.of("url/to/file1", "url/to/file2", "url/to/file3");
 
-    @ParameterizedTest
-    @MethodSource("forbiddenRolesAndResponses")
-    public void getTaskRolesAccess(String[] roles, int expectedResponse) {
+    @Test
+    void shouldFailUnauthenticatedGetTaskRequest() {
 
         var intellectualProperty = createBasicIntellectualPropertyForDomain(DEFAULT_DOMAIN_ID);
         ResponseEntity<?> response = restTemplate.exchange(
-                preparePath(intellectualProperty.getId()),
+                pathFromIntellectualProperty(intellectualProperty.getId()),
                 HttpMethod.GET,
-                new HttpEntity<String>(headers(DEFAULT_DOMAIN_ID, roles)),
+                new HttpEntity<String>(headers(DEFAULT_DOMAIN_ID)),
                 String.class);
-        assertEquals(expectedResponse, response.getStatusCode().value());
+        assertEquals(401, response.getStatusCode().value());
     }
 
-    @ParameterizedTest
-    @MethodSource("forbiddenRolesAndResponses")
-    public void createTaskRolesAccess(String[] roles, int expectedResponse) throws JsonProcessingException {
-
+    @Test
+    void shouldFailUnauthenticatedCreateTaskRequest() throws JsonProcessingException {
         var intellectualProperty = createBasicIntellectualPropertyForDomain(DEFAULT_DOMAIN_ID);
-        HttpHeaders headers = headers(DEFAULT_DOMAIN_ID, roles);
+        HttpHeaders headers = headers(DEFAULT_DOMAIN_ID);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         TaskData testTaskToCreate = new TaskData("", "");
         HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testTaskToCreate), headers);
 
         ResponseEntity<?> response = restTemplate.exchange(
-                preparePath(intellectualProperty.getId()),
+                pathFromIntellectualProperty(intellectualProperty.getId()),
+                HttpMethod.POST,
+                requestEntity,
+                String.class);
+        assertEquals(401, response.getStatusCode().value());
+    }
+
+    @Test
+    void shouldFailUnauthenticatedUpdateTaskRequest() throws JsonProcessingException {
+        var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
+        HttpHeaders headers = headers(DEFAULT_DOMAIN_ID);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        TaskData testTaskToUpdate = new TaskData("", "");
+        HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testTaskToUpdate), headers);
+
+        ResponseEntity<?> response = restTemplate.exchange(
+                pathFromTask(task.getId()),
+                HttpMethod.PATCH,
+                requestEntity,
+                String.class);
+
+        assertEquals(401, response.getStatusCode().value());
+    }
+
+    @ParameterizedTest
+    @MethodSource("forbiddenRolesAndResponses")
+    void getTaskRolesAccess(String[] roles, int expectedResponse) {
+
+        var intellectualProperty = createBasicIntellectualPropertyForDomain(DEFAULT_DOMAIN_ID);
+        ResponseEntity<?> response = restTemplate.exchange(
+                pathFromIntellectualProperty(intellectualProperty.getId()),
+                HttpMethod.GET,
+                new HttpEntity<String>(authenticatedHeaders(DEFAULT_DOMAIN_ID, roles)),
+                String.class);
+        assertEquals(expectedResponse, response.getStatusCode().value());
+    }
+
+    @ParameterizedTest
+    @MethodSource("forbiddenRolesAndResponses")
+    void createTaskRolesAccess(String[] roles, int expectedResponse) throws JsonProcessingException {
+
+        var intellectualProperty = createBasicIntellectualPropertyForDomain(DEFAULT_DOMAIN_ID);
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, roles);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        TaskData testTaskToCreate = new TaskData("", "");
+        HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testTaskToCreate), headers);
+
+        ResponseEntity<?> response = restTemplate.exchange(
+                pathFromIntellectualProperty(intellectualProperty.getId()),
                 HttpMethod.POST,
                 requestEntity,
                 String.class);
         assertEquals(expectedResponse, response.getStatusCode().value());
     }
 
+    @ParameterizedTest
+    @MethodSource("forbiddenRolesAndResponses")
+    void updateTaskRolesAccess(String[] roles, int expectedResponse) throws JsonProcessingException {
+
+        var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, roles);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        TaskData testTaskToUpdate = new TaskData("", "");
+        HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testTaskToUpdate), headers);
+
+        ResponseEntity<?> response = restTemplate.exchange(
+                pathFromTask(task.getId()),
+                HttpMethod.PATCH,
+                requestEntity,
+                String.class);
+        assertEquals(expectedResponse, response.getStatusCode().value());
+    }
+
     @Test
-    public void shouldFailCreationOfTaskForIPFromOtherDomain() throws JsonProcessingException {
+    void shouldFailCreationOfTaskForIPFromOtherDomain() throws JsonProcessingException {
 
         var intellectualProperty = createBasicIntellectualPropertyForDomain(SECOND_DOMAIN_ID);
 
-        HttpHeaders headers = headers(DEFAULT_DOMAIN_ID, "IPR");
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
         headers.setContentType(MediaType.APPLICATION_JSON);
         TaskData testTaskToCreate = new TaskData(TASK_CO_AUTHORS, TASK_DESCRIPTION);
         HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testTaskToCreate), headers);
 
         ResponseEntity<?> response = restTemplate.exchange(
-                preparePath(intellectualProperty.getId()),
+                pathFromIntellectualProperty(intellectualProperty.getId()),
                 HttpMethod.POST,
                 requestEntity,
                 String.class);
@@ -86,17 +152,17 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
     }
 
     @Test
-    public void shouldCreateTask() throws JsonProcessingException {
+    void shouldCreateTask() throws JsonProcessingException {
 
         var intellectualProperty = createBasicIntellectualPropertyForDomain(DEFAULT_DOMAIN_ID);
 
-        HttpHeaders headers = headers(DEFAULT_DOMAIN_ID, "IPR");
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
         headers.setContentType(MediaType.APPLICATION_JSON);
         TaskData testTaskToCreate = new TaskData(TASK_CO_AUTHORS, TASK_DESCRIPTION);
         HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testTaskToCreate), headers);
 
         ResponseEntity<?> response = restTemplate.exchange(
-                preparePath(intellectualProperty.getId()),
+                pathFromIntellectualProperty(intellectualProperty.getId()),
                 HttpMethod.POST,
                 requestEntity,
                 String.class);
@@ -108,16 +174,16 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
     }
 
     @Test
-    public void shouldGetTasksFromDomainToWhichUserHasAccessOnlyAndFromOnlyOneIP() throws JsonProcessingException {
+    void shouldGetTasksFromDomainToWhichUserHasAccessOnlyAndFromOnlyOneIP() throws JsonProcessingException {
 
         var task = createTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID, TASK_DESCRIPTION, TASK_CO_AUTHORS, TASK_ATTACHMENTS);
         createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
         createBasicTaskWithIntellectualProperty(SECOND_DOMAIN_ID);
 
         ResponseEntity<?> response = restTemplate.exchange(
-                preparePath(task.getIntellectualProperty().getId()),
+                pathFromIntellectualProperty(task.getIntellectualProperty().getId()),
                 HttpMethod.GET,
-                new HttpEntity<String>(headers(DEFAULT_DOMAIN_ID, "IPR")),
+                new HttpEntity<String>(authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
                 String.class);
         assertEquals(200, response.getStatusCode().value());
 
@@ -132,21 +198,81 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
     }
 
     @Test
-    public void shouldFailGetForNotExistingIP() {
+    void shouldFailGetForNotExistingIP() {
 
         var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
 
         ResponseEntity<?> response = restTemplate.exchange(
-                preparePath(task.getIntellectualProperty().getId() + 1),
+                pathFromIntellectualProperty(task.getIntellectualProperty().getId() + 1),
                 HttpMethod.GET,
-                new HttpEntity<String>(headers(DEFAULT_DOMAIN_ID, "IPR")),
+                new HttpEntity<String>(authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
                 String.class);
         assertEquals(404, response.getStatusCode().value());
     }
 
+    @Test
+    void updateTaskRequestShouldFailWhenNoEntity() throws JsonProcessingException {
+        var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        TaskData testTaskToUpdate = new TaskData("", "");
+        HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testTaskToUpdate), headers);
+
+        ResponseEntity<?> response = restTemplate.exchange(
+                pathFromTask(task.getId() + 1),
+                HttpMethod.PATCH,
+                requestEntity,
+                String.class);
+        assertEquals(404, response.getStatusCode().value());
+    }
+
+    @Test
+    void updateTaskRequestShouldFailWhenNoDomainAccess() throws JsonProcessingException {
+        var task = createBasicTaskWithIntellectualProperty(SECOND_DOMAIN_ID);
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        TaskData testTaskToUpdate = new TaskData("", "");
+        HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testTaskToUpdate), headers);
+
+        ResponseEntity<?> response = restTemplate.exchange(
+                pathFromTask(task.getId()),
+                HttpMethod.PATCH,
+                requestEntity,
+                String.class);
+        assertEquals(403, response.getStatusCode().value());
+    }
+
+    @Test
+    void updateTaskRequestShouldUpdateTask() throws JsonProcessingException {
+        var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        TaskData testTaskToUpdate = new TaskData(TASK_CO_AUTHORS, TASK_DESCRIPTION);
+        HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testTaskToUpdate), headers);
+
+        ResponseEntity<?> response = restTemplate.exchange(
+                pathFromTask(task.getId()),
+                HttpMethod.PATCH,
+                requestEntity,
+                String.class);
+        assertEquals(200, response.getStatusCode().value());
+        List<Task> allTasks = taskRepository.findAll();
+        assertEquals(1, allTasks.size());
+        assertEquals(TASK_CO_AUTHORS, allTasks.get(0).getCoAuthors());
+        assertEquals(TASK_DESCRIPTION, allTasks.get(0).getDescription());
+    }
+
     @NotNull
-    private String preparePath(Integer intellectualPropertyId) {
+    private String pathFromIntellectualProperty(int intellectualPropertyId) {
         return "http://localhost:" + serverPort + "/ipr/" + intellectualPropertyId + "/task";
+    }
+
+    @NotNull
+    private String pathFromTask(int taskId) {
+        return "http://localhost:" + serverPort + "/task/" + taskId;
     }
 
 }
