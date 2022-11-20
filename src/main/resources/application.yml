@@ -37,3 +37,8 @@ cron:
   fetch-accounts-monthly: "-"
   fetch-transactions: "-"
 
+intellectual-property:
+  task:
+    attachments:
+      storage:
+        dir: D:/Development/ipStorage/
