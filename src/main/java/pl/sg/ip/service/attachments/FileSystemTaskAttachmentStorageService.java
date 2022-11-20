@@ -22,7 +22,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 @Component
-@Profile("dev")
+@Profile("fileSystemStorage")
 public class FileSystemTaskAttachmentStorageService implements TaskAttachmentStorageService {
 
     private static final Logger LOG = LoggerFactory.getLogger(FileSystemTaskAttachmentStorageService.class);
@@ -68,7 +68,7 @@ public class FileSystemTaskAttachmentStorageService implements TaskAttachmentSto
     @Override
     public boolean deleteFile(int intellectualPropertyId, int taskId, String fileName) {
         try {
-            Files.delete(subfolder(intellectualPropertyId, taskId));
+            Files.delete(subfolder(intellectualPropertyId, taskId).resolve(fileName));
             return true;
         } catch (IOException e) {
             LOG.warn("Unable to delete file " + fileName + " from directory " + intellectualPropertyId + "/" + taskId + "/ due to an exception.", e);

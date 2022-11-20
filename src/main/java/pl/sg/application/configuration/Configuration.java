@@ -2,6 +2,7 @@ package pl.sg.application.configuration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -16,37 +17,59 @@ import static java.util.Optional.*;
 public class Configuration {
 
     private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
+    private final Environment environment;
+
+    public Configuration(Environment environment) {
+        this.environment = environment;
+    }
 
     public String getJWTTokenSecret() {
-        return getEnv("JWT_SECRET", Paths.get("/", "run", "secrets", "jwt_secret_code")).orElse("confidentialsecret");
+        return getEnvironmentValue("JWT_SECRET")
+                .or(() -> getSecret(Paths.get("/", "run", "secrets", "jwt_secret_code")))
+                .orElse("confidentialsecret");
     }
 
     public String getSendgridApiKey() {
-        return getEnv("SENDGRID_API_KEY", Paths.get("/", "run", "secrets", "sendgrid_api_key")).orElse("");
+        return getEnvironmentValue("SENDGRID_API_KEY")
+                .or(() -> getSecret(Paths.get("/", "run", "secrets", "sendgrid_api_key")))
+                .orElse("");
     }
 
     public String getNordigenSecretId() {
-        return getEnv("NORDIGEN_SECRET_ID", Paths.get("/", "run", "secrets", "nordigen_secret_id")).orElse("");
+        return getEnvironmentValue("NORDIGEN_SECRET_ID")
+                .or(() -> getSecret(Paths.get("/", "run", "secrets", "nordigen_secret_id")))
+                .orElse("");
     }
 
     public String getNordigenSecretKey() {
-        return getEnv("NORDIGEN_SECRET_KEY", Paths.get("/", "run", "secrets", "nordigen_secret_key")).orElse("");
+        return getEnvironmentValue("NORDIGEN_SECRET_KEY")
+                .or(() -> getSecret(Paths.get("/", "run", "secrets", "nordigen_secret_key")))
+                .orElse("");
     }
 
     public String getAWSAccessKeyId() {
-        return getEnv("AWS_ACCESS_KEY_ID", Paths.get("/", "run", "secrets", "aws_access_key_id")).orElseThrow();
+        return getEnvironmentValue("AWS_ACCESS_KEY_ID")
+                .or(() -> getSecret(Paths.get("/", "run", "secrets", "aws_access_key_id")))
+                .or(() -> getApplicationConfig("aws.aws_access_key_id"))
+                .orElseThrow();
     }
 
     public String getAWSSecretAccessKey() {
-        return getEnv("AWS_SECRET_ACCESS_KEY", Paths.get("/", "run", "secrets", "aws_secret_access_key")).orElseThrow();
+        return getEnvironmentValue("AWS_SECRET_ACCESS_KEY")
+                .or(() -> getSecret(Paths.get("/", "run", "secrets", "aws_secret_access_key")))
+                .or(() -> getApplicationConfig("aws.aws_secret_access_key"))
+                .orElseThrow();
     }
 
     public String getAWSRegion() {
-        return getEnv("AWS_REGION", Paths.get("/", "run", "secrets", "aws_region")).orElseThrow();
+        return getEnvironmentValue("AWS_REGION")
+                .or(() -> getSecret(Paths.get("/", "run", "secrets", "aws_region")))
+                .or(() -> getApplicationConfig("aws.aws_region"))
+                .orElseThrow();
     }
 
-    private Optional<String> getEnv(String key, Path secretPath) {
-        return ofNullable(System.getenv(key)).or(() -> getSecret(secretPath));
+    private Optional<String> getEnvironmentValue(String environmentKey) {
+        return ofNullable(System.getenv(environmentKey));
     }
 
     private Optional<String> getSecret(Path secretPath) {
@@ -56,5 +79,9 @@ public class Configuration {
             LOG.warn("Problem during reading secret file.", e);
             return empty();
         }
+    }
+
+    private Optional<String> getApplicationConfig(String key) {
+        return ofNullable(environment.getProperty(key, String.class));
     }
 }

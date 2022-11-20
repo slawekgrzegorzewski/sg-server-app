@@ -25,7 +25,7 @@ import static java.util.Optional.*;
 import static java.util.Optional.empty;
 
 @Component
-@Profile("https")
+@Profile("S3Storage")
 public class S3TaskAttachmentStorageService implements TaskAttachmentStorageService {
 
     private static final Logger LOG = LoggerFactory.getLogger(S3TaskAttachmentStorageService.class);
@@ -47,6 +47,7 @@ public class S3TaskAttachmentStorageService implements TaskAttachmentStorageServ
                     .getObjectSummaries()
                     .stream()
                     .map(S3ObjectSummary::getKey)
+                    .map(key -> key.replace(prefix, ""))
                     .collect(Collectors.toList());
         } catch (AmazonServiceException e) {
             LOG.warn("Unable to list files under directory " + prefix + " due to an exception.", e);

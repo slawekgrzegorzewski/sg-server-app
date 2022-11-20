@@ -8,7 +8,7 @@ services:
     ports:
       - "8090:8443"
     environment:
-      spring_profiles_active: https
+      spring_profiles_active: https,S3Storage
     configs:
       - source: application.yml
         target: /app/application.yml
