@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
-import pl.sg.AbstractContainerBaseTest;
+import pl.sg.AbstractApplicationBaseTest;
 import pl.sg.application.model.Domain;
 import pl.sg.application.repository.DomainRepository;
 import pl.sg.ip.model.IntellectualProperty;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class AbstractIPBaseTest extends AbstractContainerBaseTest {
+public class AbstractIPBaseTest extends AbstractApplicationBaseTest {
 
     @Autowired
     DomainRepository domainRepository;

@@ -41,4 +41,4 @@ intellectual-property:
   task:
     attachments:
       storage:
-        dir: D:/Development/ipStorage/
+        dir: ./ipStorage/
