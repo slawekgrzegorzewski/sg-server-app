@@ -16,3 +16,17 @@ cron:
   fetch-accounts: "-"
   fetch-accounts-monthly: "-"
   fetch-transactions: "-"
+
+intellectual-property:
+  task:
+    attachments:
+      storage:
+        dir: ./ipStorageTest/
+
+aws:
+  aws_access_key_id: "SET_TO_REAL_VALUE_WHEN_TESTING_S3"
+  aws_secret_access_key: "SET_TO_REAL_VALUE_WHEN_TESTING_S3"
+  aws_region: "SET_TO_REAL_VALUE_WHEN_TESTING_S3"
+  intellectual-property-task:
+    attachments:
+      bucket-name: sdajhfgjkasgdfjkasdhfkjashdkjfhaskjdfhasdkjfhkjashdfkjadsfhdasj

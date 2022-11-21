@@ -8,7 +8,7 @@ services:
     ports:
       - "8090:8443"
     environment:
-      spring_profiles_active: https
+      spring_profiles_active: https,S3Storage
     configs:
       - source: application.yml
         target: /app/application.yml
@@ -21,6 +21,9 @@ services:
       - postgres_password
       - key_store_password
       - key_password
+      - aws_access_key_id
+      - aws_secret_access_key
+      - aws_region
     volumes:
       - $HOME/docker/volumes/logs:/app/logs/
 
@@ -90,4 +93,10 @@ secrets:
     file: certs/sgapplication.key
   sgapplication.p12: 
     file: certs/sgapplication.p12
+  aws_access_key_id:
+    external: true
+  aws_secret_access_key:
+    external: true
+  aws_region:
+    external: true
   

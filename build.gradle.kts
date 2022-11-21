@@ -56,6 +56,7 @@ repositories {
 }
 
 dependencies {
+    implementation("com.amazonaws:aws-java-sdk-s3:1.12.345")
     implementation("com.auth0:java-jwt:4.0.0")
     implementation("com.google.code.gson:gson:2.9.0")
     implementation("com.sendgrid:sendgrid-java:4.9.3")
