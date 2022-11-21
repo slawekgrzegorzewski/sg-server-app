@@ -11,6 +11,7 @@ left to right direction
 (Deletes existing Task) as (deltask)
 
 (Adds an attachment to an existing Task to an existing IPR) as (addattch)
+(Gets an attachment for a Task) as (getattch)
 (Deletes an attachment to an existing Task to an existing IPR) as (delattch)
 
 (Adds new TimeRecord to existing Task) as (addtimerecord1)
@@ -45,6 +46,7 @@ IPR or TimeRecord IPR times should contain all dates\n\
 from relating TimeRecords"
 
 Task -> (delattch)
+Task -> (getattch)
 Task -> (addattch)
 
 note "Deletion is only possible\n\

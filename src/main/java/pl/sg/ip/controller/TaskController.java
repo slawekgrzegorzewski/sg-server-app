@@ -1,9 +1,8 @@
 package pl.sg.ip.controller;
 
-import pl.sg.ip.api.TaskData;
+import org.springframework.web.multipart.MultipartFile;
 
 
 public interface TaskController {
-
-    void update(int domainId, int taskId, TaskData taskData);
+    void uploadAttachment(int domainId, int taskId, MultipartFile file, String fileName);
 }

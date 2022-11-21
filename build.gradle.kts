@@ -60,6 +60,7 @@ dependencies {
     implementation("com.auth0:java-jwt:4.0.0")
     implementation("com.google.code.gson:gson:2.9.0")
     implementation("com.sendgrid:sendgrid-java:4.9.3")
+    implementation("commons-fileupload:commons-fileupload:1.4")
 
     implementation("jakarta.xml.bind:jakarta.xml.bind-api:4.0.0")
     implementation("javax.xml.bind:jaxb-api:2.3.1")

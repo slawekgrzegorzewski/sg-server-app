@@ -18,6 +18,12 @@ public abstract class AbstractApplicationBaseTest extends AbstractContainerBaseT
     protected HttpHeaders headers(int domainId, String... roles) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("domainId", String.valueOf(domainId));
+        return headers;
+    }
+
+    protected HttpHeaders authenticatedHeaders(int domainId, String... roles) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("domainId", String.valueOf(domainId));
         headers.setBearerAuth(authorizationService.generateJWTToken(USER_ID + ":" + USER_NAME, List.of(roles), DEFAULT_DOMAIN_ID));
         return headers;
     }

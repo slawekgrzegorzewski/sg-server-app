@@ -46,7 +46,6 @@ class TaskAttachmentStorageServiceTest extends AbstractContainerBaseTest {
     private final int taskId = 2;
     private StorageTestUtil storageTestUtil;
 
-
     @BeforeEach
     public void beforeEach() throws IOException {
         storageTestUtil = storageTestUtilFactory.create(intellectualPropertyId, taskId);

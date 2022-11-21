@@ -1,21 +1,19 @@
 package pl.sg;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.spi.SourceGetter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import pl.sg.accountant.model.accounts.*;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import pl.sg.accountant.model.accounts.FinancialTransaction;
+import pl.sg.accountant.model.accounts.PerformedServicePayment;
 import pl.sg.accountant.transport.FinancialTransactionTO;
 import pl.sg.accountant.transport.HolidayCurrencies;
 import pl.sg.accountant.transport.PiggyBank;
 import pl.sg.accountant.transport.accounts.*;
-import pl.sg.accountant.transport.accounts.Account;
-import pl.sg.accountant.transport.accounts.Client;
-import pl.sg.accountant.transport.accounts.ClientPayment;
-import pl.sg.accountant.transport.accounts.PerformedService;
-import pl.sg.accountant.transport.accounts.Service;
 import pl.sg.accountant.transport.billings.BillingPeriod;
 import pl.sg.accountant.transport.billings.Category;
 import pl.sg.application.api.DomainSimple;
@@ -294,4 +292,11 @@ public class Application {
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeJsonDeserializer())
                 .create();
     }
+
+    @Bean(name = "multipartResolver")
+    public CommonsMultipartResolver multipartResolver() {
+        CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver();
+        return commonsMultipartResolver;
+    }
+
 }
