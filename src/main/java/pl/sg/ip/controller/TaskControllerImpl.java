@@ -4,35 +4,42 @@ import org.modelmapper.ModelMapper;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pl.sg.application.security.annotations.TokenBearerAuth;
-import pl.sg.ip.service.attachments.TaskAttachmentStorageService;
+import pl.sg.ip.api.TaskData;
+import pl.sg.ip.service.TaskService;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 @RestController
-@RequestMapping("/iprTask")
+@RequestMapping("/task")
 public class TaskControllerImpl implements TaskController {
 
     private final ModelMapper modelMapper;
-    private final TaskAttachmentStorageService taskAttachmentStorageService;
+    private final TaskService taskService;
 
-    public TaskControllerImpl(ModelMapper modelMapper, TaskAttachmentStorageService taskAttachmentStorageService) {
+    public TaskControllerImpl(ModelMapper modelMapper, TaskService taskService) {
         this.modelMapper = modelMapper;
-        this.taskAttachmentStorageService = taskAttachmentStorageService;
+        this.taskService = taskService;
     }
 
     @Override
-    @PostMapping(path = "{id}")
+    @PatchMapping(value = "/{id}", produces = {"plain/text"})
+    @TokenBearerAuth(any = "IPR")
+    public void update(
+            @RequestHeader(value = "domainId") int domainId,
+            @PathVariable("id") int taskId,
+            @RequestBody TaskData updateData) {
+        taskService.update(domainId, taskId, updateData);
+    }
+
+    @Override
+    @PostMapping(path = "{id}/attachments")
     @TokenBearerAuth(any = "IPR")
     public void uploadAttachment(
             @RequestHeader(value = "domainId") int domainId,
             @PathVariable("id") int taskId,
-            @RequestParam("file") MultipartFile file,
-            @RequestParam("fileName") String fileName) {
-        try (InputStream inputStream = file.getInputStream()) {
-            taskAttachmentStorageService.putFile(1, taskId, fileName, inputStream);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+            @RequestParam("fileName") String fileName,
+            @RequestParam("file") MultipartFile file) throws IOException {
+        taskService.uploadAttachment(domainId, taskId, fileName, file);
     }
 }

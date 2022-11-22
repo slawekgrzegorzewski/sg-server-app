@@ -3,22 +3,44 @@ package pl.sg.ip;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentest4j.AssertionFailedError;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.util.LinkedMultiValueMap;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.shaded.com.google.common.hash.Funnels;
+import org.testcontainers.shaded.com.google.common.hash.HashCode;
+import org.testcontainers.shaded.com.google.common.hash.Hasher;
+import org.testcontainers.shaded.com.google.common.hash.Hashing;
+import org.testcontainers.shaded.com.google.common.io.ByteStreams;
 import pl.sg.ip.api.TaskData;
 import pl.sg.ip.model.Task;
+import pl.sg.ip.service.attachments.TaskAttachmentStorageService;
+import pl.sg.ip.service.attachments.utils.FileSystemStorageTestUtil;
+import pl.sg.ip.service.attachments.utils.StorageTestUtil;
+import pl.sg.ip.service.attachments.utils.StorageTestUtilFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -26,7 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {"spring.config.location=classpath:application-it.yml"})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ActiveProfiles("dev")
+@ActiveProfiles({"dev", "fileSystemStorage"})
 @Testcontainers
 public class TaskEndpointTest extends AbstractIPBaseTest {
 
@@ -34,6 +56,24 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
     public static final String TASK_CO_AUTHORS = "author1, author2, author3";
     public static final String TASK_DESCRIPTION = "Description";
     private static final List<String> TASK_ATTACHMENTS = List.of("url/to/file1", "url/to/file2", "url/to/file3");
+
+    @Autowired
+    private StorageTestUtilFactory storageTestUtilFactory;
+    @Autowired
+    private TaskAttachmentStorageService taskAttachmentStorageService;
+    private StorageTestUtil storageTestUtil;
+
+    @BeforeEach
+    public void beforeEach() throws IOException {
+        storageTestUtil = storageTestUtilFactory.create(-1, -1);
+    }
+
+    @AfterEach
+    public void afterEach() throws IOException {
+        if (storageTestUtil != null) {
+            storageTestUtil.clearStorage();
+        }
+    }
 
     @Test
     void shouldFailUnauthenticatedGetTaskRequest() {
@@ -74,8 +114,25 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
         HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testTaskToUpdate), headers);
 
         ResponseEntity<?> response = restTemplate.exchange(
-                pathFromTask(task.getId()),
+                pathForTask(task.getId()),
                 HttpMethod.PATCH,
+                requestEntity,
+                String.class);
+
+        assertEquals(401, response.getStatusCode().value());
+    }
+
+    @Test
+    void shouldFailUnauthenticatedUploadAttachmentRequest() throws URISyntaxException {
+        var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = prepareUploadForm(
+                headers(DEFAULT_DOMAIN_ID),
+                "first.pdf",
+                "/pl/sg/ip/attachment1.pdf");
+
+        ResponseEntity<?> response = restTemplate.exchange(
+                pathForAttachment(task.getId()),
+                HttpMethod.POST,
                 requestEntity,
                 String.class);
 
@@ -126,10 +183,28 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
         HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testTaskToUpdate), headers);
 
         ResponseEntity<?> response = restTemplate.exchange(
-                pathFromTask(task.getId()),
+                pathForTask(task.getId()),
                 HttpMethod.PATCH,
                 requestEntity,
                 String.class);
+        assertEquals(expectedResponse, response.getStatusCode().value());
+    }
+
+    @ParameterizedTest
+    @MethodSource("forbiddenRolesAndResponses")
+    void uploadAttachmentRequestRolesAccess(String[] roles, int expectedResponse) throws URISyntaxException {
+        var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = prepareUploadForm(
+                authenticatedHeaders(DEFAULT_DOMAIN_ID, roles),
+                "first.pdf",
+                "/pl/sg/ip/attachment1.pdf");
+
+        ResponseEntity<?> response = restTemplate.exchange(
+                pathForAttachment(task.getId()),
+                HttpMethod.POST,
+                requestEntity,
+                String.class);
+
         assertEquals(expectedResponse, response.getStatusCode().value());
     }
 
@@ -220,7 +295,7 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
         HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testTaskToUpdate), headers);
 
         ResponseEntity<?> response = restTemplate.exchange(
-                pathFromTask(task.getId() + 1),
+                pathForTask(task.getId() + 1),
                 HttpMethod.PATCH,
                 requestEntity,
                 String.class);
@@ -237,7 +312,7 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
         HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testTaskToUpdate), headers);
 
         ResponseEntity<?> response = restTemplate.exchange(
-                pathFromTask(task.getId()),
+                pathForTask(task.getId()),
                 HttpMethod.PATCH,
                 requestEntity,
                 String.class);
@@ -254,7 +329,7 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
         HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testTaskToUpdate), headers);
 
         ResponseEntity<?> response = restTemplate.exchange(
-                pathFromTask(task.getId()),
+                pathForTask(task.getId()),
                 HttpMethod.PATCH,
                 requestEntity,
                 String.class);
@@ -265,14 +340,146 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
         assertEquals(TASK_DESCRIPTION, allTasks.get(0).getDescription());
     }
 
+    @Test
+    void shouldFailUploadAttachmentRequestForNonExistingTask() throws URISyntaxException {
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = prepareUploadForm(
+                authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR"),
+                "first.pdf",
+                "/pl/sg/ip/attachment1.pdf");
+
+        ResponseEntity<?> response = restTemplate.exchange(
+                pathForAttachment(1),
+                HttpMethod.POST,
+                requestEntity,
+                String.class);
+
+        assertEquals(404, response.getStatusCode().value());
+    }
+
+    @Test
+    void shouldFailUploadAttachmentRequestForTaskFromOtherDomain() throws URISyntaxException {
+        var task = createBasicTaskWithIntellectualProperty(SECOND_DOMAIN_ID);
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = prepareUploadForm(
+                authenticatedHeaders(DEFAULT_DOMAIN_ID, "I{R"),
+                "first.pdf",
+                "/pl/sg/ip/attachment1.pdf");
+
+        ResponseEntity<?> response = restTemplate.exchange(
+                pathForAttachment(task.getId()),
+                HttpMethod.POST,
+                requestEntity,
+                String.class);
+
+        assertEquals(403, response.getStatusCode().value());
+    }
+
+    @Test
+    void shouldUploadAttachmentRequest() throws URISyntaxException, IOException {
+        var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
+        String fileName = "first.pdf";
+        String resourceName = "attachment1.pdf";
+        String resourcePath = "/pl/sg/ip/" + resourceName;
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = prepareUploadForm(
+                authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR"),
+                fileName,
+                resourcePath);
+
+        ResponseEntity<?> response = restTemplate.exchange(
+                pathForAttachment(task.getId()),
+                HttpMethod.POST,
+                requestEntity,
+                String.class);
+
+        task = taskRepository.getReferenceById(task.getId());
+
+        assertEquals(200, response.getStatusCode().value());
+        assertEquals(1, task.getAttachments().size());
+        assertEquals(fileName, task.getAttachments().get(0));
+
+        try (InputStream inputStream = taskAttachmentStorageService.getFile(task.getIntellectualProperty().getId(), task.getId(), fileName)
+                .orElseThrow(() -> new AssertionFailedError("expected a file here"))) {
+            Hasher hasher = Hashing.sha512().newHasher();
+            ByteStreams.copy(inputStream, Funnels.asOutputStream(hasher));
+            HashCode hash = hasher.hash();
+            Map<String, String> controlSums = readControlSums();
+            assertEquals(controlSums.get(resourceName), hash.toString());
+        }
+    }
+
+    @Test
+    void shouldKeepOriginalFileWhenReuploadAttachmentRequest() throws URISyntaxException, IOException {
+        var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
+        String fileName = "first.pdf";
+        String resourceName = "attachment1.pdf";
+        String resourcePath = "/pl/sg/ip/" + resourceName;
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = prepareUploadForm(
+                authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR"),
+                fileName,
+                resourcePath);
+
+        restTemplate.exchange(
+                pathForAttachment(task.getId()),
+                HttpMethod.POST,
+                requestEntity,
+                String.class);
+
+        String otherResourcePath = "/pl/sg/ip/attachment2.pdf";
+        requestEntity = prepareUploadForm(
+                authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR"),
+                fileName,
+                otherResourcePath);
+
+        ResponseEntity<?> response = restTemplate.exchange(
+                pathForAttachment(task.getId()),
+                HttpMethod.POST,
+                requestEntity,
+                String.class);
+
+        assertEquals(400, response.getStatusCode().value());
+
+        try (InputStream inputStream = taskAttachmentStorageService.getFile(task.getIntellectualProperty().getId(), task.getId(), fileName)
+                .orElseThrow(() -> new AssertionFailedError("expected a file here"))) {
+            Hasher hasher = Hashing.sha512().newHasher();
+            ByteStreams.copy(inputStream, Funnels.asOutputStream(hasher));
+            HashCode hash = hasher.hash();
+            Map<String, String> controlSums = readControlSums();
+            assertEquals(controlSums.get(resourceName), hash.toString());
+        }
+    }
+
     @NotNull
     private String pathFromIntellectualProperty(int intellectualPropertyId) {
-        return "http://localhost:" + serverPort + "/ipr/" + intellectualPropertyId + "/task";
+        return "http://localhost:%d/ipr/%d/task".formatted(serverPort, intellectualPropertyId);
     }
 
     @NotNull
-    private String pathFromTask(int taskId) {
-        return "http://localhost:" + serverPort + "/task/" + taskId;
+    private String pathForTask(int taskId) {
+        return "http://localhost:%d/task/%d".formatted(serverPort, taskId);
     }
 
+    @NotNull
+    private String pathForAttachment(int taskId) {
+        return "http://localhost:%d/task/%d/attachments".formatted(serverPort, taskId);
+    }
+
+    @NotNull
+    private HttpEntity<LinkedMultiValueMap<String, Object>> prepareUploadForm(HttpHeaders headers, String fileName, String resourceName) throws URISyntaxException {
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        var form = new LinkedMultiValueMap<String, Object>();
+        form.add("fileName", fileName);
+        form.add("file", new FileSystemResource(Paths.get(FileSystemStorageTestUtil.class.getResource(resourceName).toURI()).toFile()));
+        return new HttpEntity<>(form, headers);
+    }
+
+    @NotNull
+    private static Map<String, String> readControlSums() throws IOException, URISyntaxException {
+        return Files.readAllLines(Paths.get(FileSystemStorageTestUtil.class.getResource("/pl/sg/ip/control_sums.txt").toURI()))
+                .stream()
+                .map(line -> line.split(" ", -1))
+                .collect(Collectors.toMap(
+                        lineParts -> lineParts[0],
+                        lineParts -> lineParts[1]
+                ));
+    }
 }
