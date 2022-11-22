@@ -1,12 +1,14 @@
 package pl.sg.ip.service;
 
-import org.springframework.web.multipart.MultipartFile;
 import pl.sg.ip.api.TaskData;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 public interface TaskService {
     void update(int domainId, int intellectualPropertyId, TaskData updateData);
 
-    void uploadAttachment(int domainId, int taskId, String fileName, MultipartFile file) throws IOException;
+    void uploadAttachment(int domainId, int taskId, String fileName, InputStream inputStream) throws IOException;
+
+    InputStream downloadAttachment(int domainId, int taskId, String fileName) throws IOException;
 }

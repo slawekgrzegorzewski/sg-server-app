@@ -295,8 +295,7 @@ public class Application {
 
     @Bean(name = "multipartResolver")
     public CommonsMultipartResolver multipartResolver() {
-        CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver();
-        return commonsMultipartResolver;
+        return new CommonsMultipartResolver();
     }
 
 }

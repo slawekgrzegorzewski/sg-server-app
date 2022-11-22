@@ -24,6 +24,9 @@ import java.io.IOException;
 @Profile("dev")
 public class DevLoginController {
 
+    private static final String TOKEN_PREFIX = "Bearer";
+    private static final String HEADER_STRING = "Authorization";
+
     private final ApplicationUserService applicationUserService;
     private final AuthorizationService authorizationService;
 
@@ -33,13 +36,24 @@ public class DevLoginController {
         this.authorizationService = authorizationService;
     }
 
-    @PostMapping(produces = "plain/text")
+    @PostMapping(produces = "plain/text", path = "/plain")
     public String login(@RequestBody @NotBlank @Valid String user) {
         ApplicationUser firstByLogin = applicationUserService.getByUserLogins(user);
         return authorizationService.generateJWTToken(
                 firstByLogin.getId() + ":" + user,
                 firstByLogin.getRoles(),
                 firstByLogin.getDefaultDomain().getId());
+    }
+
+    @PostMapping(produces = "plain/text")
+    public String login(@RequestBody @Valid LoginController.User user) {
+        ApplicationUser firstByLogin = applicationUserService.getByUserLogins(user.getName());
+        String jwt = authorizationService.generateJWTToken(
+                firstByLogin.getId() + ":" + user.getName(),
+                firstByLogin.getRoles(),
+                firstByLogin.getDefaultDomain().getId());
+
+        return HEADER_STRING + ": " + TOKEN_PREFIX + " " + jwt;
     }
 
     @GetMapping("/verify")

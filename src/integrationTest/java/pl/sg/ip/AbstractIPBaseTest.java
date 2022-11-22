@@ -33,13 +33,13 @@ public class AbstractIPBaseTest extends AbstractApplicationBaseTest {
 
     protected static Stream<Arguments> forbiddenRolesAndResponses() {
         return Stream.of(
-                Arguments.of(new String[]{"ACCOUNTANT_ADMIN"}, 403),
-                Arguments.of(new String[]{"ACCOUNTANT_USER"}, 403),
-                Arguments.of(new String[]{"CHECKER_ADMIN"}, 403),
-                Arguments.of(new String[]{"CHECKER_USER"}, 403),
-                Arguments.of(new String[]{"SYR_USER"}, 403),
-                Arguments.of(new String[]{"SYR_ADMIN"}, 403),
-                Arguments.of(new String[]{"CUBES"}, 403)
+                Arguments.of("ACCOUNTANT_ADMIN"),
+                Arguments.of("ACCOUNTANT_USER"),
+                Arguments.of("CHECKER_ADMIN"),
+                Arguments.of("CHECKER_USER"),
+                Arguments.of("SYR_USER"),
+                Arguments.of("SYR_ADMIN"),
+                Arguments.of("CUBES")
         );
     }
 

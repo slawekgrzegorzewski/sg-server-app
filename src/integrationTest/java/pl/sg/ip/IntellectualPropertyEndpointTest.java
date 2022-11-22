@@ -35,22 +35,22 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
 
     @ParameterizedTest
     @MethodSource("forbiddenRolesAndResponses")
-    public void getIPRCheckRolesAccess(String[] roles, int expectedResponse) {
+    public void getIPRCheckRolesAccess(String role) {
 
-        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, roles);
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, role);
         ResponseEntity<?> response = restTemplate.exchange(
                 "http://localhost:" + serverPort + "/ipr",
                 HttpMethod.GET,
                 new HttpEntity<String>(headers),
                 String.class);
-        assertEquals(expectedResponse, response.getStatusCode().value());
+        assertEquals(403, response.getStatusCode().value());
     }
 
     @ParameterizedTest
     @MethodSource("forbiddenRolesAndResponses")
-    public void createIPRCheckRolesAccess(String[] roles, int expectedResponse) throws Exception {
+    public void createIPRCheckRolesAccess(String role) throws Exception {
 
-        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, roles);
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, role);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         IntellectualPropertyData testIPRToCreate = new IntellectualPropertyData(
@@ -66,14 +66,14 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
                 requestEntity,
                 String.class);
 
-        assertEquals(expectedResponse, response.getStatusCode().value());
+        assertEquals(403, response.getStatusCode().value());
     }
 
     @ParameterizedTest
     @MethodSource("forbiddenRolesAndResponses")
-    public void updateIPRCheckRolesAccess(String[] roles, int expectedResponse) throws Exception {
+    public void updateIPRCheckRolesAccess(String role) throws Exception {
 
-        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, roles);
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, role);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         IntellectualPropertyData testIPRToUpdate = new IntellectualPropertyData(
@@ -89,14 +89,14 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
                 requestEntity,
                 String.class);
 
-        assertEquals(expectedResponse, response.getStatusCode().value());
+        assertEquals(403, response.getStatusCode().value());
     }
 
     @ParameterizedTest
     @MethodSource("forbiddenRolesAndResponses")
-    public void deleteIPRCheckRolesAccess(String[] roles, int expectedResponse) {
+    public void deleteIPRCheckRolesAccess(String role) {
 
-        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, roles);
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, role);
 
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
@@ -106,7 +106,7 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
                 requestEntity,
                 String.class);
 
-        assertEquals(expectedResponse, response.getStatusCode().value());
+        assertEquals(403, response.getStatusCode().value());
     }
 
     @Test

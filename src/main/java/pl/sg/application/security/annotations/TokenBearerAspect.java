@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 public class TokenBearerAspect {
     private final AuthorizationService authorizationService;
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
 
     public TokenBearerAspect(AuthorizationService authorizationService, EntityManager entityManager) {
         this.authorizationService = authorizationService;
@@ -33,14 +33,20 @@ public class TokenBearerAspect {
 
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
                 .currentRequestAttributes()).getRequest();
-        String token = request.getHeader("Authorization");
+        String token = tokenBearerAuth.inQuery()
+                ? request.getParameter("authorization")
+                : request.getHeader("Authorization");
         if (token == null) {
             throw new UnauthorizedException("No token bearer in the request.");
         }
         authorizationService.validateRequiredRoles(token, tokenBearerAuth.all(), tokenBearerAuth.any());
         if (tokenBearerAuth.domainAdmin() || tokenBearerAuth.domainMember()) {
             final ApplicationUser userInfo = authorizationService.getUserInfo(token);
-            final Domain domain = new DomainExtractor(this.entityManager).getDomain(request.getHeader("DomainId"));
+            final Domain domain = new DomainExtractor(this.entityManager).getDomain(
+                    tokenBearerAuth.inQuery()
+                            ? request.getParameter("domainId")
+                            : request.getHeader("DomainId")
+            );
             if (tokenBearerAuth.domainMember()) {
                 userInfo.validateDomain(domain);
             }

@@ -9,6 +9,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TokenBearerAuth {
 
+    boolean inQuery() default false;
+
     String[] all() default {};
 
     String[] any() default {};
