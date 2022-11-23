@@ -145,19 +145,27 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
     @Test
     void shouldFailUnauthenticatedDownloadAttachmentRequest() throws URISyntaxException, IOException {
         String fileName = "first.pdf";
-        var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
-        storageTestUtil = storageTestUtilFactory.create(task.getIntellectualProperty().getId(), task.getId());
-        storageTestUtil.initStorage();
-        storageTestUtil.putResourceInStorage("/pl/sg/ip/attachment1.pdf", fileName);
-        task.setAttachments(List.of(fileName));
-        taskRepository.save(task);
-        commitAndStartNewTransaction();
+        Task task = createTaskWithAttachment(fileName);
 
         ResponseEntity<?> response = restTemplate.exchange(
-                pathForAttachmentDownloadUnauthenticated(task.getId(), fileName),
+                pathForAttachmentDownload(task.getId(), fileName),
                 HttpMethod.GET,
                 new HttpEntity<>(new HttpHeaders()),
                 Resource.class);
+
+        assertEquals(401, response.getStatusCode().value());
+    }
+
+    @Test
+    void shouldFailUnauthenticatedDeleteAttachmentRequest() throws URISyntaxException, IOException {
+        String fileName = "first.pdf";
+        Task task = createTaskWithAttachment(fileName);
+
+        ResponseEntity<?> response = restTemplate.exchange(
+                pathForAttachmentDownload(task.getId(), fileName),
+                HttpMethod.DELETE,
+                new HttpEntity<>(headers(DEFAULT_DOMAIN_ID)),
+                String.class);
 
         assertEquals(401, response.getStatusCode().value());
     }
@@ -234,19 +242,30 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
     @MethodSource("forbiddenRolesAndResponses")
     void downloadAttachmentRequestRolesAccess(String role) throws URISyntaxException, IOException {
         String fileName = "first.pdf";
-        var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
-        storageTestUtil = storageTestUtilFactory.create(task.getIntellectualProperty().getId(), task.getId());
-        storageTestUtil.initStorage();
-        storageTestUtil.putResourceInStorage("/pl/sg/ip/attachment1.pdf", fileName);
-        task.setAttachments(List.of(fileName));
-        taskRepository.save(task);
-        commitAndStartNewTransaction();
+        Task task = createTaskWithAttachment(fileName);
 
         ResponseEntity<?> response = restTemplate.exchange(
-                pathForAttachmentDownload(task.getId(), fileName, DEFAULT_DOMAIN_ID, generateJWTToken(new String[]{role})),
+                pathForAttachmentDownloadWithAuthentication(task.getId(), fileName, DEFAULT_DOMAIN_ID, generateJWTToken(new String[]{role})),
                 HttpMethod.GET,
                 new HttpEntity<>(new HttpHeaders()),
                 Resource.class);
+
+        assertEquals(403, response.getStatusCode().value());
+    }
+
+
+    @ParameterizedTest
+    @MethodSource("forbiddenRolesAndResponses")
+    void deleteAttachmentRequestRolesAccess(String role) throws URISyntaxException, IOException {
+        String fileName = "first.pdf";
+        Task task = createTaskWithAttachment(fileName);
+
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, role);
+        ResponseEntity<?> response = restTemplate.exchange(
+                pathForAttachmentDownload(task.getId(), fileName),
+                HttpMethod.DELETE,
+                new HttpEntity<>(headers),
+                String.class);
 
         assertEquals(403, response.getStatusCode().value());
     }
@@ -502,7 +521,7 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
         commitAndStartNewTransaction();
 
         ResponseEntity<?> response = restTemplate.exchange(
-                pathForAttachmentDownload(task.getId(), fileName, DEFAULT_DOMAIN_ID, generateJWTToken(new String[]{"IPR"})),
+                pathForAttachmentDownloadWithAuthentication(task.getId(), fileName, DEFAULT_DOMAIN_ID, generateJWTToken(new String[]{"IPR"})),
                 HttpMethod.GET,
                 new HttpEntity<>(new HttpHeaders()),
                 Resource.class);
@@ -519,7 +538,7 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
         commitAndStartNewTransaction();
 
         ResponseEntity<?> response = restTemplate.exchange(
-                pathForAttachmentDownload(task.getId(), fileName, DEFAULT_DOMAIN_ID, generateJWTToken(new String[]{"IPR"})),
+                pathForAttachmentDownloadWithAuthentication(task.getId(), fileName, DEFAULT_DOMAIN_ID, generateJWTToken(new String[]{"IPR"})),
                 HttpMethod.GET,
                 new HttpEntity<>(new HttpHeaders()),
                 Resource.class);
@@ -539,7 +558,7 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
         storageTestUtil.putResourceInStorage("/pl/sg/ip/attachment1.pdf", fileName);
 
         ResponseEntity<?> response = restTemplate.exchange(
-                pathForAttachmentDownload(task.getId(), fileName, DEFAULT_DOMAIN_ID, generateJWTToken(new String[]{"IPR"})),
+                pathForAttachmentDownloadWithAuthentication(task.getId(), fileName, DEFAULT_DOMAIN_ID, generateJWTToken(new String[]{"IPR"})),
                 HttpMethod.GET,
                 new HttpEntity<>(new HttpHeaders()),
                 Resource.class);
@@ -561,7 +580,7 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
         commitAndStartNewTransaction();
 
         ResponseEntity<Resource> response = restTemplate.exchange(
-                pathForAttachmentDownload(task.getId(), fileName, DEFAULT_DOMAIN_ID, generateJWTToken(new String[]{"IPR"})),
+                pathForAttachmentDownloadWithAuthentication(task.getId(), fileName, DEFAULT_DOMAIN_ID, generateJWTToken(new String[]{"IPR"})),
                 HttpMethod.GET,
                 new HttpEntity<>(new HttpHeaders()),
                 Resource.class);
@@ -575,6 +594,70 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
             Map<String, String> controlSums = readControlSums();
             assertEquals(controlSums.get(resourceName), hash.toString());
         }
+    }
+
+    @Test
+    void shouldFailDeleteAttachmentRequestBelongingToOtherDomain() throws URISyntaxException, IOException {
+        String fileName = "first.pdf";
+        Task task = createTaskWithAttachment(fileName);
+
+        HttpHeaders headers = authenticatedHeaders(SECOND_DOMAIN_ID, "IPR");
+        ResponseEntity<?> response = restTemplate.exchange(
+                pathForAttachmentDownload(task.getId(), fileName),
+                HttpMethod.DELETE,
+                new HttpEntity<>(headers),
+                String.class);
+
+        assertEquals(403, response.getStatusCode().value());
+    }
+
+    @Test
+    void shouldFailDeleteAttachmentRequestForNonExistingAttachment() {
+        String fileName = "first.pdf";
+        Task task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
+
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
+        ResponseEntity<?> response = restTemplate.exchange(
+                pathForAttachmentDownload(task.getId(), fileName),
+                HttpMethod.DELETE,
+                new HttpEntity<>(headers),
+                String.class);
+
+        assertEquals(404, response.getStatusCode().value());
+    }
+
+    @Test
+    void shouldDeleteAttachment() throws IOException, URISyntaxException {
+        String fileName = "first.pdf";
+        Task task = createTaskWithAttachment(fileName);
+
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
+        ResponseEntity<?> response = restTemplate.exchange(
+                pathForAttachmentDownload(task.getId(), fileName),
+                HttpMethod.DELETE,
+                new HttpEntity<>(headers),
+                String.class);
+
+        assertEquals(200, response.getStatusCode().value());
+        assertFalse(storageTestUtil.checkFileExistenceInStorage(fileName));
+        commitAndStartNewTransaction();
+        task = taskRepository.getReferenceById(task.getId());
+        assertFalse(task.getAttachments().contains(fileName));
+    }
+
+    @Test
+    void shouldDeleteReferencedButNotPresentInStorageAttachment() {
+        String fileName = "first.pdf";
+        Task task = createTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID, "", "", List.of(fileName));
+
+        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
+        ResponseEntity<?> response = restTemplate.exchange(
+                pathForAttachmentDownload(task.getId(), fileName),
+                HttpMethod.DELETE,
+                new HttpEntity<>(headers),
+                String.class);
+
+        assertEquals(299, response.getStatusCodeValue());
     }
 
     @NotNull
@@ -593,15 +676,15 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
     }
 
     @NotNull
-    private String pathForAttachmentDownloadUnauthenticated(int taskId, String fileName) {
+    private String pathForAttachmentDownload(int taskId, String fileName) {
         return "%s/%s".formatted(pathForAttachment(taskId),
                 URLEncoder.encode(fileName, StandardCharsets.UTF_8));
     }
 
     @NotNull
-    private String pathForAttachmentDownload(int taskId, String fileName, int domainId, String token) {
+    private String pathForAttachmentDownloadWithAuthentication(int taskId, String fileName, int domainId, String token) {
         return "%s?domainId=%s&authorization=%s".formatted(
-                pathForAttachmentDownloadUnauthenticated(taskId, URLEncoder.encode(fileName, StandardCharsets.UTF_8)),
+                pathForAttachmentDownload(taskId, URLEncoder.encode(fileName, StandardCharsets.UTF_8)),
                 String.valueOf(domainId),
                 URLEncoder.encode(token, StandardCharsets.UTF_8));
     }
@@ -625,5 +708,17 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
                         lineParts -> lineParts[0],
                         lineParts -> lineParts[1]
                 ));
+    }
+
+    @NotNull
+    private Task createTaskWithAttachment(String fileName) throws IOException, URISyntaxException {
+        var task = createTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID, "", "", List.of(fileName));
+        storageTestUtil = storageTestUtilFactory.create(task.getIntellectualProperty().getId(), task.getId());
+        storageTestUtil.initStorage();
+        storageTestUtil.putResourceInStorage("/pl/sg/ip/attachment1.pdf", fileName);
+        task.setAttachments(List.of(fileName));
+        taskRepository.save(task);
+        commitAndStartNewTransaction();
+        return task;
     }
 }

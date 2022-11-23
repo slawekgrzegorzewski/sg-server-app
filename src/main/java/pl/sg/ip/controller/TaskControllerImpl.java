@@ -67,4 +67,20 @@ public class TaskControllerImpl implements TaskController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + URLEncoder.encode(fileName, StandardCharsets.UTF_8) + "\"")
                 .body(new InputStreamResource(taskService.downloadAttachment(domainId, taskId, fileName)));
     }
+
+    @Override
+    @DeleteMapping(path = "{id}/attachment/{fileName}")
+    @TokenBearerAuth(any = "IPR")
+    @ResponseBody
+    public ResponseEntity<Void> deleteAttachment(
+            @RequestHeader(value = "domainId") int domainId,
+            @PathVariable("id") int taskId,
+            @PathVariable("fileName") String fileName) throws IOException {
+        TaskService.DeleteOutcome outcome = taskService.deleteAttachment(domainId, taskId, fileName);
+        if (outcome == TaskService.DeleteOutcome.DELETED) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(299).build();
+        }
+    }
 }

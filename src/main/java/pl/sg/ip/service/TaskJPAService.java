@@ -13,6 +13,7 @@ import pl.sg.ip.service.attachments.TaskAttachmentStorageService;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -86,5 +87,27 @@ public class TaskJPAService implements TaskService {
             throw new NoSuchElementException("File not present at storage");
         }
         return file.get();
+    }
+
+    @Override
+    public DeleteOutcome deleteAttachment(int domainId, int taskId, String fileName) {
+        Task task = taskRepository.findById(taskId).orElseThrow();
+        if (!new IPValidator(task.getIntellectualProperty()).validateDomain(domainId)) {
+            throw new ForbiddenException("Trying to delete attachment for task from other domain.");
+        }
+        List<String> attachments = new ArrayList<>(task.getAttachments());
+        if (!attachments.contains(fileName)) {
+            throw new NoSuchElementException("Attachment not connected to Task");
+        }
+        attachments.remove(fileName);
+        task.setAttachments(attachments);
+        taskRepository.save(task);
+        boolean fileExists = taskAttachmentStorageService.listFiles(task.getIntellectualProperty().getId(), taskId)
+                .contains(fileName);
+        if (fileExists) {
+            taskAttachmentStorageService.deleteFile(task.getIntellectualProperty().getId(), taskId, fileName);
+            return DeleteOutcome.DELETED;
+        }
+        return DeleteOutcome.DONT_EXISTS;
     }
 }

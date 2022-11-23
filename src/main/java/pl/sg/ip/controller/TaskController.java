@@ -15,4 +15,6 @@ public interface TaskController {
     void uploadAttachment(int domainId, int taskId, String fileName, MultipartFile file) throws IOException;
 
     ResponseEntity<Resource> downloadAttachment(Integer domainId, int taskId, String fileName) throws IOException;
+
+    ResponseEntity<Void> deleteAttachment(int domainId, int taskId, String fileName) throws IOException;
 }
