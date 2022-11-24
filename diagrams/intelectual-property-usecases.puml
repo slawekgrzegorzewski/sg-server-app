@@ -32,14 +32,16 @@ TimeRecord -> (addtimerecord1)
 (addtimerecord1) --> N7
 note right of (addtimerecord1): "Following data is needed:\n\
 a) date\n\
-b) description\n\
-c) related Task"
+b) numberOfHours\n\
+c) description\n\
+d) related Task"
 
 TimeRecord -> (addtimerecord2)
 (addtimerecord2) --> N7
 note right of (addtimerecord1): "Following data is needed:\n\
 a) date\n\
-b) description\n"
+b) numberOfHours\n\
+c) description"
 
 note right of User: "Whenever user updates/creates/deletes\n\
 IPR or TimeRecord IPR times should contain all dates\n\

@@ -111,4 +111,22 @@ public class AbstractIPBaseTest extends AbstractApplicationBaseTest {
         commitAndStartNewTransaction();
         return task;
     }
+
+    @NotNull
+    protected Task createBasicTaskWithIntellectualPropertyForDates(int domainId, LocalDate startDate, LocalDate endDate) {
+        Domain domain = this.domainRepository.getReferenceById(domainId);
+
+        Task task = taskRepository.save(new Task("description", "coAuthors", Lists.newArrayList(), null, Lists.newArrayList()));
+
+        IntellectualProperty intellectualProperty = intellectualPropertyRepository.save(new IntellectualProperty(startDate, endDate, "", domain));
+        ArrayList<Task> tasks = Lists.newArrayList();
+        tasks.add(task);
+        intellectualProperty.setTasks(tasks);
+        intellectualProperty = intellectualPropertyRepository.save(intellectualProperty);
+
+        task.setIntellectualProperty(intellectualProperty);
+        task = taskRepository.save(task);
+        commitAndStartNewTransaction();
+        return task;
+    }
 }

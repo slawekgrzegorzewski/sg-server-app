@@ -1,6 +1,5 @@
 package pl.sg.ip.controller;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -9,9 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pl.sg.application.security.annotations.TokenBearerAuth;
 import pl.sg.ip.api.TaskData;
-import pl.sg.ip.repository.TaskRepository;
 import pl.sg.ip.service.TaskService;
-import pl.sg.ip.service.attachments.TaskAttachmentStorageService;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -21,16 +18,10 @@ import java.nio.charset.StandardCharsets;
 @RequestMapping("/task")
 public class TaskControllerImpl implements TaskController {
 
-    private final ModelMapper modelMapper;
     private final TaskService taskService;
-    private final TaskRepository taskRepository;
-    private final TaskAttachmentStorageService taskAttachmentStorageService;
 
-    public TaskControllerImpl(ModelMapper modelMapper, TaskService taskService, TaskRepository taskRepository, TaskAttachmentStorageService taskAttachmentStorageService) {
-        this.modelMapper = modelMapper;
+    public TaskControllerImpl(TaskService taskService) {
         this.taskService = taskService;
-        this.taskRepository = taskRepository;
-        this.taskAttachmentStorageService = taskAttachmentStorageService;
     }
 
     @Override
@@ -75,7 +66,7 @@ public class TaskControllerImpl implements TaskController {
     public ResponseEntity<Void> deleteAttachment(
             @RequestHeader(value = "domainId") int domainId,
             @PathVariable("id") int taskId,
-            @PathVariable("fileName") String fileName) throws IOException {
+            @PathVariable("fileName") String fileName) {
         TaskService.DeleteOutcome outcome = taskService.deleteAttachment(domainId, taskId, fileName);
         if (outcome == TaskService.DeleteOutcome.DELETED) {
             return ResponseEntity.ok().build();

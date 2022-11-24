@@ -22,6 +22,7 @@ import pl.sg.cubes.transport.CubeRecord;
 import pl.sg.integrations.nodrigen.model.NodrigenTransactionsToImport;
 import pl.sg.integrations.nodrigen.transport.NodrigenBankPermission;
 import pl.sg.integrations.nodrigen.transport.NodrigenTransactionsToImportTO;
+import pl.sg.ip.api.TimeRecord;
 import pl.sg.ip.model.IntellectualProperty;
 import pl.sg.ip.model.Task;
 
@@ -165,6 +166,7 @@ public class Application {
         modelMapper.typeMap(FinancialTransaction.class, FinancialTransactionTO.class);
         modelMapper.typeMap(IntellectualProperty.class, pl.sg.ip.api.IntellectualProperty.class);
         modelMapper.typeMap(Task.class, pl.sg.ip.api.Task.class);
+        modelMapper.typeMap(TimeRecord.class, pl.sg.ip.api.TimeRecord.class);
 
         return modelMapper;
     }
