@@ -25,7 +25,7 @@ public class TaskControllerImpl implements TaskController {
     }
 
     @Override
-    @PatchMapping(value = "/{id}", produces = {"plain/text"})
+    @PatchMapping(value = "/{id}")
     @TokenBearerAuth(any = "IPR")
     public void update(
             @RequestHeader(value = "domainId") int domainId,

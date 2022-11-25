@@ -1,6 +1,5 @@
 package pl.sg;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -24,8 +23,6 @@ public abstract class AbstractContainerBaseTest {
     @LocalServerPort
     protected int serverPort;
     @Autowired
-    protected ObjectMapper objectMapper;
-    @Autowired
     protected TestRestTemplate restTemplate;
 
 
@@ -35,6 +32,14 @@ public abstract class AbstractContainerBaseTest {
 
         Flyway flyway = Flyway.configure().dataSource(POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword()).load();
         flyway.migrate();
+    }
+
+    public AbstractContainerBaseTest() {
+//        restTemplate = new TestRestTemplate();
+//        restTemplate.getRestTemplate().setRequestFactory(new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()));
+//        restTemplate.getRestTemplate().setInterceptors(List.of(
+//                new DebugRestTemplateInterceptor()
+//        ));
     }
 
     static class DockerPostgresDataSourceInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {

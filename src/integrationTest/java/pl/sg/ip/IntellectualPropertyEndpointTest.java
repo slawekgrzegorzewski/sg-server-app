@@ -1,13 +1,13 @@
 package pl.sg.ip;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
@@ -18,7 +18,6 @@ import pl.sg.ip.model.IntellectualProperty;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,62 +31,50 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
 
     private static final String INTELLECTUAL_PROPERTY_DESCRIPTION = "description";
     private static final int SECOND_DOMAIN_ID = 2;
+    public static final LocalDate NOW = LocalDate.now();
 
     @ParameterizedTest
     @MethodSource("forbiddenRolesAndResponses")
     public void getIPRCheckRolesAccess(String role) {
-
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, role);
-        ResponseEntity<?> response = restTemplate.exchange(
+        ResponseEntity<Void> response = restTemplate.exchange(
                 "http://localhost:" + serverPort + "/ipr",
                 HttpMethod.GET,
-                new HttpEntity<String>(headers),
-                String.class);
+                new HttpEntity<>(headers),
+                Void.class);
         assertEquals(403, response.getStatusCode().value());
     }
 
     @ParameterizedTest
     @MethodSource("forbiddenRolesAndResponses")
-    public void createIPRCheckRolesAccess(String role) throws Exception {
-
+    public void createIPRCheckRolesAccess(String role) {
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, role);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        IntellectualPropertyData testIPRToCreate = new IntellectualPropertyData(
-                LocalDate.now().minusDays(1),
-                LocalDate.now(),
-                INTELLECTUAL_PROPERTY_DESCRIPTION);
+        IntellectualPropertyData testIPRToCreate = new IntellectualPropertyData(INTELLECTUAL_PROPERTY_DESCRIPTION);
 
-        HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testIPRToCreate), headers);
-
-        ResponseEntity<?> response = restTemplate.exchange(
+        ResponseEntity<Void> response = restTemplate.exchange(
                 "http://localhost:" + serverPort + "/ipr",
                 HttpMethod.PUT,
-                requestEntity,
-                String.class);
+                new HttpEntity<>(testIPRToCreate, headers),
+                Void.class);
 
         assertEquals(403, response.getStatusCode().value());
     }
 
     @ParameterizedTest
     @MethodSource("forbiddenRolesAndResponses")
-    public void updateIPRCheckRolesAccess(String role) throws Exception {
-
+    public void updateIPRCheckRolesAccess(String role) {
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, role);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        IntellectualPropertyData testIPRToUpdate = new IntellectualPropertyData(
-                LocalDate.now().minusDays(1),
-                LocalDate.now(),
-                INTELLECTUAL_PROPERTY_DESCRIPTION);
+        IntellectualPropertyData testIPRToUpdate = new IntellectualPropertyData(INTELLECTUAL_PROPERTY_DESCRIPTION);
 
-        HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testIPRToUpdate), headers);
-
-        ResponseEntity<?> response = restTemplate.exchange(
+        ResponseEntity<Void> response = restTemplate.exchange(
                 "http://localhost:" + serverPort + "/ipr/1",
                 HttpMethod.PATCH,
-                requestEntity,
-                String.class);
+                new HttpEntity<>(testIPRToUpdate, headers),
+                Void.class);
 
         assertEquals(403, response.getStatusCode().value());
     }
@@ -95,172 +82,122 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
     @ParameterizedTest
     @MethodSource("forbiddenRolesAndResponses")
     public void deleteIPRCheckRolesAccess(String role) {
-
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, role);
 
-        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
-
-        ResponseEntity<?> response = restTemplate.exchange(
+        ResponseEntity<Void> response = restTemplate.exchange(
                 "http://localhost:" + serverPort + "/ipr/1",
                 HttpMethod.DELETE,
-                requestEntity,
-                String.class);
+                new HttpEntity<>(headers),
+                Void.class);
 
         assertEquals(403, response.getStatusCode().value());
     }
 
     @Test
-    public void shouldGetDomainOnlyData() throws JsonProcessingException {
-
-        LocalDate endDate = LocalDate.now();
-        LocalDate startDate = endDate.minusDays(1);
-
-        createIntellectualPropertyWithTaskAndTimeRecords(DEFAULT_DOMAIN_ID, startDate, endDate, INTELLECTUAL_PROPERTY_DESCRIPTION);
-        createIntellectualPropertyWithTaskAndTimeRecords(SECOND_DOMAIN_ID, startDate.minusDays(1), startDate, INTELLECTUAL_PROPERTY_DESCRIPTION);
+    public void shouldGetDomainOnlyData() {
+        createIntellectualPropertyWithTaskAndTimeRecords___NEW(DEFAULT_DOMAIN_ID, INTELLECTUAL_PROPERTY_DESCRIPTION, NOW);
+        createIntellectualPropertyWithTaskAndTimeRecords___NEW(SECOND_DOMAIN_ID, INTELLECTUAL_PROPERTY_DESCRIPTION, NOW);
 
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-        ResponseEntity<?> response = restTemplate.exchange(
+
+        ResponseEntity<List<pl.sg.ip.api.IntellectualProperty>> response = restTemplate.exchange(
                 "http://localhost:" + serverPort + "/ipr",
                 HttpMethod.GET,
-                new HttpEntity<String>(headers),
-                String.class);
+                new HttpEntity<>(headers),
+                new ParameterizedTypeReference<>() {
+                });
 
-        Object body = response.getBody();
-
-        List<pl.sg.ip.api.IntellectualProperty> intellectualProperties = objectMapper.readValue(Objects.requireNonNull(body).toString(), new TypeReference<>() {
-        });
+        List<pl.sg.ip.api.IntellectualProperty> intellectualProperties = response.getBody();
+        assertNotNull(intellectualProperties);
         assertEquals(1, intellectualProperties.size());
-        assertEquals(INTELLECTUAL_PROPERTY_DESCRIPTION, intellectualProperties.get(0).getDescription());
-        assertEquals(startDate, intellectualProperties.get(0).getStartDate());
-        assertEquals(endDate, intellectualProperties.get(0).getEndDate());
-        assertEquals(DEFAULT_DOMAIN_ID, intellectualProperties.get(0).getDomain().getId());
+        pl.sg.ip.api.IntellectualProperty intellectualProperty = intellectualProperties.get(0);
+        assertEquals(INTELLECTUAL_PROPERTY_DESCRIPTION, intellectualProperty.getDescription());
+        assertEquals(DEFAULT_DOMAIN_ID, intellectualProperty.getDomain().getId());
+        assertEquals(1, intellectualProperty.getTasks().size());
+        assertEquals(1, intellectualProperty.getTasks().get(0).getTimeRecords().size());
+        assertEquals(NOW, intellectualProperty.getTasks().get(0).getTimeRecords().get(0).getDate());
     }
 
     @Test
-    public void shouldCreateIntellectualProperty() throws JsonProcessingException {
-
+    public void shouldCreateIntellectualProperty() {
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        LocalDate endDate = LocalDate.now();
-        LocalDate startDate = endDate.minusDays(1);
+        IntellectualPropertyData testIPRToCreate = new IntellectualPropertyData(INTELLECTUAL_PROPERTY_DESCRIPTION);
 
-        IntellectualPropertyData testIPRToCreate = new IntellectualPropertyData(
-                startDate,
-                endDate,
-                INTELLECTUAL_PROPERTY_DESCRIPTION);
-
-        HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testIPRToCreate), headers);
-
-        ResponseEntity<?> response = restTemplate.exchange(
+        ResponseEntity<pl.sg.ip.api.IntellectualProperty> response = restTemplate.exchange(
                 "http://localhost:" + serverPort + "/ipr",
                 HttpMethod.PUT,
-                requestEntity,
-                String.class);
+                new HttpEntity<>(testIPRToCreate, headers),
+                pl.sg.ip.api.IntellectualProperty.class);
 
         List<IntellectualProperty> dbValue = intellectualPropertyRepository.findAll();
         assertEquals(1, dbValue.size());
         assertEquals(INTELLECTUAL_PROPERTY_DESCRIPTION, dbValue.get(0).getDescription());
-        assertEquals(startDate, dbValue.get(0).getStartDate());
-        assertEquals(endDate, dbValue.get(0).getEndDate());
         assertEquals(DEFAULT_DOMAIN_ID, dbValue.get(0).getDomain().getId());
 
-        pl.sg.ip.api.IntellectualProperty fromResponse = objectMapper.readValue(Objects.requireNonNull(response.getBody()).toString(), pl.sg.ip.api.IntellectualProperty.class);
+        pl.sg.ip.api.IntellectualProperty fromResponse = response.getBody();
         assertEquals(dbValue.get(0).getId(), fromResponse.getId());
         assertEquals(INTELLECTUAL_PROPERTY_DESCRIPTION, fromResponse.getDescription());
-        assertEquals(startDate, fromResponse.getStartDate());
-        assertEquals(endDate, fromResponse.getEndDate());
         assertEquals(DEFAULT_DOMAIN_ID, fromResponse.getDomain().getId());
     }
 
     @Test
-    public void shouldFailUpdateWhenEntityDoesntExist() throws JsonProcessingException {
+    public void shouldFailUpdateWhenEntityDoesntExist() {
 
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        LocalDate endDate = LocalDate.now();
-        LocalDate startDate = endDate.minusDays(1);
-
-        IntellectualPropertyData testIPRToUpdate = new IntellectualPropertyData(
-                startDate,
-                endDate,
-                INTELLECTUAL_PROPERTY_DESCRIPTION);
-
-        HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testIPRToUpdate), headers);
-
-        ResponseEntity<?> response = restTemplate.exchange(
+        ResponseEntity<Void> response = restTemplate.exchange(
                 "http://localhost:" + serverPort + "/ipr/1",
                 HttpMethod.PATCH,
-                requestEntity,
-                String.class);
+                new HttpEntity<>(new IntellectualPropertyData(INTELLECTUAL_PROPERTY_DESCRIPTION), headers),
+                Void.class);
 
         assertEquals(404, response.getStatusCode().value());
     }
 
     @Test
     public void shouldFailUpdateForOtherDomain() throws JsonProcessingException {
-
         String newDescription = "newDescription";
 
-        LocalDate endDate = LocalDate.now();
-        LocalDate startDate = endDate.minusDays(1);
-
-        IntellectualProperty testIPRToUpdate = createIntellectualPropertyWithTaskAndTimeRecords(SECOND_DOMAIN_ID, startDate, endDate, INTELLECTUAL_PROPERTY_DESCRIPTION);
-        tryToUpdateAndExceptResponseCode(testIPRToUpdate.getId(), new IntellectualPropertyData(startDate, endDate, newDescription), 403);
+        IntellectualProperty testIPRToUpdate = createBasicIntellectualPropertyForDomain(SECOND_DOMAIN_ID);
+        tryToUpdateAndExceptResponseCode(
+                testIPRToUpdate.getId(),
+                new IntellectualPropertyData(newDescription),
+                403);
     }
 
     @Test
-    public void shouldUpdate() throws JsonProcessingException {
-
-        String newDescription = "newDescription";
-
-        LocalDate endDate = LocalDate.now();
-        LocalDate startDate = endDate.minusDays(1);
-
-        IntellectualProperty testIPRToUpdate = createIntellectualPropertyWithTaskAndTimeRecords(DEFAULT_DOMAIN_ID, startDate, endDate, INTELLECTUAL_PROPERTY_DESCRIPTION);
+    public void shouldUpdate() {
+        IntellectualProperty testIPRToUpdate = createIntellectualProperty(DEFAULT_DOMAIN_ID, INTELLECTUAL_PROPERTY_DESCRIPTION);
 
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
         headers.setContentType(MediaType.APPLICATION_JSON);
-        LocalDate newStartDate = startDate.minusDays(1);
-        LocalDate newEndDate = endDate.plusDays(1);
-        HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(new IntellectualPropertyData(newStartDate, newEndDate, newDescription)), headers);
 
-        ResponseEntity<?> response = restTemplate.exchange(
+        String newDescription = "newDescription";
+
+        ResponseEntity<Void> response = restTemplate.exchange(
                 "http://localhost:" + serverPort + "/ipr/" + testIPRToUpdate.getId(),
                 HttpMethod.PATCH,
-                requestEntity,
-                String.class);
+                new HttpEntity<>(new IntellectualPropertyData(newDescription), headers),
+                Void.class);
 
         assertEquals(200, response.getStatusCode().value());
         IntellectualProperty updated = intellectualPropertyRepository.getReferenceById(testIPRToUpdate.getId());
         assertEquals(newDescription, updated.getDescription());
-        assertEquals(newStartDate, updated.getStartDate());
-        assertEquals(newEndDate, updated.getEndDate());
     }
 
-    @Test
-    public void shouldFailUpdateWhenUpdatingDatesOutsideOfTimeRecordsBoundaries() throws JsonProcessingException {
-
-        LocalDate endDate = LocalDate.now();
-        LocalDate startDate = endDate.minusDays(1);
-
-        IntellectualProperty testIPRToUpdate = createIntellectualPropertyWithTaskAndTimeRecords(DEFAULT_DOMAIN_ID, startDate, endDate, INTELLECTUAL_PROPERTY_DESCRIPTION);
-        tryToUpdateAndExceptResponseCode(testIPRToUpdate.getId(), new IntellectualPropertyData(startDate.plusDays(1), endDate, INTELLECTUAL_PROPERTY_DESCRIPTION), 400);
-        tryToUpdateAndExceptResponseCode(testIPRToUpdate.getId(), new IntellectualPropertyData(startDate, endDate.minusDays(1), INTELLECTUAL_PROPERTY_DESCRIPTION), 400);
-    }
-
-    private void tryToUpdateAndExceptResponseCode(int ipId, IntellectualPropertyData updateInfo, int responseCode) throws JsonProcessingException {
+    private void tryToUpdateAndExceptResponseCode(int ipId, IntellectualPropertyData updateInfo, int responseCode) {
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(updateInfo), headers);
 
-        ResponseEntity<?> response = restTemplate.exchange(
+        ResponseEntity<Void> response = restTemplate.exchange(
                 "http://localhost:" + serverPort + "/ipr/" + ipId,
                 HttpMethod.PATCH,
-                requestEntity,
-                String.class);
+                new HttpEntity<>(updateInfo, headers),
+                Void.class);
 
         assertEquals(responseCode, response.getStatusCode().value());
     }
@@ -270,15 +207,13 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
 
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
 
-        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
-
-        IntellectualProperty intellectualProperty = createIntellectualProperty(DEFAULT_DOMAIN_ID, LocalDate.now().minusDays(1), LocalDate.now(), "");
+        IntellectualProperty intellectualProperty = createBasicIntellectualPropertyForDomain(DEFAULT_DOMAIN_ID);
 
         restTemplate.exchange(
                 "http://localhost:" + serverPort + "/ipr/" + intellectualProperty.getId(),
                 HttpMethod.DELETE,
-                requestEntity,
-                String.class);
+                new HttpEntity<>(headers),
+                Void.class);
 
         assertFalse(intellectualPropertyRepository.existsById(intellectualProperty.getId()));
     }
@@ -288,15 +223,17 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
 
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
 
-        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+        IntellectualProperty intellectualProperty = createIntellectualPropertyWithTaskAndTimeRecords(
+                DEFAULT_DOMAIN_ID,
+                LocalDate.now().minusDays(1),
+                LocalDate.now(),
+                "");
 
-        IntellectualProperty intellectualProperty = createIntellectualPropertyWithTaskAndTimeRecords(DEFAULT_DOMAIN_ID, LocalDate.now().minusDays(1), LocalDate.now(), "");
-
-        ResponseEntity<?> response = restTemplate.exchange(
+        ResponseEntity<Void> response = restTemplate.exchange(
                 "http://localhost:" + serverPort + "/ipr/" + intellectualProperty.getId(),
                 HttpMethod.DELETE,
-                requestEntity,
-                String.class);
+                new HttpEntity<>(headers),
+                Void.class);
 
         assertEquals(400, response.getStatusCode().value());
         assertTrue(intellectualPropertyRepository.existsById(intellectualProperty.getId()));
@@ -307,15 +244,13 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
 
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
 
-        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+        IntellectualProperty intellectualProperty = createIntellectualProperty(SECOND_DOMAIN_ID, "");
 
-        IntellectualProperty intellectualProperty = createIntellectualProperty(SECOND_DOMAIN_ID, LocalDate.now().minusDays(1), LocalDate.now(), "");
-
-        ResponseEntity<?> response = restTemplate.exchange(
+        ResponseEntity<Void> response = restTemplate.exchange(
                 "http://localhost:" + serverPort + "/ipr/" + intellectualProperty.getId(),
                 HttpMethod.DELETE,
-                requestEntity,
-                String.class);
+                new HttpEntity<>(headers),
+                Void.class);
 
         assertEquals(403, response.getStatusCode().value());
         assertTrue(intellectualPropertyRepository.existsById(intellectualProperty.getId()));
@@ -326,15 +261,13 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
 
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
 
-        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+        IntellectualProperty intellectualProperty = createIntellectualProperty(SECOND_DOMAIN_ID, "");
 
-        IntellectualProperty intellectualProperty = createIntellectualProperty(SECOND_DOMAIN_ID, LocalDate.now().minusDays(1), LocalDate.now(), "");
-
-        ResponseEntity<?> response = restTemplate.exchange(
+        ResponseEntity<Void> response = restTemplate.exchange(
                 "http://localhost:" + serverPort + "/ipr/" + (intellectualProperty.getId() + 1),
                 HttpMethod.DELETE,
-                requestEntity,
-                String.class);
+                new HttpEntity<>(headers),
+                Void.class);
 
         assertEquals(404, response.getStatusCode().value());
         assertTrue(intellectualPropertyRepository.existsById(intellectualProperty.getId()));

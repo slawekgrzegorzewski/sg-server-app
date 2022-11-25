@@ -164,8 +164,10 @@ public class Application {
         modelMapper.typeMap(pl.sg.banks.model.BankAccount.class, BankAccount.class);
         modelMapper.typeMap(NodrigenTransactionsToImport.class, NodrigenTransactionsToImportTO.class);
         modelMapper.typeMap(FinancialTransaction.class, FinancialTransactionTO.class);
-        modelMapper.typeMap(IntellectualProperty.class, pl.sg.ip.api.IntellectualProperty.class);
-        modelMapper.typeMap(Task.class, pl.sg.ip.api.Task.class);
+        modelMapper.typeMap(IntellectualProperty.class, pl.sg.ip.api.IntellectualProperty.class)
+                .addMapping(IntellectualProperty::tasks, pl.sg.ip.api.IntellectualProperty::setTasks);
+        modelMapper.typeMap(Task.class, pl.sg.ip.api.Task.class)
+                .addMapping(Task::getTimeRecords, pl.sg.ip.api.Task::setTimeRecords);
         modelMapper.typeMap(TimeRecord.class, pl.sg.ip.api.TimeRecord.class);
 
         return modelMapper;

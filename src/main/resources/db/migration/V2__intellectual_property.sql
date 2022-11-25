@@ -5,8 +5,6 @@ create table intellectual_property
 (
     id          integer not null primary key,
     description varchar(10000),
-    end_date    date,
-    start_date  date,
     domain_id   integer
         constraint fk_domain references domain
 );

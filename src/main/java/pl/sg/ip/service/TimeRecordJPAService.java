@@ -6,7 +6,6 @@ import pl.sg.application.ForbiddenException;
 import pl.sg.application.model.Domain;
 import pl.sg.application.repository.DomainRepository;
 import pl.sg.ip.api.TimeRecordData;
-import pl.sg.ip.model.IntellectualProperty;
 import pl.sg.ip.model.Task;
 import pl.sg.ip.model.TimeRecord;
 import pl.sg.ip.repository.IntellectualPropertyRepository;
@@ -51,18 +50,10 @@ public class TimeRecordJPAService implements TimeRecordService {
                 new TimeRecord(createData.getDate(), createData.getNumberOfHours(), createData.getDescription(), domain, task)
         );
         ofNullable(task).ifPresent(t -> {
-            IntellectualProperty intellectualProperty = t.getIntellectualProperty();
             List<TimeRecord> timeRecords = new ArrayList<>(t.getTimeRecords());
             timeRecords.add(timeRecord);
             task.setTimeRecords(timeRecords);
             taskRepository.save(task);
-            if (intellectualProperty.getStartDate().isAfter(timeRecord.getDate())) {
-                intellectualProperty.setStartDate(timeRecord.getDate());
-                intellectualPropertyRepository.save(intellectualProperty);
-            } else if (intellectualProperty.getEndDate().isBefore(timeRecord.getDate())) {
-                intellectualProperty.setEndDate(timeRecord.getDate());
-                intellectualPropertyRepository.save(intellectualProperty);
-            }
         });
         return timeRecord;
     }

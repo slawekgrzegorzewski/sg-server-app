@@ -19,17 +19,17 @@ left to right direction
 (Updates existing TimeRecord) as (updatetimerecord)
 (Deletes existing TimeRecord) as (deltimerecord)
 
-note "Any action on this element should trigger IPR dates update,\n\
-according to a general note above" as N7
-
 TimeRecord -> (deltimerecord)
-(deltimerecord) --> N7
 
 TimeRecord -> (updatetimerecord)
-(updatetimerecord) --> N7
+note right of (updatetimerecord): "Following data can be altered:\n\
+a) description\n\
+b) task assignment - time record can be\n\
+        i) assigned to a task\n\
+        ii)  reassigned to another task\n\
+        iii) unassigned from a task"
 
 TimeRecord -> (addtimerecord1)
-(addtimerecord1) --> N7
 note right of (addtimerecord1): "Following data is needed:\n\
 a) date\n\
 b) numberOfHours\n\
@@ -37,15 +37,10 @@ c) description\n\
 d) related Task"
 
 TimeRecord -> (addtimerecord2)
-(addtimerecord2) --> N7
-note right of (addtimerecord1): "Following data is needed:\n\
+note right of (addtimerecord2): "Following data is needed:\n\
 a) date\n\
 b) numberOfHours\n\
 c) description"
-
-note right of User: "Whenever user updates/creates/deletes\n\
-IPR or TimeRecord IPR times should contain all dates\n\
-from relating TimeRecords"
 
 Task -> (delattch)
 Task -> (getattch)
@@ -73,16 +68,12 @@ IPR -> (delIPR)
 (delIPR) --> N2
 
 note "User can modify following fields\n\
-a) start date\n\
-b) end date\n\
-c) description" as N3
+a) description" as N3
 IPR -> (updateIPR)
 (updateIPR) --> N3
 
 note "Provide following data\n\
-a) start date\n\
-b) end date\n\
-c) description" as N4
+a) description" as N4
 IPR -> (addIPR)
 (addIPR) --> N4
 

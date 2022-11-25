@@ -34,7 +34,10 @@ public class DebugRestTemplateInterceptor implements ClientHttpRequestIntercepto
         Path dir = Paths.get(
                 "requests",
                 requestLogInfo.getRequestURI().toString()
-                        .replace("https://", "").replace("/", "_").replace("?", "")
+                        .replace("https://", "")
+                        .replace("/", "_")
+                        .replace("?", "")
+                        .replace(":", "_")
                         .replace("=", "_"));
         Files.createDirectories(dir);
         Files.write(

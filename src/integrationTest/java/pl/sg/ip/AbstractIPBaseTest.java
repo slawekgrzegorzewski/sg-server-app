@@ -17,7 +17,9 @@ import pl.sg.ip.repository.TimeRecordRepository;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class AbstractIPBaseTest extends AbstractApplicationBaseTest {
@@ -54,13 +56,38 @@ public class AbstractIPBaseTest extends AbstractApplicationBaseTest {
 
     @NotNull
     protected IntellectualProperty createBasicIntellectualPropertyForDomain(int domainId) {
-        return createIntellectualProperty(domainId, LocalDate.now(), LocalDate.now().plusDays(1), "");
+        return createIntellectualProperty(domainId, "");
     }
 
     @NotNull
-    protected IntellectualProperty createIntellectualProperty(int domainId, LocalDate startDate, LocalDate endDate, String description) {
+    protected IntellectualProperty createIntellectualProperty(int domainId, String description) {
         Domain domain = this.domainRepository.getReferenceById(domainId);
-        IntellectualProperty intellectualProperty = intellectualPropertyRepository.save(new IntellectualProperty(startDate, endDate, description, domain));
+        IntellectualProperty intellectualProperty = intellectualPropertyRepository.save(new IntellectualProperty(description, domain));
+        commitAndStartNewTransaction();
+        return intellectualProperty;
+    }
+
+    @NotNull
+    protected IntellectualProperty createIntellectualPropertyWithTaskAndTimeRecords___NEW(int domainId, String description, LocalDate... timeRecordDates) {
+        Domain domain = this.domainRepository.getReferenceById(domainId);
+        List<TimeRecord> timeRecords = timeRecordRepository.saveAllAndFlush(
+                Arrays.stream(timeRecordDates)
+                        .map(date -> new TimeRecord(date, 8, description, domain, null))
+                        .collect(Collectors.toList())
+        );
+
+        Task task = taskRepository.save(new Task("", "", Lists.newArrayList(), null, timeRecords));
+        timeRecords.forEach(tr -> tr.setTask(task));
+        timeRecordRepository.saveAllAndFlush(timeRecords);
+
+        IntellectualProperty toCreate = new IntellectualProperty(description, domain);
+        ArrayList<Task> tasks = Lists.newArrayList();
+        tasks.add(task);
+        toCreate.setTasks(tasks);
+        IntellectualProperty intellectualProperty = intellectualPropertyRepository.save(toCreate);
+        task.setIntellectualProperty(intellectualProperty);
+        taskRepository.save(task);
+
         commitAndStartNewTransaction();
         return intellectualProperty;
     }
@@ -77,7 +104,7 @@ public class AbstractIPBaseTest extends AbstractApplicationBaseTest {
         timeRecords.forEach(tr -> tr.setTask(task));
         timeRecordRepository.saveAllAndFlush(timeRecords);
 
-        IntellectualProperty toCreate = new IntellectualProperty(startDate, endDate, description, domain);
+        IntellectualProperty toCreate = new IntellectualProperty(description, domain);
         ArrayList<Task> tasks = Lists.newArrayList();
         tasks.add(task);
         toCreate.setTasks(tasks);
@@ -100,7 +127,7 @@ public class AbstractIPBaseTest extends AbstractApplicationBaseTest {
 
         Task task = taskRepository.save(new Task(description, coAuthors, attachments, null, Lists.newArrayList()));
 
-        IntellectualProperty intellectualProperty = intellectualPropertyRepository.save(new IntellectualProperty(LocalDate.now(), LocalDate.now().plusDays(1), "", domain));
+        IntellectualProperty intellectualProperty = intellectualPropertyRepository.save(new IntellectualProperty("", domain));
         ArrayList<Task> tasks = Lists.newArrayList();
         tasks.add(task);
         intellectualProperty.setTasks(tasks);
@@ -113,12 +140,12 @@ public class AbstractIPBaseTest extends AbstractApplicationBaseTest {
     }
 
     @NotNull
-    protected Task createBasicTaskWithIntellectualPropertyForDates(int domainId, LocalDate startDate, LocalDate endDate) {
+    protected Task createBasicTaskWithIntellectualPropertyForDates(int domainId) {
         Domain domain = this.domainRepository.getReferenceById(domainId);
 
         Task task = taskRepository.save(new Task("description", "coAuthors", Lists.newArrayList(), null, Lists.newArrayList()));
 
-        IntellectualProperty intellectualProperty = intellectualPropertyRepository.save(new IntellectualProperty(startDate, endDate, "", domain));
+        IntellectualProperty intellectualProperty = intellectualPropertyRepository.save(new IntellectualProperty("", domain));
         ArrayList<Task> tasks = Lists.newArrayList();
         tasks.add(task);
         intellectualProperty.setTasks(tasks);

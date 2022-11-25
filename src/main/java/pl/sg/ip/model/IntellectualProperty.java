@@ -5,7 +5,6 @@ import pl.sg.application.model.WithDomain;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -22,47 +21,23 @@ public class IntellectualProperty implements WithDomain<IntellectualProperty> {
     @GeneratedValue(generator = "intellectualPropertyIdGenerator")
     private Integer id;
     @NotNull
-    private LocalDate startDate;
-    @NotNull
-    private LocalDate endDate;
-    @NotNull
     @Column(length = 10_000)
     private String description;
     @ManyToOne
     private Domain domain;
-    @OneToMany(mappedBy = "intellectualProperty")
+    @OneToMany(mappedBy = "intellectualProperty", fetch = FetchType.LAZY)
     List<Task> tasks;
 
     public IntellectualProperty() {
     }
 
-    public IntellectualProperty(LocalDate startDate, LocalDate endDate, String description, Domain domain) {
-        this.startDate = startDate;
-        this.endDate = endDate;
+    public IntellectualProperty(String description, Domain domain) {
         this.description = description;
         this.domain = domain;
     }
 
     public Integer getId() {
         return id;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public IntellectualProperty setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-        return this;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public IntellectualProperty setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-        return this;
     }
 
     public String getDescription() {
@@ -99,11 +74,11 @@ public class IntellectualProperty implements WithDomain<IntellectualProperty> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         IntellectualProperty that = (IntellectualProperty) o;
-        return Objects.equals(id, that.id) && Objects.equals(startDate, that.startDate) && Objects.equals(endDate, that.endDate) && Objects.equals(description, that.description) && Objects.equals(domain, that.domain) && Objects.equals(tasks, that.tasks);
+        return Objects.equals(id, that.id) && Objects.equals(description, that.description) && Objects.equals(domain, that.domain) && Objects.equals(tasks, that.tasks);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, startDate, endDate, description, domain, tasks);
+        return Objects.hash(id, description, domain, tasks);
     }
 }

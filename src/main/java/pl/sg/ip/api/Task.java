@@ -14,4 +14,5 @@ public class Task {
     private List<String> attachments;
     private String coAuthors;
     private String description;
+    private List<TimeRecord> timeRecords;
 }

@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.*;
 import pl.sg.application.security.annotations.TokenBearerAuth;
 import pl.sg.ip.api.IntellectualProperty;
 import pl.sg.ip.api.IntellectualPropertyData;
-import pl.sg.ip.api.Task;
 import pl.sg.ip.api.TaskData;
 import pl.sg.ip.service.IntellectualPropertyService;
 
@@ -25,7 +24,7 @@ public class IntellectualPropertyControllerImpl implements IntellectualPropertyC
     }
 
     @Override
-    @GetMapping(produces = {"application/json", "plain/text"})
+    @GetMapping
     @TokenBearerAuth(any = "IPR")
     public Collection<IntellectualProperty> getAll(@RequestHeader(value = "domainId") Integer domainId) {
         return intellectualPropertyService.getAll(domainId)
@@ -35,7 +34,7 @@ public class IntellectualPropertyControllerImpl implements IntellectualPropertyC
     }
 
     @Override
-    @PutMapping(produces = {"application/json", "plain/text"})
+    @PutMapping
     @TokenBearerAuth(any = "IPR")
     public IntellectualProperty create(
             @RequestHeader(value = "domainId") Integer domainId,
@@ -47,7 +46,7 @@ public class IntellectualPropertyControllerImpl implements IntellectualPropertyC
     }
 
     @Override
-    @PatchMapping(value = "/{id}", produces = {"application/json", "plain/text"})
+    @PatchMapping(value = "/{id}")
     @TokenBearerAuth(any = "IPR")
     public void update(
             @RequestHeader(value = "domainId") int domainId,
@@ -57,7 +56,7 @@ public class IntellectualPropertyControllerImpl implements IntellectualPropertyC
     }
 
     @Override
-    @DeleteMapping(value = "/{id}", produces = {"plain/text"})
+    @DeleteMapping(value = "/{id}")
     @TokenBearerAuth(any = "IPR")
     public void delete(
             @RequestHeader(value = "domainId") int domainId,
@@ -66,18 +65,7 @@ public class IntellectualPropertyControllerImpl implements IntellectualPropertyC
     }
 
     @Override
-    @GetMapping(path = "{id}/task", produces = {"application/json", "plain/text"})
-    @TokenBearerAuth(any = "IPR")
-    public Collection<Task> getAllTasks(
-            @RequestHeader(value = "domainId") int domainId,
-            @PathVariable("id") int intellectualPropertyId) {
-        return intellectualPropertyService.getTasksOfIntellectualProperty(domainId, intellectualPropertyId).stream()
-                .map(task -> modelMapper.map(task, Task.class))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    @PostMapping(path = "{id}/task", produces = {"plain/text"})
+    @PostMapping(path = "/{id}")
     @TokenBearerAuth(any = "IPR")
     public void createTask(
             @RequestHeader(value = "domainId") int domainId,

@@ -1,7 +1,5 @@
 package pl.sg.ip;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,9 +54,15 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TaskEndpointTest extends AbstractIPBaseTest {
 
     private static final int SECOND_DOMAIN_ID = 2;
+
     public static final String TASK_CO_AUTHORS = "author1, author2, author3";
     public static final String TASK_DESCRIPTION = "Description";
     private static final List<String> TASK_ATTACHMENTS = List.of("url/to/file1", "url/to/file2", "url/to/file3");
+
+    public static final String FILE_NAME = "first.pdf";
+    public static final String FIRST_ATTACHMENT_IN_RESOURCE = "/pl/sg/ip/attachment1.pdf";
+    public static final String SECOND_ATTACHMENT_IN_RESOURCE = "/pl/sg/ip/attachment2.pdf";
+    public static final String FIRST_ATTACHMENT_FILE_NAME_IN_RESOURCE = "attachment1.pdf";
 
     @Autowired
     private StorageTestUtilFactory storageTestUtilFactory;
@@ -79,48 +83,34 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
     }
 
     @Test
-    void shouldFailUnauthenticatedGetTaskRequest() {
-
+    void shouldFailUnauthenticatedCreateTaskRequest() {
         var intellectualProperty = createBasicIntellectualPropertyForDomain(DEFAULT_DOMAIN_ID);
-        ResponseEntity<?> response = restTemplate.exchange(
-                pathFromIntellectualProperty(intellectualProperty.getId()),
-                HttpMethod.GET,
-                new HttpEntity<String>(headers(DEFAULT_DOMAIN_ID)),
-                String.class);
-        assertEquals(401, response.getStatusCode().value());
-    }
 
-    @Test
-    void shouldFailUnauthenticatedCreateTaskRequest() throws JsonProcessingException {
-        var intellectualProperty = createBasicIntellectualPropertyForDomain(DEFAULT_DOMAIN_ID);
         HttpHeaders headers = headers(DEFAULT_DOMAIN_ID);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         TaskData testTaskToCreate = new TaskData("", "");
-        HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testTaskToCreate), headers);
 
-        ResponseEntity<?> response = restTemplate.exchange(
+        ResponseEntity<Void> response = restTemplate.exchange(
                 pathFromIntellectualProperty(intellectualProperty.getId()),
                 HttpMethod.POST,
-                requestEntity,
-                String.class);
+                new HttpEntity<>(testTaskToCreate, headers),
+                Void.class);
         assertEquals(401, response.getStatusCode().value());
     }
 
     @Test
-    void shouldFailUnauthenticatedUpdateTaskRequest() throws JsonProcessingException {
+    void shouldFailUnauthenticatedUpdateTaskRequest() {
         var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
+
         HttpHeaders headers = headers(DEFAULT_DOMAIN_ID);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        TaskData testTaskToUpdate = new TaskData("", "");
-        HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testTaskToUpdate), headers);
-
-        ResponseEntity<?> response = restTemplate.exchange(
+        ResponseEntity<Void> response = restTemplate.exchange(
                 pathForTask(task.getId()),
                 HttpMethod.PATCH,
-                requestEntity,
-                String.class);
+                new HttpEntity<>(new TaskData("", ""), headers),
+                Void.class);
 
         assertEquals(401, response.getStatusCode().value());
     }
@@ -128,95 +118,77 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
     @Test
     void shouldFailUnauthenticatedUploadAttachmentRequest() throws URISyntaxException {
         var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
+
         HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = prepareUploadForm(
                 headers(DEFAULT_DOMAIN_ID),
                 "first.pdf",
                 "/pl/sg/ip/attachment1.pdf");
 
-        ResponseEntity<?> response = restTemplate.exchange(
+        ResponseEntity<Void> response = restTemplate.exchange(
                 pathForAttachment(task.getId()),
                 HttpMethod.POST,
                 requestEntity,
-                String.class);
+                Void.class);
 
         assertEquals(401, response.getStatusCode().value());
     }
 
     @Test
     void shouldFailUnauthenticatedDownloadAttachmentRequest() throws URISyntaxException, IOException {
-        String fileName = "first.pdf";
-        Task task = createTaskWithAttachment(fileName);
 
-        ResponseEntity<?> response = restTemplate.exchange(
-                pathForAttachmentDownload(task.getId(), fileName),
+        Task task = createTaskWithAttachment(DEFAULT_DOMAIN_ID, FILE_NAME);
+
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForAttachmentDownload(task.getId(), FILE_NAME),
                 HttpMethod.GET,
                 new HttpEntity<>(new HttpHeaders()),
-                Resource.class);
+                Void.class);
 
         assertEquals(401, response.getStatusCode().value());
     }
 
     @Test
     void shouldFailUnauthenticatedDeleteAttachmentRequest() throws URISyntaxException, IOException {
-        String fileName = "first.pdf";
-        Task task = createTaskWithAttachment(fileName);
+        Task task = createTaskWithAttachment(DEFAULT_DOMAIN_ID, FILE_NAME);
 
-        ResponseEntity<?> response = restTemplate.exchange(
-                pathForAttachmentDownload(task.getId(), fileName),
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForAttachmentDownload(task.getId(), FILE_NAME),
                 HttpMethod.DELETE,
                 new HttpEntity<>(headers(DEFAULT_DOMAIN_ID)),
-                String.class);
+                Void.class);
 
         assertEquals(401, response.getStatusCode().value());
     }
 
     @ParameterizedTest
     @MethodSource("forbiddenRolesAndResponses")
-    void getTaskRolesAccess(String role) {
+    void createTaskRolesAccess(String role) {
         var intellectualProperty = createBasicIntellectualPropertyForDomain(DEFAULT_DOMAIN_ID);
-        ResponseEntity<?> response = restTemplate.exchange(
-                pathFromIntellectualProperty(intellectualProperty.getId()),
-                HttpMethod.GET,
-                new HttpEntity<String>(authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
-                String.class);
-        assertEquals(403, response.getStatusCode().value());
-    }
 
-    @ParameterizedTest
-    @MethodSource("forbiddenRolesAndResponses")
-    void createTaskRolesAccess(String role) throws JsonProcessingException {
-
-        var intellectualProperty = createBasicIntellectualPropertyForDomain(DEFAULT_DOMAIN_ID);
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, role);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        TaskData testTaskToCreate = new TaskData("", "");
-        HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testTaskToCreate), headers);
-
-        ResponseEntity<?> response = restTemplate.exchange(
+        ResponseEntity<Void> response = restTemplate.exchange(
                 pathFromIntellectualProperty(intellectualProperty.getId()),
                 HttpMethod.POST,
-                requestEntity,
-                String.class);
+                new HttpEntity<>(new TaskData("", ""), headers),
+                Void.class);
         assertEquals(403, response.getStatusCode().value());
     }
 
     @ParameterizedTest
     @MethodSource("forbiddenRolesAndResponses")
-    void updateTaskRolesAccess(String role) throws JsonProcessingException {
-
+    void updateTaskRolesAccess(String role) {
         var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
+
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, role);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        TaskData testTaskToUpdate = new TaskData("", "");
-        HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testTaskToUpdate), headers);
-
-        ResponseEntity<?> response = restTemplate.exchange(
+        ResponseEntity<Void> response = restTemplate.exchange(
                 pathForTask(task.getId()),
                 HttpMethod.PATCH,
-                requestEntity,
-                String.class);
+                new HttpEntity<>(new TaskData("", ""), headers),
+                Void.class);
         assertEquals(403, response.getStatusCode().value());
     }
 
@@ -224,32 +196,30 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
     @MethodSource("forbiddenRolesAndResponses")
     void uploadAttachmentRequestRolesAccess(String role) throws URISyntaxException {
         var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
+
         HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = prepareUploadForm(
                 authenticatedHeaders(DEFAULT_DOMAIN_ID, role),
                 "first.pdf",
                 "/pl/sg/ip/attachment1.pdf");
 
-        ResponseEntity<?> response = restTemplate.exchange(
+        ResponseEntity<Void> response = restTemplate.exchange(
                 pathForAttachment(task.getId()),
                 HttpMethod.POST,
                 requestEntity,
-                String.class);
-
+                Void.class);
         assertEquals(403, response.getStatusCode().value());
     }
 
     @ParameterizedTest
     @MethodSource("forbiddenRolesAndResponses")
     void downloadAttachmentRequestRolesAccess(String role) throws URISyntaxException, IOException {
-        String fileName = "first.pdf";
-        Task task = createTaskWithAttachment(fileName);
+        Task task = createTaskWithAttachment(DEFAULT_DOMAIN_ID, FILE_NAME);
 
-        ResponseEntity<?> response = restTemplate.exchange(
-                pathForAttachmentDownloadWithAuthentication(task.getId(), fileName, DEFAULT_DOMAIN_ID, generateJWTToken(new String[]{role})),
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForAttachmentDownloadWithAuthentication(task.getId(), FILE_NAME, DEFAULT_DOMAIN_ID, generateJWTToken(new String[]{role})),
                 HttpMethod.GET,
                 new HttpEntity<>(new HttpHeaders()),
-                Resource.class);
-
+                Void.class);
         assertEquals(403, response.getStatusCode().value());
     }
 
@@ -257,52 +227,47 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
     @ParameterizedTest
     @MethodSource("forbiddenRolesAndResponses")
     void deleteAttachmentRequestRolesAccess(String role) throws URISyntaxException, IOException {
-        String fileName = "first.pdf";
-        Task task = createTaskWithAttachment(fileName);
+        Task task = createTaskWithAttachment(DEFAULT_DOMAIN_ID, FILE_NAME);
 
-        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, role);
-        ResponseEntity<?> response = restTemplate.exchange(
-                pathForAttachmentDownload(task.getId(), fileName),
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForAttachmentDownload(task.getId(), FILE_NAME),
                 HttpMethod.DELETE,
-                new HttpEntity<>(headers),
-                String.class);
-
+                new HttpEntity<>(authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
+                Void.class);
         assertEquals(403, response.getStatusCode().value());
     }
 
     @Test
-    void shouldFailCreationOfTaskForIPFromOtherDomain() throws JsonProcessingException {
-
+    void shouldFailCreationOfTaskForIPFromOtherDomain() {
         var intellectualProperty = createBasicIntellectualPropertyForDomain(SECOND_DOMAIN_ID);
 
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
         headers.setContentType(MediaType.APPLICATION_JSON);
-        TaskData testTaskToCreate = new TaskData(TASK_CO_AUTHORS, TASK_DESCRIPTION);
-        HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testTaskToCreate), headers);
 
-        ResponseEntity<?> response = restTemplate.exchange(
+        ResponseEntity<Void> response = restTemplate.exchange(
                 pathFromIntellectualProperty(intellectualProperty.getId()),
                 HttpMethod.POST,
-                requestEntity,
-                String.class);
+                new HttpEntity<>(
+                        new TaskData(TASK_CO_AUTHORS, TASK_DESCRIPTION),
+                        headers),
+                Void.class);
         assertEquals(403, response.getStatusCode().value());
     }
 
     @Test
-    void shouldCreateTask() throws JsonProcessingException {
-
+    void shouldCreateTask() {
         var intellectualProperty = createBasicIntellectualPropertyForDomain(DEFAULT_DOMAIN_ID);
 
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
         headers.setContentType(MediaType.APPLICATION_JSON);
-        TaskData testTaskToCreate = new TaskData(TASK_CO_AUTHORS, TASK_DESCRIPTION);
-        HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testTaskToCreate), headers);
 
-        ResponseEntity<?> response = restTemplate.exchange(
+        ResponseEntity<Void> response = restTemplate.exchange(
                 pathFromIntellectualProperty(intellectualProperty.getId()),
                 HttpMethod.POST,
-                requestEntity,
-                String.class);
+                new HttpEntity<>(
+                        new TaskData(TASK_CO_AUTHORS, TASK_DESCRIPTION),
+                        headers),
+                Void.class);
         assertEquals(200, response.getStatusCode().value());
         List<Task> tasks = taskRepository.findAll();
         assertEquals(1, tasks.size());
@@ -311,90 +276,54 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
     }
 
     @Test
-    void shouldGetTasksFromDomainToWhichUserHasAccessOnlyAndFromOnlyOneIP() throws JsonProcessingException {
-
-        var task = createTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID, TASK_DESCRIPTION, TASK_CO_AUTHORS, TASK_ATTACHMENTS);
-        createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
-        createBasicTaskWithIntellectualProperty(SECOND_DOMAIN_ID);
-
-        ResponseEntity<?> response = restTemplate.exchange(
-                pathFromIntellectualProperty(task.getIntellectualProperty().getId()),
-                HttpMethod.GET,
-                new HttpEntity<String>(authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
-                String.class);
-        assertEquals(200, response.getStatusCode().value());
-
-        Object body = response.getBody();
-
-        List<pl.sg.ip.api.Task> tasks = objectMapper.readValue(Objects.requireNonNull(body).toString(), new TypeReference<>() {
-        });
-        assertEquals(1, tasks.size());
-        assertEquals(TASK_DESCRIPTION, tasks.get(0).getDescription());
-        assertEquals(TASK_CO_AUTHORS, tasks.get(0).getCoAuthors());
-        assertEquals(TASK_ATTACHMENTS, tasks.get(0).getAttachments());
-    }
-
-    @Test
-    void shouldFailGetForNotExistingIP() {
-
+    void updateTaskRequestShouldFailWhenNoEntity() {
         var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
 
-        ResponseEntity<?> response = restTemplate.exchange(
-                pathFromIntellectualProperty(task.getIntellectualProperty().getId() + 1),
-                HttpMethod.GET,
-                new HttpEntity<String>(authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
-                String.class);
-        assertEquals(404, response.getStatusCode().value());
-    }
-
-    @Test
-    void updateTaskRequestShouldFailWhenNoEntity() throws JsonProcessingException {
-        var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        TaskData testTaskToUpdate = new TaskData("", "");
-        HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testTaskToUpdate), headers);
-
-        ResponseEntity<?> response = restTemplate.exchange(
+        ResponseEntity<Void> response = restTemplate.exchange(
                 pathForTask(task.getId() + 1),
                 HttpMethod.PATCH,
-                requestEntity,
-                String.class);
+                new HttpEntity<>(
+                        new TaskData("", ""),
+                        headers),
+                Void.class);
         assertEquals(404, response.getStatusCode().value());
     }
 
     @Test
-    void updateTaskRequestShouldFailWhenNoDomainAccess() throws JsonProcessingException {
+    void updateTaskRequestShouldFailWhenNoDomainAccess() {
         var task = createBasicTaskWithIntellectualProperty(SECOND_DOMAIN_ID);
+
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        TaskData testTaskToUpdate = new TaskData("", "");
-        HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testTaskToUpdate), headers);
-
-        ResponseEntity<?> response = restTemplate.exchange(
+        ResponseEntity<Void> response = restTemplate.exchange(
                 pathForTask(task.getId()),
                 HttpMethod.PATCH,
-                requestEntity,
-                String.class);
+                new HttpEntity<>(
+                        new TaskData("", ""),
+                        headers),
+                Void.class);
         assertEquals(403, response.getStatusCode().value());
     }
 
     @Test
-    void updateTaskRequestShouldUpdateTask() throws JsonProcessingException {
+    void updateTaskRequestShouldUpdateTask() {
         var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
+
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        TaskData testTaskToUpdate = new TaskData(TASK_CO_AUTHORS, TASK_DESCRIPTION);
-        HttpEntity<String> requestEntity = new HttpEntity<>(objectMapper.writeValueAsString(testTaskToUpdate), headers);
-
-        ResponseEntity<?> response = restTemplate.exchange(
+        ResponseEntity<Void> response = restTemplate.exchange(
                 pathForTask(task.getId()),
                 HttpMethod.PATCH,
-                requestEntity,
-                String.class);
+                new HttpEntity<>(
+                        new TaskData(TASK_CO_AUTHORS, TASK_DESCRIPTION),
+                        headers),
+                Void.class);
+
         assertEquals(200, response.getStatusCode().value());
         List<Task> allTasks = taskRepository.findAll();
         assertEquals(1, allTasks.size());
@@ -404,16 +333,15 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
 
     @Test
     void shouldFailUploadAttachmentRequestForNonExistingTask() throws URISyntaxException {
-        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = prepareUploadForm(
-                authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR"),
-                "first.pdf",
-                "/pl/sg/ip/attachment1.pdf");
 
-        ResponseEntity<?> response = restTemplate.exchange(
+        ResponseEntity<Void> response = restTemplate.exchange(
                 pathForAttachment(1),
                 HttpMethod.POST,
-                requestEntity,
-                String.class);
+                prepareUploadForm(
+                        authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR"),
+                        FILE_NAME,
+                        FIRST_ATTACHMENT_IN_RESOURCE),
+                Void.class);
 
         assertEquals(404, response.getStatusCode().value());
     }
@@ -421,16 +349,17 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
     @Test
     void shouldFailUploadAttachmentRequestForTaskFromOtherDomain() throws URISyntaxException {
         var task = createBasicTaskWithIntellectualProperty(SECOND_DOMAIN_ID);
+
         HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = prepareUploadForm(
                 authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR"),
-                "first.pdf",
-                "/pl/sg/ip/attachment1.pdf");
+                FILE_NAME,
+                FIRST_ATTACHMENT_IN_RESOURCE);
 
-        ResponseEntity<?> response = restTemplate.exchange(
+        ResponseEntity<Void> response = restTemplate.exchange(
                 pathForAttachment(task.getId()),
                 HttpMethod.POST,
                 requestEntity,
-                String.class);
+                Void.class);
 
         assertEquals(403, response.getStatusCode().value());
     }
@@ -438,110 +367,92 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
     @Test
     void shouldUploadAttachmentRequest() throws URISyntaxException, IOException {
         var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
-        String fileName = "first.pdf";
-        String resourceName = "attachment1.pdf";
-        String resourcePath = "/pl/sg/ip/" + resourceName;
-        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = prepareUploadForm(
-                authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR"),
-                fileName,
-                resourcePath);
 
-        ResponseEntity<?> response = restTemplate.exchange(
+        ResponseEntity<Void> response = restTemplate.exchange(
                 pathForAttachment(task.getId()),
                 HttpMethod.POST,
-                requestEntity,
-                String.class);
+                prepareUploadForm(
+                        authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR"),
+                        FILE_NAME,
+                        FIRST_ATTACHMENT_IN_RESOURCE),
+                Void.class);
 
         task = taskRepository.getReferenceById(task.getId());
 
         assertEquals(200, response.getStatusCode().value());
         assertEquals(1, task.getAttachments().size());
-        assertEquals(fileName, task.getAttachments().get(0));
+        assertEquals(FILE_NAME, task.getAttachments().get(0));
 
-        try (InputStream inputStream = taskAttachmentStorageService.getFile(task.getIntellectualProperty().getId(), task.getId(), fileName)
+        try (InputStream inputStream = taskAttachmentStorageService.getFile(task.getIntellectualProperty().getId(), task.getId(), FILE_NAME)
                 .orElseThrow(() -> new AssertionFailedError("expected a file here"))) {
             Hasher hasher = Hashing.sha512().newHasher();
             ByteStreams.copy(inputStream, Funnels.asOutputStream(hasher));
             HashCode hash = hasher.hash();
             Map<String, String> controlSums = readControlSums();
-            assertEquals(controlSums.get(resourceName), hash.toString());
+            assertEquals(controlSums.get(FIRST_ATTACHMENT_FILE_NAME_IN_RESOURCE), hash.toString());
         }
     }
 
     @Test
     void shouldKeepOriginalFileWhenReuploadAttachmentRequest() throws URISyntaxException, IOException {
         var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
-        String fileName = "first.pdf";
-        String resourceName = "attachment1.pdf";
-        String resourcePath = "/pl/sg/ip/" + resourceName;
-        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = prepareUploadForm(
-                authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR"),
-                fileName,
-                resourcePath);
 
         restTemplate.exchange(
                 pathForAttachment(task.getId()),
                 HttpMethod.POST,
-                requestEntity,
-                String.class);
-
-        String otherResourcePath = "/pl/sg/ip/attachment2.pdf";
-        requestEntity = prepareUploadForm(
-                authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR"),
-                fileName,
-                otherResourcePath);
+                prepareUploadForm(
+                        authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR"),
+                        FILE_NAME,
+                        FIRST_ATTACHMENT_IN_RESOURCE),
+                Void.class);
 
         ResponseEntity<?> response = restTemplate.exchange(
                 pathForAttachment(task.getId()),
                 HttpMethod.POST,
-                requestEntity,
+                prepareUploadForm(
+                        authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR"),
+                        FILE_NAME,
+                        SECOND_ATTACHMENT_IN_RESOURCE),
                 String.class);
 
         assertEquals(400, response.getStatusCode().value());
 
-        try (InputStream inputStream = taskAttachmentStorageService.getFile(task.getIntellectualProperty().getId(), task.getId(), fileName)
+        try (InputStream inputStream = taskAttachmentStorageService
+                .getFile(task.getIntellectualProperty().getId(), task.getId(), FILE_NAME)
                 .orElseThrow(() -> new AssertionFailedError("expected a file here"))) {
             Hasher hasher = Hashing.sha512().newHasher();
             ByteStreams.copy(inputStream, Funnels.asOutputStream(hasher));
             HashCode hash = hasher.hash();
             Map<String, String> controlSums = readControlSums();
-            assertEquals(controlSums.get(resourceName), hash.toString());
+            assertEquals(controlSums.get(FIRST_ATTACHMENT_FILE_NAME_IN_RESOURCE), hash.toString());
         }
     }
 
     @Test
     void shouldFailDownloadingAttachmentForTaskInOtherDomain() throws URISyntaxException, IOException {
-        String fileName = "first.pdf";
-        var task = createBasicTaskWithIntellectualProperty(SECOND_DOMAIN_ID);
-        storageTestUtil = storageTestUtilFactory.create(task.getIntellectualProperty().getId(), task.getId());
-        storageTestUtil.initStorage();
-        storageTestUtil.putResourceInStorage("/pl/sg/ip/attachment1.pdf", fileName);
-        task.setAttachments(List.of(fileName));
-        taskRepository.save(task);
-        commitAndStartNewTransaction();
+        var task = createTaskWithAttachment(SECOND_DOMAIN_ID, FILE_NAME);
 
-        ResponseEntity<?> response = restTemplate.exchange(
-                pathForAttachmentDownloadWithAuthentication(task.getId(), fileName, DEFAULT_DOMAIN_ID, generateJWTToken(new String[]{"IPR"})),
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForAttachmentDownloadWithAuthentication(task.getId(), FILE_NAME, DEFAULT_DOMAIN_ID, generateJWTToken(new String[]{"IPR"})),
                 HttpMethod.GET,
                 new HttpEntity<>(new HttpHeaders()),
-                Resource.class);
+                Void.class);
 
         assertEquals(403, response.getStatusCode().value());
     }
 
     @Test
     void shouldFailDownloadingForNonExistingAttachmentAndUpdateTaskIfThisAttachmentWasThere() {
-        String fileName = "first.pdf";
         var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
-        task.setAttachments(List.of(fileName));
+        task.setAttachments(List.of(FILE_NAME));
         taskRepository.save(task);
         commitAndStartNewTransaction();
 
-        ResponseEntity<?> response = restTemplate.exchange(
-                pathForAttachmentDownloadWithAuthentication(task.getId(), fileName, DEFAULT_DOMAIN_ID, generateJWTToken(new String[]{"IPR"})),
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForAttachmentDownloadWithAuthentication(task.getId(), FILE_NAME, DEFAULT_DOMAIN_ID, generateJWTToken(new String[]{"IPR"})),
                 HttpMethod.GET,
                 new HttpEntity<>(new HttpHeaders()),
-                Resource.class);
+                Void.class);
 
         assertEquals(404, response.getStatusCode().value());
         commitAndStartNewTransaction();
@@ -551,36 +462,27 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
 
     @Test
     void shouldFailDownloadingForAttachmentNotRelatedInTaskAndRemoveItFromStorage() throws IOException, URISyntaxException {
-        String fileName = "first.pdf";
         var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
         storageTestUtil = storageTestUtilFactory.create(task.getIntellectualProperty().getId(), task.getId());
         storageTestUtil.initStorage();
-        storageTestUtil.putResourceInStorage("/pl/sg/ip/attachment1.pdf", fileName);
+        storageTestUtil.putResourceInStorage("/pl/sg/ip/attachment1.pdf", FILE_NAME);
 
-        ResponseEntity<?> response = restTemplate.exchange(
-                pathForAttachmentDownloadWithAuthentication(task.getId(), fileName, DEFAULT_DOMAIN_ID, generateJWTToken(new String[]{"IPR"})),
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForAttachmentDownloadWithAuthentication(task.getId(), FILE_NAME, DEFAULT_DOMAIN_ID, generateJWTToken(new String[]{"IPR"})),
                 HttpMethod.GET,
                 new HttpEntity<>(new HttpHeaders()),
-                Resource.class);
+                Void.class);
 
         assertEquals(404, response.getStatusCode().value());
-        assertFalse(storageTestUtil.checkFileExistenceInStorage(fileName));
+        assertFalse(storageTestUtil.checkFileExistenceInStorage(FILE_NAME));
     }
 
     @Test
     void shouldDownloadAttachment() throws IOException, URISyntaxException {
-        String fileName = "first.pdf";
-        var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
-        storageTestUtil = storageTestUtilFactory.create(task.getIntellectualProperty().getId(), task.getId());
-        storageTestUtil.initStorage();
-        String resourceName = "attachment1.pdf";
-        storageTestUtil.putResourceInStorage("/pl/sg/ip/" + resourceName, fileName);
-        task.setAttachments(List.of(fileName));
-        taskRepository.save(task);
-        commitAndStartNewTransaction();
+        var task = createTaskWithAttachment(DEFAULT_DOMAIN_ID, FILE_NAME);
 
         ResponseEntity<Resource> response = restTemplate.exchange(
-                pathForAttachmentDownloadWithAuthentication(task.getId(), fileName, DEFAULT_DOMAIN_ID, generateJWTToken(new String[]{"IPR"})),
+                pathForAttachmentDownloadWithAuthentication(task.getId(), FILE_NAME, DEFAULT_DOMAIN_ID, generateJWTToken(new String[]{"IPR"})),
                 HttpMethod.GET,
                 new HttpEntity<>(new HttpHeaders()),
                 Resource.class);
@@ -592,77 +494,70 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
             ByteStreams.copy(inputStream, Funnels.asOutputStream(hasher));
             HashCode hash = hasher.hash();
             Map<String, String> controlSums = readControlSums();
-            assertEquals(controlSums.get(resourceName), hash.toString());
+            assertEquals(controlSums.get(FIRST_ATTACHMENT_FILE_NAME_IN_RESOURCE), hash.toString());
         }
     }
 
     @Test
     void shouldFailDeleteAttachmentRequestBelongingToOtherDomain() throws URISyntaxException, IOException {
-        String fileName = "first.pdf";
-        Task task = createTaskWithAttachment(fileName);
+        Task task = createTaskWithAttachment(DEFAULT_DOMAIN_ID, FILE_NAME);
 
-        HttpHeaders headers = authenticatedHeaders(SECOND_DOMAIN_ID, "IPR");
-        ResponseEntity<?> response = restTemplate.exchange(
-                pathForAttachmentDownload(task.getId(), fileName),
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForAttachmentDownload(task.getId(), FILE_NAME),
                 HttpMethod.DELETE,
-                new HttpEntity<>(headers),
-                String.class);
+                new HttpEntity<>(authenticatedHeaders(SECOND_DOMAIN_ID, "IPR")),
+                Void.class);
 
         assertEquals(403, response.getStatusCode().value());
     }
 
     @Test
     void shouldFailDeleteAttachmentRequestForNonExistingAttachment() {
-        String fileName = "first.pdf";
         Task task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
 
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
-        ResponseEntity<?> response = restTemplate.exchange(
-                pathForAttachmentDownload(task.getId(), fileName),
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForAttachmentDownload(task.getId(), FILE_NAME),
                 HttpMethod.DELETE,
                 new HttpEntity<>(headers),
-                String.class);
+                Void.class);
 
         assertEquals(404, response.getStatusCode().value());
     }
 
     @Test
     void shouldDeleteAttachment() throws IOException, URISyntaxException {
-        String fileName = "first.pdf";
-        Task task = createTaskWithAttachment(fileName);
+        Task task = createTaskWithAttachment(DEFAULT_DOMAIN_ID, FILE_NAME);
 
-        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
-        ResponseEntity<?> response = restTemplate.exchange(
-                pathForAttachmentDownload(task.getId(), fileName),
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForAttachmentDownload(task.getId(), FILE_NAME),
                 HttpMethod.DELETE,
-                new HttpEntity<>(headers),
-                String.class);
+                new HttpEntity<>(authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
+                Void.class);
 
         assertEquals(200, response.getStatusCode().value());
-        assertFalse(storageTestUtil.checkFileExistenceInStorage(fileName));
+        assertFalse(storageTestUtil.checkFileExistenceInStorage(FILE_NAME));
         commitAndStartNewTransaction();
         task = taskRepository.getReferenceById(task.getId());
-        assertFalse(task.getAttachments().contains(fileName));
+        assertFalse(task.getAttachments().contains(FILE_NAME));
     }
 
     @Test
     void shouldDeleteReferencedButNotPresentInStorageAttachment() {
-        String fileName = "first.pdf";
-        Task task = createTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID, "", "", List.of(fileName));
+        Task task = createTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID, "", "", List.of(FILE_NAME));
 
-        HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
-        ResponseEntity<?> response = restTemplate.exchange(
-                pathForAttachmentDownload(task.getId(), fileName),
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForAttachmentDownload(task.getId(), FILE_NAME),
                 HttpMethod.DELETE,
-                new HttpEntity<>(headers),
-                String.class);
+                new HttpEntity<>(authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
+                Void.class);
 
         assertEquals(299, response.getStatusCodeValue());
     }
 
     @NotNull
     private String pathFromIntellectualProperty(int intellectualPropertyId) {
-        return "http://localhost:%d/ipr/%d/task".formatted(serverPort, intellectualPropertyId);
+        return "http://localhost:%d/ipr/%d".formatted(serverPort, intellectualPropertyId);
     }
 
     @NotNull
@@ -711,11 +606,11 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
     }
 
     @NotNull
-    private Task createTaskWithAttachment(String fileName) throws IOException, URISyntaxException {
-        var task = createTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID, "", "", List.of(fileName));
+    private Task createTaskWithAttachment(int domainId, String fileName) throws IOException, URISyntaxException {
+        var task = createTaskWithIntellectualProperty(domainId, "", "", List.of(fileName));
         storageTestUtil = storageTestUtilFactory.create(task.getIntellectualProperty().getId(), task.getId());
         storageTestUtil.initStorage();
-        storageTestUtil.putResourceInStorage("/pl/sg/ip/attachment1.pdf", fileName);
+        storageTestUtil.putResourceInStorage(FIRST_ATTACHMENT_IN_RESOURCE, fileName);
         task.setAttachments(List.of(fileName));
         taskRepository.save(task);
         commitAndStartNewTransaction();

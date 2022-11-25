@@ -21,9 +21,7 @@ public class IntellectualPropertyJPAService implements IntellectualPropertyServi
     private final IntellectualPropertyRepository intellectualPropertyRepository;
     private final TaskRepository taskRepository;
 
-    public IntellectualPropertyJPAService(DomainRepository domainRepository,
-                                          IntellectualPropertyRepository intellectualPropertyRepository,
-                                          TaskRepository taskRepository) {
+    public IntellectualPropertyJPAService(DomainRepository domainRepository, IntellectualPropertyRepository intellectualPropertyRepository, TaskRepository taskRepository) {
         this.domainRepository = domainRepository;
         this.intellectualPropertyRepository = intellectualPropertyRepository;
         this.taskRepository = taskRepository;
@@ -36,14 +34,7 @@ public class IntellectualPropertyJPAService implements IntellectualPropertyServi
 
     @Override
     public IntellectualProperty create(int domainId, IntellectualPropertyData createData) {
-        return intellectualPropertyRepository.save(
-                new IntellectualProperty(
-                        createData.startDate(),
-                        createData.endDate(),
-                        createData.description(),
-                        this.domainRepository.getReferenceById(domainId)
-                )
-        );
+        return intellectualPropertyRepository.save(new IntellectualProperty(createData.description(), this.domainRepository.getReferenceById(domainId)));
     }
 
     @Override
@@ -54,18 +45,6 @@ public class IntellectualPropertyJPAService implements IntellectualPropertyServi
             throw new ForbiddenException("Trying to update an IP for other domain.");
         }
         toUpdate.setDescription(updateData.description());
-        if (!toUpdate.getStartDate().equals(updateData.startDate())) {
-            if (!validator.validateStartDate(updateData.startDate())) {
-                throw new IPException("Start date can not be set to after of any of tasks related to this IP.");
-            }
-            toUpdate.setStartDate(updateData.startDate());
-        }
-        if (!toUpdate.getEndDate().equals(updateData.endDate())) {
-            if (!validator.validateEndDate(updateData.endDate())) {
-                throw new IPException("End date can not be set to before of any of tasks related to this IP.");
-            }
-            toUpdate.setEndDate(updateData.endDate());
-        }
         this.intellectualPropertyRepository.save(toUpdate);
     }
 
@@ -98,9 +77,7 @@ public class IntellectualPropertyJPAService implements IntellectualPropertyServi
         if (!validator.validateDomain(domainId)) {
             throw new ForbiddenException("Trying to add task to an IP from other domain.");
         }
-        this.taskRepository.save(
-                new Task(taskData.description(), taskData.coAuthors(), List.of(), addTaskTo, List.of())
-        );
+        this.taskRepository.save(new Task(taskData.description(), taskData.coAuthors(), List.of(), addTaskTo, List.of()));
         this.intellectualPropertyRepository.save(addTaskTo);
     }
 }

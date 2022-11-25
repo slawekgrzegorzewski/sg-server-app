@@ -20,7 +20,7 @@ public class TimeRecordControllerImpl implements TimeRecordController {
     }
 
     @Override
-    @PutMapping(produces = {"application/json", "plain/text"})
+    @PutMapping
     @TokenBearerAuth(any = "IPR")
     public TimeRecord create(@RequestHeader("domainId") int domainId,
                              @RequestBody TimeRecordData taskData) {
@@ -30,7 +30,7 @@ public class TimeRecordControllerImpl implements TimeRecordController {
     }
 
     @Override
-    @PutMapping(path = "/{taskId}", produces = {"application/json", "plain/text"})
+    @PutMapping(path = "/{taskId}")
     @TokenBearerAuth(any = "IPR")
     public TimeRecord create(@RequestHeader("domainId") int domainId,
                              @PathVariable(value = "taskId") int taskId,

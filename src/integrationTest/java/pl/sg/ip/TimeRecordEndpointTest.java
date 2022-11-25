@@ -37,11 +37,12 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
     @Test
     void shouldFailUnauthenticatedCreateTimeRecordRequest() {
         TimeRecordData timeRecordToCreateData = new TimeRecordData(LocalDate.now(), 0, "");
-        ResponseEntity<?> response = restTemplate.exchange(
+
+        ResponseEntity<Void> response = restTemplate.exchange(
                 pathForTimeRecordCreation(),
                 HttpMethod.PUT,
                 new HttpEntity<>(timeRecordToCreateData, headers(DEFAULT_DOMAIN_ID)),
-                String.class);
+                Void.class);
         assertEquals(401, response.getStatusCode().value());
 
         var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
@@ -49,20 +50,20 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
                 pathForTimeRecordCreationForTask(task.getId()),
                 HttpMethod.PUT,
                 new HttpEntity<>(timeRecordToCreateData, headers(DEFAULT_DOMAIN_ID)),
-                String.class);
+                Void.class);
         assertEquals(401, response.getStatusCode().value());
     }
 
     @ParameterizedTest
     @MethodSource("forbiddenRolesAndResponses")
     void createTimeRecordRolesAccess(String role) {
-
         TimeRecordData timeRecordToCreateData = new TimeRecordData(LocalDate.now(), 0, "");
-        ResponseEntity<?> response = restTemplate.exchange(
+
+        ResponseEntity<Void> response = restTemplate.exchange(
                 pathForTimeRecordCreation(),
                 HttpMethod.PUT,
                 new HttpEntity<>(timeRecordToCreateData, authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
-                String.class);
+                Void.class);
         assertEquals(403, response.getStatusCode().value());
 
         var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
@@ -70,7 +71,7 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
                 pathForTimeRecordCreationForTask(task.getId()),
                 HttpMethod.PUT,
                 new HttpEntity<>(timeRecordToCreateData, authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
-                String.class);
+                Void.class);
         assertEquals(403, response.getStatusCode().value());
     }
 
@@ -79,22 +80,24 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
     void shouldFailCreationOfTimeRecordWhenCreatingForTaskFromOtherDomain() {
         TimeRecordData timeRecordToCreateData = new TimeRecordData(LocalDate.now(), 0, "");
         var task = createBasicTaskWithIntellectualProperty(SECOND_DOMAIN_ID);
-        ResponseEntity<?> response = restTemplate.exchange(
+
+        ResponseEntity<Void> response = restTemplate.exchange(
                 pathForTimeRecordCreationForTask(task.getId()),
                 HttpMethod.PUT,
                 new HttpEntity<>(timeRecordToCreateData, authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
-                String.class);
+                Void.class);
         assertEquals(403, response.getStatusCode().value());
     }
 
     @Test
     void shouldFailCreationOfTimeRecordWhenCreatingForNotExistingTask() {
         TimeRecordData timeRecordToCreateData = new TimeRecordData(LocalDate.now(), 0, "");
-        ResponseEntity<?> response = restTemplate.exchange(
+
+        ResponseEntity<Void> response = restTemplate.exchange(
                 pathForTimeRecordCreationForTask(1),
                 HttpMethod.PUT,
                 new HttpEntity<>(timeRecordToCreateData, authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
-                String.class);
+                Void.class);
         assertEquals(404, response.getStatusCode().value());
     }
 
@@ -102,11 +105,13 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
     void shouldCreateTimeRecordWithNoAssociationWithTask() {
         TimeRecordData timeRecordToCreateData = new TimeRecordData(NOW, NUMBER_OF_HOURS, DESCRIPTION);
         createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
+
         ResponseEntity<TimeRecord> response = restTemplate.exchange(
                 pathForTimeRecordCreation(),
                 HttpMethod.PUT,
                 new HttpEntity<>(timeRecordToCreateData, authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
                 TimeRecord.class);
+
         assertEquals(200, response.getStatusCode().value());
         TimeRecord createdTimeRecord = response.getBody();
         assertNotNull(createdTimeRecord);
@@ -120,42 +125,21 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
 
     @Test
     void shouldCreateTimeRecordAssociatedWithTask() {
-        var task = createBasicTaskWithIntellectualPropertyForDates(DEFAULT_DOMAIN_ID, NOW.minusDays(4), NOW.minusDays(1));
-        pl.sg.ip.model.TimeRecord timeRecord = testTimeRecordCreation(task, new TimeRecordData(NOW.minusDays(2), NUMBER_OF_HOURS, DESCRIPTION));
-        assertEquals(NOW.minusDays(4), timeRecord.getTask().getIntellectualProperty().getStartDate());
-        assertEquals(NOW.minusDays(1), timeRecord.getTask().getIntellectualProperty().getEndDate());
-    }
+        var task = createBasicTaskWithIntellectualPropertyForDates(DEFAULT_DOMAIN_ID);
 
-    @Test
-    void shouldCreateTimeRecordAssociatedWithTaskAndAlignIPStart() {
-        var task = createBasicTaskWithIntellectualPropertyForDates(DEFAULT_DOMAIN_ID, NOW.minusDays(4), NOW.minusDays(1));
-        TimeRecordData timeRecordToCreateData = new TimeRecordData(NOW.minusDays(5), NUMBER_OF_HOURS, DESCRIPTION);
-        pl.sg.ip.model.TimeRecord timeRecord = testTimeRecordCreation(task, timeRecordToCreateData);
-        assertEquals(NOW.minusDays(5), timeRecord.getTask().getIntellectualProperty().getStartDate());
-        assertEquals(NOW.minusDays(1), timeRecord.getTask().getIntellectualProperty().getEndDate());
-    }
-
-    @Test
-    void shouldCreateTimeRecordAssociatedWithTaskAndAlignIPEndDate() {
-        var task = createBasicTaskWithIntellectualPropertyForDates(DEFAULT_DOMAIN_ID, NOW.minusDays(4), NOW.minusDays(1));
-        TimeRecordData timeRecordToCreateData = new TimeRecordData(NOW, NUMBER_OF_HOURS, DESCRIPTION);
-        pl.sg.ip.model.TimeRecord timeRecord = testTimeRecordCreation(task, timeRecordToCreateData);
-        assertEquals(NOW.minusDays(4), timeRecord.getTask().getIntellectualProperty().getStartDate());
-        assertEquals(NOW, timeRecord.getTask().getIntellectualProperty().getEndDate());
-    }
-
-    private pl.sg.ip.model.TimeRecord testTimeRecordCreation(Task task, TimeRecordData timeRecordToCreateData) {
         ResponseEntity<TimeRecord> response = restTemplate.exchange(
                 pathForTimeRecordCreationForTask(task.getId()),
                 HttpMethod.PUT,
-                new HttpEntity<>(timeRecordToCreateData, authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
+                new HttpEntity<>(
+                        new TimeRecordData(NOW.minusDays(2), NUMBER_OF_HOURS, DESCRIPTION),
+                        authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
                 TimeRecord.class);
+
         assertEquals(200, response.getStatusCode().value());
         TimeRecord createdTimeRecord = response.getBody();
         assertNotNull(createdTimeRecord);
         assertEquals(NUMBER_OF_HOURS, createdTimeRecord.getNumberOfHours());
         assertEquals(DESCRIPTION, createdTimeRecord.getDescription());
-        assertEquals(timeRecordToCreateData.getDate(), createdTimeRecord.getDate());
         assertEquals(DEFAULT_DOMAIN_ID, createdTimeRecord.getDomain().getId());
         commitAndStartNewTransaction();
         List<Task> tasksWithTimeRecords = taskRepository.findAll().stream()
@@ -164,7 +148,6 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
         assertEquals(1, tasksWithTimeRecords.size());
         assertEquals(1, tasksWithTimeRecords.get(0).getTimeRecords().size());
         assertEquals(createdTimeRecord.getId(), tasksWithTimeRecords.get(0).getTimeRecords().get(0).getId());
-        return timeRecordRepository.getReferenceById(createdTimeRecord.getId());
     }
 
     @NotNull
