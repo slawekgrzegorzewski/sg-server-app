@@ -25,18 +25,8 @@ public class TimeRecordControllerImpl implements TimeRecordController {
     public TimeRecord create(@RequestHeader("domainId") int domainId,
                              @RequestBody TimeRecordData taskData) {
         return modelMapper.map(
-                timeRecordService.createWithoutTask(domainId, taskData),
-                TimeRecord.class);
-    }
 
-    @Override
-    @PutMapping(path = "/{taskId}")
-    @TokenBearerAuth(any = "IPR")
-    public TimeRecord create(@RequestHeader("domainId") int domainId,
-                             @PathVariable(value = "taskId") int taskId,
-                             @RequestBody TimeRecordData taskData) {
-        return modelMapper.map(
-                timeRecordService.createInTask(domainId, taskId, taskData),
+                timeRecordService.createWithoutTask(domainId, taskData),
                 TimeRecord.class);
     }
 }

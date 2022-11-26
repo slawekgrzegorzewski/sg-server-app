@@ -13,4 +13,10 @@ public class TimeRecordData {
     private LocalDate date;
     private int numberOfHours;
     private String description;
+    private AssignmentAction assignmentAction;
+    private Integer taskId;
+
+    enum AssignmentAction {
+        NOP, ASSIGN, UNASSING
+    }
 }
