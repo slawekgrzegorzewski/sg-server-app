@@ -45,7 +45,7 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
                 Void.class);
         assertEquals(401, response.getStatusCode().value());
 
-        var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
+        var task = taskIntellectualProperty(DEFAULT_DOMAIN_ID);
         response = restTemplate.exchange(
                 pathForTimeRecordCreationForTask(task.getId()),
                 HttpMethod.PUT,
@@ -66,7 +66,7 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
                 Void.class);
         assertEquals(403, response.getStatusCode().value());
 
-        var task = createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
+        var task = taskIntellectualProperty(DEFAULT_DOMAIN_ID);
         response = restTemplate.exchange(
                 pathForTimeRecordCreationForTask(task.getId()),
                 HttpMethod.PUT,
@@ -79,7 +79,7 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
     @Test
     void shouldFailCreationOfTimeRecordWhenCreatingForTaskFromOtherDomain() {
         TimeRecordData timeRecordToCreateData = new TimeRecordData(LocalDate.now(), 0, "");
-        var task = createBasicTaskWithIntellectualProperty(SECOND_DOMAIN_ID);
+        var task = taskIntellectualProperty(SECOND_DOMAIN_ID);
 
         ResponseEntity<Void> response = restTemplate.exchange(
                 pathForTimeRecordCreationForTask(task.getId()),
@@ -104,7 +104,7 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
     @Test
     void shouldCreateTimeRecordWithNoAssociationWithTask() {
         TimeRecordData timeRecordToCreateData = new TimeRecordData(NOW, NUMBER_OF_HOURS, DESCRIPTION);
-        createBasicTaskWithIntellectualProperty(DEFAULT_DOMAIN_ID);
+        taskIntellectualProperty(DEFAULT_DOMAIN_ID);
 
         ResponseEntity<TimeRecord> response = restTemplate.exchange(
                 pathForTimeRecordCreation(),
@@ -125,7 +125,7 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
 
     @Test
     void shouldCreateTimeRecordAssociatedWithTask() {
-        var task = createBasicTaskWithIntellectualPropertyForDates(DEFAULT_DOMAIN_ID);
+        var task = taskIntellectualProperty(DEFAULT_DOMAIN_ID);
 
         ResponseEntity<TimeRecord> response = restTemplate.exchange(
                 pathForTimeRecordCreationForTask(task.getId()),

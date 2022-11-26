@@ -6,10 +6,14 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public interface TaskService {
+
     enum DeleteOutcome {
         DELETED, DONT_EXISTS
     }
+
     void update(int domainId, int intellectualPropertyId, TaskData updateData);
+
+    void delete(int domainId, int taskId);
 
     void uploadAttachment(int domainId, int taskId, String fileName, InputStream inputStream) throws IOException;
 

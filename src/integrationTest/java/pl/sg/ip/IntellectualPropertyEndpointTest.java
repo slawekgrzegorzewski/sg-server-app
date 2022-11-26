@@ -95,8 +95,8 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
 
     @Test
     public void shouldGetDomainOnlyData() {
-        createIntellectualPropertyWithTaskAndTimeRecords___NEW(DEFAULT_DOMAIN_ID, INTELLECTUAL_PROPERTY_DESCRIPTION, NOW);
-        createIntellectualPropertyWithTaskAndTimeRecords___NEW(SECOND_DOMAIN_ID, INTELLECTUAL_PROPERTY_DESCRIPTION, NOW);
+        intellectualPropertyTaskTimeRecords(DEFAULT_DOMAIN_ID, INTELLECTUAL_PROPERTY_DESCRIPTION, NOW);
+        intellectualPropertyTaskTimeRecords(SECOND_DOMAIN_ID, INTELLECTUAL_PROPERTY_DESCRIPTION, NOW);
 
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
@@ -159,10 +159,10 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
     }
 
     @Test
-    public void shouldFailUpdateForOtherDomain() throws JsonProcessingException {
+    public void shouldFailUpdateForOtherDomain() {
         String newDescription = "newDescription";
 
-        IntellectualProperty testIPRToUpdate = createBasicIntellectualPropertyForDomain(SECOND_DOMAIN_ID);
+        IntellectualProperty testIPRToUpdate = intellectualProperty(SECOND_DOMAIN_ID);
         tryToUpdateAndExceptResponseCode(
                 testIPRToUpdate.getId(),
                 new IntellectualPropertyData(newDescription),
@@ -171,7 +171,7 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
 
     @Test
     public void shouldUpdate() {
-        IntellectualProperty testIPRToUpdate = createIntellectualProperty(DEFAULT_DOMAIN_ID, INTELLECTUAL_PROPERTY_DESCRIPTION);
+        IntellectualProperty testIPRToUpdate = intellectualProperty(DEFAULT_DOMAIN_ID, INTELLECTUAL_PROPERTY_DESCRIPTION);
 
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -207,7 +207,7 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
 
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
 
-        IntellectualProperty intellectualProperty = createBasicIntellectualPropertyForDomain(DEFAULT_DOMAIN_ID);
+        IntellectualProperty intellectualProperty = intellectualProperty(DEFAULT_DOMAIN_ID);
 
         restTemplate.exchange(
                 "http://localhost:" + serverPort + "/ipr/" + intellectualProperty.getId(),
@@ -223,11 +223,7 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
 
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
 
-        IntellectualProperty intellectualProperty = createIntellectualPropertyWithTaskAndTimeRecords(
-                DEFAULT_DOMAIN_ID,
-                LocalDate.now().minusDays(1),
-                LocalDate.now(),
-                "");
+        IntellectualProperty intellectualProperty = intellectualPropertyTaskTimeRecords(DEFAULT_DOMAIN_ID, "", LocalDate.now().minusDays(1), LocalDate.now());
 
         ResponseEntity<Void> response = restTemplate.exchange(
                 "http://localhost:" + serverPort + "/ipr/" + intellectualProperty.getId(),
@@ -244,7 +240,7 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
 
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
 
-        IntellectualProperty intellectualProperty = createIntellectualProperty(SECOND_DOMAIN_ID, "");
+        IntellectualProperty intellectualProperty = intellectualProperty(SECOND_DOMAIN_ID, "");
 
         ResponseEntity<Void> response = restTemplate.exchange(
                 "http://localhost:" + serverPort + "/ipr/" + intellectualProperty.getId(),
@@ -261,7 +257,7 @@ public class IntellectualPropertyEndpointTest extends AbstractIPBaseTest {
 
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
 
-        IntellectualProperty intellectualProperty = createIntellectualProperty(SECOND_DOMAIN_ID, "");
+        IntellectualProperty intellectualProperty = intellectualProperty(SECOND_DOMAIN_ID, "");
 
         ResponseEntity<Void> response = restTemplate.exchange(
                 "http://localhost:" + serverPort + "/ipr/" + (intellectualProperty.getId() + 1),

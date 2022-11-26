@@ -35,6 +35,17 @@ public class TaskControllerImpl implements TaskController {
     }
 
     @Override
+    @DeleteMapping(value = "/{id}")
+    @TokenBearerAuth(any = "IPR")
+    public void delete(
+            @RequestHeader("domainId" +
+                           "" +
+                           "") int domainId,
+            @PathVariable("id") int taskId) {
+        taskService.delete(domainId, taskId);
+    }
+
+    @Override
     @PostMapping(path = "{id}/attachment")
     @TokenBearerAuth(any = "IPR")
     public void uploadAttachment(

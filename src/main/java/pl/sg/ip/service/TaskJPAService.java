@@ -9,6 +9,8 @@ import pl.sg.ip.model.IPException;
 import pl.sg.ip.model.Task;
 import pl.sg.ip.repository.TaskRepository;
 import pl.sg.ip.service.attachments.TaskAttachmentStorageService;
+import pl.sg.ip.service.validator.Validator;
+import pl.sg.ip.service.validator.ValidatorFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,16 +25,18 @@ public class TaskJPAService implements TaskService {
     private static final Logger LOG = LoggerFactory.getLogger(TaskJPAService.class);
     private final TaskRepository taskRepository;
     private final TaskAttachmentStorageService taskAttachmentStorageService;
+    private final ValidatorFactory validatorFactory;
 
-    public TaskJPAService(TaskRepository taskRepository, TaskAttachmentStorageService taskAttachmentStorageService) {
+    public TaskJPAService(TaskRepository taskRepository, TaskAttachmentStorageService taskAttachmentStorageService, ValidatorFactory validatorFactory) {
         this.taskRepository = taskRepository;
         this.taskAttachmentStorageService = taskAttachmentStorageService;
+        this.validatorFactory = validatorFactory;
     }
 
     @Override
     public void update(int domainId, int taskId, TaskData updateData) {
         Task task = taskRepository.findById(taskId).orElseThrow();
-        if (!new IPValidator(task.getIntellectualProperty()).validateDomain(domainId)) {
+        if (!validatorFactory.validator(task).validateDomain(domainId)) {
             throw new ForbiddenException("Trying to update tasks from IP from other domain.");
         }
         task.setDescription(updateData.description());
@@ -41,9 +45,22 @@ public class TaskJPAService implements TaskService {
     }
 
     @Override
+    public void delete(int domainId, int taskId) {
+        Task task = taskRepository.findById(taskId).orElseThrow();
+        Validator validator = validatorFactory.validator(task);
+        if (!validator.validateDomain(domainId)) {
+            throw new ForbiddenException("Trying to delete tasks from IP from other domain.");
+        }
+        if (!validator.validateDeletion()) {
+            throw new IPException("This entity refers time record and thus can not be deleted");
+        }
+        taskRepository.delete(task);
+    }
+
+    @Override
     public void uploadAttachment(int domainId, int taskId, String fileName, InputStream inputStream) throws IOException {
         Task task = taskRepository.findById(taskId).orElseThrow();
-        if (!new IPValidator(task.getIntellectualProperty()).validateDomain(domainId)) {
+        if (!validatorFactory.validator(task).validateDomain(domainId)) {
             throw new ForbiddenException("Trying to upload attachment for task from other domain.");
         }
         if (task.getAttachments().contains(fileName)) {
@@ -61,7 +78,7 @@ public class TaskJPAService implements TaskService {
     @Override
     public InputStream downloadAttachment(int domainId, int taskId, String fileName) {
         Task task = taskRepository.findById(taskId).orElseThrow();
-        if (!new IPValidator(task.getIntellectualProperty()).validateDomain(domainId)) {
+        if (!validatorFactory.validator(task).validateDomain(domainId)) {
             throw new ForbiddenException("Trying to upload attachment for task from other domain.");
         }
         Optional<InputStream> file = taskAttachmentStorageService.getFile(task.getIntellectualProperty().getId(), taskId, fileName);
@@ -92,7 +109,7 @@ public class TaskJPAService implements TaskService {
     @Override
     public DeleteOutcome deleteAttachment(int domainId, int taskId, String fileName) {
         Task task = taskRepository.findById(taskId).orElseThrow();
-        if (!new IPValidator(task.getIntellectualProperty()).validateDomain(domainId)) {
+        if (!validatorFactory.validator(task).validateDomain(domainId)) {
             throw new ForbiddenException("Trying to delete attachment for task from other domain.");
         }
         List<String> attachments = new ArrayList<>(task.getAttachments());

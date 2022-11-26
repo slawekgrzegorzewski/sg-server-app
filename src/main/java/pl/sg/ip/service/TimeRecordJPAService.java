@@ -8,9 +8,9 @@ import pl.sg.application.repository.DomainRepository;
 import pl.sg.ip.api.TimeRecordData;
 import pl.sg.ip.model.Task;
 import pl.sg.ip.model.TimeRecord;
-import pl.sg.ip.repository.IntellectualPropertyRepository;
 import pl.sg.ip.repository.TaskRepository;
 import pl.sg.ip.repository.TimeRecordRepository;
+import pl.sg.ip.service.validator.ValidatorFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,14 +22,14 @@ public class TimeRecordJPAService implements TimeRecordService {
 
     private final DomainRepository domainRepository;
     private final TaskRepository taskRepository;
-    private final IntellectualPropertyRepository intellectualPropertyRepository;
     private final TimeRecordRepository timeRecordRepository;
+    private final ValidatorFactory validatorFactory;
 
-    public TimeRecordJPAService(DomainRepository domainRepository, TaskRepository taskRepository, IntellectualPropertyRepository intellectualPropertyRepository, TimeRecordRepository timeRecordRepository) {
+    public TimeRecordJPAService(DomainRepository domainRepository, TaskRepository taskRepository, TimeRecordRepository timeRecordRepository, ValidatorFactory validatorFactory) {
         this.domainRepository = domainRepository;
         this.taskRepository = taskRepository;
-        this.intellectualPropertyRepository = intellectualPropertyRepository;
         this.timeRecordRepository = timeRecordRepository;
+        this.validatorFactory = validatorFactory;
     }
 
     public TimeRecord createWithoutTask(int domainId, TimeRecordData createData) {
@@ -43,7 +43,7 @@ public class TimeRecordJPAService implements TimeRecordService {
 
     private TimeRecord createTimeRecord(int domainId, @Nullable Task task, TimeRecordData createData) {
         Domain domain = domainRepository.findById(domainId).orElseThrow();
-        if (task != null && !new IPValidator(task.getIntellectualProperty()).validateDomain(domainId)) {
+        if (task != null && !validatorFactory.validator(task).validateDomain(domainId)) {
             throw new ForbiddenException("Trying to create time record in task from other domain.");
         }
         TimeRecord timeRecord = timeRecordRepository.save(
