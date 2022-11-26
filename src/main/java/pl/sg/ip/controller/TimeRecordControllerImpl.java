@@ -23,10 +23,17 @@ public class TimeRecordControllerImpl implements TimeRecordController {
     @PutMapping
     @TokenBearerAuth(any = "IPR")
     public TimeRecord create(@RequestHeader("domainId") int domainId,
-                             @RequestBody TimeRecordData taskData) {
-        return modelMapper.map(
+                             @RequestBody TimeRecordData createData) {
+        return modelMapper.map(timeRecordService.create(domainId, createData), TimeRecord.class);
+    }
 
-                timeRecordService.createWithoutTask(domainId, taskData),
-                TimeRecord.class);
+    @Override
+    @PatchMapping("/{timeRecordId}")
+    @TokenBearerAuth(any = "IPR")
+    public void update(
+            @RequestHeader("domainId") int domainId,
+            @PathVariable("timeRecordId") int timeRecordId,
+            @RequestBody TimeRecordData updateData) {
+        this.timeRecordService.update(domainId, timeRecordId, updateData);
     }
 }

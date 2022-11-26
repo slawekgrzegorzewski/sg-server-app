@@ -125,4 +125,22 @@ public class AbstractIPBaseTest extends AbstractApplicationBaseTest {
         return task;
     }
 
+    @NotNull
+    protected TimeRecord timeRecord(int domainId) {
+        IntellectualProperty intellectualProperty = intellectualPropertyTaskTimeRecords(domainId, "", LocalDate.now());
+        return intellectualProperty.tasks().get(0).getTimeRecords().get(0);
+    }
+
+    @NotNull
+    protected TimeRecord notAssignedTimeRecord(int domainId) {
+        return timeRecordRepository.saveAndFlush(
+                new TimeRecord(
+                        LocalDate.now(),
+                        8,
+                        "",
+                        this.domainRepository.getReferenceById(domainId),
+                        null)
+        );
+    }
+
 }

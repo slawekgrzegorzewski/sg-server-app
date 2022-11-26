@@ -4,10 +4,13 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -18,6 +21,8 @@ import pl.sg.ip.model.Task;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -36,20 +41,45 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
 
     @Test
     void shouldFailUnauthenticatedCreateTimeRecordRequest() {
-        TimeRecordData timeRecordToCreateData = new TimeRecordData(LocalDate.now(), 0, "");
 
         ResponseEntity<Void> response = restTemplate.exchange(
-                pathForTimeRecordCreation(),
+                pathForTimeRecord(),
                 HttpMethod.PUT,
-                new HttpEntity<>(timeRecordToCreateData, headers(DEFAULT_DOMAIN_ID)),
+                new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, ""), headers(DEFAULT_DOMAIN_ID)),
                 Void.class);
         assertEquals(401, response.getStatusCode().value());
 
         var task = taskIntellectualProperty(DEFAULT_DOMAIN_ID);
         response = restTemplate.exchange(
-                pathForTimeRecordCreationForTask(task.getId()),
+                pathForTimeRecord(),
                 HttpMethod.PUT,
-                new HttpEntity<>(timeRecordToCreateData, headers(DEFAULT_DOMAIN_ID)),
+                new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, "", TimeRecordData.AssignmentAction.ASSIGN, task.getId()), headers(DEFAULT_DOMAIN_ID)),
+                Void.class);
+        assertEquals(401, response.getStatusCode().value());
+    }
+
+    @Test
+    void shouldFailUnauthenticatedUpdateTimeRecordRequest() {
+
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForTimeRecord(),
+                HttpMethod.PUT,
+                new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, ""), headers(DEFAULT_DOMAIN_ID)),
+                Void.class);
+        assertEquals(401, response.getStatusCode().value());
+
+        response = restTemplate.exchange(
+                pathForTimeRecord(),
+                HttpMethod.PUT,
+                new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, "", TimeRecordData.AssignmentAction.UNASSIGN), headers(DEFAULT_DOMAIN_ID)),
+                Void.class);
+        assertEquals(401, response.getStatusCode().value());
+
+        var task = taskIntellectualProperty(DEFAULT_DOMAIN_ID);
+        response = restTemplate.exchange(
+                pathForTimeRecord(),
+                HttpMethod.PUT,
+                new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, "", TimeRecordData.AssignmentAction.ASSIGN, task.getId()), headers(DEFAULT_DOMAIN_ID)),
                 Void.class);
         assertEquals(401, response.getStatusCode().value());
     }
@@ -57,32 +87,63 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
     @ParameterizedTest
     @MethodSource("forbiddenRolesAndResponses")
     void createTimeRecordRolesAccess(String role) {
-        TimeRecordData timeRecordToCreateData = new TimeRecordData(LocalDate.now(), 0, "");
 
         ResponseEntity<Void> response = restTemplate.exchange(
-                pathForTimeRecordCreation(),
+                pathForTimeRecord(),
                 HttpMethod.PUT,
-                new HttpEntity<>(timeRecordToCreateData, authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
+                new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, ""), authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
                 Void.class);
         assertEquals(403, response.getStatusCode().value());
 
         var task = taskIntellectualProperty(DEFAULT_DOMAIN_ID);
         response = restTemplate.exchange(
-                pathForTimeRecordCreationForTask(task.getId()),
+                pathForTimeRecord(),
                 HttpMethod.PUT,
-                new HttpEntity<>(timeRecordToCreateData, authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
+                new HttpEntity<>(
+                        new TimeRecordData(LocalDate.now(), 0, "", TimeRecordData.AssignmentAction.ASSIGN, task.getId()),
+                        authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
                 Void.class);
         assertEquals(403, response.getStatusCode().value());
     }
 
+    @ParameterizedTest
+    @MethodSource("forbiddenRolesAndResponses")
+    void updateTimeRecordRolesAccess(String role) {
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForTimeRecord(),
+                HttpMethod.PUT,
+                new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, ""), authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
+                Void.class);
+        assertEquals(403, response.getStatusCode().value());
+
+        var task = taskIntellectualProperty(DEFAULT_DOMAIN_ID);
+        response = restTemplate.exchange(
+                pathForTimeRecord(),
+                HttpMethod.PUT,
+                new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, "", TimeRecordData.AssignmentAction.ASSIGN, task.getId()), authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
+                Void.class);
+        assertEquals(403, response.getStatusCode().value());
+
+        response = restTemplate.exchange(
+                pathForTimeRecord(),
+                HttpMethod.PUT,
+                new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, "", TimeRecordData.AssignmentAction.UNASSIGN), authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
+                Void.class);
+        assertEquals(403, response.getStatusCode().value());
+    }
 
     @Test
     void shouldFailCreationOfTimeRecordWhenCreatingForTaskFromOtherDomain() {
-        TimeRecordData timeRecordToCreateData = new TimeRecordData(LocalDate.now(), 0, "");
         var task = taskIntellectualProperty(SECOND_DOMAIN_ID);
+        TimeRecordData timeRecordToCreateData = new TimeRecordData(
+                LocalDate.now(),
+                0,
+                "",
+                TimeRecordData.AssignmentAction.ASSIGN,
+                task.getId());
 
         ResponseEntity<Void> response = restTemplate.exchange(
-                pathForTimeRecordCreationForTask(task.getId()),
+                pathForTimeRecord(),
                 HttpMethod.PUT,
                 new HttpEntity<>(timeRecordToCreateData, authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
                 Void.class);
@@ -91,10 +152,10 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
 
     @Test
     void shouldFailCreationOfTimeRecordWhenCreatingForNotExistingTask() {
-        TimeRecordData timeRecordToCreateData = new TimeRecordData(LocalDate.now(), 0, "");
+        TimeRecordData timeRecordToCreateData = new TimeRecordData(LocalDate.now(), 0, "", TimeRecordData.AssignmentAction.ASSIGN, 1);
 
         ResponseEntity<Void> response = restTemplate.exchange(
-                pathForTimeRecordCreationForTask(1),
+                pathForTimeRecord(),
                 HttpMethod.PUT,
                 new HttpEntity<>(timeRecordToCreateData, authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
                 Void.class);
@@ -107,7 +168,7 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
         taskIntellectualProperty(DEFAULT_DOMAIN_ID);
 
         ResponseEntity<TimeRecord> response = restTemplate.exchange(
-                pathForTimeRecordCreation(),
+                pathForTimeRecord(),
                 HttpMethod.PUT,
                 new HttpEntity<>(timeRecordToCreateData, authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
                 TimeRecord.class);
@@ -128,10 +189,10 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
         var task = taskIntellectualProperty(DEFAULT_DOMAIN_ID);
 
         ResponseEntity<TimeRecord> response = restTemplate.exchange(
-                pathForTimeRecordCreationForTask(task.getId()),
+                pathForTimeRecord(),
                 HttpMethod.PUT,
                 new HttpEntity<>(
-                        new TimeRecordData(NOW.minusDays(2), NUMBER_OF_HOURS, DESCRIPTION),
+                        new TimeRecordData(NOW.minusDays(2), NUMBER_OF_HOURS, DESCRIPTION, TimeRecordData.AssignmentAction.ASSIGN, task.getId()),
                         authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
                 TimeRecord.class);
 
@@ -150,13 +211,163 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
         assertEquals(createdTimeRecord.getId(), tasksWithTimeRecords.get(0).getTimeRecords().get(0).getId());
     }
 
+    @Test
+    void shouldFailUpdateForOtherDomain() {
+        var timeRecord = timeRecord(SECOND_DOMAIN_ID);
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForTimeRecordUpdate(timeRecord.getId()),
+                HttpMethod.PATCH,
+                new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, "", TimeRecordData.AssignmentAction.ASSIGN, timeRecord.getTask().getId()),
+                        authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
+                Void.class);
+        assertEquals(403, response.getStatusCode().value());
+    }
+
+    @Test
+    void shouldFailUpdateWhenAssigningToOtherTaskFromOtherDomain() {
+        var timeRecord = timeRecord(DEFAULT_DOMAIN_ID);
+        var task = taskIntellectualProperty(SECOND_DOMAIN_ID);
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForTimeRecordUpdate(timeRecord.getId()),
+                HttpMethod.PATCH,
+                new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, "", TimeRecordData.AssignmentAction.ASSIGN, task.getId()),
+                        authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
+                Void.class);
+        assertEquals(403, response.getStatusCode().value());
+    }
+
+    @Test
+    void shouldFailUpdateForNotExistingTimeRecord() {
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForTimeRecordUpdate(1),
+                HttpMethod.PATCH,
+                new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, ""),
+                        authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
+                Void.class);
+        assertEquals(404, response.getStatusCode().value());
+    }
+
+    @Test
+    void shouldFailUpdateWhenAssigningToNotExistingTask() {
+        var timeRecord = timeRecord(DEFAULT_DOMAIN_ID);
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForTimeRecordUpdate(timeRecord.getId()),
+                HttpMethod.PATCH,
+                new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, "", TimeRecordData.AssignmentAction.ASSIGN, 1),
+                        authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
+                Void.class);
+        assertEquals(404, response.getStatusCode().value());
+    }
+
+    @Test
+    void testAssignmentJourney() {
+        var timeRecord = notAssignedTimeRecord(DEFAULT_DOMAIN_ID);
+        var task = taskIntellectualProperty(DEFAULT_DOMAIN_ID);
+        var task2 = taskIntellectualProperty(DEFAULT_DOMAIN_ID);
+
+        testSingleStep(1, task.getId(), task2.getId(), timeRecord.getId(), Function.identity(), 0, 0);
+        testSingleStep(2, task.getId(), task2.getId(), timeRecord.getId(), data -> {
+            data.setAssignmentAction(TimeRecordData.AssignmentAction.ASSIGN);
+            data.setTaskId(task.getId());
+            return data;
+        }, 1, 0);
+        testSingleStep(3, task.getId(), task2.getId(), timeRecord.getId(), Function.identity(), 1, 0);
+        testSingleStep(4, task.getId(), task2.getId(), timeRecord.getId(), data -> {
+            data.setAssignmentAction(TimeRecordData.AssignmentAction.ASSIGN);
+            data.setTaskId(task2.getId());
+            return data;
+        }, 0, 1);
+        testSingleStep(5, task.getId(), task2.getId(), timeRecord.getId(), Function.identity(), 0, 1);
+        testSingleStep(6, task.getId(), task2.getId(), timeRecord.getId(), data -> {
+            data.setAssignmentAction(TimeRecordData.AssignmentAction.UNASSIGN);
+            return data;
+        }, 0, 0);
+    }
+
+    private void testSingleStep(int step, int taskId, int task2Id, int timeRecordId, Function<TimeRecordData, TimeRecordData> customizeUpdateData, int sizeOfTimeRecordsInTask, int sizeOfTimeRecordsInTask2) {
+        TimeRecordData updateData = customizeUpdateData.apply(new TimeRecordData(LocalDate.now().plusDays(step), step, String.valueOf(step)));
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForTimeRecordUpdate(timeRecordId),
+                HttpMethod.PATCH,
+                new HttpEntity<>(updateData, authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")), Void.class);
+
+        assertEquals(200, response.getStatusCode().value());
+        commitAndStartNewTransaction();
+        pl.sg.ip.model.TimeRecord timeRecord = timeRecordRepository.getReferenceById(timeRecordId);
+        assertEquals(LocalDate.now().plusDays(step), timeRecord.getDate());
+        assertEquals(step, timeRecord.getNumberOfHours());
+        assertEquals(String.valueOf(step), timeRecord.getDescription());
+        assertEquals(sizeOfTimeRecordsInTask, taskRepository.getReferenceById(taskId).getTimeRecords().size());
+        assertEquals(sizeOfTimeRecordsInTask2, taskRepository.getReferenceById(task2Id).getTimeRecords().size());
+    }
+
+    @ParameterizedTest
+    @MethodSource("incorrectTaskCreationData")
+    void shouldFailCreationWhenAssigmentActionIsNotRight(TimeRecordData timeRecordData, int expectedResponse, boolean putTaskIdInTimeRecord) {
+        var task = taskIntellectualProperty(DEFAULT_DOMAIN_ID);
+        if (putTaskIdInTimeRecord) {
+            timeRecordData.setTaskId(task.getId());
+        }
+
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForTimeRecord(),
+                HttpMethod.PUT,
+                new HttpEntity<>(
+                        timeRecordData,
+                        authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
+                Void.class);
+
+        assertEquals(expectedResponse, response.getStatusCode().value());
+    }
+
+    public static Stream<Arguments> incorrectTaskCreationData() {
+        return Stream.of(
+                Arguments.of(new TimeRecordData(NOW.minusDays(2), NUMBER_OF_HOURS, DESCRIPTION, TimeRecordData.AssignmentAction.UNASSIGN, 1), 400, true),
+                Arguments.of(new TimeRecordData(NOW.minusDays(2), NUMBER_OF_HOURS, DESCRIPTION, TimeRecordData.AssignmentAction.UNASSIGN, null), 400, false),
+                Arguments.of(new TimeRecordData(NOW.minusDays(2), NUMBER_OF_HOURS, DESCRIPTION, TimeRecordData.AssignmentAction.NOP, 1), 400, true),
+                Arguments.of(new TimeRecordData(NOW.minusDays(2), NUMBER_OF_HOURS, DESCRIPTION, TimeRecordData.AssignmentAction.NOP, null), 200, false),
+                Arguments.of(new TimeRecordData(NOW.minusDays(2), NUMBER_OF_HOURS, DESCRIPTION, TimeRecordData.AssignmentAction.ASSIGN, 1), 200, true),
+                Arguments.of(new TimeRecordData(NOW.minusDays(2), NUMBER_OF_HOURS, DESCRIPTION, TimeRecordData.AssignmentAction.ASSIGN, null), 400, false)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("incorrectTaskUpdateData")
+    void shouldFailUpdateWhenAssigmentActionIsNotRight(TimeRecordData timeRecordData, int expectedResponse, boolean putTaskIdInTimeRecord) {
+        var timeRecord = timeRecord(DEFAULT_DOMAIN_ID);
+        if (putTaskIdInTimeRecord) {
+            timeRecordData.setTaskId(timeRecord.getTask().getId());
+        }
+
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForTimeRecordUpdate(timeRecord.getId()),
+                HttpMethod.PATCH,
+                new HttpEntity<>(
+                        timeRecordData,
+                        authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
+                Void.class);
+
+        assertEquals(expectedResponse, response.getStatusCode().value());
+    }
+
+    public static Stream<Arguments> incorrectTaskUpdateData() {
+        return Stream.of(
+                Arguments.of(new TimeRecordData(NOW.minusDays(2), NUMBER_OF_HOURS, DESCRIPTION, TimeRecordData.AssignmentAction.UNASSIGN, 1), 400, true),
+                Arguments.of(new TimeRecordData(NOW.minusDays(2), NUMBER_OF_HOURS, DESCRIPTION, TimeRecordData.AssignmentAction.UNASSIGN, null), 200, false),
+                Arguments.of(new TimeRecordData(NOW.minusDays(2), NUMBER_OF_HOURS, DESCRIPTION, TimeRecordData.AssignmentAction.NOP, 1), 400, true),
+                Arguments.of(new TimeRecordData(NOW.minusDays(2), NUMBER_OF_HOURS, DESCRIPTION, TimeRecordData.AssignmentAction.NOP, null), 200, false),
+                Arguments.of(new TimeRecordData(NOW.minusDays(2), NUMBER_OF_HOURS, DESCRIPTION, TimeRecordData.AssignmentAction.ASSIGN, 1), 200, true),
+                Arguments.of(new TimeRecordData(NOW.minusDays(2), NUMBER_OF_HOURS, DESCRIPTION, TimeRecordData.AssignmentAction.ASSIGN, null), 400, false)
+        );
+    }
+
     @NotNull
-    private String pathForTimeRecordCreation() {
+    private String pathForTimeRecord() {
         return "http://localhost:%d/time-record".formatted(serverPort);
     }
 
     @NotNull
-    private String pathForTimeRecordCreationForTask(int taskId) {
-        return "%s/%d".formatted(pathForTimeRecordCreation(), taskId);
+    private String pathForTimeRecordUpdate(int timeRecordId) {
+        return "%s/%s".formatted(pathForTimeRecord(), timeRecordId);
     }
 }

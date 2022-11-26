@@ -38,9 +38,7 @@ public class TaskControllerImpl implements TaskController {
     @DeleteMapping(value = "/{id}")
     @TokenBearerAuth(any = "IPR")
     public void delete(
-            @RequestHeader("domainId" +
-                           "" +
-                           "") int domainId,
+            @RequestHeader("domainId") int domainId,
             @PathVariable("id") int taskId) {
         taskService.delete(domainId, taskId);
     }

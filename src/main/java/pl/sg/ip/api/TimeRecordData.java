@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,7 +18,16 @@ public class TimeRecordData {
     private AssignmentAction assignmentAction;
     private Integer taskId;
 
-    enum AssignmentAction {
-        NOP, ASSIGN, UNASSING
+    public enum AssignmentAction {
+        NOP, ASSIGN, UNASSIGN;
+        public static final Collection<AssignmentAction> ACTIONS_ALLOWED_DURING_CREATION = List.of(NOP, ASSIGN);
+    }
+
+    public TimeRecordData(LocalDate date, int numberOfHours, String description) {
+        this(date, numberOfHours, description, AssignmentAction.NOP);
+    }
+
+    public TimeRecordData(LocalDate date, int numberOfHours, String description, AssignmentAction action) {
+        this(date, numberOfHours, description, action, null);
     }
 }
