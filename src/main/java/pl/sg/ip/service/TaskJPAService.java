@@ -54,6 +54,8 @@ public class TaskJPAService implements TaskService {
         if (!validator.validateDeletion()) {
             throw new IPException("This entity refers time record and thus can not be deleted");
         }
+        task.getAttachments().forEach(attachment ->
+                taskAttachmentStorageService.deleteFile(task.getIntellectualProperty().getId(), taskId, attachment));
         taskRepository.delete(task);
     }
 

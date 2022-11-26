@@ -154,7 +154,7 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
     @Test
     void shouldFailUnauthenticatedDownloadAttachmentRequest() throws URISyntaxException, IOException {
 
-        Task task = createTaskWithAttachment(DEFAULT_DOMAIN_ID, FILE_NAME);
+        Task task = taskWithAttachments(DEFAULT_DOMAIN_ID, FILE_NAME);
 
         ResponseEntity<Void> response = restTemplate.exchange(
                 pathForAttachmentDownload(task.getId(), FILE_NAME),
@@ -167,7 +167,7 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
 
     @Test
     void shouldFailUnauthenticatedDeleteAttachmentRequest() throws URISyntaxException, IOException {
-        Task task = createTaskWithAttachment(DEFAULT_DOMAIN_ID, FILE_NAME);
+        Task task = taskWithAttachments(DEFAULT_DOMAIN_ID, FILE_NAME);
 
         ResponseEntity<Void> response = restTemplate.exchange(
                 pathForAttachmentDownload(task.getId(), FILE_NAME),
@@ -244,7 +244,7 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
     @ParameterizedTest
     @MethodSource("forbiddenRolesAndResponses")
     void downloadAttachmentRequestRolesAccess(String role) throws URISyntaxException, IOException {
-        Task task = createTaskWithAttachment(DEFAULT_DOMAIN_ID, FILE_NAME);
+        Task task = taskWithAttachments(DEFAULT_DOMAIN_ID, FILE_NAME);
 
         ResponseEntity<Void> response = restTemplate.exchange(
                 pathForAttachmentDownloadWithAuthentication(task.getId(), FILE_NAME, DEFAULT_DOMAIN_ID, generateJWTToken(new String[]{role})),
@@ -258,7 +258,7 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
     @ParameterizedTest
     @MethodSource("forbiddenRolesAndResponses")
     void deleteAttachmentRequestRolesAccess(String role) throws URISyntaxException, IOException {
-        Task task = createTaskWithAttachment(DEFAULT_DOMAIN_ID, FILE_NAME);
+        Task task = taskWithAttachments(DEFAULT_DOMAIN_ID, FILE_NAME);
 
         ResponseEntity<Void> response = restTemplate.exchange(
                 pathForAttachmentDownload(task.getId(), FILE_NAME),
@@ -348,8 +348,10 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
     }
 
     @Test
-    void shouldDeleteTask() {
-        var task = taskIntellectualProperty(DEFAULT_DOMAIN_ID);
+    void shouldDeleteTask() throws IOException, URISyntaxException {
+        var task = taskWithAttachments(DEFAULT_DOMAIN_ID, FILE_NAME);
+        storageTestUtil = storageTestUtilFactory.create(task.getIntellectualProperty().getId(), task.getId());
+        assertTrue(storageTestUtil.checkFileExistenceInStorage(FILE_NAME));
 
         HttpHeaders headers = authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR");
 
@@ -362,6 +364,7 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
         assertEquals(200, response.getStatusCode().value());
         commitAndStartNewTransaction();
         assertFalse(taskRepository.existsById(task.getId()));
+        assertFalse(storageTestUtil.checkFileExistenceInStorage(FILE_NAME));
     }
 
     @Test
@@ -519,7 +522,7 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
 
     @Test
     void shouldFailDownloadingAttachmentForTaskInOtherDomain() throws URISyntaxException, IOException {
-        var task = createTaskWithAttachment(SECOND_DOMAIN_ID, FILE_NAME);
+        var task = taskWithAttachments(SECOND_DOMAIN_ID, FILE_NAME);
 
         ResponseEntity<Void> response = restTemplate.exchange(
                 pathForAttachmentDownloadWithAuthentication(task.getId(), FILE_NAME, DEFAULT_DOMAIN_ID, generateJWTToken(new String[]{"IPR"})),
@@ -568,7 +571,7 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
 
     @Test
     void shouldDownloadAttachment() throws IOException, URISyntaxException {
-        var task = createTaskWithAttachment(DEFAULT_DOMAIN_ID, FILE_NAME);
+        var task = taskWithAttachments(DEFAULT_DOMAIN_ID, FILE_NAME);
 
         ResponseEntity<Resource> response = restTemplate.exchange(
                 pathForAttachmentDownloadWithAuthentication(task.getId(), FILE_NAME, DEFAULT_DOMAIN_ID, generateJWTToken(new String[]{"IPR"})),
@@ -589,7 +592,7 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
 
     @Test
     void shouldFailDeleteAttachmentRequestBelongingToOtherDomain() throws URISyntaxException, IOException {
-        Task task = createTaskWithAttachment(DEFAULT_DOMAIN_ID, FILE_NAME);
+        Task task = taskWithAttachments(DEFAULT_DOMAIN_ID, FILE_NAME);
 
         ResponseEntity<Void> response = restTemplate.exchange(
                 pathForAttachmentDownload(task.getId(), FILE_NAME),
@@ -616,7 +619,7 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
 
     @Test
     void shouldDeleteAttachment() throws IOException, URISyntaxException {
-        Task task = createTaskWithAttachment(DEFAULT_DOMAIN_ID, FILE_NAME);
+        Task task = taskWithAttachments(DEFAULT_DOMAIN_ID, FILE_NAME);
 
         ResponseEntity<Void> response = restTemplate.exchange(
                 pathForAttachmentDownload(task.getId(), FILE_NAME),
@@ -695,7 +698,7 @@ public class TaskEndpointTest extends AbstractIPBaseTest {
     }
 
     @NotNull
-    private Task createTaskWithAttachment(int domainId, String fileName) throws IOException, URISyntaxException {
+    private Task taskWithAttachments(int domainId, String fileName) throws IOException, URISyntaxException {
         var task = taskIntellectualProperty(domainId, List.of(fileName));
         storageTestUtil = storageTestUtilFactory.create(task.getIntellectualProperty().getId(), task.getId());
         storageTestUtil.initStorage();
