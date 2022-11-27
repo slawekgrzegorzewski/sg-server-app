@@ -60,26 +60,54 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
 
     @Test
     void shouldFailUnauthenticatedUpdateTimeRecordRequest() {
+        var timeRecord = timeRecord(DEFAULT_DOMAIN_ID);
 
         ResponseEntity<Void> response = restTemplate.exchange(
-                pathForTimeRecord(),
-                HttpMethod.PUT,
+                pathForTimeRecordUpdate(timeRecord.getId()),
+                HttpMethod.PATCH,
                 new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, ""), headers(DEFAULT_DOMAIN_ID)),
                 Void.class);
         assertEquals(401, response.getStatusCode().value());
 
         response = restTemplate.exchange(
-                pathForTimeRecord(),
-                HttpMethod.PUT,
+                pathForTimeRecordUpdate(timeRecord.getId()),
+                HttpMethod.PATCH,
                 new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, "", TimeRecordData.AssignmentAction.UNASSIGN), headers(DEFAULT_DOMAIN_ID)),
                 Void.class);
         assertEquals(401, response.getStatusCode().value());
 
         var task = taskIntellectualProperty(DEFAULT_DOMAIN_ID);
         response = restTemplate.exchange(
-                pathForTimeRecord(),
-                HttpMethod.PUT,
+                pathForTimeRecordUpdate(timeRecord.getId()),
+                HttpMethod.PATCH,
                 new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, "", TimeRecordData.AssignmentAction.ASSIGN, task.getId()), headers(DEFAULT_DOMAIN_ID)),
+                Void.class);
+        assertEquals(401, response.getStatusCode().value());
+    }
+
+    @Test
+    void shouldFailUnauthenticatedDeleteTimeRecordRequest() {
+        var timeRecord = timeRecord(DEFAULT_DOMAIN_ID);
+
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForTimeRecordUpdate(timeRecord.getId()),
+                HttpMethod.DELETE,
+                new HttpEntity<>(headers(DEFAULT_DOMAIN_ID)),
+                Void.class);
+        assertEquals(401, response.getStatusCode().value());
+
+        response = restTemplate.exchange(
+                pathForTimeRecordUpdate(timeRecord.getId()),
+                HttpMethod.DELETE,
+                new HttpEntity<>(headers(DEFAULT_DOMAIN_ID)),
+                Void.class);
+        assertEquals(401, response.getStatusCode().value());
+
+        var task = taskIntellectualProperty(DEFAULT_DOMAIN_ID);
+        response = restTemplate.exchange(
+                pathForTimeRecordUpdate(timeRecord.getId()),
+                HttpMethod.DELETE,
+                new HttpEntity<>(headers(DEFAULT_DOMAIN_ID)),
                 Void.class);
         assertEquals(401, response.getStatusCode().value());
     }
@@ -109,25 +137,55 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
     @ParameterizedTest
     @MethodSource("forbiddenRolesAndResponses")
     void updateTimeRecordRolesAccess(String role) {
+        var timeRecord = timeRecord(DEFAULT_DOMAIN_ID);
+
         ResponseEntity<Void> response = restTemplate.exchange(
-                pathForTimeRecord(),
-                HttpMethod.PUT,
+                pathForTimeRecordUpdate(timeRecord.getId()),
+                HttpMethod.PATCH,
                 new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, ""), authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
                 Void.class);
         assertEquals(403, response.getStatusCode().value());
 
         var task = taskIntellectualProperty(DEFAULT_DOMAIN_ID);
         response = restTemplate.exchange(
-                pathForTimeRecord(),
-                HttpMethod.PUT,
+                pathForTimeRecordUpdate(timeRecord.getId()),
+                HttpMethod.PATCH,
                 new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, "", TimeRecordData.AssignmentAction.ASSIGN, task.getId()), authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
                 Void.class);
         assertEquals(403, response.getStatusCode().value());
 
         response = restTemplate.exchange(
-                pathForTimeRecord(),
-                HttpMethod.PUT,
+                pathForTimeRecordUpdate(timeRecord.getId()),
+                HttpMethod.PATCH,
                 new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, "", TimeRecordData.AssignmentAction.UNASSIGN), authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
+                Void.class);
+        assertEquals(403, response.getStatusCode().value());
+    }
+
+    @ParameterizedTest
+    @MethodSource("forbiddenRolesAndResponses")
+    void deleteTimeRecordRolesAccess(String role) {
+        var timeRecord = timeRecord(DEFAULT_DOMAIN_ID);
+
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForTimeRecordUpdate(timeRecord.getId()),
+                HttpMethod.DELETE,
+                new HttpEntity<>(authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
+                Void.class);
+        assertEquals(403, response.getStatusCode().value());
+
+        var task = taskIntellectualProperty(DEFAULT_DOMAIN_ID);
+        response = restTemplate.exchange(
+                pathForTimeRecordUpdate(timeRecord.getId()),
+                HttpMethod.DELETE,
+                new HttpEntity<>(authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
+                Void.class);
+        assertEquals(403, response.getStatusCode().value());
+
+        response = restTemplate.exchange(
+                pathForTimeRecordUpdate(timeRecord.getId()),
+                HttpMethod.DELETE,
+                new HttpEntity<>(authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
                 Void.class);
         assertEquals(403, response.getStatusCode().value());
     }
@@ -360,6 +418,57 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
                 Arguments.of(new TimeRecordData(NOW.minusDays(2), NUMBER_OF_HOURS, DESCRIPTION, TimeRecordData.AssignmentAction.ASSIGN, null), 400, false)
         );
     }
+
+    @Test
+    public void shouldFailDeletionForAnotherDomain() {
+        var timeRecord = timeRecord(SECOND_DOMAIN_ID);
+
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForTimeRecordUpdate(timeRecord.getId()),
+                HttpMethod.DELETE,
+                new HttpEntity<>(authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
+                Void.class);
+        assertEquals(403, response.getStatusCode().value());
+    }
+
+    @Test
+    public void shouldFailDeletionForNonExistingEntity() {
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForTimeRecordUpdate(1),
+                HttpMethod.DELETE,
+                new HttpEntity<>(authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
+                Void.class);
+        assertEquals(404, response.getStatusCode().value());
+    }
+
+    @Test
+    public void shouldDeleteTimeRecordNotAssignedToTask() {
+        var timeRecord = notAssignedTimeRecord(DEFAULT_DOMAIN_ID);
+
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForTimeRecordUpdate(timeRecord.getId()),
+                HttpMethod.DELETE,
+                new HttpEntity<>(authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
+                Void.class);
+        assertEquals(200, response.getStatusCode().value());
+        commitAndStartNewTransaction();
+        taskRepository.findAll().forEach(task -> assertFalse(task.getTimeRecords().stream().anyMatch(tr -> tr.getId().equals(timeRecord.getId()))));
+    }
+
+    @Test
+    public void shouldDeleteTimeRecordAssignedToTask() {
+        var timeRecord = timeRecord(DEFAULT_DOMAIN_ID);
+
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForTimeRecordUpdate(timeRecord.getId()),
+                HttpMethod.DELETE,
+                new HttpEntity<>(authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
+                Void.class);
+        assertEquals(200, response.getStatusCode().value());
+        commitAndStartNewTransaction();
+        taskRepository.findAll().forEach(task -> assertFalse(task.getTimeRecords().stream().anyMatch(tr -> tr.getId().equals(timeRecord.getId()))));
+    }
+
 
     @NotNull
     private String pathForTimeRecord() {

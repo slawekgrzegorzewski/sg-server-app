@@ -9,4 +9,6 @@ public interface TimeRecordController {
     TimeRecord create(int domainId, TimeRecordData createData);
 
     void update(int domainId, int timeRecordId, TimeRecordData updateData);
+
+    void delete(int domainId, int timeRecordId);
 }

@@ -52,7 +52,7 @@ public class TaskJPAService implements TaskService {
             throw new ForbiddenException("Trying to delete tasks from IP from other domain.");
         }
         if (!validator.validateDeletion()) {
-            throw new IPException("This entity refers time record and thus can not be deleted");
+            throw new IPException("This entry can not be delted.");
         }
         task.getAttachments().forEach(attachment ->
                 taskAttachmentStorageService.deleteFile(task.getIntellectualProperty().getId(), taskId, attachment));

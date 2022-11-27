@@ -133,7 +133,7 @@ public class AbstractIPBaseTest extends AbstractApplicationBaseTest {
 
     @NotNull
     protected TimeRecord notAssignedTimeRecord(int domainId) {
-        return timeRecordRepository.saveAndFlush(
+        TimeRecord timeRecord = timeRecordRepository.saveAndFlush(
                 new TimeRecord(
                         LocalDate.now(),
                         8,
@@ -141,6 +141,8 @@ public class AbstractIPBaseTest extends AbstractApplicationBaseTest {
                         this.domainRepository.getReferenceById(domainId),
                         null)
         );
+        commitAndStartNewTransaction();
+        return timeRecord;
     }
 
 }

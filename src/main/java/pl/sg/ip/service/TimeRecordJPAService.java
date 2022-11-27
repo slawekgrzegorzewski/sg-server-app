@@ -10,6 +10,7 @@ import pl.sg.ip.model.Task;
 import pl.sg.ip.model.TimeRecord;
 import pl.sg.ip.repository.TaskRepository;
 import pl.sg.ip.repository.TimeRecordRepository;
+import pl.sg.ip.service.validator.Validator;
 import pl.sg.ip.service.validator.ValidatorFactory;
 
 import java.util.ArrayList;
@@ -79,6 +80,23 @@ public class TimeRecordJPAService implements TimeRecordService {
             removeTimeRecordFromTask(timeRecord);
         }
         timeRecordRepository.save(timeRecord);
+    }
+
+    @Override
+    public void delete(int domainId, int timeRecordId) {
+        domainRepository.findById(domainId).orElseThrow();
+        TimeRecord timeRecord = timeRecordRepository.findById(timeRecordId).orElseThrow();
+        Validator validator = validatorFactory.validator(timeRecord);
+        if (!validator.validateDomain(domainId)) {
+            throw new ForbiddenException("Trying to create time record in task from other domain.");
+        }
+        if (!validator.validateDeletion()) {
+            throw new IPException("This entry can not be deleted.");
+        }
+        if (timeRecord.getTask() != null) {
+            removeTimeRecordFromTask(timeRecord);
+        }
+        timeRecordRepository.delete(timeRecord);
     }
 
     private void addTimeRecordToTask(TimeRecord timeRecord, Task task) {

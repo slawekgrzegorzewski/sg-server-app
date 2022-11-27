@@ -36,4 +36,13 @@ public class TimeRecordControllerImpl implements TimeRecordController {
             @RequestBody TimeRecordData updateData) {
         this.timeRecordService.update(domainId, timeRecordId, updateData);
     }
+
+    @Override
+    @DeleteMapping("/{timeRecordId}")
+    @TokenBearerAuth(any = "IPR")
+    public void delete(
+            @RequestHeader("domainId") int domainId,
+            @PathVariable("timeRecordId") int timeRecordId) {
+        this.timeRecordService.delete(domainId, timeRecordId);
+    }
 }
