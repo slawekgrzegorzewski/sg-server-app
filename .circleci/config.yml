@@ -14,13 +14,13 @@ jobs:
           steps:
             - restore_cache:
                 keys:
-                  - v1-dependencies-{{ checksum "build.gradle" }}
+                  - v1-dependencies-{{ checksum "build.gradle.kts" }}
                   - v1-dependencies-
             - run: gradle dependencies
             - save_cache:
                 paths:
                   - ~/.m2
-                key: v1-dependencies-{{ checksum "build.gradle" }}
+                key: v1-dependencies-{{ checksum "build.gradle.kts" }}
             - run: gradle clean build
             - setup_remote_docker
             - aws-ecr/build-and-push-image:
