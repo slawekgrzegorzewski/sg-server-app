@@ -6,9 +6,11 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
 
 import static java.util.Optional.*;
@@ -74,7 +76,11 @@ public class Configuration {
 
     private Optional<String> getSecret(Path secretPath) {
         try {
-            return of(Files.readString(secretPath));
+            List<String> lines = Files.readAllLines(secretPath, StandardCharsets.UTF_8);
+            if (lines.isEmpty()) {
+                return empty();
+            }
+            return of(lines.get(0));
         } catch (IOException e) {
             LOG.warn("Problem during reading secret file.", e);
             return empty();
