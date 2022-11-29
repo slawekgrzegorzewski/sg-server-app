@@ -5,6 +5,7 @@ import pl.sg.application.model.WithDomain;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -19,7 +20,7 @@ public class TimeRecord implements WithDomain<TimeRecord> {
     @GeneratedValue(generator = "timeRecordIdGenerator")
     private Integer id;
     private LocalDate date;
-    private int numberOfHours;
+    private BigDecimal numberOfHours;
     @NotNull
     @Column(length = 10_000)
     private String description;
@@ -31,7 +32,7 @@ public class TimeRecord implements WithDomain<TimeRecord> {
     public TimeRecord() {
     }
 
-    public TimeRecord(LocalDate date, int numberOfHours, String description, Domain domain, Task task) {
+    public TimeRecord(LocalDate date, BigDecimal numberOfHours, String description, Domain domain, Task task) {
         this.date = date;
         this.numberOfHours = numberOfHours;
         this.description = description;
@@ -57,11 +58,11 @@ public class TimeRecord implements WithDomain<TimeRecord> {
         return this;
     }
 
-    public int getNumberOfHours() {
+    public BigDecimal getNumberOfHours() {
         return numberOfHours;
     }
 
-    public TimeRecord setNumberOfHours(int numberOfHours) {
+    public TimeRecord setNumberOfHours(BigDecimal numberOfHours) {
         this.numberOfHours = numberOfHours;
         return this;
     }

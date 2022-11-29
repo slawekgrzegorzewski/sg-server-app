@@ -13,7 +13,7 @@ import java.time.LocalDate;
 public class TimeRecord {
     private int id;
     private LocalDate date;
-    private int numberOfHours;
+    private String numberOfHours;
     private String description;
     private DomainSimple domain;
 }

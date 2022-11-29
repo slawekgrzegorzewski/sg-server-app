@@ -1,0 +1,1 @@
+alter table time_record alter column number_of_hours type decimal(20,1)

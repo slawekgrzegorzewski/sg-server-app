@@ -15,6 +15,7 @@ import pl.sg.ip.repository.IntellectualPropertyRepository;
 import pl.sg.ip.repository.TaskRepository;
 import pl.sg.ip.repository.TimeRecordRepository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -77,7 +78,7 @@ public class AbstractIPBaseTest extends AbstractApplicationBaseTest {
         Domain domain = this.domainRepository.getReferenceById(domainId);
         List<TimeRecord> timeRecords = timeRecordRepository.saveAllAndFlush(
                 Arrays.stream(timeRecordDates)
-                        .map(date -> new TimeRecord(date, 8, "", domain, null))
+                        .map(date -> new TimeRecord(date, BigDecimal.valueOf(8), "", domain, null))
                         .collect(Collectors.toList())
         );
 
@@ -136,7 +137,7 @@ public class AbstractIPBaseTest extends AbstractApplicationBaseTest {
         TimeRecord timeRecord = timeRecordRepository.saveAndFlush(
                 new TimeRecord(
                         LocalDate.now(),
-                        8,
+                        BigDecimal.valueOf(8),
                         "",
                         this.domainRepository.getReferenceById(domainId),
                         null)

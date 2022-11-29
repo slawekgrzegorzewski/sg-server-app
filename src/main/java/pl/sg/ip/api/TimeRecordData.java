@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 public class TimeRecordData {
     private LocalDate date;
-    private int numberOfHours;
+    private String numberOfHours;
     private String description;
     private AssignmentAction assignmentAction;
     private Integer taskId;
@@ -23,11 +23,11 @@ public class TimeRecordData {
         public static final Collection<AssignmentAction> ACTIONS_ALLOWED_DURING_CREATION = List.of(NOP, ASSIGN);
     }
 
-    public TimeRecordData(LocalDate date, int numberOfHours, String description) {
+    public TimeRecordData(LocalDate date, String numberOfHours, String description) {
         this(date, numberOfHours, description, AssignmentAction.NOP);
     }
 
-    public TimeRecordData(LocalDate date, int numberOfHours, String description, AssignmentAction action) {
+    public TimeRecordData(LocalDate date, String numberOfHours, String description, AssignmentAction action) {
         this(date, numberOfHours, description, action, null);
     }
 }

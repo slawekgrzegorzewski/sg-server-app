@@ -33,3 +33,5 @@ out/
 .vscode/
 /docker/development/accountant.jar
 /docker/development/application.yml
+
+ipStorage

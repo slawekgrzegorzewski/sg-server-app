@@ -19,6 +19,7 @@ import pl.sg.ip.api.TimeRecord;
 import pl.sg.ip.api.TimeRecordData;
 import pl.sg.ip.model.Task;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Function;
@@ -35,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TimeRecordEndpointTest extends AbstractIPBaseTest {
 
     private static final int SECOND_DOMAIN_ID = 2;
-    public static final int NUMBER_OF_HOURS = 0;
+    public static final String NUMBER_OF_HOURS = "0.0";
     public static final String DESCRIPTION = "";
     public static final LocalDate NOW = LocalDate.now();
 
@@ -45,7 +46,7 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
         ResponseEntity<Void> response = restTemplate.exchange(
                 pathForTimeRecord(),
                 HttpMethod.PUT,
-                new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, ""), headers(DEFAULT_DOMAIN_ID)),
+                new HttpEntity<>(new TimeRecordData(LocalDate.now(), NUMBER_OF_HOURS, ""), headers(DEFAULT_DOMAIN_ID)),
                 Void.class);
         assertEquals(401, response.getStatusCode().value());
 
@@ -53,7 +54,7 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
         response = restTemplate.exchange(
                 pathForTimeRecord(),
                 HttpMethod.PUT,
-                new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, "", TimeRecordData.AssignmentAction.ASSIGN, task.getId()), headers(DEFAULT_DOMAIN_ID)),
+                new HttpEntity<>(new TimeRecordData(LocalDate.now(), NUMBER_OF_HOURS, "", TimeRecordData.AssignmentAction.ASSIGN, task.getId()), headers(DEFAULT_DOMAIN_ID)),
                 Void.class);
         assertEquals(401, response.getStatusCode().value());
     }
@@ -65,14 +66,14 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
         ResponseEntity<Void> response = restTemplate.exchange(
                 pathForTimeRecordUpdate(timeRecord.getId()),
                 HttpMethod.PATCH,
-                new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, ""), headers(DEFAULT_DOMAIN_ID)),
+                new HttpEntity<>(new TimeRecordData(LocalDate.now(), NUMBER_OF_HOURS, ""), headers(DEFAULT_DOMAIN_ID)),
                 Void.class);
         assertEquals(401, response.getStatusCode().value());
 
         response = restTemplate.exchange(
                 pathForTimeRecordUpdate(timeRecord.getId()),
                 HttpMethod.PATCH,
-                new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, "", TimeRecordData.AssignmentAction.UNASSIGN), headers(DEFAULT_DOMAIN_ID)),
+                new HttpEntity<>(new TimeRecordData(LocalDate.now(), NUMBER_OF_HOURS, "", TimeRecordData.AssignmentAction.UNASSIGN), headers(DEFAULT_DOMAIN_ID)),
                 Void.class);
         assertEquals(401, response.getStatusCode().value());
 
@@ -80,7 +81,7 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
         response = restTemplate.exchange(
                 pathForTimeRecordUpdate(timeRecord.getId()),
                 HttpMethod.PATCH,
-                new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, "", TimeRecordData.AssignmentAction.ASSIGN, task.getId()), headers(DEFAULT_DOMAIN_ID)),
+                new HttpEntity<>(new TimeRecordData(LocalDate.now(), NUMBER_OF_HOURS, "", TimeRecordData.AssignmentAction.ASSIGN, task.getId()), headers(DEFAULT_DOMAIN_ID)),
                 Void.class);
         assertEquals(401, response.getStatusCode().value());
     }
@@ -119,7 +120,7 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
         ResponseEntity<Void> response = restTemplate.exchange(
                 pathForTimeRecord(),
                 HttpMethod.PUT,
-                new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, ""), authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
+                new HttpEntity<>(new TimeRecordData(LocalDate.now(), NUMBER_OF_HOURS, ""), authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
                 Void.class);
         assertEquals(403, response.getStatusCode().value());
 
@@ -128,7 +129,7 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
                 pathForTimeRecord(),
                 HttpMethod.PUT,
                 new HttpEntity<>(
-                        new TimeRecordData(LocalDate.now(), 0, "", TimeRecordData.AssignmentAction.ASSIGN, task.getId()),
+                        new TimeRecordData(LocalDate.now(), NUMBER_OF_HOURS, "", TimeRecordData.AssignmentAction.ASSIGN, task.getId()),
                         authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
                 Void.class);
         assertEquals(403, response.getStatusCode().value());
@@ -142,7 +143,7 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
         ResponseEntity<Void> response = restTemplate.exchange(
                 pathForTimeRecordUpdate(timeRecord.getId()),
                 HttpMethod.PATCH,
-                new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, ""), authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
+                new HttpEntity<>(new TimeRecordData(LocalDate.now(), NUMBER_OF_HOURS, ""), authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
                 Void.class);
         assertEquals(403, response.getStatusCode().value());
 
@@ -150,14 +151,14 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
         response = restTemplate.exchange(
                 pathForTimeRecordUpdate(timeRecord.getId()),
                 HttpMethod.PATCH,
-                new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, "", TimeRecordData.AssignmentAction.ASSIGN, task.getId()), authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
+                new HttpEntity<>(new TimeRecordData(LocalDate.now(), NUMBER_OF_HOURS, "", TimeRecordData.AssignmentAction.ASSIGN, task.getId()), authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
                 Void.class);
         assertEquals(403, response.getStatusCode().value());
 
         response = restTemplate.exchange(
                 pathForTimeRecordUpdate(timeRecord.getId()),
                 HttpMethod.PATCH,
-                new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, "", TimeRecordData.AssignmentAction.UNASSIGN), authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
+                new HttpEntity<>(new TimeRecordData(LocalDate.now(), NUMBER_OF_HOURS, "", TimeRecordData.AssignmentAction.UNASSIGN), authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
                 Void.class);
         assertEquals(403, response.getStatusCode().value());
     }
@@ -195,7 +196,7 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
         var task = taskIntellectualProperty(SECOND_DOMAIN_ID);
         TimeRecordData timeRecordToCreateData = new TimeRecordData(
                 LocalDate.now(),
-                0,
+                NUMBER_OF_HOURS,
                 "",
                 TimeRecordData.AssignmentAction.ASSIGN,
                 task.getId());
@@ -210,7 +211,7 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
 
     @Test
     void shouldFailCreationOfTimeRecordWhenCreatingForNotExistingTask() {
-        TimeRecordData timeRecordToCreateData = new TimeRecordData(LocalDate.now(), 0, "", TimeRecordData.AssignmentAction.ASSIGN, 1);
+        TimeRecordData timeRecordToCreateData = new TimeRecordData(LocalDate.now(), NUMBER_OF_HOURS, "", TimeRecordData.AssignmentAction.ASSIGN, 1);
 
         ResponseEntity<Void> response = restTemplate.exchange(
                 pathForTimeRecord(),
@@ -275,7 +276,7 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
         ResponseEntity<Void> response = restTemplate.exchange(
                 pathForTimeRecordUpdate(timeRecord.getId()),
                 HttpMethod.PATCH,
-                new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, "", TimeRecordData.AssignmentAction.ASSIGN, timeRecord.getTask().getId()),
+                new HttpEntity<>(new TimeRecordData(LocalDate.now(), NUMBER_OF_HOURS, "", TimeRecordData.AssignmentAction.ASSIGN, timeRecord.getTask().getId()),
                         authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
                 Void.class);
         assertEquals(403, response.getStatusCode().value());
@@ -288,7 +289,7 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
         ResponseEntity<Void> response = restTemplate.exchange(
                 pathForTimeRecordUpdate(timeRecord.getId()),
                 HttpMethod.PATCH,
-                new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, "", TimeRecordData.AssignmentAction.ASSIGN, task.getId()),
+                new HttpEntity<>(new TimeRecordData(LocalDate.now(), NUMBER_OF_HOURS, "", TimeRecordData.AssignmentAction.ASSIGN, task.getId()),
                         authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
                 Void.class);
         assertEquals(403, response.getStatusCode().value());
@@ -299,7 +300,7 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
         ResponseEntity<Void> response = restTemplate.exchange(
                 pathForTimeRecordUpdate(1),
                 HttpMethod.PATCH,
-                new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, ""),
+                new HttpEntity<>(new TimeRecordData(LocalDate.now(), NUMBER_OF_HOURS, ""),
                         authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
                 Void.class);
         assertEquals(404, response.getStatusCode().value());
@@ -311,7 +312,7 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
         ResponseEntity<Void> response = restTemplate.exchange(
                 pathForTimeRecordUpdate(timeRecord.getId()),
                 HttpMethod.PATCH,
-                new HttpEntity<>(new TimeRecordData(LocalDate.now(), 0, "", TimeRecordData.AssignmentAction.ASSIGN, 1),
+                new HttpEntity<>(new TimeRecordData(LocalDate.now(), NUMBER_OF_HOURS, "", TimeRecordData.AssignmentAction.ASSIGN, 1),
                         authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
                 Void.class);
         assertEquals(404, response.getStatusCode().value());
@@ -343,7 +344,7 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
     }
 
     private void testSingleStep(int step, int taskId, int task2Id, int timeRecordId, Function<TimeRecordData, TimeRecordData> customizeUpdateData, int sizeOfTimeRecordsInTask, int sizeOfTimeRecordsInTask2) {
-        TimeRecordData updateData = customizeUpdateData.apply(new TimeRecordData(LocalDate.now().plusDays(step), step, String.valueOf(step)));
+        TimeRecordData updateData = customizeUpdateData.apply(new TimeRecordData(LocalDate.now().plusDays(step), BigDecimal.valueOf(step).toString(), String.valueOf(step)));
         ResponseEntity<Void> response = restTemplate.exchange(
                 pathForTimeRecordUpdate(timeRecordId),
                 HttpMethod.PATCH,
@@ -353,7 +354,7 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
         commitAndStartNewTransaction();
         pl.sg.ip.model.TimeRecord timeRecord = timeRecordRepository.getReferenceById(timeRecordId);
         assertEquals(LocalDate.now().plusDays(step), timeRecord.getDate());
-        assertEquals(step, timeRecord.getNumberOfHours());
+        assertEquals(0, BigDecimal.valueOf(step).compareTo(timeRecord.getNumberOfHours()));
         assertEquals(String.valueOf(step), timeRecord.getDescription());
         assertEquals(sizeOfTimeRecordsInTask, taskRepository.getReferenceById(taskId).getTimeRecords().size());
         assertEquals(sizeOfTimeRecordsInTask2, taskRepository.getReferenceById(task2Id).getTimeRecords().size());

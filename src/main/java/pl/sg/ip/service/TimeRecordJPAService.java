@@ -13,6 +13,7 @@ import pl.sg.ip.repository.TimeRecordRepository;
 import pl.sg.ip.service.validator.Validator;
 import pl.sg.ip.service.validator.ValidatorFactory;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class TimeRecordJPAService implements TimeRecordService {
             throw new ForbiddenException("Trying to create time record in task from other domain.");
         }
         TimeRecord timeRecord = timeRecordRepository.save(
-                new TimeRecord(createData.getDate(), createData.getNumberOfHours(), createData.getDescription(), domain, task)
+                new TimeRecord(createData.getDate(), new BigDecimal(createData.getNumberOfHours()), createData.getDescription(), domain, task)
         );
         if (task != null) {
             List<TimeRecord> timeRecords = new ArrayList<>(task.getTimeRecords());
@@ -70,7 +71,7 @@ public class TimeRecordJPAService implements TimeRecordService {
         TimeRecord timeRecord = timeRecordRepository.findById(timeRecordId).orElseThrow();
         timeRecord.setDate(updateData.getDate());
         timeRecord.setDescription(updateData.getDescription());
-        timeRecord.setNumberOfHours(updateData.getNumberOfHours());
+        timeRecord.setNumberOfHours(new BigDecimal(updateData.getNumberOfHours()));
         if (task != null) {
             if (timeRecord.getTask() != null) {
                 removeTimeRecordFromTask(timeRecord);
