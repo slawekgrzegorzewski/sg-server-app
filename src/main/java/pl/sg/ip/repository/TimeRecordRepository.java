@@ -10,4 +10,6 @@ public interface TimeRecordRepository extends JpaRepository<TimeRecord, Integer>
 
     List<TimeRecord> findAllByDomain(Domain domain);
 
+    List<TimeRecord> findAllByDomainAndTaskIdIsNull(Domain domain);
+
 }

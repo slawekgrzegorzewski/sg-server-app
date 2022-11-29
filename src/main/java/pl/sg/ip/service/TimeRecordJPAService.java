@@ -33,6 +33,11 @@ public class TimeRecordJPAService implements TimeRecordService {
     }
 
     @Override
+    public List<TimeRecord> getUnassociatedTimeRecords(int domainId) {
+        return timeRecordRepository.findAllByDomainAndTaskIdIsNull(this.domainRepository.findById(domainId).orElseThrow());
+    }
+
+    @Override
     public TimeRecord create(int domainId, TimeRecordData createData) {
         if (!validate(createData)) {
             throw new IPException("Trying to invoke illegal action during timer record creation: " + createData.getAssignmentAction());

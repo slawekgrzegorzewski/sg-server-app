@@ -47,4 +47,4 @@ intellectual-property:
   task:
     attachments:
       storage:
-        dir: ./ipStorage/
+        dir: D:\\Development\\S3cpy

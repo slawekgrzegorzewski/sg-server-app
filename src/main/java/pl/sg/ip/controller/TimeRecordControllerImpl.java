@@ -7,6 +7,9 @@ import pl.sg.ip.api.TimeRecord;
 import pl.sg.ip.api.TimeRecordData;
 import pl.sg.ip.service.TimeRecordService;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/time-record")
 public class TimeRecordControllerImpl implements TimeRecordController {
@@ -17,6 +20,16 @@ public class TimeRecordControllerImpl implements TimeRecordController {
     public TimeRecordControllerImpl(ModelMapper modelMapper, TimeRecordService timeRecordService) {
         this.modelMapper = modelMapper;
         this.timeRecordService = timeRecordService;
+    }
+
+    @Override
+    @GetMapping
+    @TokenBearerAuth(any = "IPR")
+    public List<TimeRecord> getUnassociatedTimeRecords(@RequestHeader("domainId") int domainId) {
+        return timeRecordService.getUnassociatedTimeRecords(domainId)
+                .stream()
+                .map(timeRecord -> modelMapper.map(timeRecord, TimeRecord.class))
+                .collect(Collectors.toList());
     }
 
     @Override

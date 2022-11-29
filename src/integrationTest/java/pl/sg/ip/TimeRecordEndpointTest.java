@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -115,7 +116,7 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
 
     @ParameterizedTest
     @MethodSource("forbiddenRolesAndResponses")
-    void createTimeRecordRolesAccess(String role) {
+    void getTimeRecordRolesAccess(String role) {
 
         ResponseEntity<Void> response = restTemplate.exchange(
                 pathForTimeRecord(),
@@ -131,6 +132,17 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
                 new HttpEntity<>(
                         new TimeRecordData(LocalDate.now(), NUMBER_OF_HOURS, "", TimeRecordData.AssignmentAction.ASSIGN, task.getId()),
                         authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
+                Void.class);
+        assertEquals(403, response.getStatusCode().value());
+    }
+
+    @ParameterizedTest
+    @MethodSource("forbiddenRolesAndResponses")
+    void createTimeRecordRolesAccess(String role) {
+        ResponseEntity<Void> response = restTemplate.exchange(
+                pathForTimeRecord(),
+                HttpMethod.GET,
+                new HttpEntity<>(authenticatedHeaders(DEFAULT_DOMAIN_ID, role)),
                 Void.class);
         assertEquals(403, response.getStatusCode().value());
     }
@@ -418,6 +430,26 @@ public class TimeRecordEndpointTest extends AbstractIPBaseTest {
                 Arguments.of(new TimeRecordData(NOW.minusDays(2), NUMBER_OF_HOURS, DESCRIPTION, TimeRecordData.AssignmentAction.ASSIGN, 1), 200, true),
                 Arguments.of(new TimeRecordData(NOW.minusDays(2), NUMBER_OF_HOURS, DESCRIPTION, TimeRecordData.AssignmentAction.ASSIGN, null), 400, false)
         );
+    }
+
+    @Test
+    public void shouldGetUnassociatedTimeRecordsFromDomain() {
+        timeRecord(DEFAULT_DOMAIN_ID);
+        var expectedTimeRecord = notAssignedTimeRecord(DEFAULT_DOMAIN_ID);
+        timeRecord(SECOND_DOMAIN_ID);
+        notAssignedTimeRecord(SECOND_DOMAIN_ID);
+
+        ResponseEntity<List<TimeRecord>> response = restTemplate.exchange(
+                pathForTimeRecord(),
+                HttpMethod.GET,
+                new HttpEntity<>(authenticatedHeaders(DEFAULT_DOMAIN_ID, "IPR")),
+                new ParameterizedTypeReference<>() {
+                });
+        assertEquals(200, response.getStatusCode().value());
+        List<TimeRecord> result = response.getBody();
+        assertNotNull(result);
+        assertEquals(1, response.getBody().size());
+        assertEquals(expectedTimeRecord.getId(), response.getBody().get(0).getId());
     }
 
     @Test
