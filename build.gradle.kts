@@ -130,7 +130,7 @@ val migrateLocal = tasks.register<org.flywaydb.gradle.task.FlywayMigrateTask>("m
 val migrateProduction = tasks.register<org.flywaydb.gradle.task.FlywayMigrateTask>("migrateProduction") {
     url = "jdbc:postgresql://grzegorzewski.org:5432/accountant"
     user = "postgres"
-    password = "m=#}F,_H^eUbUD6ds%T9#iw_&.Dacp=FX6y83n#?+36pT-A)^@V%_jbyJGCpz.d7"
+    password = ""
 }
 
 val dockerPackage = tasks.register<Zip>("dockerPackage") {
