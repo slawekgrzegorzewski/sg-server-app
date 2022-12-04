@@ -40,7 +40,7 @@ public class TimeRecordJPAService implements TimeRecordService {
     @Override
     public TimeRecord create(int domainId, TimeRecordData createData) {
         if (!validate(createData)) {
-            throw new IPException("Trying to invoke illegal action during timer record creation: " + createData.getAssignmentAction());
+            throw new IPException("Trying to invoke illegal action during time record creation: " + createData.getAssignmentAction());
         }
         Domain domain = domainRepository.findById(domainId).orElseThrow();
         Task task = createData.getAssignmentAction() == TimeRecordData.AssignmentAction.ASSIGN && createData.getTaskId() != null
@@ -64,7 +64,7 @@ public class TimeRecordJPAService implements TimeRecordService {
     @Override
     public void update(int domainId, int timeRecordId, TimeRecordData updateData) {
         if (!validateCorrectConfiguration(updateData)) {
-            throw new IPException("Trying to invoke illegal action during timer record update: " + updateData.getAssignmentAction());
+            throw new IPException("Trying to invoke illegal action during time record update: " + updateData.getAssignmentAction());
         }
         domainRepository.findById(domainId).orElseThrow();
         Task task = updateData.getAssignmentAction() == TimeRecordData.AssignmentAction.ASSIGN && updateData.getTaskId() != null
