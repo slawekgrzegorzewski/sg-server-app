@@ -1,0 +1,30 @@
+@startuml
+
+object KPiREntryLock {
+    date: LocalDate
+    lockedAt: DateTime
+}
+
+object KPiREntry {
+    order: Int
+    date: LocalDate
+    bookingNumber: String(1 000)
+    counterparty: String(1 000)
+    counterpartyAddress: String(1 000)
+    description: String(1 000)
+    providedGoodsAndServicesValue: Money
+    otherIncomes: Money
+    totalIncomes: Money
+    purchasedGoodsAndMaterialsValue: Money
+    additionalCostOfPurchase: Money
+    remunerationInCashOrInKind: Money
+    otherExpenses: Money
+    totalExpenses: Money
+    comments: String(10 000)
+    domain: Domain
+}
+
+IntellectualProperty --> Task: 1:N
+Task --> TimeRecord: 1:N
+
+@enduml
