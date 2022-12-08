@@ -5,7 +5,7 @@ import pl.sg.integrations.nodrigen.model.balances.NodrigenAmount;
 import pl.sg.integrations.nodrigen.model.balances.NodrigenBalanceEmbeddable;
 import pl.sg.banks.model.BankAccount;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -13,7 +13,13 @@ import java.time.OffsetDateTime;
 @Entity
 public class NodrigenTransaction {
     @Id
-    @GeneratedValue
+    
+    @SequenceGenerator(
+            name = "commonIdGenerator",
+            sequenceName = "hibernate_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(generator = "commonIdGenerator")
     private Integer id;
     @Enumerated(EnumType.STRING)
     private NodrigenPhase phase;

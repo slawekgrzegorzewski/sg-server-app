@@ -1,16 +1,19 @@
 package pl.sg.integrations.nodrigen.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Entity
 public class NodrigenAccess {
     @Id
-    @GeneratedValue
+    @SequenceGenerator(
+            name = "commonIdGenerator",
+            sequenceName = "hibernate_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(generator = "commonIdGenerator")
     private Integer id;
     @Column(columnDefinition="TEXT")
     private String accessToken;

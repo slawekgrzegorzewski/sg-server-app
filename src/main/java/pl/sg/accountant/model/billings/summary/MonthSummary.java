@@ -5,13 +5,19 @@ import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.model.billings.BillingPeriod;
 import pl.sg.accountant.model.billings.PiggyBank;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
 public class MonthSummary {
     @Id
-    @GeneratedValue
+    
+    @SequenceGenerator(
+            name = "commonIdGenerator",
+            sequenceName = "hibernate_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(generator = "commonIdGenerator")
     private int id;
     @Column(length = 10000)
     private String data;

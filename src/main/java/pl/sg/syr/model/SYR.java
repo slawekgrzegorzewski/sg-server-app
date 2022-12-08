@@ -1,18 +1,20 @@
 package pl.sg.syr.model;
 
+import jakarta.persistence.*;
 import pl.sg.application.database.YearStringAttributeConverter;
 
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.time.Year;
 
 @Entity
 public class SYR<T extends SYR> {
     @Id
-    @GeneratedValue
+    @SequenceGenerator(
+            name = "commonIdGenerator",
+            sequenceName = "hibernate_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(generator = "commonIdGenerator")
     private int id;
     @NotNull
     @Convert(converter = YearStringAttributeConverter.class)

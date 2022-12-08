@@ -3,7 +3,7 @@ package pl.sg.cubes.model;
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
@@ -11,7 +11,13 @@ import java.time.LocalDateTime;
 public class CubeRecord implements WithDomain<CubeRecord> {
 
     @Id
-    @GeneratedValue
+    
+    @SequenceGenerator(
+            name = "commonIdGenerator",
+            sequenceName = "hibernate_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(generator = "commonIdGenerator")
     private Integer id;
     @Enumerated(EnumType.STRING)
     private CubesType cubesType;

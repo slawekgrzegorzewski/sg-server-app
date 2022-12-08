@@ -1,5 +1,7 @@
 package pl.sg.application.security.annotations;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -13,7 +15,6 @@ import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.WithDomain;
 import pl.sg.application.service.AuthorizationService;
 
-import javax.persistence.EntityManager;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
@@ -56,7 +57,7 @@ public class PathVariableWithDomainResolver extends PathVariableMapMethodArgumen
 
         if (wd == null) {
             if (ann.required()) {
-                throw new javax.persistence.EntityNotFoundException(parameter.getParameterType() + " with id " + id);
+                throw new EntityNotFoundException(parameter.getParameterType() + " with id " + id);
             }
             return null;
         }

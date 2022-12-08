@@ -6,7 +6,7 @@ import org.hibernate.annotations.FetchMode;
 import org.jboss.aerogear.security.otp.api.Base32;
 import pl.sg.application.ForbiddenException;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,7 +14,13 @@ import java.util.List;
 @Entity
 public class ApplicationUser {
     @Id
-    @GeneratedValue
+    
+    @SequenceGenerator(
+            name = "commonIdGenerator",
+            sequenceName = "hibernate_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(generator = "commonIdGenerator")
     private Integer id;
     private String login;
     private String password;

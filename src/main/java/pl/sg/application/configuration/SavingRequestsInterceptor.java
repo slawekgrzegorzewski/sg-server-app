@@ -1,6 +1,7 @@
 package pl.sg.application.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -12,7 +13,6 @@ import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.ReceivedRequest;
 import pl.sg.application.service.AuthorizationService;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;

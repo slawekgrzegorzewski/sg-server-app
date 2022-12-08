@@ -1,6 +1,6 @@
 package pl.sg.checker.model;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 @Entity
 public class FilterElementsStep extends CheckerStep<FilterElementsStep> {

@@ -3,13 +3,18 @@ package pl.sg.accountant.model;
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
 public class HolidayCurrencies implements WithDomain<HolidayCurrencies> {
     @Id
-    @GeneratedValue
+    @SequenceGenerator(
+            name = "commonIdGenerator",
+            sequenceName = "hibernate_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(generator = "commonIdGenerator")
     private Integer id;
     @Column(columnDefinition = "numeric(19,6) default 0")
     private BigDecimal euroConversionRate;

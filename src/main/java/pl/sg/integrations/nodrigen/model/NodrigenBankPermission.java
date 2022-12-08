@@ -3,7 +3,7 @@ package pl.sg.integrations.nodrigen.model;
 import pl.sg.application.model.Domain;
 import pl.sg.banks.model.BankPermission;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.net.URL;
 import java.util.UUID;
 

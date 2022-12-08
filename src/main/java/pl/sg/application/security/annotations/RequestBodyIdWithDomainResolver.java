@@ -1,6 +1,7 @@
 package pl.sg.application.security.annotations;
 
 import com.google.gson.Gson;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
@@ -13,7 +14,7 @@ import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.WithDomain;
 import pl.sg.application.service.AuthorizationService;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
@@ -57,7 +58,7 @@ public class RequestBodyIdWithDomainResolver implements HandlerMethodArgumentRes
 
         if (withDomain == null) {
             if (ann.required()) {
-                throw new javax.persistence.EntityNotFoundException(parameter.getParameterType() + " with id " + id);
+                throw new EntityNotFoundException(parameter.getParameterType() + " with id " + id);
             }
             return null;
         }

@@ -5,7 +5,7 @@ import pl.sg.accountant.transport.accounts.PerformedServicePaymentTO;
 import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.Domain;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.time.YearMonth;
 import java.util.List;
 

@@ -3,9 +3,9 @@ package pl.sg.accountant.model.accounts;
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Currency;
@@ -15,7 +15,12 @@ import java.util.List;
 public class ClientPayment implements WithDomain<ClientPayment> {
 
     @Id
-    @GeneratedValue
+    @SequenceGenerator(
+            name = "commonIdGenerator",
+            sequenceName = "hibernate_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(generator = "commonIdGenerator")
     private Integer id;
 
     @NotNull

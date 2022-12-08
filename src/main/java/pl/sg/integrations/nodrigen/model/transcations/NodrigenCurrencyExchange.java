@@ -2,7 +2,7 @@ package pl.sg.integrations.nodrigen.model.transcations;
 
 import pl.sg.integrations.nodrigen.model.balances.NodrigenAmount;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.Currency;
 

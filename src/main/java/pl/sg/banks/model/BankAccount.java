@@ -6,15 +6,21 @@ import pl.sg.application.model.WithDomain;
 import pl.sg.integrations.nodrigen.model.balances.NodrigenBankAccountBalance;
 import pl.sg.integrations.nodrigen.model.transcations.NodrigenTransaction;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.util.Currency;
 import java.util.List;
 
 @Entity
 public class BankAccount implements WithDomain<BankAccount> {
     @Id
-    @GeneratedValue
+    
+    @SequenceGenerator(
+            name = "commonIdGenerator",
+            sequenceName = "hibernate_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(generator = "commonIdGenerator")
     private Integer id;
     @NotNull
     private String iban;

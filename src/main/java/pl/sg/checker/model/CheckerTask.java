@@ -1,10 +1,10 @@
 package pl.sg.checker.model;
 
+import jakarta.persistence.*;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import pl.sg.application.model.ApplicationUser;
 
-import javax.persistence.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,7 +12,13 @@ import java.util.List;
 @Entity
 public class CheckerTask {
     @Id
-    @GeneratedValue
+    
+    @SequenceGenerator(
+            name = "commonIdGenerator",
+            sequenceName = "hibernate_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(generator = "commonIdGenerator")
     private int id;
     private String name;
     private String description;

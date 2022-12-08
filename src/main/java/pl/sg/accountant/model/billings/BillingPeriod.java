@@ -5,15 +5,21 @@ import pl.sg.application.database.YearMonthStringAttributeConverter;
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.time.YearMonth;
 import java.util.List;
 
 @Entity
 public class BillingPeriod implements WithDomain<BillingPeriod> {
     @Id
-    @GeneratedValue
+    
+    @SequenceGenerator(
+            name = "commonIdGenerator",
+            sequenceName = "hibernate_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(generator = "commonIdGenerator")
     private Integer id;
     @NotNull
     private String name;

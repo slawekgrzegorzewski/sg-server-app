@@ -1,17 +1,18 @@
 package pl.sg.accountant.model.accounts;
 
+import jakarta.persistence.*;
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 
 @Entity
 public class Service implements WithDomain<Service> {
     @Id
-    @GeneratedValue
+    @SequenceGenerator(
+            name = "commonIdGenerator",
+            sequenceName = "hibernate_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(generator = "commonIdGenerator")
     private Integer id;
     String name;
     @ManyToOne

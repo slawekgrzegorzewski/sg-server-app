@@ -3,7 +3,7 @@ package pl.sg.accountant.controller;
 import pl.sg.accountant.transport.accounts.ClientPayment;
 import pl.sg.application.model.Domain;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.time.YearMonth;
 import java.util.List;
 

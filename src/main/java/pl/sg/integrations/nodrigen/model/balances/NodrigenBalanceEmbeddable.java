@@ -1,7 +1,7 @@
 package pl.sg.integrations.nodrigen.model.balances;
 
-import javax.persistence.Embeddable;
-import javax.persistence.Embedded;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 

@@ -1,5 +1,8 @@
 package pl.sg.application.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.extern.slf4j.Slf4j;
 import org.jboss.aerogear.security.otp.Totp;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +16,6 @@ import pl.sg.application.security.annotations.TokenBearerAuth;
 import pl.sg.application.service.ApplicationUserService;
 import pl.sg.application.service.AuthorizationService;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import java.io.IOException;
 
 @RestController

@@ -1,5 +1,7 @@
 package pl.sg.application.security.annotations;
 
+import jakarta.persistence.EntityManager;
+import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -11,9 +13,6 @@ import pl.sg.application.UnauthorizedException;
 import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.Domain;
 import pl.sg.application.service.AuthorizationService;
-
-import javax.persistence.EntityManager;
-import javax.servlet.http.HttpServletRequest;
 
 @Aspect
 @Component

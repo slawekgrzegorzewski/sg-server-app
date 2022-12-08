@@ -4,7 +4,7 @@ import pl.sg.accountant.model.accounts.PerformedServicePayment;
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,7 +13,13 @@ import java.util.UUID;
 @Entity
 public class BankPermission implements WithDomain<BankPermission> {
     @Id
-    @GeneratedValue
+    
+    @SequenceGenerator(
+            name = "commonIdGenerator",
+            sequenceName = "hibernate_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(generator = "commonIdGenerator")
     protected Integer id;
     @ManyToOne
     protected Domain domain;

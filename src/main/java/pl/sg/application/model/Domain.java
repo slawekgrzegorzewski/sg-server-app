@@ -1,9 +1,7 @@
 package pl.sg.application.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import jakarta.persistence.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -11,13 +9,17 @@ import java.util.Objects;
 @Entity
 public class Domain {
     @Id
-    @GeneratedValue
+    @SequenceGenerator(
+            name = "commonIdGenerator",
+            sequenceName = "hibernate_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(generator = "commonIdGenerator")
     private Integer id;
     String name;
 
     @OneToMany(mappedBy = "domain")
     List<ApplicationUserDomainRelation> assignedUsers;
-
 
     public Domain() {
     }

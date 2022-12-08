@@ -1,10 +1,11 @@
 package pl.sg.ip.model;
 
+import jakarta.validation.constraints.NotNull;
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 

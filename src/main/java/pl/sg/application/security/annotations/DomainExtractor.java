@@ -3,7 +3,7 @@ package pl.sg.application.security.annotations;
 import pl.sg.application.DomainException;
 import pl.sg.application.model.Domain;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 public class DomainExtractor {
 

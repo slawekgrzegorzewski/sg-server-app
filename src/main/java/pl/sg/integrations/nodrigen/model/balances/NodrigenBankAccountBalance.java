@@ -2,7 +2,7 @@ package pl.sg.integrations.nodrigen.model.balances;
 
 import pl.sg.banks.model.BankAccount;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -10,7 +10,13 @@ import java.time.OffsetDateTime;
 @Entity
 public class NodrigenBankAccountBalance {
     @Id
-    @GeneratedValue
+    
+    @SequenceGenerator(
+            name = "commonIdGenerator",
+            sequenceName = "hibernate_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(generator = "commonIdGenerator")
     private Integer id;
     private LocalDateTime fetchTime;
     @Embedded

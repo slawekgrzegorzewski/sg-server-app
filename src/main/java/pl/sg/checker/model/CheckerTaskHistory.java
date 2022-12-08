@@ -3,14 +3,20 @@ package pl.sg.checker.model;
 import com.google.gson.Gson;
 import pl.sg.checker.engine.Result;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 public class CheckerTaskHistory {
     @Id
-    @GeneratedValue
+    
+    @SequenceGenerator(
+            name = "commonIdGenerator",
+            sequenceName = "hibernate_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(generator = "commonIdGenerator")
     private int id;
     @ManyToOne
     CheckerTask task;

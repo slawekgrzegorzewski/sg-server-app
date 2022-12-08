@@ -1,13 +1,19 @@
 package pl.sg.syr.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
 public class Country {
 
     @Id
-    @GeneratedValue
+    
+    @SequenceGenerator(
+            name = "commonIdGenerator",
+            sequenceName = "hibernate_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(generator = "commonIdGenerator")
     private int id;
     @ElementCollection(fetch = FetchType.EAGER)
     List<String> names;

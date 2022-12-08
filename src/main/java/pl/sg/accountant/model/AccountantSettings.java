@@ -1,18 +1,19 @@
 package pl.sg.accountant.model;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.validation.constraints.NotNull;
 
 @Entity
 public class AccountantSettings implements WithDomain<AccountantSettings> {
     @Id
-    @GeneratedValue
+    @SequenceGenerator(
+            name = "commonIdGenerator",
+            sequenceName = "hibernate_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(generator = "commonIdGenerator")
     private Integer id;
     @NotNull
     private boolean isCompany;

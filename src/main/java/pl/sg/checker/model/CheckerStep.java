@@ -1,11 +1,17 @@
 package pl.sg.checker.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 public class CheckerStep<T extends CheckerStep> {
     @Id
-    @GeneratedValue
+    
+    @SequenceGenerator(
+            name = "commonIdGenerator",
+            sequenceName = "hibernate_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(generator = "commonIdGenerator")
     private int id;
     @Column(length = 1000)
     private String name;
