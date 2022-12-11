@@ -16,6 +16,7 @@ public class CheckerTask {
     private int id;
     private String name;
     private String description;
+    @Column(columnDefinition = "numeric(21,0)")
     private Duration interval;
     private LocalDateTime nextRun;
 

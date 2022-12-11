@@ -1,6 +1,6 @@
 buildscript {
     dependencies {
-        classpath("org.postgresql:postgresql:42.5.0")
+        classpath("org.postgresql:postgresql:42.5.1")
     }
 }
 
@@ -10,6 +10,7 @@ plugins {
     id("jvm-test-suite")
     id("java")
     id("org.flywaydb.flyway") version "9.5.1"
+    id("com.netflix.dgs.codegen") version "5.6.0"
 }
 
 group = "pl.sg"
@@ -56,7 +57,12 @@ repositories {
 }
 
 dependencies {
-    implementation("com.amazonaws:aws-java-sdk-s3:1.12.345")
+
+    implementation(platform("com.netflix.graphql.dgs:graphql-dgs-platform-dependencies:latest.release"))
+    implementation("com.netflix.graphql.dgs:graphql-dgs-spring-boot-starter")
+    implementation("com.graphql-java:graphql-java:19.2")
+
+    implementation("com.amazonaws:aws-java-sdk-s3:1.12.351")
     implementation("com.auth0:java-jwt:4.0.0")
     implementation("com.google.code.gson:gson:2.9.0")
     implementation("com.sendgrid:sendgrid-java:4.9.3")
@@ -90,7 +96,7 @@ dependencies {
     compileOnly("org.springframework.boot:spring-boot-devtools")
 
     runtimeOnly("com.github.joschi.jackson:jackson-datatype-threetenbp:2.12.5")
-    runtimeOnly("org.postgresql:postgresql:42.5.0")
+    runtimeOnly("org.postgresql:postgresql:42.5.1")
 
     annotationProcessor("org.projectlombok:lombok:1.18.24")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
@@ -141,4 +147,9 @@ val dockerPackage = tasks.register<Zip>("dockerPackage") {
 
 tasks.named("build") {
     dependsOn(dockerPackage)
+}
+
+tasks.withType<com.netflix.graphql.dgs.codegen.gradle.GenerateJavaTask> {
+    generateClient = true
+    packageName = "pl.sg.graphql.schema"
 }
