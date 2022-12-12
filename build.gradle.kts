@@ -64,10 +64,6 @@ repositories {
     mavenCentral()
 }
 
-java.sourceSets["main"].java {
-    srcDir("src/generated/java")
-}
-
 dependencies {
 
     implementation(platform("com.netflix.graphql.dgs:graphql-dgs-platform-dependencies:latest.release"))
@@ -195,7 +191,7 @@ jooq() {
                     driver = "org.postgresql.Driver"
                     url = "jdbc:postgresql://192.168.52.98:5432/accountant"
                     user = "postgres"
-                    password = "SLAwek1!"
+                    password = System.getenv("SG_DB_PASSWORD")
                     properties = listOf(
                         Property().apply {
                             key = "PAGE_SIZE"
@@ -232,7 +228,7 @@ jooq() {
                     }
                     target.apply {
                         packageName = "pl.sg.jooq"
-                        directory = "src/generated/java"
+                        directory = "build/generated/sources/jooq"
                     }
                 }
             }
