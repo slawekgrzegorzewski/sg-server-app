@@ -21,6 +21,7 @@ public class CubeRecord implements WithDomain<CubeRecord> {
     private Integer id;
     @Enumerated(EnumType.STRING)
     private CubesType cubesType;
+    @Column(columnDefinition = "numeric(21,0)")
     private Duration time;
     private String scramble;
     private LocalDateTime recordTime;
