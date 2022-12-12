@@ -10,7 +10,6 @@ import org.modelmapper.jooq.RecordValueReader;
 import org.springframework.web.bind.annotation.RequestHeader;
 import pl.sg.application.security.annotations.TokenBearerAuth;
 import pl.sg.graphql.schema.types.KPIREntry;
-import pl.sg.kpir.repositories.KPiRRepository;
 
 import java.time.YearMonth;
 import java.util.List;
