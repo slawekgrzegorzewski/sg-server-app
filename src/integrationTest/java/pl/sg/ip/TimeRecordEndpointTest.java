@@ -1,6 +1,6 @@
 package pl.sg.ip;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;

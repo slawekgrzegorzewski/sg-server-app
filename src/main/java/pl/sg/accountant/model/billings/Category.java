@@ -3,8 +3,8 @@ package pl.sg.accountant.model.billings;
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Entity

@@ -1,7 +1,7 @@
 package pl.sg.application.security.annotations;
 
 import com.google.gson.Gson;
-import jakarta.persistence.EntityNotFoundException;
+import javax.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,7 @@ import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.WithDomain;
 import pl.sg.application.service.AuthorizationService;
 
-import jakarta.persistence.EntityManager;
+import javax.persistence.EntityManager;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;

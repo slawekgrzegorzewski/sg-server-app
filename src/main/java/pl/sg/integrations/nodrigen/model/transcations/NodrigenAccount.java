@@ -1,6 +1,6 @@
 package pl.sg.integrations.nodrigen.model.transcations;
 
-import jakarta.persistence.Embeddable;
+import javax.persistence.Embeddable;
 
 @Embeddable
 public class NodrigenAccount {

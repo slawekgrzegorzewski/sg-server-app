@@ -2,7 +2,7 @@ package pl.sg.checker.model;
 
 import org.hibernate.annotations.Fetch;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.util.Map;
 
 @Entity

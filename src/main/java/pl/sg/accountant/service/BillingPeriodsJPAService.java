@@ -18,7 +18,7 @@ import pl.sg.application.model.Domain;
 import pl.sg.integrations.nodrigen.model.transcations.NodrigenTransaction;
 import pl.sg.integrations.nodrigen.repository.NodrigenTransactionRepository;
 
-import jakarta.persistence.EntityNotFoundException;
+import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;

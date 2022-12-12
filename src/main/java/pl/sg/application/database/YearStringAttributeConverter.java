@@ -1,6 +1,6 @@
 package pl.sg.application.database;
 
-import jakarta.persistence.AttributeConverter;
+import javax.persistence.AttributeConverter;
 import java.time.Year;
 
 public class YearStringAttributeConverter implements AttributeConverter<Year, String> {

@@ -15,7 +15,7 @@ import pl.sg.application.security.annotations.RequestBodyWithDomain;
 import pl.sg.application.security.annotations.RequestDomain;
 import pl.sg.application.security.annotations.TokenBearerAuth;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.time.YearMonth;
 import java.util.*;

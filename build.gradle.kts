@@ -84,7 +84,7 @@ dependencies {
 
     implementation("commons-fileupload:commons-fileupload:1.4")
 
-    implementation("jakarta.xml.bind:jakarta.xml.bind-api:4.0.0")
+    implementation("javax.xml.bind:jaxb-api:2.3.1")
 
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("org.apache.poi:poi:5.2.2")

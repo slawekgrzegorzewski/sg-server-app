@@ -4,7 +4,7 @@ import pl.sg.accountant.model.accounts.PerformedServicePayment;
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.List;

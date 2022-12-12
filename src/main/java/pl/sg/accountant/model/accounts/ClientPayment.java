@@ -3,9 +3,9 @@ package pl.sg.accountant.model.accounts;
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Currency;

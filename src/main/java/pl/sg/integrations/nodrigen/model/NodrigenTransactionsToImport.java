@@ -3,7 +3,7 @@ package pl.sg.integrations.nodrigen.model;
 import org.hibernate.annotations.Immutable;
 import pl.sg.accountant.model.accounts.Account;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.Instant;
 

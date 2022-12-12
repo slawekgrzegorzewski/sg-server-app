@@ -1,6 +1,6 @@
 package pl.sg.checker.model;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import pl.sg.application.model.ApplicationUser;

@@ -13,7 +13,7 @@ import pl.sg.accountant.transport.billings.IncomeTO;
 import pl.sg.application.model.Domain;
 import pl.sg.application.security.annotations.*;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.function.Function;

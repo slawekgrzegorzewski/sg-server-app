@@ -1,8 +1,8 @@
 package pl.sg.syr.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import jakarta.validation.constraints.NotNull;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class CountrySYR extends SYR<CountrySYR> {

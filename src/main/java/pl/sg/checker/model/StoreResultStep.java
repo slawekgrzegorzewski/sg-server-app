@@ -1,6 +1,6 @@
 package pl.sg.checker.model;
 
-import jakarta.persistence.Entity;
+import javax.persistence.Entity;
 
 @Entity
 public class StoreResultStep extends CheckerStep<StoreResultStep> {

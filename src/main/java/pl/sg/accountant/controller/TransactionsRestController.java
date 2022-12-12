@@ -12,8 +12,8 @@ import pl.sg.application.security.annotations.PathVariableWithDomain;
 import pl.sg.application.security.annotations.RequestDomain;
 import pl.sg.application.security.annotations.TokenBearerAuth;
 
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;

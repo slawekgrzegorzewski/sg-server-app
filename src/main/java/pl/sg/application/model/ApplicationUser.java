@@ -6,7 +6,7 @@ import org.hibernate.annotations.FetchMode;
 import org.jboss.aerogear.security.otp.api.Base32;
 import pl.sg.application.ForbiddenException;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

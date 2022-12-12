@@ -1,6 +1,6 @@
 package pl.sg.integrations.nodrigen.model.balances;
 
-import jakarta.persistence.Embeddable;
+import javax.persistence.Embeddable;
 import java.math.BigDecimal;
 import java.util.Currency;
 

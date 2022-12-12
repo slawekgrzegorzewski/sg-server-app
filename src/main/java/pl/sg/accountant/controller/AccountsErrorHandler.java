@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import pl.sg.accountant.model.AccountsException;
 
-import jakarta.validation.ConstraintViolationException;
+import javax.validation.ConstraintViolationException;
 
 @ControllerAdvice
 public class AccountsErrorHandler extends ResponseEntityExceptionHandler {

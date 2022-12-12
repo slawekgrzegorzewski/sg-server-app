@@ -19,7 +19,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import pl.sg.application.security.annotations.*;
 import pl.sg.application.service.AuthorizationService;
 
-import jakarta.persistence.EntityManager;
+import javax.persistence.EntityManager;
 import java.util.List;
 
 @Configuration

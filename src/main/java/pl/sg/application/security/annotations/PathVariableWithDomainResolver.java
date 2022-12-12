@@ -1,7 +1,7 @@
 package pl.sg.application.security.annotations;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityNotFoundException;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityNotFoundException;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;

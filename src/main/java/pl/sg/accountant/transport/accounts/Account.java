@@ -4,10 +4,10 @@ import pl.sg.application.api.DomainSimple;
 import pl.sg.application.api.WithDomain;
 import pl.sg.banks.transport.BankAccount;
 
-import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.util.Currency;
 

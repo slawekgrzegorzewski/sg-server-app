@@ -6,8 +6,8 @@ import pl.sg.application.model.WithDomain;
 import pl.sg.integrations.nodrigen.model.balances.NodrigenBankAccountBalance;
 import pl.sg.integrations.nodrigen.model.transcations.NodrigenTransaction;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Currency;
 import java.util.List;
 

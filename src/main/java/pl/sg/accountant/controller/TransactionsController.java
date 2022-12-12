@@ -4,8 +4,8 @@ import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.transport.FinancialTransactionTO;
 import pl.sg.application.model.Domain;
 
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.util.List;
 

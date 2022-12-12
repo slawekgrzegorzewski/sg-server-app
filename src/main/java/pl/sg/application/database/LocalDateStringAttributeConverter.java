@@ -1,7 +1,7 @@
 package pl.sg.application.database;
 
-import jakarta.persistence.AttributeConverter;
-import jakarta.persistence.Converter;
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 

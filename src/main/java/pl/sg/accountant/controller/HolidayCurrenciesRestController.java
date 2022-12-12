@@ -10,7 +10,7 @@ import pl.sg.application.security.annotations.RequestBodyWithDomain;
 import pl.sg.application.security.annotations.RequestDomain;
 import pl.sg.application.security.annotations.TokenBearerAuth;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 import static pl.sg.Application.CREATE_HOLIDAY_CURRENCIES;
 import static pl.sg.Application.UPDATE_HOLIDAY_CURRENCIES;

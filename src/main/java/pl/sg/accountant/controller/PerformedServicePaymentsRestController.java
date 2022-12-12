@@ -13,7 +13,7 @@ import pl.sg.application.security.annotations.RequestDomain;
 import pl.sg.application.security.annotations.RequestUser;
 import pl.sg.application.security.annotations.TokenBearerAuth;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.stream.Collectors;

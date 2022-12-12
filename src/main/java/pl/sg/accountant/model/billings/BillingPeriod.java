@@ -5,8 +5,8 @@ import pl.sg.application.database.YearMonthStringAttributeConverter;
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.YearMonth;
 import java.util.List;
 

@@ -7,7 +7,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import jakarta.persistence.EntityManager;
+import javax.persistence.EntityManager;
 
 @Component
 public class RequestDomainResolver implements HandlerMethodArgumentResolver {

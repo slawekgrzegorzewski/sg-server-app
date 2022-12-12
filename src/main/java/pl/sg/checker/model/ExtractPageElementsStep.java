@@ -1,7 +1,7 @@
 package pl.sg.checker.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
+import javax.persistence.Column;
+import javax.persistence.Entity;
 
 @Entity
 public class ExtractPageElementsStep extends CheckerStep<ExtractPageElementsStep> {
