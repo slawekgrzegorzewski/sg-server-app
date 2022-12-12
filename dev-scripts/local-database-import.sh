@@ -10,6 +10,9 @@ chmod 400 ~/.pgpass
 
  echo "$HOME/Development/Slawek/backups/current/$file"
 
-psql -h localhost -p 5432 -w -U postgres -c "DROP DATABASE accountant;" postgres
-psql -h localhost -p 5432 -w -U postgres -c "CREATE DATABASE accountant;" postgres
-psql -h localhost -U postgres -w accountant < "$HOME/Development/Slawek/backups/current/$file"
+#psql -h localhost -p 5432 -w -U postgres -c "DROP DATABASE accountant;" postgres
+#psql -h localhost -p 5432 -w -U postgres -c "CREATE DATABASE accountant;" postgres
+#psql -h localhost -U postgres -w accountant < "$HOME/Development/Slawek/backups/current/$file"
+psql -h 192.168.52.98 -p 5432 -w -U postgres -c "DROP DATABASE accountant;" postgres
+psql -h 192.168.52.98 -p 5432 -w -U postgres -c "CREATE DATABASE accountant;" postgres
+psql -h 192.168.52.98 -U postgres -w accountant < "$HOME/Development/Slawek/backups/current/$file"

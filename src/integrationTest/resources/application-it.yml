@@ -10,6 +10,9 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: validate
+  jooq:
+    sql-dialect: POSTGRES
+
 nodrigen:
   service-url: ""
 cron:

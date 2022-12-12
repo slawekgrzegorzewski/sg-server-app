@@ -6,8 +6,8 @@ object KPiREntryLock {
 }
 
 object KPiREntry {
-    order: Int
-    date: LocalDate
+    entryOrder: Int
+    entryDate: LocalDate
     bookingNumber: String(1 000)
     counterparty: String(1 000)
     counterpartyAddress: String(1 000)
@@ -27,4 +27,4 @@ object KPiREntry {
 IntellectualProperty --> Task: 1:N
 Task --> TimeRecord: 1:N
 
-@enduml
+@endumlk

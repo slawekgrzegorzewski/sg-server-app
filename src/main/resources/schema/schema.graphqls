@@ -1,8 +1,32 @@
+scalar UUID
+scalar BigDecimal
+scalar LocalDate
+
 type Query {
-    shows(titleFilter: String): [Show]
+    monthKPIR(year: Int!, month: Int!): [KPIREntry]
 }
 
-type Show {
-    title: String
-    releaseYear: Int
+type DomainSimple {
+    id: Int!,
+    name: String!
+}
+
+type KPIREntry {
+    publicId: UUID!,
+    domain: DomainSimple!,
+    entryDate: LocalDate!,
+    entryOrder: Int!,
+    bookingNumber: String!,
+    counterparty: String!,
+    counterpartyAddress: String!,
+    description: String!,
+    providedGoodsAndServicesValue: BigDecimal!,
+    otherIncomes: BigDecimal!,
+    totalIncomes: BigDecimal!,
+    purchasedGoodsAndMaterialsValue: BigDecimal!,
+    additionalCostOfPurchase: BigDecimal!,
+    remunerationInCashOrInKind: BigDecimal!,
+    otherExpenses: BigDecimal!,
+    totalExpenses: BigDecimal!,
+    comments: String!
 }
