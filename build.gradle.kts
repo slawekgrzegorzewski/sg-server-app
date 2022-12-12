@@ -189,7 +189,7 @@ jooq() {
                 logging = Logging.WARN
                 jdbc.apply {
                     driver = "org.postgresql.Driver"
-                    url = "jdbc:postgresql://192.168.52.98:5432/accountant"
+                    url = System.getenv("SG_DB_URL")
                     user = "postgres"
                     password = System.getenv("SG_DB_PASSWORD")
                     properties = listOf(
