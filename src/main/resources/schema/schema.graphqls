@@ -3,7 +3,11 @@ scalar BigDecimal
 scalar LocalDate
 
 type Query {
-    monthKPIR(year: Int!, month: Int!): [KPIREntry]
+    monthKPIR(year: Int!, month: Int!): [KPiREntry]
+}
+
+type Mutation{
+    addKPiREntry(input: KPiREntryInput):KPiREntry
 }
 
 type DomainSimple {
@@ -11,9 +15,28 @@ type DomainSimple {
     name: String!
 }
 
-type KPIREntry {
+type KPiREntry {
     publicId: UUID!,
     domain: DomainSimple!,
+    entryDate: LocalDate!,
+    entryOrder: Int!,
+    bookingNumber: String!,
+    counterparty: String!,
+    counterpartyAddress: String!,
+    description: String!,
+    providedGoodsAndServicesValue: BigDecimal!,
+    otherIncomes: BigDecimal!,
+    totalIncomes: BigDecimal!,
+    purchasedGoodsAndMaterialsValue: BigDecimal!,
+    additionalCostOfPurchase: BigDecimal!,
+    remunerationInCashOrInKind: BigDecimal!,
+    otherExpenses: BigDecimal!,
+    totalExpenses: BigDecimal!,
+    comments: String!
+}
+
+input KPiREntryInput {
+    publicId: UUID,
     entryDate: LocalDate!,
     entryOrder: Int!,
     bookingNumber: String!,
