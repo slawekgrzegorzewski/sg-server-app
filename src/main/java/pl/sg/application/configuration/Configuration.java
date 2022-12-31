@@ -70,6 +70,12 @@ public class Configuration {
                 .orElseThrow();
     }
 
+    public String getRandomOrgApiKey() {
+        return getEnvironmentValue("RANDOM_ORG_API_KEY")
+                .or(() -> getSecret(Paths.get("/", "run", "secrets", "random_org_api_key")))
+                .orElseThrow();
+    }
+
     private Optional<String> getEnvironmentValue(String environmentKey) {
         return ofNullable(System.getenv(environmentKey));
     }

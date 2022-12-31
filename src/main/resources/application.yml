@@ -41,6 +41,9 @@ spring:
 nodrigen:
   service-url: https://ob.nordigen.com/api/v2/
 
+random-org:
+  url: https://api.random.org/json-rpc/4/invoke
+
 cron:
   fetch-accounts: "-"
   fetch-accounts-monthly: "-"
