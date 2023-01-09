@@ -1,7 +1,9 @@
 package pl.sg.syr.generator;
 
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.jetbrains.annotations.NotNull;
 import pl.sg.syr.model.Country;
 import pl.sg.syr.model.CountrySYR;
 import pl.sg.syr.model.SYR;
@@ -10,6 +12,7 @@ import pl.sg.syr.model.SecretCountriesSYR;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class From2019SYRGenerator extends SheetBasedSyrGeneratorStrategy {
 
@@ -27,31 +30,36 @@ public class From2019SYRGenerator extends SheetBasedSyrGeneratorStrategy {
                 newSyr = new SecretCountriesSYR()
                         .setYear(Year.parse(sheet.getSheetName()))
                         .setNumberOfCountries(extractNoOfCountries(row.getCell(0).getStringCellValue()))
-                        .setPeak((int) row.getCell(2).getNumericCellValue())
-                        .setAverage((int) row.getCell(4).getNumericCellValue())
-                        .setPercentIncrease((int) row.getCell(5).getNumericCellValue())
-                        .setBaptized((int) row.getCell(6).getNumericCellValue())
-                        .setAveragePioneers((int) row.getCell(7).getNumericCellValue())
-                        .setNumberOfCongregations((int) row.getCell(8).getNumericCellValue())
-                        .setMemorialAttendance((int) row.getCell(9).getNumericCellValue());
+                        .setPeak(getNumberFromCell(row, 2))
+                        .setAverage(getNumberFromCell(row, 4))
+                        .setPercentIncrease(getNumberFromCell(row, 5))
+                        .setBaptized(getNumberFromCell(row, 6))
+                        .setAveragePioneers(getNumberFromCell(row, 7))
+                        .setNumberOfCongregations(getNumberFromCell(row, 8))
+                        .setMemorialAttendance(getNumberFromCell(row, 9));
                 result.add(newSyr);
                 break;
             } else {
                 newSyr = new CountrySYR()
                         .setYear(Year.parse(sheet.getSheetName()))
                         .setCountry(findCountry(row))
-                        .setPopulation((int) row.getCell(1).getNumericCellValue())
-                        .setPeak((int) row.getCell(2).getNumericCellValue())
-                        .setRatio1PublisherTo((int) row.getCell(3).getNumericCellValue())
-                        .setAverage((int) row.getCell(4).getNumericCellValue())
-                        .setPercentIncrease((int) row.getCell(5).getNumericCellValue())
-                        .setBaptized((int) row.getCell(6).getNumericCellValue())
-                        .setAveragePioneers((int) row.getCell(7).getNumericCellValue())
-                        .setNumberOfCongregations((int) row.getCell(8).getNumericCellValue())
-                        .setMemorialAttendance((int) row.getCell(9).getNumericCellValue());
+                        .setPopulation(getNumberFromCell(row, 1))
+                        .setPeak(getNumberFromCell(row, 2))
+                        .setRatio1PublisherTo(getNumberFromCell(row, 3))
+                        .setAverage(getNumberFromCell(row, 4))
+                        .setPercentIncrease(getNumberFromCell(row, 5))
+                        .setBaptized(getNumberFromCell(row, 6))
+                        .setAveragePioneers(getNumberFromCell(row, 7))
+                        .setNumberOfCongregations(getNumberFromCell(row, 8))
+                        .setMemorialAttendance(getNumberFromCell(row, 9));
                 result.add(newSyr);
             }
         }
         return result;
+    }
+
+    @NotNull
+    private static Integer getNumberFromCell(Row row, int cell) {
+        return Optional.ofNullable(row.getCell(cell)).map(Cell::getNumericCellValue).map(Double::intValue).orElse(0);
     }
 }
