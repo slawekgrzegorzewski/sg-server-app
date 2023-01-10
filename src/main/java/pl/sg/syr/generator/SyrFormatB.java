@@ -11,9 +11,9 @@ import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Between2017And2018SYRGenerator extends SheetBasedSyrGeneratorStrategy {
+public class SyrFormatB extends SheetBasedSyrGeneratorStrategy {
 
-    public Between2017And2018SYRGenerator(Sheet sheet, List<Country> countries) {
+    public SyrFormatB(Sheet sheet, List<Country> countries) {
         super(sheet, countries);
     }
 

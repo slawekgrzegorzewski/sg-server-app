@@ -11,9 +11,9 @@ import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UpTo2016SYRGenerator extends SheetBasedSyrGeneratorStrategy {
+public class SyrFormatA extends SheetBasedSyrGeneratorStrategy {
 
-    public UpTo2016SYRGenerator(Sheet sheet, List<Country> countries) {
+    public SyrFormatA(Sheet sheet, List<Country> countries) {
         super(sheet, countries);
     }
 

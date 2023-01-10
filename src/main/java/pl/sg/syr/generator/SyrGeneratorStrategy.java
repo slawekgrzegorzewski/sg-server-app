@@ -6,16 +6,24 @@ import pl.sg.syr.model.SYR;
 
 import java.time.Year;
 import java.util.List;
+import java.util.Map;
+import java.util.function.BiFunction;
 
 public interface SyrGeneratorStrategy {
+
+    Map<Year, BiFunction<Sheet, List<Country>, SyrGeneratorStrategy>> strategyGenerators = Map.of(
+            Year.of(2015), SyrFormatA::new,
+            Year.of(2016), SyrFormatA::new,
+            Year.of(2017), SyrFormatB::new,
+            Year.of(2018), SyrFormatB::new,
+            Year.of(2019), SyrFormatC::new,
+            Year.of(2020), SyrFormatC::new,
+            Year.of(2021), SyrFormatD::new,
+            Year.of(2022), SyrFormatD::new
+    );
+
     static SyrGeneratorStrategy getStrategy(Year year, Sheet sheet, List<Country> countries) {
-        if (year.isBefore(Year.of(2017))) {
-            return new UpTo2016SYRGenerator(sheet, countries);
-        } else if (year.isAfter(Year.of(2016)) && year.isBefore(Year.of(2019))) {
-            return new Between2017And2018SYRGenerator(sheet, countries);
-        } else {
-            return new From2019SYRGenerator(sheet, countries);
-        }
+        return strategyGenerators.get(year).apply(sheet, countries);
     }
 
     Year getYear();

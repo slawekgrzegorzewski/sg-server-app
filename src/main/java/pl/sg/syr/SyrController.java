@@ -42,6 +42,7 @@ public class SyrController {
 
     @PostMapping()
     @TokenBearerAuth(any = {"SYR_ADMIN"})
+    @SuppressWarnings("rawtypes")
     public SyrCreationResult importReport(
             @RequestParam("uploadFile") MultipartFile file,
             @RequestParam("newCountriesMatch") String newCountriesMatch) throws IOException {
@@ -59,7 +60,7 @@ public class SyrController {
                 .filter(sheet -> syrs.stream().noneMatch(syr -> syr.getYear() == Year.parse(sheet.getSheetName())))
                 .sorted(Comparator.comparing(sheet -> Year.parse(sheet.getSheetName())))
                 .map(sheet -> SyrGeneratorStrategy.getStrategy(Year.parse(sheet.getSheetName()), sheet, countries))
-                .collect(Collectors.toList());
+                .toList();
         Set<String> notKnownCountries = generators.stream()
                 .map(SyrGeneratorStrategy::getListOfCountries)
                 .map(findNotMatchedCountries(countries, matches))

@@ -14,9 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class From2019SYRGenerator extends SheetBasedSyrGeneratorStrategy {
+public class SyrFormatC extends SheetBasedSyrGeneratorStrategy {
 
-    public From2019SYRGenerator(Sheet sheet, List<Country> countries) {
+    public SyrFormatC(Sheet sheet, List<Country> countries) {
         super(sheet, countries);
     }
 
