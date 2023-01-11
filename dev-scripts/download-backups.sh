@@ -12,4 +12,3 @@ else
   rm -rf ~/Development/Slawek/S3cpy
   cp -r ~/Development/Slawek/S3 ~/Development/Slawek/S3cpy
 fi
-D:\OneDrive\Dokumenty\Development
