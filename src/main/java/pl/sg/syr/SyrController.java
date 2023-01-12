@@ -57,7 +57,7 @@ public class SyrController {
         List<SyrGeneratorStrategy> generators = IntStream.range(0, workbook.getNumberOfSheets())
                 .mapToObj(workbook::getSheetAt)
                 .filter(sheet -> Pattern.compile("[0-9][0-9][0-9][0-9]").matcher(sheet.getSheetName()).matches())
-                .filter(sheet -> syrs.stream().noneMatch(syr -> syr.getYear() == Year.parse(sheet.getSheetName())))
+                .filter(sheet -> syrs.stream().noneMatch(syr -> syr.getYear().equals(Year.parse(sheet.getSheetName()))))
                 .sorted(Comparator.comparing(sheet -> Year.parse(sheet.getSheetName())))
                 .map(sheet -> SyrGeneratorStrategy.getStrategy(Year.parse(sheet.getSheetName()), sheet, countries))
                 .toList();
