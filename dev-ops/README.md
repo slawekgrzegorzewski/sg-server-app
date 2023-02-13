@@ -13,8 +13,8 @@
 3. Automatic set up
    1. copy `docker - ovh.zip` file from `Docker - secrets` 1Password entry to `<<dir1>>`
    2. copy db backup to be restored to `<<dir2>>` 
-   3. run `dev-scripts/setup/setup-machine.sh grzegorzewski.org root slawek setup <<dir1>> AWS_ACCESS_ID AWS_SECRET_ACCESS_KEY AWS_ACCESS_ID_LOGS AWS_SECRET_ACCESS_KEY_LOGS POSTGRESS_PASSWORD`
+   3. run `dev-ops/setup/setup-machine.sh grzegorzewski.org root slawek setup <<dir1>> AWS_ACCESS_ID AWS_SECRET_ACCESS_KEY AWS_ACCESS_ID_LOGS AWS_SECRET_ACCESS_KEY_LOGS POSTGRESS_PASSWORD`
 1. Login to a server
    1. set up crontab
       1. `0 * * * * /home/slawek/management/backup_data.sh`
-4. run `dev-scripts/setup/setup-machine.sh grzegorzewski.org root slawek restore_db <<dir2>>` 
+4. run `dev-ops/setup/setup-machine.sh grzegorzewski.org root slawek restore_db <<dir2>>` 
