@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+
+  backup-app:
+    build: .
+    container_name: backup-app
+    volumes:
+      - $DEVELOPMENT_DIRECTORY/.aws:/root/.aws
+      - $DEVELOPMENT_DIRECTORY/.ssh:/root/.ssh
+      - $DEVELOPMENT_DIRECTORY:/development/
