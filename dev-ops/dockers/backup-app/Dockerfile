@@ -1,6 +1,6 @@
 FROM ubuntu:kinetic
 
-COPY download-backups.sh /app/download-backups.sh
+COPY --chmod=755 download-backups.sh /app/
 
 RUN mkdir /development
 
