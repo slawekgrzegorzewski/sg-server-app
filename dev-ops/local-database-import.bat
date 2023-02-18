@@ -1,4 +1,4 @@
-cd "D:\OneDrive\Dokumenty\Development\SG app backup\DB\current"
+cd "D:\OneDrive\Dokumenty\SG app backup\DB\current"
 D:
 for /f %%i in ('dir /b/a-d/od/t:c') do set LAST=%%i
 echo The most recently created file is %LAST%
