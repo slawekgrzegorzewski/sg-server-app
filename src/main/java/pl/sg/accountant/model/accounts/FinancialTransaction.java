@@ -5,7 +5,7 @@ import pl.sg.accountant.model.OperationType;
 import pl.sg.accountant.model.validation.AccountTransaction;
 import pl.sg.integrations.nodrigen.model.transcations.NodrigenTransaction;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;

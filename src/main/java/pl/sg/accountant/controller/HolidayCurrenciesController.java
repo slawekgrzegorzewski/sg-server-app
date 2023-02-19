@@ -3,7 +3,7 @@ package pl.sg.accountant.controller;
 import pl.sg.accountant.transport.HolidayCurrencies;
 import pl.sg.application.model.Domain;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 public interface HolidayCurrenciesController {
 

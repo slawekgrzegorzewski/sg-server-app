@@ -1,12 +1,10 @@
 package pl.sg.accountant.model.billings;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Currency;
-import java.util.Date;
 
 @Entity
 public class Income {

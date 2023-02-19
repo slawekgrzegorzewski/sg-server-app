@@ -1,7 +1,7 @@
 package pl.sg.accountant.model;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;
 

@@ -7,7 +7,6 @@ import org.modelmapper.spi.SourceGetter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import pl.sg.accountant.model.accounts.FinancialTransaction;
 import pl.sg.accountant.model.accounts.PerformedServicePayment;
 import pl.sg.accountant.transport.FinancialTransactionTO;
@@ -297,9 +296,16 @@ public class Application {
                 .create();
     }
 
-    @Bean(name = "multipartResolver")
-    public CommonsMultipartResolver multipartResolver() {
-        return new CommonsMultipartResolver();
-    }
+//    @Bean(name = "multipartResolver")
+//    public StandardServletMultipartResolver multipartResolver() {
+//        return new StandardServletMultipartResolver();
+//    }
+
+//    @Bean(name = "multipartResolver")
+//    public MultipartResolver multipartResolver() {
+//        StandardServletMultipartResolver resolver = new StandardServletMultipartResolver();
+//        resolver.setResolveLazily(true);
+//        return resolver;
+//    }
 
 }

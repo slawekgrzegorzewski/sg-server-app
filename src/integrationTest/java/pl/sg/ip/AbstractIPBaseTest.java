@@ -1,7 +1,7 @@
 package pl.sg.ip;
 
 import org.apache.commons.compress.utils.Lists;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;

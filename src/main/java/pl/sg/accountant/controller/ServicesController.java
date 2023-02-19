@@ -3,7 +3,7 @@ package pl.sg.accountant.controller;
 import pl.sg.accountant.transport.accounts.Service;
 import pl.sg.application.model.Domain;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 public interface ServicesController {

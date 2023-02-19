@@ -1,9 +1,9 @@
 package pl.sg.syr.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import pl.sg.application.database.YearStringAttributeConverter;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.time.Year;
 
 @Entity

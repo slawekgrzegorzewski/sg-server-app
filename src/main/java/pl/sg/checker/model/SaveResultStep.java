@@ -1,8 +1,6 @@
 package pl.sg.checker.model;
 
-import org.hibernate.annotations.Fetch;
-
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Map;
 
 @Entity

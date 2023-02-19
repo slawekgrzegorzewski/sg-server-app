@@ -17,7 +17,7 @@ import pl.sg.application.model.Domain;
 import pl.sg.application.service.AuthorizationService;
 import pl.sg.application.api.WithDomain;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;

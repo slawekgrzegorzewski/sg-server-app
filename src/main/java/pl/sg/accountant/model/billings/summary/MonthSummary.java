@@ -5,7 +5,7 @@ import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.model.billings.BillingPeriod;
 import pl.sg.accountant.model.billings.PiggyBank;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Entity

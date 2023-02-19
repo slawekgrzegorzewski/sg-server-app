@@ -1,6 +1,6 @@
 package pl.sg.application.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @IdClass(ApplicationUserDomainPK.class)

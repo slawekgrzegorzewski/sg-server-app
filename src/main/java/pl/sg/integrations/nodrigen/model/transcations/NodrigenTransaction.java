@@ -5,7 +5,7 @@ import pl.sg.integrations.nodrigen.model.balances.NodrigenAmount;
 import pl.sg.integrations.nodrigen.model.balances.NodrigenBalanceEmbeddable;
 import pl.sg.banks.model.BankAccount;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;

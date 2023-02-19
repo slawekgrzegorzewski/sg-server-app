@@ -1,7 +1,7 @@
 package pl.sg.syr.model;
 
-import javax.persistence.Entity;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.Entity;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class SecretCountriesSYR extends SYR<SecretCountriesSYR> {

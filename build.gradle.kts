@@ -1,9 +1,7 @@
 import nu.studer.gradle.jooq.JooqEdition
+import org.jooq.meta.jaxb.ForcedType
 import org.jooq.meta.jaxb.Logging
 import org.jooq.meta.jaxb.Property
-import org.jooq.meta.jaxb.ForcedType
-import org.jooq.codegen.GenerationTool
-import org.jooq.meta.jaxb.*
 
 buildscript {
     dependencies {
@@ -12,8 +10,8 @@ buildscript {
 }
 
 plugins {
-    id("org.springframework.boot") version "2.7.4"
-    id("io.spring.dependency-management") version "1.0.14.RELEASE"
+    id("org.springframework.boot") version "3.0.2"
+    id("io.spring.dependency-management") version "1.1.0"
     id("jvm-test-suite")
     id("java")
     id("org.flywaydb.flyway") version "9.5.1"
@@ -69,41 +67,48 @@ dependencies {
     implementation(platform("com.netflix.graphql.dgs:graphql-dgs-platform-dependencies:latest.release"))
     implementation("com.netflix.graphql.dgs:graphql-dgs-extended-scalars")
     implementation("com.netflix.graphql.dgs:graphql-dgs-spring-boot-starter")
+
     implementation("com.graphql-java:graphql-java:19.2")
 
     implementation("com.amazonaws:aws-java-sdk-s3:1.12.351")
-    implementation("com.auth0:java-jwt:4.0.0")
-    implementation("com.google.code.gson:gson:2.9.0")
-    implementation(platform("com.netflix.graphql.dgs:graphql-dgs-platform-dependencies:latest.release"))
-    implementation("com.netflix.graphql.dgs:graphql-dgs-spring-boot-starter")
-    implementation("com.sendgrid:sendgrid-java:4.9.3")
 
-    implementation("commons-fileupload:commons-fileupload:1.4")
+    implementation("com.auth0:java-jwt:4.0.0")
+
+    implementation("com.google.code.gson:gson:2.9.0")
+
+    implementation("com.sendgrid:sendgrid-java:4.9.3")
 
     implementation("javax.xml.bind:jaxb-api:2.3.1")
 
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("org.apache.poi:poi:5.2.2")
     implementation("org.apache.poi:poi-ooxml:5.2.2")
+
     implementation("org.codehaus.groovy:groovy-all:3.0.13")
     implementation("org.codehaus.groovy:groovy:3.0.13")
+
     implementation("org.glassfish.jaxb:jaxb-runtime:4.0.0")
+
     implementation("org.hibernate.validator:hibernate-validator:8.0.0.Final")
+
     implementation("org.jboss.aerogear:aerogear-otp-java:1.0.0")
+
     implementation("org.jooq:jooq:3.17.6")
+
     implementation("org.jsoup:jsoup:1.15.3")
+
     implementation("org.modelmapper:modelmapper:3.1.0")
-    implementation("org.springframework.boot:spring-boot-starter-jooq")
     implementation("org.modelmapper.extensions:modelmapper-jooq:3.1.0")
+
     implementation("org.springframework.boot:spring-boot")
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-jooq")
-    implementation("org.springframework.boot:spring-boot-starter-quartz")
     implementation("org.springframework.boot:spring-boot-starter-mail")
+    implementation("org.springframework.boot:spring-boot-starter-quartz")
     implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-web")
 
     implementation("net.logstash.logback:logstash-logback-encoder:7.2")
 
@@ -112,14 +117,19 @@ dependencies {
     compileOnly("org.projectlombok:lombok:1.18.24")
 
     runtimeOnly("com.github.joschi.jackson:jackson-datatype-threetenbp:2.12.5")
+
     runtimeOnly("org.postgresql:postgresql:42.5.1")
 
     annotationProcessor("org.projectlombok:lombok:1.18.24")
+
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
     testImplementation("com.jayway.jsonpath:json-path:2.7.0")
+
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.1")
+
     testImplementation("org.hamcrest:hamcrest-library:2.2")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test:2.7.4")
     testImplementation("org.springframework.boot:spring-boot-test")
     testImplementation("org.springframework:spring-test:5.3.23")

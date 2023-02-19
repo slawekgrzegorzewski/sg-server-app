@@ -3,8 +3,8 @@ package pl.sg.ip.model;
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

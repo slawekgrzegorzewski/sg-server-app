@@ -3,7 +3,7 @@ package pl.sg.accountant.model;
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 
 @Entity

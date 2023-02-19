@@ -1,6 +1,6 @@
 package pl.sg.accountant.model.accounts;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;
 

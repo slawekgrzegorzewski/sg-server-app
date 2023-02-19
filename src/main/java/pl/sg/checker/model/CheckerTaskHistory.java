@@ -3,7 +3,7 @@ package pl.sg.checker.model;
 import com.google.gson.Gson;
 import pl.sg.checker.engine.Result;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
