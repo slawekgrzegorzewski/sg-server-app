@@ -2,6 +2,7 @@ package pl.sg.application.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -32,7 +33,7 @@ public class SavingRequestsInterceptor implements WebRequestInterceptor {
     }
 
     @Override
-    public void preHandle(WebRequest request) throws Exception {
+    public void preHandle(@NotNull WebRequest request) throws Exception {
         if (request instanceof DispatcherServletWebRequest) {
             HttpServletRequest r = ((DispatcherServletWebRequest) request).getRequest();
             String method = r.getMethod();

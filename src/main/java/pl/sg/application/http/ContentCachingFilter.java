@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -20,8 +21,8 @@ public class ContentCachingFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(
             HttpServletRequest httpServletRequest,
-            HttpServletResponse httpServletResponse,
-            FilterChain filterChain) throws ServletException, IOException {
+            @NotNull HttpServletResponse httpServletResponse,
+            @NotNull FilterChain filterChain) throws ServletException, IOException {
         CachedBodyHttpServletRequest cachedBodyHttpServletRequest = new CachedBodyHttpServletRequest(httpServletRequest);
         filterChain.doFilter(cachedBodyHttpServletRequest, httpServletResponse);
     }

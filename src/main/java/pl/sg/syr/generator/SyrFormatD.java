@@ -1,9 +1,9 @@
 package pl.sg.syr.generator;
 
+import jakarta.validation.constraints.NotNull;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.jetbrains.annotations.NotNull;
 import pl.sg.syr.model.Country;
 import pl.sg.syr.model.CountrySYR;
 import pl.sg.syr.model.SYR;

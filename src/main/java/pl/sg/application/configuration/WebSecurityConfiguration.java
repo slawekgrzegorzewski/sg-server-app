@@ -1,12 +1,14 @@
 package pl.sg.application.configuration;
 
 import com.google.gson.Gson;
+import jakarta.persistence.EntityManager;
+import jakarta.validation.constraints.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,15 +21,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import pl.sg.application.security.annotations.*;
 import pl.sg.application.service.AuthorizationService;
 
-import jakarta.persistence.EntityManager;
 import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(
-        prePostEnabled = true,
+@EnableMethodSecurity(
         securedEnabled = true,
-        jsr250Enabled = true)
+        jsr250Enabled = true
+)
 @EnableScheduling
 @Profile("dev")
 public class WebSecurityConfiguration {
@@ -35,7 +36,7 @@ public class WebSecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests().anyRequest().permitAll()
+                .authorizeHttpRequests().anyRequest().permitAll()
                 .and().cors()
                 .and().csrf().disable();
         return http.build();
@@ -48,13 +49,13 @@ public class WebSecurityConfiguration {
                                            SavingRequestsInterceptor savingRequestsInterceptor) {
         return new WebMvcConfigurer() {
             @Override
-            public void addCorsMappings(CorsRegistry registry) {
+            public void addCorsMappings(@NotNull CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedMethods("OPTIONS", "HEAD", "GET", "PUT", "POST", "DELETE", "PATCH");
             }
 
             @Override
-            public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+            public void addArgumentResolvers(@NotNull List<HandlerMethodArgumentResolver> argumentResolvers) {
                 argumentResolvers.add(new RequestUserResolver(authorizationService));
                 argumentResolvers.add(new RequestDomainResolver(entityManager));
                 argumentResolvers.add(new PathVariableWithDomainResolver(authorizationService, entityManager));
@@ -64,7 +65,7 @@ public class WebSecurityConfiguration {
             }
 
             @Override
-            public void addInterceptors(InterceptorRegistry registry) {
+            public void addInterceptors(@NotNull InterceptorRegistry registry) {
                 registry.addWebRequestInterceptor(addMDCRequestInterceptor);
                 registry.addWebRequestInterceptor(savingRequestsInterceptor);
             }
