@@ -23,7 +23,10 @@ public class CachedBodyHttpServletRequest extends HttpServletRequestWrapper {
 
     public CachedBodyHttpServletRequest(HttpServletRequest request) throws IOException {
         super(request);
-        if (request.getContentType().startsWith(ContentType.MULTIPART_FORM_DATA.getMimeType())) {
+        Boolean isMultipartRequest = ofNullable(request.getContentType())
+                .map(contentType -> contentType.startsWith(ContentType.MULTIPART_FORM_DATA.getMimeType()))
+                .orElse(false);
+        if (isMultipartRequest) {
             try {
                 parts = request.getParts();
             } catch (ServletException e) {
