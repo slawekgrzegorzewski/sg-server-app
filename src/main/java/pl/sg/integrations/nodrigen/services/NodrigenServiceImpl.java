@@ -54,13 +54,11 @@ public class NodrigenServiceImpl implements NodrigenService {
     }
 
     @Override
-    public void recreateRequisitionIfNeeded(BankAccount bankAccount) {
+    public void recreateRequisition(BankAccount bankAccount) {
         nodrigenBankPermissionRepository.getPermissionsGrantedForBankAccount(bankAccount.getDomain(), bankAccount)
                 .ifPresent((permission) -> {
-                    if (permission.getGivenAt().isBefore(LocalDateTime.now().minusDays(90))) {
-                        permission.setWithdrawnAt(LocalDateTime.now());
-                        nodrigenBankPermissionRepository.save(permission);
-                    }
+                    permission.setWithdrawnAt(LocalDateTime.now());
+                    nodrigenBankPermissionRepository.save(permission);
                 });
     }
 
