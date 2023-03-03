@@ -102,7 +102,7 @@ public class BankAccountServiceImpl implements BankAccountService {
             nodrigenTransactionRepository.saveAll(toSave);
 
         } catch (EUAEndedException exception) {
-            nodrigenService.recreateRequisitionIfNeeded(bankAccount);
+            nodrigenService.recreateRequisition(bankAccount);
         }
 
 
@@ -221,7 +221,7 @@ public class BankAccountServiceImpl implements BankAccountService {
                     .collect(Collectors.toCollection(() -> toSave));
             nodrigenBankAccountBalanceRepository.saveAll(toSave);
         } catch (EUAEndedException exception) {
-            nodrigenService.recreateRequisitionIfNeeded(bankAccount);
+            nodrigenService.recreateRequisition(bankAccount);
         }
 
     }

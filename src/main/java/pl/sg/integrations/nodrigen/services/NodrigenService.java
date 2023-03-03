@@ -11,7 +11,7 @@ public interface NodrigenService {
 
     NodrigenBankPermission createRequisition(Domain domain, NodrigenPermissionRequest nodrigenPermissionRequest);
 
-    void recreateRequisitionIfNeeded(BankAccount bankAccount);
+    void recreateRequisition(BankAccount bankAccount);
 
     void confirmPermission(Domain domain, String reference);
 
