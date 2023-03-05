@@ -123,13 +123,13 @@ public class BillingPeriodRestController implements BillingPeriodController {
     }
 
     @Override
-    @PutMapping("/expense/{account}/{nodrigenTransactionId}/{nodrigenAlignmentTransactionId}")
+    @PutMapping("/expense/{account}/{nodrigenTransactionIds}/{nodrigenAlignmentTransactionIds}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public String createExpense(@PathVariableWithDomain Account account,
                                 @MapRequestBody(transportClass = ExpenseTO.class) Expense expense,
-                                @PathVariable int nodrigenTransactionId,
-                                @PathVariable int nodrigenAlignmentTransactionId) {
-        billingPeriodsService.addExpense(account, expense, nodrigenTransactionId, nodrigenAlignmentTransactionId);
+                                @PathVariable List<Integer> nodrigenTransactionIds,
+                                @PathVariable List<Integer> nodrigenAlignmentTransactionIds) {
+        billingPeriodsService.addExpense(account, expense, nodrigenTransactionIds.get(0), nodrigenAlignmentTransactionIds.get(0));
         return "OK";
     }
 
