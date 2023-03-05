@@ -3,6 +3,12 @@ import org.jooq.meta.jaxb.ForcedType
 import org.jooq.meta.jaxb.Logging
 import org.jooq.meta.jaxb.Property
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
 buildscript {
     dependencies {
         classpath("org.postgresql:postgresql:42.5.1")
@@ -16,17 +22,11 @@ plugins {
     id("java")
     id("org.flywaydb.flyway") version "9.5.1"
     id("com.netflix.dgs.codegen") version "5.6.0"
-    id("nu.studer.jooq") version "8.0"
+    id("nu.studer.jooq") version "8.1"
 }
 
 group = "pl.sg"
 version = "0.0.1-SNAPSHOT"
-
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
-}
 
 testing {
     suites {
@@ -93,12 +93,12 @@ dependencies {
 
     implementation("org.jboss.aerogear:aerogear-otp-java:1.0.0")
 
-    implementation("org.jooq:jooq:3.17.6")
+    implementation("org.jooq:jooq:3.17.8")
 
     implementation("org.jsoup:jsoup:1.15.3")
 
     implementation("org.modelmapper:modelmapper:3.1.0")
-    implementation("org.modelmapper.extensions:modelmapper-jooq:3.1.0")
+    implementation("org.modelmapper.extensions:modelmapper-jooq:3.1.1")
 
     implementation("org.springframework.boot:spring-boot")
     implementation("org.springframework.boot:spring-boot-starter-aop")
