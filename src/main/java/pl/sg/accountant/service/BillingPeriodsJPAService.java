@@ -19,6 +19,7 @@ import pl.sg.integrations.nodrigen.model.transcations.NodrigenTransaction;
 import pl.sg.integrations.nodrigen.repository.NodrigenTransactionRepository;
 
 import jakarta.persistence.EntityNotFoundException;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -117,24 +118,13 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
     }
 
     @Override
-    public void addIncome(Account account, Income income, int nodrigenTransactionId) {
-        NodrigenTransaction nodrigenTransaction = nodrigenTransactionRepository.getOne(nodrigenTransactionId);
-        validateNodrigenTransactionBelongsToAnAccount(account, nodrigenTransaction);
-        nodrigenTransaction.setCreditTransaction(addIncome2(account, income));
-        nodrigenTransactionRepository.save(nodrigenTransaction);
-    }
-
-    @Override
-    public void addIncome(Account account, Income income, int nodrigenTransactionId, int nodrigenAlignmentTransactionId) {
-        NodrigenTransaction nodrigenTransaction = nodrigenTransactionRepository.getOne(nodrigenTransactionId);
-        NodrigenTransaction nodrigenAlignmentTransaction = nodrigenTransactionRepository.getOne(nodrigenAlignmentTransactionId);
-        validateNodrigenTransactionBelongsToAnAccount(account, nodrigenTransaction);
-        validateNodrigenTransactionBelongsToAnAccount(account, nodrigenAlignmentTransaction);
+    public void addIncome(Account account, Income income, List<Integer> nodrigenTransactionsIds) {
+        List<NodrigenTransaction> nodrigenTransactions = nodrigenTransactionRepository.findAllById(nodrigenTransactionsIds);
+        for (NodrigenTransaction nodrigenTransaction : nodrigenTransactions) {
+            validateNodrigenTransactionBelongsToAnAccount(account, nodrigenTransaction);
+        }
         FinancialTransaction transaction = addIncome2(account, income);
-        nodrigenTransaction.setCreditTransaction(transaction);
-        nodrigenAlignmentTransaction.setDebitTransaction(transaction);
-        nodrigenTransactionRepository.save(nodrigenTransaction);
-        nodrigenTransactionRepository.save(nodrigenAlignmentTransaction);
+        markNodrigenTransactionsCompleted(nodrigenTransactions, transaction);
     }
 
     private FinancialTransaction addIncome2(Account account, Income income) {
@@ -159,25 +149,13 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
     }
 
     @Override
-    public void addExpense(Account account, Expense expense, int nodrigenTransactionId) {
-        NodrigenTransaction nodrigenTransaction = nodrigenTransactionRepository.getOne(nodrigenTransactionId);
-        validateNodrigenTransactionBelongsToAnAccount(account, nodrigenTransaction);
-        nodrigenTransaction.setDebitTransaction(addExpense2(account, expense));
-        nodrigenTransactionRepository.save(nodrigenTransaction);
-    }
-
-    @Override
-    public void addExpense(Account account, Expense expense, int nodrigenTransactionId, int nodrigenAlignmentTransactionId) {
-        NodrigenTransaction nodrigenTransaction = nodrigenTransactionRepository.getOne(nodrigenTransactionId);
-        NodrigenTransaction nodrigenAlignmentTransaction = nodrigenTransactionRepository.getOne(nodrigenAlignmentTransactionId);
-        validateNodrigenTransactionBelongsToAnAccount(account, nodrigenTransaction);
-        validateNodrigenTransactionBelongsToAnAccount(account, nodrigenAlignmentTransaction);
+    public void addExpense(Account account, Expense expense, List<Integer> nodrigenTransactionsIds) {
+        List<NodrigenTransaction> nodrigenTransactions = nodrigenTransactionRepository.findAllById(nodrigenTransactionsIds);
+        for (NodrigenTransaction nodrigenTransaction : nodrigenTransactions) {
+            validateNodrigenTransactionBelongsToAnAccount(account, nodrigenTransaction);
+        }
         FinancialTransaction transaction = addExpense2(account, expense);
-        nodrigenTransaction.setDebitTransaction(transaction);
-        nodrigenAlignmentTransaction.setCreditTransaction(transaction);
-        nodrigenTransactionRepository.save(nodrigenTransaction);
-        nodrigenTransactionRepository.save(nodrigenAlignmentTransaction);
-
+        markNodrigenTransactionsCompleted(nodrigenTransactions, transaction);
     }
 
     private FinancialTransaction addExpense2(Account account, Expense expense) {
@@ -194,6 +172,15 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
         expense.setBillingPeriod(billingPeriod);
         expenseRepository.save(expense);
         return ft;
+    }
+
+    private void markNodrigenTransactionsCompleted(List<NodrigenTransaction> nodrigenTransactions, FinancialTransaction transaction) {
+        for (NodrigenTransaction nodrigenTransaction : nodrigenTransactions) {
+            if (nodrigenTransaction.getTransactionAmount().getAmount().compareTo(BigDecimal.ZERO) >= 0)
+                nodrigenTransaction.setCreditTransaction(transaction);
+            else nodrigenTransaction.setDebitTransaction(transaction);
+        }
+        nodrigenTransactionRepository.saveAll(nodrigenTransactions);
     }
 
     private BillingPeriod unfinishedCurrentOrPreviousMonthBillingPeriod(Domain domain) {

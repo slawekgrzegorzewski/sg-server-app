@@ -26,7 +26,7 @@ public interface NodrigenController {
 
     void mutuallyCancelTransactions(Domain domain, int firstTransactionId, int secondTransactionId);
 
-    void ignoreTransactions(Domain domain, int transactionId);
+    void ignoreTransactions(Domain domain, List<Integer> transactionsId);
 
     void fetch(Domain domain, String bankAccountExternalId);
 }

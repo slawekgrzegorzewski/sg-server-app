@@ -17,7 +17,7 @@ public interface NodrigenService {
 
     void mutuallyCancelTransactions(Domain domain, int firstTransactionId, int secondTransactionId);
 
-    void ignoreTransactions(Domain domain, int transactionId);
+    void ignoreTransactions(Domain domain, List<Integer> transactionsId);
 
     List<String> getInstitutionsToRecreate(Domain domain);
 }

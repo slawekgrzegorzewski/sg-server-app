@@ -131,11 +131,11 @@ public class NodrigenControllerImpl implements NodrigenController {
 
 
     @Override
-    @PutMapping("/nodrigen_ignore_transaction/{transactionId}")
+    @PutMapping("/nodrigen_ignore_transaction/{transactionsIds}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public void ignoreTransactions(
-            @RequestDomain Domain domain, @PathVariable int transactionId) {
-        this.nodrigenService.ignoreTransactions(domain, transactionId);
+            @RequestDomain Domain domain, @PathVariable List<Integer> transactionsIds) {
+        this.nodrigenService.ignoreTransactions(domain, transactionsIds);
     }
 
     @Override

@@ -83,23 +83,12 @@ public class BillingPeriodRestController implements BillingPeriodController {
     }
 
     @Override
-    @PutMapping("/income/{account}/{nodrigenTransactionId}")
+    @PutMapping("/income/{account}/{nodrigenTransactionsIds}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public String createIncome(@PathVariableWithDomain Account account,
                                @MapRequestBody(transportClass = IncomeTO.class) Income income,
-                               @PathVariable int nodrigenTransactionId) {
-        billingPeriodsService.addIncome(account, income, nodrigenTransactionId);
-        return "OK";
-    }
-
-    @Override
-    @PutMapping("/income/{account}/{nodrigenTransactionId}/{nodrigenAlignmentTransactionId}")
-    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public String createIncome(@PathVariableWithDomain Account account,
-                               @MapRequestBody(transportClass = IncomeTO.class) Income income,
-                               @PathVariable int nodrigenTransactionId,
-                               @PathVariable int nodrigenAlignmentTransactionId) {
-        billingPeriodsService.addIncome(account, income, nodrigenTransactionId, nodrigenAlignmentTransactionId);
+                               @PathVariable List<Integer> nodrigenTransactionsIds) {
+        billingPeriodsService.addIncome(account, income, nodrigenTransactionsIds);
         return "OK";
     }
 
@@ -113,26 +102,14 @@ public class BillingPeriodRestController implements BillingPeriodController {
     }
 
     @Override
-    @PutMapping("/expense/{account}/{nodrigenTransactionId}")
+    @PutMapping("/expense/{account}/{nodrigenTransactionsIds}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public String createExpense(@PathVariableWithDomain Account account,
                                 @MapRequestBody(transportClass = ExpenseTO.class) Expense expense,
-                                @PathVariable int nodrigenTransactionId) {
-        billingPeriodsService.addExpense(account, expense, nodrigenTransactionId);
+                                @PathVariable List<Integer> nodrigenTransactionsIds) {
+        billingPeriodsService.addExpense(account, expense, nodrigenTransactionsIds);
         return "OK";
     }
-
-    @Override
-    @PutMapping("/expense/{account}/{nodrigenTransactionIds}/{nodrigenAlignmentTransactionIds}")
-    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public String createExpense(@PathVariableWithDomain Account account,
-                                @MapRequestBody(transportClass = ExpenseTO.class) Expense expense,
-                                @PathVariable List<Integer> nodrigenTransactionIds,
-                                @PathVariable List<Integer> nodrigenAlignmentTransactionIds) {
-        billingPeriodsService.addExpense(account, expense, nodrigenTransactionIds.get(0), nodrigenAlignmentTransactionIds.get(0));
-        return "OK";
-    }
-
 
     @NotNull
     private BillingPeriodInfo getBilling(Domain domain, YearMonth month) {

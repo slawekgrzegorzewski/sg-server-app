@@ -24,13 +24,9 @@ public interface BillingPeriodController {
 
     String createIncome(Account account, Income income);
 
-    String createIncome(Account account, Income income, int nodrigenTransactionId);
-
-    String createIncome(Account account, Income income, int nodrigenTransactionId, int nodrigenAlignmentTransactionId);
+    String createIncome(Account account, Income income, List<Integer> nodrigenTransactionsIds);
 
     String createExpense(Account account, Expense expense);
 
-    String createExpense(Account account, Expense expense, int nodrigenTransactionId);
-
-    String createExpense(Account account, Expense expense, List<Integer> nodrigenTransactionIds, List<Integer> nodrigenAlignmentTransactionIds);
+    String createExpense(Account account, Expense expense, List<Integer> nodrigenTransactionsIds);
 }

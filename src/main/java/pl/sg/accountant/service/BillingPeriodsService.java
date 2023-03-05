@@ -26,13 +26,9 @@ public interface BillingPeriodsService {
 
     void addIncome(Account account, Income income);
 
-    void addIncome(Account account, Income income, int nodrigenTransactionId);
-
-    void addIncome(Account account, Income income, int nodrigenTransactionId, int nodrigenAlignmentTransactionId);
+    void addIncome(Account account, Income income, List<Integer> nodrigenTransactionsIds);
 
     void addExpense(Account account, Expense expense);
 
-    void addExpense(Account account, Expense expense, int nodrigenTransactionId);
-
-    void addExpense(Account account, Expense expense, int nodrigenTransactionId, int nodrigenAlignmentTransactionId);
+    void addExpense(Account account, Expense expense, List<Integer> nodrigenTransactionsIds);
 }
