@@ -82,7 +82,7 @@ public class AbstractIPBaseTest extends AbstractApplicationBaseTest {
                         .collect(Collectors.toList())
         );
 
-        Task task = taskRepository.save(new Task("", "", Lists.newArrayList(), null, timeRecords));
+        Task task = taskRepository.save(new Task("", "", Lists.newArrayList(), null, timeRecords, null));
         timeRecords.forEach(tr -> tr.setTask(task));
         timeRecordRepository.saveAllAndFlush(timeRecords);
 
@@ -112,7 +112,7 @@ public class AbstractIPBaseTest extends AbstractApplicationBaseTest {
     protected Task taskIntellectualProperty(int domainId, String taskDescription, String taskCoAuthors, List<String> taskAttachments) {
         Domain domain = this.domainRepository.getReferenceById(domainId);
 
-        Task task = taskRepository.save(new Task(taskDescription, taskCoAuthors, taskAttachments, null, Lists.newArrayList()));
+        Task task = taskRepository.save(new Task(taskDescription, taskCoAuthors, taskAttachments, null, Lists.newArrayList(), null));
 
         IntellectualProperty intellectualProperty = intellectualPropertyRepository.save(new IntellectualProperty("", domain));
         ArrayList<Task> tasks = Lists.newArrayList();

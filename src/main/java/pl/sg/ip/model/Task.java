@@ -27,16 +27,19 @@ public class Task {
     private IntellectualProperty intellectualProperty;
     @OneToMany(mappedBy = "task")
     private List<TimeRecord> timeRecords;
+    @ManyToOne
+    private TaskCategory taskCategory;
 
     public Task() {
     }
 
-    public Task(String description, String coAuthors, List<String> attachments, IntellectualProperty intellectualProperty, List<TimeRecord> timeRecords) {
+    public Task(String description, String coAuthors, List<String> attachments, IntellectualProperty intellectualProperty, List<TimeRecord> timeRecords, TaskCategory taskCategory) {
         this.description = description;
         this.coAuthors = coAuthors;
         this.attachments = new ArrayList<>(attachments);
         this.intellectualProperty = intellectualProperty;
         this.timeRecords = new ArrayList<>(timeRecords);
+        this.taskCategory = taskCategory;
     }
 
     public Integer getId() {
@@ -91,5 +94,13 @@ public class Task {
     public Task setTimeRecords(List<TimeRecord> timeRecords) {
         this.timeRecords = new ArrayList<>(timeRecords);
         return this;
+    }
+
+    public TaskCategory getTaskCategory() {
+        return taskCategory;
+    }
+
+    public void setTaskCategory(TaskCategory category) {
+        this.taskCategory = category;
     }
 }

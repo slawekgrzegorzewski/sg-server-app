@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pl.sg.application.security.annotations.TokenBearerAuth;
-import pl.sg.ip.api.TaskData;
 import pl.sg.ip.service.TaskService;
 
 import java.io.IOException;
@@ -25,25 +24,6 @@ public class TaskControllerImpl implements TaskController {
     }
 
     @Override
-    @PatchMapping(value = "/{id}")
-    @TokenBearerAuth(any = "IPR")
-    public void update(
-            @RequestHeader(value = "domainId") int domainId,
-            @PathVariable("id") int taskId,
-            @RequestBody TaskData updateData) {
-        taskService.update(domainId, taskId, updateData);
-    }
-
-    @Override
-    @DeleteMapping(value = "/{id}")
-    @TokenBearerAuth(any = "IPR")
-    public void delete(
-            @RequestHeader("domainId") int domainId,
-            @PathVariable("id") int taskId) {
-        taskService.delete(domainId, taskId);
-    }
-
-    @Override
     @PostMapping(path = "{id}/attachment")
     @TokenBearerAuth(any = "IPR")
     public void uploadAttachment(
@@ -53,7 +33,6 @@ public class TaskControllerImpl implements TaskController {
             @RequestParam("file") MultipartFile file) throws IOException {
         taskService.uploadAttachment(domainId, taskId, fileName, file.getInputStream());
     }
-
     @Override
     @GetMapping(path = "{id}/attachment/{fileName}")
     @TokenBearerAuth(any = "IPR", inQuery = true)

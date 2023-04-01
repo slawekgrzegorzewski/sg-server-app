@@ -16,7 +16,7 @@ buildscript {
 }
 
 plugins {
-    id("org.springframework.boot") version "3.0.2"
+    id("org.springframework.boot") version "3.0.4"
     id("io.spring.dependency-management") version "1.1.0"
     id("jvm-test-suite")
     id("java")
@@ -109,6 +109,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
 
     implementation("net.logstash.logback:logstash-logback-encoder:7.2")
 
@@ -158,7 +159,7 @@ tasks.jar {
 }
 
 val migrateLocal = tasks.register<org.flywaydb.gradle.task.FlywayMigrateTask>("migrateLocal") {
-    url = "jdbc:postgresql://localhost:5432/accountant"
+    url = "jdbc:postgresql://192.168.52.98:5432/accountant"
     user = "postgres"
     password = "SLAwek1!"
 }

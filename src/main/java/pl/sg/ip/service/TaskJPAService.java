@@ -4,7 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import pl.sg.application.ForbiddenException;
-import pl.sg.ip.api.TaskData;
+
+import pl.sg.graphql.schema.types.TaskData;
 import pl.sg.ip.model.IPException;
 import pl.sg.ip.model.Task;
 import pl.sg.ip.repository.TaskRepository;
@@ -39,8 +40,8 @@ public class TaskJPAService implements TaskService {
         if (!validatorFactory.validator(task).validateDomain(domainId)) {
             throw new ForbiddenException("Trying to update tasks from IP from other domain.");
         }
-        task.setDescription(updateData.description());
-        task.setCoAuthors(updateData.coAuthors());
+        task.setDescription(updateData.getDescription());
+        task.setCoAuthors(updateData.getCoAuthors());
         taskRepository.save(task);
     }
 

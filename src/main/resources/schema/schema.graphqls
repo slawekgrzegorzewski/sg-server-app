@@ -1,18 +1,65 @@
 scalar UUID
 scalar BigDecimal
 scalar LocalDate
+scalar Upload
 
 type Query {
-    monthKPIR(year: Int!, month: Int!): [KPiREntry]
+    allIPRs: [IntellectualProperty!]
+    monthKPIR(year: Int!, month: Int!): [KPiREntry!]
 }
 
 type Mutation{
     addKPiREntry(input: KPiREntryInput):KPiREntry
+    addIPR(input: IntellectualPropertyData): IntellectualProperty
+    updateIPR(intellectualPropertyId: Int!, input: IntellectualPropertyData): IntellectualProperty
+    deleteIPR(intellectualPropertyId: Int!): String!
+    createTask(intellectualPropertyId: Int!, taskData: TaskData!): String!
+    updateTask(taskId: Int!, taskData: TaskData!): String!
+    deleteTask(taskId: Int!): String!
+    uploadAttachment(taskId: Int!, fileName: String!, file: Upload!): String!
+}
+
+input IntellectualPropertyData{
+    description: String!
+}
+
+input TaskData{
+    coAuthors: String!,
+    description: String!
 }
 
 type DomainSimple {
     id: Int!,
     name: String!
+}
+
+type IntellectualProperty {
+    id: Int!,
+    description: String!,
+    tasks: [Task!],
+    domain: DomainSimple!
+}
+
+type Task {
+    id: Int!,
+    taskCategory: TaskCategory,
+    attachments: [String!],
+    coAuthors: String!,
+    description: String!,
+    timeRecords: [TimeRecord!]
+}
+
+type TaskCategory {
+    id: Int!,
+    name: String!
+}
+
+type TimeRecord {
+    id: Int!,
+    date: LocalDate!,
+    numberOfHours: BigDecimal!,
+    description: String,
+    domain: DomainSimple!
 }
 
 type KPiREntry {

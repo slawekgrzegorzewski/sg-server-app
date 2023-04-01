@@ -9,6 +9,8 @@
     <logger name="org" level="INFO" />
     <logger name="com" level="INFO" />
     <logger name="net" level="INFO" />
+    <logger name="notprivacysafe.graphql.GraphQL" level="INFO" />
+    <logger name="graphql" level="INFO" />
     <logger name="pl" level="DEBUG" />
 
     <root level="DEBUG">

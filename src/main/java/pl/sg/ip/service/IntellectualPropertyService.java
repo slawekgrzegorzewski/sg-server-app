@@ -1,7 +1,7 @@
 package pl.sg.ip.service;
 
-import pl.sg.ip.api.IntellectualPropertyData;
-import pl.sg.ip.api.TaskData;
+import pl.sg.graphql.schema.types.IntellectualPropertyData;
+import pl.sg.graphql.schema.types.TaskData;
 import pl.sg.ip.model.IntellectualProperty;
 import pl.sg.ip.model.Task;
 

@@ -3,8 +3,8 @@ package pl.sg.ip.service;
 import org.springframework.stereotype.Component;
 import pl.sg.application.ForbiddenException;
 import pl.sg.application.repository.DomainRepository;
-import pl.sg.ip.api.IntellectualPropertyData;
-import pl.sg.ip.api.TaskData;
+import pl.sg.graphql.schema.types.IntellectualPropertyData;
+import pl.sg.graphql.schema.types.TaskData;
 import pl.sg.ip.model.IPException;
 import pl.sg.ip.model.IntellectualProperty;
 import pl.sg.ip.model.Task;
@@ -38,7 +38,7 @@ public class IntellectualPropertyJPAService implements IntellectualPropertyServi
 
     @Override
     public IntellectualProperty create(int domainId, IntellectualPropertyData createData) {
-        return intellectualPropertyRepository.save(new IntellectualProperty(createData.description(), this.domainRepository.getReferenceById(domainId)));
+        return intellectualPropertyRepository.save(new IntellectualProperty(createData.getDescription(), this.domainRepository.getReferenceById(domainId)));
     }
 
     @Override
@@ -48,7 +48,7 @@ public class IntellectualPropertyJPAService implements IntellectualPropertyServi
         if (!validator.validateDomain(domainId)) {
             throw new ForbiddenException("Trying to update an IP for other domain.");
         }
-        toUpdate.setDescription(updateData.description());
+        toUpdate.setDescription(updateData.getDescription());
         this.intellectualPropertyRepository.save(toUpdate);
     }
 
@@ -81,7 +81,7 @@ public class IntellectualPropertyJPAService implements IntellectualPropertyServi
         if (!validator.validateDomain(domainId)) {
             throw new ForbiddenException("Trying to add task to an IP from other domain.");
         }
-        this.taskRepository.save(new Task(taskData.description(), taskData.coAuthors(), List.of(), addTaskTo, List.of()));
+        this.taskRepository.save(new Task(taskData.getDescription(), taskData.getCoAuthors(), List.of(), addTaskTo, List.of(), null));
         this.intellectualPropertyRepository.save(addTaskTo);
     }
 }
