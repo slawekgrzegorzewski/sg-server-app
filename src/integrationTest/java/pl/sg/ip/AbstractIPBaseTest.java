@@ -78,7 +78,7 @@ public class AbstractIPBaseTest extends AbstractApplicationBaseTest {
         Domain domain = this.domainRepository.getReferenceById(domainId);
         List<TimeRecord> timeRecords = timeRecordRepository.saveAllAndFlush(
                 Arrays.stream(timeRecordDates)
-                        .map(date -> new TimeRecord(date, BigDecimal.valueOf(8), "", domain, null))
+                        .map(date -> new TimeRecord(date, BigDecimal.valueOf(8), "", domain, null, null))
                         .collect(Collectors.toList())
         );
 
@@ -140,6 +140,7 @@ public class AbstractIPBaseTest extends AbstractApplicationBaseTest {
                         BigDecimal.valueOf(8),
                         "",
                         this.domainRepository.getReferenceById(domainId),
+                        null,
                         null)
         );
         commitAndStartNewTransaction();

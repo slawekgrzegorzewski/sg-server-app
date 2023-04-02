@@ -1,9 +1,8 @@
 package pl.sg.ip.service;
 
-import pl.sg.ip.api.TimeRecordData;
+import pl.sg.graphql.schema.types.TimeRecordData;
 import pl.sg.ip.model.TimeRecord;
 
-import java.util.Collection;
 import java.util.List;
 
 public interface TimeRecordService {

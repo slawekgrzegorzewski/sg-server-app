@@ -4,7 +4,8 @@ import org.springframework.stereotype.Component;
 import pl.sg.application.ForbiddenException;
 import pl.sg.application.model.Domain;
 import pl.sg.application.repository.DomainRepository;
-import pl.sg.ip.api.TimeRecordData;
+import pl.sg.graphql.schema.types.AssignmentAction;
+import pl.sg.graphql.schema.types.TimeRecordData;
 import pl.sg.ip.model.IPException;
 import pl.sg.ip.model.Task;
 import pl.sg.ip.model.TimeRecord;
@@ -13,9 +14,11 @@ import pl.sg.ip.repository.TimeRecordRepository;
 import pl.sg.ip.service.validator.Validator;
 import pl.sg.ip.service.validator.ValidatorFactory;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+
+import static pl.sg.graphql.schema.types.AssignmentAction.ASSIGN;
+import static pl.sg.graphql.schema.types.AssignmentAction.NOP;
 
 @Component
 public class TimeRecordJPAService implements TimeRecordService {
@@ -43,14 +46,14 @@ public class TimeRecordJPAService implements TimeRecordService {
             throw new IPException("Trying to invoke illegal action during time record creation: " + createData.getAssignmentAction());
         }
         Domain domain = domainRepository.findById(domainId).orElseThrow();
-        Task task = createData.getAssignmentAction() == TimeRecordData.AssignmentAction.ASSIGN && createData.getTaskId() != null
+        Task task = createData.getAssignmentAction() == ASSIGN && createData.getTaskId() != null
                 ? taskRepository.findById(createData.getTaskId()).orElseThrow()
                 : null;
         if (task != null && !validatorFactory.validator(task).validateDomain(domainId)) {
             throw new ForbiddenException("Trying to create time record in task from other domain.");
         }
         TimeRecord timeRecord = timeRecordRepository.save(
-                new TimeRecord(createData.getDate(), new BigDecimal(createData.getNumberOfHours()), createData.getDescription(), domain, task)
+                new TimeRecord(createData.getDate(), createData.getNumberOfHours(), createData.getDescription(), domain, task, null)
         );
         if (task != null) {
             List<TimeRecord> timeRecords = new ArrayList<>(task.getTimeRecords());
@@ -67,7 +70,7 @@ public class TimeRecordJPAService implements TimeRecordService {
             throw new IPException("Trying to invoke illegal action during time record update: " + updateData.getAssignmentAction());
         }
         domainRepository.findById(domainId).orElseThrow();
-        Task task = updateData.getAssignmentAction() == TimeRecordData.AssignmentAction.ASSIGN && updateData.getTaskId() != null
+        Task task = updateData.getAssignmentAction() == ASSIGN && updateData.getTaskId() != null
                 ? taskRepository.findById(updateData.getTaskId()).orElseThrow()
                 : null;
         if (task != null && !validatorFactory.validator(task).validateDomain(domainId)) {
@@ -76,13 +79,13 @@ public class TimeRecordJPAService implements TimeRecordService {
         TimeRecord timeRecord = timeRecordRepository.findById(timeRecordId).orElseThrow();
         timeRecord.setDate(updateData.getDate());
         timeRecord.setDescription(updateData.getDescription());
-        timeRecord.setNumberOfHours(new BigDecimal(updateData.getNumberOfHours()));
+        timeRecord.setNumberOfHours(updateData.getNumberOfHours());
         if (task != null) {
             if (timeRecord.getTask() != null) {
                 removeTimeRecordFromTask(timeRecord);
             }
             addTimeRecordToTask(timeRecord, task);
-        } else if (updateData.getAssignmentAction() == TimeRecordData.AssignmentAction.UNASSIGN && timeRecord.getTask() != null) {
+        } else if (updateData.getAssignmentAction() == AssignmentAction.UNASSIGN && timeRecord.getTask() != null) {
             removeTimeRecordFromTask(timeRecord);
         }
         timeRecordRepository.save(timeRecord);
@@ -123,12 +126,12 @@ public class TimeRecordJPAService implements TimeRecordService {
     }
 
     private boolean validate(TimeRecordData createData) {
-        return TimeRecordData.AssignmentAction.ACTIONS_ALLOWED_DURING_CREATION.contains(createData.getAssignmentAction()) && validateCorrectConfiguration(createData);
+        return List.of(NOP, ASSIGN).contains(createData.getAssignmentAction()) && validateCorrectConfiguration(createData);
     }
 
     private static boolean validateCorrectConfiguration(TimeRecordData createData) {
-        return (createData.getAssignmentAction() == TimeRecordData.AssignmentAction.NOP && createData.getTaskId() == null)
-               || (createData.getAssignmentAction() == TimeRecordData.AssignmentAction.ASSIGN && createData.getTaskId() != null)
-               || (createData.getAssignmentAction() == TimeRecordData.AssignmentAction.UNASSIGN && createData.getTaskId() == null);
+        return (createData.getAssignmentAction() == NOP && createData.getTaskId() == null)
+                || (createData.getAssignmentAction() == ASSIGN && createData.getTaskId() != null)
+                || (createData.getAssignmentAction() == AssignmentAction.UNASSIGN && createData.getTaskId() == null);
     }
 }

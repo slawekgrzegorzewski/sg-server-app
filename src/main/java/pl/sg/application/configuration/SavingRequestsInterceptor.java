@@ -10,7 +10,6 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.context.request.WebRequestInterceptor;
 import org.springframework.web.servlet.handler.DispatcherServletWebRequest;
-import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.ReceivedRequest;
 import pl.sg.application.service.AuthorizationService;
 
@@ -58,8 +57,7 @@ public class SavingRequestsInterceptor implements WebRequestInterceptor {
             String token = request.getHeader("Authorization");
             String login = "";
             if (token != null) {
-                ApplicationUser userInfo = authorizationService.getUserInfo(token);
-                login = userInfo.getLogin();
+                login = authorizationService.getUserInfo(token).getLogin();
             }
             String remoteAddr = r.getRemoteAddr();
 

@@ -21,7 +21,6 @@ import pl.sg.cubes.transport.CubeRecord;
 import pl.sg.integrations.nodrigen.model.NodrigenTransactionsToImport;
 import pl.sg.integrations.nodrigen.transport.NodrigenBankPermission;
 import pl.sg.integrations.nodrigen.transport.NodrigenTransactionsToImportTO;
-import pl.sg.ip.api.TimeRecord;
 import pl.sg.ip.model.IntellectualProperty;
 import pl.sg.ip.model.Task;
 
@@ -163,11 +162,10 @@ public class Application {
         modelMapper.typeMap(pl.sg.banks.model.BankAccount.class, BankAccount.class);
         modelMapper.typeMap(NodrigenTransactionsToImport.class, NodrigenTransactionsToImportTO.class);
         modelMapper.typeMap(FinancialTransaction.class, FinancialTransactionTO.class);
-        modelMapper.typeMap(IntellectualProperty.class, pl.sg.ip.api.IntellectualProperty.class)
-                .addMapping(IntellectualProperty::tasks, pl.sg.ip.api.IntellectualProperty::setTasks);
-        modelMapper.typeMap(Task.class, pl.sg.ip.api.Task.class)
-                .addMapping(Task::getTimeRecords, pl.sg.ip.api.Task::setTimeRecords);
-        modelMapper.typeMap(TimeRecord.class, pl.sg.ip.api.TimeRecord.class);
+
+        modelMapper.typeMap(IntellectualProperty.class, pl.sg.graphql.schema.types.IntellectualProperty.class);
+        modelMapper.typeMap(Task.class, pl.sg.graphql.schema.types.Task.class);
+        modelMapper.typeMap(pl.sg.ip.model.TimeRecord.class, pl.sg.graphql.schema.types.TimeRecord.class);
 
         return modelMapper;
     }

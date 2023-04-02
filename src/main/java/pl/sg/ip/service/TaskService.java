@@ -1,6 +1,6 @@
 package pl.sg.ip.service;
 
-import pl.sg.ip.api.TaskData;
+import pl.sg.graphql.schema.types.TaskData;
 
 import java.io.IOException;
 import java.io.InputStream;

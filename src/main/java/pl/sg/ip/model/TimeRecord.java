@@ -29,16 +29,19 @@ public class TimeRecord implements WithDomain<TimeRecord> {
     private Domain domain;
     @ManyToOne
     private Task task;
+    @ManyToOne
+    private TimeRecordCategory timeRecordCategory;
 
     public TimeRecord() {
     }
 
-    public TimeRecord(LocalDate date, BigDecimal numberOfHours, String description, Domain domain, Task task) {
+    public TimeRecord(LocalDate date, BigDecimal numberOfHours, String description, Domain domain, Task task, TimeRecordCategory timeRecordCategory) {
         this.date = date;
         this.numberOfHours = numberOfHours;
         this.description = description;
         this.domain = domain;
         this.task = task;
+        this.timeRecordCategory = timeRecordCategory;
     }
 
     public Integer getId() {
@@ -95,5 +98,13 @@ public class TimeRecord implements WithDomain<TimeRecord> {
     public TimeRecord setTask(Task task) {
         this.task = task;
         return this;
+    }
+
+    public TimeRecordCategory getTimeRecordCategory() {
+        return timeRecordCategory;
+    }
+
+    public void setTimeRecordCategory(TimeRecordCategory category) {
+        this.timeRecordCategory = category;
     }
 }
