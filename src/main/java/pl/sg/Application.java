@@ -166,6 +166,7 @@ public class Application {
         modelMapper.typeMap(IntellectualProperty.class, pl.sg.graphql.schema.types.IntellectualProperty.class);
         modelMapper.typeMap(Task.class, pl.sg.graphql.schema.types.Task.class);
         modelMapper.typeMap(pl.sg.ip.model.TimeRecord.class, pl.sg.graphql.schema.types.TimeRecord.class);
+        modelMapper.typeMap(pl.sg.ip.model.TimeRecordCategory.class, pl.sg.graphql.schema.types.TimeRecordCategory.class);
 
         return modelMapper;
     }

@@ -9,7 +9,9 @@ import pl.sg.graphql.schema.types.TimeRecordData;
 import pl.sg.ip.model.IPException;
 import pl.sg.ip.model.Task;
 import pl.sg.ip.model.TimeRecord;
+import pl.sg.ip.model.TimeRecordCategory;
 import pl.sg.ip.repository.TaskRepository;
+import pl.sg.ip.repository.TimeRecordCategoryRepository;
 import pl.sg.ip.repository.TimeRecordRepository;
 import pl.sg.ip.service.validator.Validator;
 import pl.sg.ip.service.validator.ValidatorFactory;
@@ -26,12 +28,14 @@ public class TimeRecordJPAService implements TimeRecordService {
     private final DomainRepository domainRepository;
     private final TaskRepository taskRepository;
     private final TimeRecordRepository timeRecordRepository;
+    private final TimeRecordCategoryRepository timeRecordCategoryRepository;
     private final ValidatorFactory validatorFactory;
 
-    public TimeRecordJPAService(DomainRepository domainRepository, TaskRepository taskRepository, TimeRecordRepository timeRecordRepository, ValidatorFactory validatorFactory) {
+    public TimeRecordJPAService(DomainRepository domainRepository, TaskRepository taskRepository, TimeRecordRepository timeRecordRepository, TimeRecordCategoryRepository timeRecordCategoryRepository, ValidatorFactory validatorFactory) {
         this.domainRepository = domainRepository;
         this.taskRepository = taskRepository;
         this.timeRecordRepository = timeRecordRepository;
+        this.timeRecordCategoryRepository = timeRecordCategoryRepository;
         this.validatorFactory = validatorFactory;
     }
 
@@ -106,6 +110,44 @@ public class TimeRecordJPAService implements TimeRecordService {
             removeTimeRecordFromTask(timeRecord);
         }
         timeRecordRepository.delete(timeRecord);
+    }
+
+    @Override
+    public List<TimeRecordCategory> getAllTimeRecordCategories(int domainId) {
+        return timeRecordCategoryRepository.getTimeRecordCategoriesByDomainId(domainId);
+    }
+
+    @Override
+    public TimeRecordCategory createTimeRecordCategory(String name, int domainId) {
+        return timeRecordCategoryRepository.save(
+                new TimeRecordCategory()
+                        .setName(name)
+                        .setDomain(domainRepository.getReferenceById(domainId))
+        );
+    }
+
+    @Override
+    public void updateTimeRecordCategory(int domainId, int timeRecordCategoryId, String name) {
+        TimeRecordCategory timeRecordCategory = timeRecordCategoryRepository.getReferenceById(timeRecordCategoryId);
+        if (!validatorFactory.validator(timeRecordCategory).validateDomain(domainId)) {
+            throw new ForbiddenException("Trying to update time record category from other domain.");
+        }
+        timeRecordCategoryRepository.save(
+                timeRecordCategory.setName(name)
+        );
+    }
+
+    @Override
+    public void deleteTimeRecordCategory(int domainId, int timeRecordCategoryId) {
+        TimeRecordCategory timeRecordCategory = timeRecordCategoryRepository.getReferenceById(timeRecordCategoryId);
+        Validator validator = validatorFactory.validator(timeRecordCategory);
+        if (!validator.validateDomain(domainId)) {
+            throw new ForbiddenException("Trying to delete time record category from other domain.");
+        }
+        if (!validator.validateDeletion()) {
+            throw new ForbiddenException("Deletion of time record category is not allowed.");
+        }
+        timeRecordCategoryRepository.delete(timeRecordCategory);
     }
 
     private void addTimeRecordToTask(TimeRecord timeRecord, Task task) {

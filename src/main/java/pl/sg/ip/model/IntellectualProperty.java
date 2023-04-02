@@ -1,10 +1,10 @@
 package pl.sg.ip.model;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

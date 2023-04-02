@@ -58,6 +58,17 @@ public class IpDatafetcher {
                 .collect(Collectors.toList());
     }
 
+    @DgsQuery
+    @TokenBearerAuth(any = {"IPR"})
+    public List<TimeRecordCategory> allTimeRecordCategories(
+            @RequestHeader("domainId") int domainId
+    ) {
+        return timeRecordService.getAllTimeRecordCategories(domainId)
+                .stream()
+                .map(tr -> modelMapper.map(tr, TimeRecordCategory.class))
+                .collect(Collectors.toList());
+    }
+
     @DgsMutation
     @TokenBearerAuth(any = "IPR")
     public IntellectualProperty addIPR(
@@ -146,6 +157,36 @@ public class IpDatafetcher {
             @RequestHeader("domainId") int domainId,
             @InputArgument int timeRecordId) {
         this.timeRecordService.delete(domainId, timeRecordId);
+        return "OK";
+    }
+
+    @DgsMutation
+    @TokenBearerAuth(any = "IPR")
+    public TimeRecordCategory createTimeRecordCategory(
+            @RequestHeader("domainId") int domainId,
+            @InputArgument String name) {
+        return modelMapper.map(
+                this.timeRecordService.createTimeRecordCategory(name, domainId),
+                TimeRecordCategory.class
+        );
+    }
+
+    @DgsMutation
+    @TokenBearerAuth(any = "IPR")
+    public String updateTimeRecordCategory(
+            @RequestHeader("domainId") int domainId,
+            @InputArgument int timeRecordId,
+            @InputArgument String name) {
+        this.timeRecordService.updateTimeRecordCategory(domainId, timeRecordId, name);
+        return "OK";
+    }
+
+    @DgsMutation
+    @TokenBearerAuth(any = "IPR")
+    public String deleteTimeRecordCategory(
+            @RequestHeader("domainId") int domainId,
+            @InputArgument int timeRecordId) {
+        this.timeRecordService.deleteTimeRecordCategory(domainId, timeRecordId);
         return "OK";
     }
 }
