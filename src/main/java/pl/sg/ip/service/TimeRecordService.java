@@ -16,6 +16,10 @@ public interface TimeRecordService {
 
     void delete(int domainId, int timeRecordId);
 
+    void assignCategoryToTimeRecord(int domainId, int timeRecordId, int timeRecordCategoryId);
+
+    void clearCategoryOnTimeRecord(int domainId, int timeRecordId);
+
     List<TimeRecordCategory> getAllTimeRecordCategories(int domainId);
 
     TimeRecordCategory createTimeRecordCategory(String name, int domainId);

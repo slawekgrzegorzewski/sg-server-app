@@ -162,6 +162,20 @@ public class IpDatafetcher {
 
     @DgsMutation
     @TokenBearerAuth(any = "IPR")
+    public String assignCategoryToTimeRecord(
+            @RequestHeader("domainId") int domainId,
+            @InputArgument int timeRecordId,
+            @InputArgument Integer timeRecordCategoryId) {
+        if (timeRecordCategoryId == null) {
+            this.timeRecordService.clearCategoryOnTimeRecord(domainId, timeRecordId);
+        } else {
+            this.timeRecordService.assignCategoryToTimeRecord(domainId, timeRecordId, timeRecordCategoryId);
+        }
+        return "OK";
+    }
+
+    @DgsMutation
+    @TokenBearerAuth(any = "IPR")
     public TimeRecordCategory createTimeRecordCategory(
             @RequestHeader("domainId") int domainId,
             @InputArgument String name) {

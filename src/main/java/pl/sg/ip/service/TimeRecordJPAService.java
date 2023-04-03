@@ -113,6 +113,30 @@ public class TimeRecordJPAService implements TimeRecordService {
     }
 
     @Override
+    public void assignCategoryToTimeRecord(int domainId, int timeRecordId, int timeRecordCategoryId) {
+        TimeRecord timeRecord = timeRecordRepository.getReferenceById(timeRecordId);
+        if (!validatorFactory.validator(timeRecord).validateDomain(domainId)) {
+            throw new ForbiddenException("Trying to update time record from other domain.");
+        }
+        TimeRecordCategory timeRecordCategory = timeRecordCategoryRepository.getReferenceById(timeRecordCategoryId);
+        if(!validatorFactory.validator(timeRecordCategory).validateDomain(domainId)){
+            throw new ForbiddenException("Trying assign time record category from a different domain.");
+        }
+        timeRecord.setTimeRecordCategory(timeRecordCategory);
+        timeRecordRepository.save(timeRecord);
+    }
+
+    @Override
+    public void clearCategoryOnTimeRecord(int domainId, int timeRecordId) {
+        TimeRecord timeRecord = timeRecordRepository.getReferenceById(timeRecordId);
+        if (!validatorFactory.validator(timeRecord).validateDomain(domainId)) {
+            throw new ForbiddenException("Trying to update time record from other domain.");
+        }
+        timeRecord.setTimeRecordCategory(null);
+        timeRecordRepository.save(timeRecord);
+    }
+
+    @Override
     public List<TimeRecordCategory> getAllTimeRecordCategories(int domainId) {
         return timeRecordCategoryRepository.getTimeRecordCategoriesByDomainId(domainId);
     }
