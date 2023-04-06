@@ -1,0 +1,7 @@
+alter table kpir_entry rename to revenue_and_expense_entries;
+alter table revenue_and_expense_entries rename column booking_number to accounting_document_number;
+alter table revenue_and_expense_entries rename column other_incomes to other_income;
+alter table revenue_and_expense_entries rename column total_incomes to total_income;
+alter table revenue_and_expense_entries rename column other_expenses to other_expense;
+alter table revenue_and_expense_entries rename column total_expenses to total_expense;
+alter sequence kpir_entry_id_seq rename to revenue_and_expense_entries_id_seq;
