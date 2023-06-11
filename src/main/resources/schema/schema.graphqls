@@ -8,6 +8,7 @@ type Query {
     nonIPTimeRecords: [TimeRecord!]!
     allTimeRecordCategories: [TimeRecordCategory!]!
     monthRevenueAndExpenseEntry(year: Int!, month: Int!): [RevenueAndExpenseEntry!]
+    simulateMortgage(mortgageCalculationParams: MortgageCalculationParams): [MortgageCalculationInstallment!]!
 }
 
 type Mutation{
@@ -25,6 +26,26 @@ type Mutation{
     createTimeRecordCategory(name: String!): TimeRecordCategory!
     updateTimeRecordCategory(timeRecordId: Int!, name: String!): String!
     deleteTimeRecordCategory(timeRecordId:Int!): String!
+}
+
+input MortgageCalculationParams {
+    mortgageAmount: BigDecimal!,
+    repaymentStart: LocalDate!,
+    rate: BigDecimal!,
+    wibor: BigDecimal!,
+    numberOfInstallments: Int!,
+    overpaymentMonthlyBudget: BigDecimal!,
+    overpaymentYearlyBudget: BigDecimal!
+}
+
+type MortgageCalculationInstallment {
+    paymentFrom: LocalDate!
+    paymentTo: LocalDate!,
+    remainingCapitalAtTheBeginning: BigDecimal!,
+    installment: BigDecimal!,
+    repaidCapital: BigDecimal!,
+    paidInterest: BigDecimal!,
+    overpayment: BigDecimal!
 }
 
 input IntellectualPropertyData{

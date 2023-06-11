@@ -1,7 +1,7 @@
 1. Create a new deployment
    1. windows
 
-      `cmd /C "set DEVELOPMENT_DIRECTORY=D:\OneDrive\Dokumenty\SG app backup&& docker compose up backup-app"`
+      `cmd /C "set DEVELOPMENT_DIRECTORY=E:\OneDrive\Dokumenty\SG app backup&& docker compose up backup-app"`
 
    1. macOS
 
