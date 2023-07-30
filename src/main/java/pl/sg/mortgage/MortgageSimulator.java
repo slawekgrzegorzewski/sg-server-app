@@ -15,6 +15,7 @@ import java.util.List;
 
 import static java.math.BigDecimal.ZERO;
 import static java.time.temporal.ChronoUnit.DAYS;
+import static java.util.Optional.ofNullable;
 
 @Component
 public class MortgageSimulator {
@@ -35,27 +36,36 @@ public class MortgageSimulator {
         BigDecimal leftToRepay = mortgageCalculationParams.getMortgageAmount();
         BigDecimal annualRate = mortgageCalculationParams.getWibor().add(mortgageCalculationParams.getRate()).divide(HUNDRED, SCALE_OF_FORTY, RoundingMode.HALF_DOWN);
         BigDecimal monthlyRate = annualRate.divide(TWELVE, SCALE_OF_FORTY, RoundingMode.HALF_DOWN);
-        BigDecimal installmentAmount = null;
-        int installmentsFromLastHolidays = 0;
-        while (installments.size() < mortgageCalculationParams.getNumberOfInstallments()) {
 
-            LocalDate installmentStartDate = installments.isEmpty() ? mortgageCalculationParams.getRepaymentStart() : installments.get(installments.size() - 1).getPaymentTo().plusDays(1);
+        int installmentsFromLastHolidays = 0;
+        while (leftToRepay.compareTo(ZERO) > 0) {
+            LocalDate installmentStartDate = installments.isEmpty()
+                    ? mortgageCalculationParams.getRepaymentStart()
+                    : installments.get(installments.size() - 1).getPaymentTo().plusDays(1);
+
             LocalDate installmentEndDate = installmentStartDate.plusMonths(1).minusDays(1);
 
-            boolean holidays = mortgageCalculationParams.getHolidaysMonthAfterNumberOfInstallments() != null
-                               && mortgageCalculationParams.getHolidaysMonthAfterNumberOfInstallments() == installmentsFromLastHolidays;
+            int finalInstallmentsFromLastHolidays = installmentsFromLastHolidays;
+            boolean applyHolidays = ofNullable(mortgageCalculationParams.getHolidaysMonthAfterNumberOfInstallments())
+                    .map(months -> months == finalInstallmentsFromLastHolidays)
+                    .orElse(false);
 
-            if (holidays) {
+            BigDecimal installmentAmount = null;
+            if (applyHolidays) {
                 installmentsFromLastHolidays = -1;
                 installmentAmount = ZERO;
-            } else if (installmentAmount == null) {
+            } else if (installmentAmount == null || installmentAmount.compareTo(ZERO) == 0) {
                 installmentAmount = calculateInstallmentAmount(leftToRepay, monthlyRate, mortgageCalculationParams.getNumberOfInstallments() - installments.size());
             }
 
-            BigDecimal interestToPay = holidays ? BigDecimal.ZERO : calculateInterest(leftToRepay, annualRate, installmentStartDate, installmentEndDate);
+            BigDecimal interestToPay = applyHolidays
+                    ? BigDecimal.ZERO
+                    : calculateInterest(leftToRepay, annualRate, installmentStartDate, installmentEndDate);
 
             BigDecimal repaidCapital = installmentAmount.subtract(interestToPay);
-            BigDecimal overpayment = mortgageOverpaymentStrategyFactory.create(mortgageCalculationParams).calculateOverpayment(installments.size() + 1, installmentAmount);
+            BigDecimal overpayment = mortgageOverpaymentStrategyFactory
+                    .create(mortgageCalculationParams)
+                    .calculateOverpayment(installments.size() + 1, installmentAmount);
 
             if (leftToRepay.subtract(repaidCapital).compareTo(ZERO) < 0) {
                 installmentAmount = leftToRepay.add(interestToPay);
@@ -65,45 +75,80 @@ public class MortgageSimulator {
                 overpayment = leftToRepay.subtract(repaidCapital);
             }
 
-            installments.add(MortgageCalculationInstallment.newBuilder().paymentFrom(installmentStartDate).paymentTo(installmentEndDate).remainingCapitalAtTheBeginning(leftToRepay.setScale(SCALE_OF_TWO, RoundingMode.HALF_UP)).installment(installmentAmount.setScale(SCALE_OF_TWO, RoundingMode.HALF_UP)).paidInterest(interestToPay.setScale(SCALE_OF_TWO, RoundingMode.HALF_UP)).repaidCapital(repaidCapital.setScale(SCALE_OF_TWO, RoundingMode.HALF_UP)).overpayment(overpayment).build());
+            installments.add(
+                    MortgageCalculationInstallment.newBuilder()
+                            .paymentFrom(installmentStartDate)
+                            .paymentTo(installmentEndDate)
+                            .remainingCapitalAtTheBeginning(leftToRepay.setScale(SCALE_OF_TWO, RoundingMode.HALF_DOWN))
+                            .installment(installmentAmount.setScale(SCALE_OF_TWO, RoundingMode.HALF_DOWN))
+                            .paidInterest(interestToPay.setScale(SCALE_OF_TWO, RoundingMode.HALF_DOWN))
+                            .repaidCapital(repaidCapital.setScale(SCALE_OF_TWO, RoundingMode.HALF_DOWN))
+                            .overpayment(overpayment)
+                            .build()
+            );
 
             installmentsFromLastHolidays++;
 
             leftToRepay = leftToRepay.subtract(repaidCapital).subtract(overpayment);
-            if (overpayment.compareTo(ZERO) > 0 || holidays) {
-                installmentAmount = null;
-            }
+
             if (leftToRepay.compareTo(ZERO) <= 0) {
                 break;
             }
         }
         if (leftToRepay.compareTo(ZERO) > 0) {
-
-            LocalDate installmentStartDate = installments.isEmpty() ? mortgageCalculationParams.getRepaymentStart() : installments.get(installments.size() - 1).getPaymentTo().plusDays(1);
+            LocalDate installmentStartDate = installments.isEmpty()
+                    ? mortgageCalculationParams.getRepaymentStart()
+                    : installments.get(installments.size() - 1).getPaymentTo().plusDays(1);
             LocalDate installmentEndDate = installmentStartDate.plusMonths(1).minusDays(1);
 
             BigDecimal interestToPay = calculateInterest(leftToRepay, annualRate, installmentStartDate, installmentEndDate);
 
-            installments.add(MortgageCalculationInstallment.newBuilder().paymentFrom(installmentStartDate).paymentTo(installmentEndDate).remainingCapitalAtTheBeginning(leftToRepay.setScale(SCALE_OF_TWO, RoundingMode.HALF_UP)).installment(interestToPay.add(leftToRepay)).paidInterest(interestToPay.setScale(SCALE_OF_TWO, RoundingMode.HALF_UP)).repaidCapital(leftToRepay.setScale(SCALE_OF_TWO, RoundingMode.HALF_UP)).overpayment(ZERO).build());
+            installments.add(
+                    MortgageCalculationInstallment.newBuilder()
+                            .paymentFrom(installmentStartDate)
+                            .paymentTo(installmentEndDate)
+                            .remainingCapitalAtTheBeginning(leftToRepay.setScale(SCALE_OF_TWO, RoundingMode.HALF_DOWN))
+                            .installment(interestToPay.add(leftToRepay))
+                            .paidInterest(interestToPay.setScale(SCALE_OF_TWO, RoundingMode.HALF_DOWN))
+                            .repaidCapital(leftToRepay.setScale(SCALE_OF_TWO, RoundingMode.HALF_DOWN))
+                            .overpayment(ZERO)
+                            .build()
+            );
         }
         return installments;
-    }
-
-    private BigDecimal calculateInterest(BigDecimal leftToRepay, BigDecimal annualRate, LocalDate installmentStartDate, LocalDate installmentEndDate) {
-        if (YearMonth.from(installmentStartDate).equals(YearMonth.from(installmentEndDate))) {
-            BigDecimal dailyRate = annualRate.divide(BigDecimal.valueOf(Year.from(installmentStartDate).length()), SCALE_OF_FORTY, RoundingMode.HALF_DOWN);
-            BigDecimal numberOfDaysBetween = BigDecimal.valueOf(DAYS.between(installmentStartDate, installmentEndDate.plusDays(1)));
-            return leftToRepay.multiply(dailyRate).multiply(numberOfDaysBetween);
-        }
-        BigDecimal left = calculateInterest(leftToRepay, annualRate, installmentStartDate, YearMonth.from(installmentStartDate).atEndOfMonth());
-        BigDecimal right = calculateInterest(leftToRepay, annualRate, YearMonth.from(installmentStartDate).atEndOfMonth().plusDays(1), installmentEndDate);
-        return left.add(right).setScale(SCALE_OF_TWO, RoundingMode.HALF_UP);
     }
 
     private BigDecimal calculateInstallmentAmount(BigDecimal mortgageAmount, BigDecimal monthlyRate, int numberOfInstallments) {
         BigDecimal factor = monthlyRate.add(BigDecimal.ONE).pow(numberOfInstallments);
         BigDecimal rate = monthlyRate.multiply(factor).divide(factor.subtract(BigDecimal.ONE), SCALE_OF_FORTY, RoundingMode.HALF_DOWN);
-        return mortgageAmount.multiply(rate);
+        return mortgageAmount.multiply(rate).setScale(SCALE_OF_TWO, RoundingMode.HALF_DOWN);
+    }
+
+    private BigDecimal calculateInterest(BigDecimal leftToRepay, BigDecimal annualRate, LocalDate installmentStartDate, LocalDate installmentEndDate) {
+        if (theSameMonth(installmentStartDate, installmentEndDate)) {
+            BigDecimal numberOfDaysBetween = BigDecimal.valueOf(DAYS.between(installmentStartDate, installmentEndDate.plusDays(1)));
+            BigDecimal periodRate = annualRate.multiply(numberOfDaysBetween).divide(daysInYear(installmentStartDate), SCALE_OF_FORTY, RoundingMode.HALF_DOWN);
+            return leftToRepay.multiply(periodRate);
+        }
+        BigDecimal currentMoths = calculateInterest(leftToRepay, annualRate, installmentStartDate, endOfMonth(installmentStartDate));
+        BigDecimal restOfMonths = calculateInterest(leftToRepay, annualRate, beginningOfNextMonth(installmentStartDate), installmentEndDate);
+        return currentMoths.add(restOfMonths).setScale(SCALE_OF_TWO, RoundingMode.HALF_DOWN);
+    }
+
+    private static LocalDate endOfMonth(LocalDate installmentStartDate) {
+        return YearMonth.from(installmentStartDate).atEndOfMonth();
+    }
+
+    private static LocalDate beginningOfNextMonth(LocalDate installmentStartDate) {
+        return YearMonth.from(installmentStartDate).atEndOfMonth().plusDays(1);
+    }
+
+    private static BigDecimal daysInYear(LocalDate installmentStartDate) {
+        return BigDecimal.valueOf(Year.from(installmentStartDate).length());
+    }
+
+    private static boolean theSameMonth(LocalDate installmentStartDate, LocalDate installmentEndDate) {
+        return YearMonth.from(installmentStartDate).equals(YearMonth.from(installmentEndDate));
     }
 
 }
