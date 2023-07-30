@@ -159,7 +159,7 @@ tasks.jar {
 }
 
 val migrateLocal = tasks.register<org.flywaydb.gradle.task.FlywayMigrateTask>("migrateLocal") {
-    url = "jdbc:postgresql://192.168.52.98:5432/accountant"
+    url = "jdbc:postgresql://192.168.52.169:5432/accountant"
     user = "postgres"
     password = "SLAwek1!"
 }
