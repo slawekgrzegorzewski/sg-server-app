@@ -1,20 +1,20 @@
 package pl.sg.application.model;
 
+import jakarta.persistence.*;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.jboss.aerogear.security.otp.api.Base32;
 import pl.sg.application.ForbiddenException;
 
-import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 @Entity
 public class ApplicationUser {
+
     @Id
-    
     @SequenceGenerator(
             name = "commonIdGenerator",
             sequenceName = "hibernate_sequence",
@@ -100,12 +100,24 @@ public class ApplicationUser {
         return firstName;
     }
 
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
     public String getLastName() {
         return lastName;
     }
 
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
     public String getEmail() {
         return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public List<String> getRoles() {

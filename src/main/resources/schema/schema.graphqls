@@ -5,7 +5,6 @@ scalar Currency
 
 type Query {
     accounts: [Account!]!
-    login(loginParameters:LoginParameters!): AuthenticationInfo!
     allIPRs: [IntellectualProperty!]!
     nonIPTimeRecords: [TimeRecord!]!
     allTimeRecordCategories: [TimeRecordCategory!]!
@@ -14,6 +13,9 @@ type Query {
 }
 
 type Mutation{
+    login(loginParameters:LoginParameters!): AuthenticationInfo!
+    register(registrationParameters:RegistrationParameters!): MFAData!
+    setupMFA(mfaParameters:MFAParameters!): Boolean!
     addRevenueAndExpenseEntry(input: RevenueAndExpenseEntryInput):RevenueAndExpenseEntry
     addIPR(input: IntellectualPropertyData): IntellectualProperty
     updateIPR(intellectualPropertyId: Int!, input: IntellectualPropertyData): IntellectualProperty
@@ -34,6 +36,21 @@ input LoginParameters{
     login:String!
     password: String!
     otp:String!
+}
+
+input RegistrationParameters{
+    firstName:String!
+    lastName:String!
+    login:String!
+    email: String!
+    password: String!
+    repeatedPassword: String!
+}
+
+input MFAParameters{
+    login: String!
+    password: String!
+    otp: String!
 }
 
 input MortgageCalculationParams {
@@ -88,6 +105,11 @@ type User {
 type AuthenticationInfo {
     jwt: String!,
     user: User!
+}
+
+type MFAData {
+    mfaCode: String!
+    qrLink: String!
 }
 
 type DomainSimple {
