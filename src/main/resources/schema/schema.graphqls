@@ -1,9 +1,11 @@
 scalar UUID
 scalar BigDecimal
 scalar LocalDate
-scalar Upload
+scalar Currency
 
 type Query {
+    accounts: [Account!]!
+    login(loginParameters:LoginParameters!): AuthenticationInfo!
     allIPRs: [IntellectualProperty!]!
     nonIPTimeRecords: [TimeRecord!]!
     allTimeRecordCategories: [TimeRecordCategory!]!
@@ -26,6 +28,12 @@ type Mutation{
     createTimeRecordCategory(name: String!): TimeRecordCategory!
     updateTimeRecordCategory(timeRecordId: Int!, name: String!): String!
     deleteTimeRecordCategory(timeRecordId:Int!): String!
+}
+
+input LoginParameters{
+    login:String!
+    password: String!
+    otp:String!
 }
 
 input MortgageCalculationParams {
@@ -68,6 +76,18 @@ input TimeRecordData {
     numberOfHours:BigDecimal!,
     description:String!,
     assignmentAction:AssignmentAction!
+}
+
+type User {
+    name: String!,
+    email: String!,
+    defaultDomainId: Int!,
+    domains: [DomainSimple!]!
+}
+
+type AuthenticationInfo {
+    jwt: String!,
+    user: User!
 }
 
 type DomainSimple {
@@ -142,4 +162,26 @@ input RevenueAndExpenseEntryInput {
     otherExpense: BigDecimal!,
     totalExpense: BigDecimal!,
     comments: String!
+}
+
+type Account {
+    id:Int!,
+    name:String!,
+    currency:Currency!,
+    currentBalance:BigDecimal!,
+    balanceIndex:Int,
+    visible:Boolean!,
+    bankAccount:BankAccount,
+    domain:DomainSimple,
+}
+
+type BankAccount {
+    id: Int!,
+    iban: String!,
+    currency: Currency!,
+    owner: String!,
+    product: String,
+    bic: String,
+    externalId: String!,
+    domain: DomainSimple!,
 }

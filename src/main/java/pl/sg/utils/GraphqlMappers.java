@@ -1,0 +1,72 @@
+package pl.sg.utils;
+
+import pl.sg.accountant.model.accounts.FinancialTransaction;
+import pl.sg.application.model.ApplicationUser;
+import pl.sg.application.model.ApplicationUserDomainRelation;
+import pl.sg.application.model.Domain;
+import pl.sg.graphql.schema.types.*;
+
+import static java.util.Optional.ofNullable;
+
+public class GraphqlMappers {
+
+    public static AuthenticationInfo mapAuthenticationInfo(ApplicationUser applicationUser, String jwt) {
+        return AuthenticationInfo
+                .newBuilder()
+                .jwt(jwt)
+                .user(mapUser(applicationUser))
+                .build();
+    }
+
+    public static User mapUser(ApplicationUser fapplicationUserrstByLogin) {
+        return User.newBuilder()
+                .name(fapplicationUserrstByLogin.getFirstName() + " " + fapplicationUserrstByLogin.getLastName())
+                .email(fapplicationUserrstByLogin.getEmail())
+                .defaultDomainId(fapplicationUserrstByLogin.getDefaultDomain().getId())
+                .domains(
+                        fapplicationUserrstByLogin.getAssignedDomains()
+                                .stream()
+                                .map(ApplicationUserDomainRelation::getDomain)
+                                .map(GraphqlMappers::mapDomainSimple)
+                                .toList()
+                )
+                .build();
+    }
+
+    public static Account mapAccount(pl.sg.accountant.model.accounts.Account account) {
+        final pl.sg.banks.model.BankAccount bankAccount = account.getBankAccount();
+        final Domain domain = account.getDomain();
+        FinancialTransaction lastTransactionIncludedInBalance = account.getLastTransactionIncludedInBalance();
+        return Account.newBuilder()
+                .id(account.getId())
+                .name(account.getName())
+                .currency(account.getCurrency())
+                .currentBalance(account.getCurrentBalance())
+                .balanceIndex(ofNullable(lastTransactionIncludedInBalance).map(FinancialTransaction::getId).orElse(null))
+                .visible(account.isVisible())
+                .bankAccount(ofNullable(bankAccount).map(GraphqlMappers::mapBankAccount).orElse(null))
+                .domain(ofNullable(domain).map(GraphqlMappers::mapDomainSimple).orElse(null))
+                .build();
+    }
+
+    public static BankAccount mapBankAccount(pl.sg.banks.model.BankAccount bankAccount) {
+        Domain domain = bankAccount.getDomain();
+        return BankAccount.newBuilder()
+                .id(bankAccount.getId())
+                .iban(bankAccount.getIban())
+                .currency(bankAccount.getCurrency())
+                .owner(bankAccount.getOwner())
+                .product(bankAccount.getProduct())
+                .bic(bankAccount.getBic())
+                .externalId(bankAccount.getExternalId())
+                .domain(ofNullable(domain).map(GraphqlMappers::mapDomainSimple).orElse(null))
+                .build();
+    }
+
+    public static DomainSimple mapDomainSimple(Domain domain) {
+        return DomainSimple.newBuilder()
+                .id(domain.getId())
+                .name(domain.getName())
+                .build();
+    }
+}
