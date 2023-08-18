@@ -81,6 +81,9 @@ public class Configuration {
     }
 
     private Optional<String> getSecret(Path secretPath) {
+        if (!Files.exists(secretPath)) {
+            return empty();
+        }
         try {
             List<String> lines = Files.readAllLines(secretPath, StandardCharsets.UTF_8);
             if (lines.isEmpty()) {
