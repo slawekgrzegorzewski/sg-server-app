@@ -1,12 +1,12 @@
 package pl.sg.accountant.service;
 
 import org.springframework.stereotype.Component;
+import pl.sg.accountant.model.AccountsException;
 import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.repository.AccountRepository;
-import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.Domain;
-import pl.sg.application.service.DomainService;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Component
@@ -34,13 +34,21 @@ public class AccountsJPAService implements AccountsService {
 
     @Override
     public void createAccount(Account account) {
+        validateCreditLimit(account);
         account.setId(null);
         accountRepository.save(account);
     }
 
     @Override
     public void update(Account toEdit) {
+        validateCreditLimit(toEdit);
         accountRepository.save(toEdit);
+    }
+
+    private void validateCreditLimit(Account account) {
+        if (account.getAvailableBalance().compareTo(BigDecimal.ZERO) < 0) {
+            throw new AccountsException("Credit limit too low");
+        }
     }
 
     @Override
