@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
+
 import java.math.BigDecimal;
 import java.util.Currency;
 
@@ -21,6 +22,12 @@ public class Account implements WithDomain {
     @Digits(integer = Integer.MAX_VALUE, fraction = 2)
     @PositiveOrZero
     private BigDecimal currentBalance;
+
+    @NotNull
+    @Digits(integer = Integer.MAX_VALUE, fraction = 2)
+    @PositiveOrZero
+    private BigDecimal creditLimit;
+
     private int balanceIndex;
     private boolean visible;
     private BankAccount bankAccount;
@@ -29,11 +36,12 @@ public class Account implements WithDomain {
     public Account() {
     }
 
-    public Account(int id, String name, Currency currency, BigDecimal currentBalance, int balanceIndex, boolean visible, BankAccount bankAccount, DomainSimple domain) {
+    public Account(int id, String name, Currency currency, BigDecimal currentBalance, BigDecimal creditLimit, int balanceIndex, boolean visible, BankAccount bankAccount, DomainSimple domain) {
         this.id = id;
         this.name = name;
         this.currency = currency;
         this.currentBalance = currentBalance;
+        this.creditLimit = creditLimit;
         this.balanceIndex = balanceIndex;
         this.visible = visible;
         this.bankAccount = bankAccount;
@@ -78,6 +86,14 @@ public class Account implements WithDomain {
     public Account setCurrentBalance(BigDecimal currentBalance) {
         this.currentBalance = currentBalance;
         return this;
+    }
+
+    public BigDecimal getCreditLimit() {
+        return creditLimit;
+    }
+
+    public void setCreditLimit(BigDecimal creditLimit) {
+        this.creditLimit = creditLimit;
     }
 
     public int getBalanceIndex() {

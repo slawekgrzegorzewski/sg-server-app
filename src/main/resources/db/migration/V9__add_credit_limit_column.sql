@@ -1,0 +1,1 @@
+alter table account add column credit_limit numeric(19,2) default 0 not null;

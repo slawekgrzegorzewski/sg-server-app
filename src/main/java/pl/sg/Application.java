@@ -182,6 +182,7 @@ public class Application {
         destination.setName(source.getName());
         destination.setCurrency(source.getCurrency());
         destination.setVisible(source.isVisible());
+        destination.setCreditLimit(source.getCreditLimit());
         return destination;
     }
 

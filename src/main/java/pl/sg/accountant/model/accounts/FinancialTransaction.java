@@ -192,7 +192,7 @@ public class FinancialTransaction {
     }
 
     private void validateEnoughMoney(Account account, BigDecimal amount) {
-        if (account.getCurrentBalance().compareTo(amount) < 0) {
+        if (account.getAvailableBalance().compareTo(amount) < 0) {
             throw new AccountsException("Not enough money");
         }
     }

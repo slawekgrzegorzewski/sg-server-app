@@ -191,6 +191,7 @@ type Account {
     name:String!,
     currency:Currency!,
     currentBalance:BigDecimal!,
+    creditLimit:BigDecimal!,
     balanceIndex:Int,
     visible:Boolean!,
     bankAccount:BankAccount,

@@ -27,9 +27,15 @@ public class Account implements WithDomain<Account> {
     private Currency currency;
     @Column(columnDefinition = "numeric(19,2) default 0")
     @Digits(integer = Integer.MAX_VALUE, fraction = 2)
-    @PositiveOrZero
     @NotNull
     private BigDecimal currentBalance = new BigDecimal(0);
+
+    @Column(columnDefinition = "numeric(19,2) default 0")
+    @Digits(integer = Integer.MAX_VALUE, fraction = 2)
+    @PositiveOrZero
+    @NotNull
+    private BigDecimal creditLimit = new BigDecimal(0);
+
     @ManyToOne
     private FinancialTransaction lastTransactionIncludedInBalance;
     @Column(columnDefinition = "boolean not null default true")
@@ -68,6 +74,10 @@ public class Account implements WithDomain<Account> {
         return this;
     }
 
+    public BigDecimal getAvailableBalance() {
+        return currentBalance.add(creditLimit);
+    }
+
     public BigDecimal getCurrentBalance() {
         return currentBalance;
     }
@@ -75,6 +85,14 @@ public class Account implements WithDomain<Account> {
     public Account setCurrentBalance(BigDecimal currentBalance) {
         this.currentBalance = currentBalance;
         return this;
+    }
+
+    public BigDecimal getCreditLimit() {
+        return creditLimit;
+    }
+
+    public void setCreditLimit(BigDecimal creditLimit) {
+        this.creditLimit = creditLimit;
     }
 
     public FinancialTransaction getLastTransactionIncludedInBalance() {

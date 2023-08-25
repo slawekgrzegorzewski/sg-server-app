@@ -189,7 +189,7 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
     }
 
     private void validateAmount(Account account, BigDecimal amount) {
-        if (account.getCurrentBalance().add(amount).compareTo(BigDecimal.ZERO) < 0) {
+        if (account.getAvailableBalance().add(amount).compareTo(BigDecimal.ZERO) < 0) {
             throw new AccountsException("There is not enough money for that expense.");
         }
     }

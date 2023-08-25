@@ -41,7 +41,7 @@ public class GraphqlMappers {
                 .id(account.getId())
                 .name(account.getName())
                 .currency(account.getCurrency())
-                .currentBalance(account.getCurrentBalance())
+                .creditLimit(account.getCreditLimit())
                 .balanceIndex(ofNullable(lastTransactionIncludedInBalance).map(FinancialTransaction::getId).orElse(null))
                 .visible(account.isVisible())
                 .bankAccount(ofNullable(bankAccount).map(GraphqlMappers::mapBankAccount).orElse(null))
