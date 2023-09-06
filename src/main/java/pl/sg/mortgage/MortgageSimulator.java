@@ -43,7 +43,7 @@ public class MortgageSimulator {
                     ? mortgageCalculationParams.getRepaymentStart()
                     : installments.get(installments.size() - 1).getPaymentTo().plusDays(1);
 
-            LocalDate installmentEndDate = installmentStartDate.plusMonths(1).minusDays(1);
+            LocalDate installmentEndDate = installmentStartDate.plusMonths(1).withDayOfMonth(1);
 
             int finalInstallmentsFromLastHolidays = installmentsFromLastHolidays;
             boolean applyHolidays = ofNullable(mortgageCalculationParams.getHolidaysMonthAfterNumberOfInstallments())
@@ -119,6 +119,9 @@ public class MortgageSimulator {
     }
 
     private BigDecimal calculateInstallmentAmount(BigDecimal mortgageAmount, BigDecimal monthlyRate, int numberOfInstallments) {
+        if(numberOfInstallments == 0) {
+            return mortgageAmount;
+        }
         BigDecimal factor = monthlyRate.add(BigDecimal.ONE).pow(numberOfInstallments);
         BigDecimal rate = monthlyRate.multiply(factor).divide(factor.subtract(BigDecimal.ONE), SCALE_OF_FORTY, RoundingMode.HALF_DOWN);
         return mortgageAmount.multiply(rate).setScale(SCALE_OF_TWO, RoundingMode.HALF_DOWN);
@@ -130,9 +133,9 @@ public class MortgageSimulator {
             BigDecimal periodRate = annualRate.multiply(numberOfDaysBetween).divide(daysInYear(installmentStartDate), SCALE_OF_FORTY, RoundingMode.HALF_DOWN);
             return leftToRepay.multiply(periodRate);
         }
-        BigDecimal currentMoths = calculateInterest(leftToRepay, annualRate, installmentStartDate, endOfMonth(installmentStartDate));
+        BigDecimal currentMonths = calculateInterest(leftToRepay, annualRate, installmentStartDate, endOfMonth(installmentStartDate));
         BigDecimal restOfMonths = calculateInterest(leftToRepay, annualRate, beginningOfNextMonth(installmentStartDate), installmentEndDate);
-        return currentMoths.add(restOfMonths).setScale(SCALE_OF_TWO, RoundingMode.HALF_DOWN);
+        return currentMonths.add(restOfMonths).setScale(SCALE_OF_TWO, RoundingMode.HALF_DOWN);
     }
 
     private static LocalDate endOfMonth(LocalDate installmentStartDate) {
