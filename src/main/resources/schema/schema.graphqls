@@ -60,8 +60,7 @@ input MortgageCalculationParams {
     wibor: BigDecimal!,
     numberOfInstallments: Int!,
     overpaymentMonthlyBudget: BigDecimal!,
-    overpaymentYearlyBudget: BigDecimal!,
-    holidaysMonthAfterNumberOfInstallments: Int
+    overpaymentYearlyBudget: BigDecimal!
 }
 
 type MortgageCalculationInstallment {

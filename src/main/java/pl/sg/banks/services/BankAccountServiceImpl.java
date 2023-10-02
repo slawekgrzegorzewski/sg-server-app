@@ -100,7 +100,6 @@ public class BankAccountServiceImpl implements BankAccountService {
                     .map(transaction -> mapToDb(transaction, bankAccount, now, NodrigenPhase.PENDING))
                     .collect(Collectors.toCollection(() -> toSave));
             nodrigenTransactionRepository.saveAll(toSave);
-
         } catch (EUAEndedException exception) {
             nodrigenService.recreateRequisition(bankAccount);
         }
