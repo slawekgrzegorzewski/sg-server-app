@@ -19,7 +19,7 @@ import static java.time.temporal.ChronoUnit.DAYS;
 @Component
 public class MortgageSimulator {
     private static final BigDecimal HUNDRED = new BigDecimal("100");
-    private final int SCALE_OF_FOURTY = 40;
+    private final int SCALE_OF_FOURTY = 5;
     private final int SCALE_OF_TWO = 2;
 
     private final MortgageOverpaymentStrategyFactory mortgageOverpaymentStrategyFactory;
@@ -111,14 +111,15 @@ public class MortgageSimulator {
 
         LocalDate from = startOfRepayment;
         BigDecimal sumOfFactors = ZERO;
+        BigDecimal multiplicationOfRates = ONE;
         for (int i = 1; i <= numberOfInstallments; i++) {
             LocalDate to = i == numberOfInstallments
                     ? from.plusMonths(1).withDayOfMonth(startOfRepayment.getDayOfMonth())
                     : from.plusMonths(1).withDayOfMonth(1);
             BigDecimal periodRate = calculatePeriodRate(annualRate, from, to);
             BigDecimal onePlusPeriodRate = periodRate.add(ONE);
-            BigDecimal onePlusPeriodRatePowerOfInstallment = onePlusPeriodRate.pow(i);
-            sumOfFactors = sumOfFactors.add(ONE.divide(onePlusPeriodRatePowerOfInstallment, SCALE_OF_FOURTY, HALF_DOWN));
+            multiplicationOfRates = multiplicationOfRates.multiply(onePlusPeriodRate);
+            sumOfFactors = sumOfFactors.add(ONE.divide(multiplicationOfRates, SCALE_OF_FOURTY, HALF_DOWN));
             from = to.plusDays(1);
         }
         return mortgageAmount.divide(sumOfFactors, SCALE_OF_TWO, HALF_DOWN);
