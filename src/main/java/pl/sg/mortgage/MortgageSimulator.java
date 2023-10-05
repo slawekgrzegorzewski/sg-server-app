@@ -19,7 +19,7 @@ import static java.time.temporal.ChronoUnit.DAYS;
 @Component
 public class MortgageSimulator {
     private static final BigDecimal HUNDRED = new BigDecimal("100");
-    private final int SCALE_OF_FOURTY = 5;
+    private final int MORE_PRECISE_SCALE = 10;
     private final int SCALE_OF_TWO = 2;
 
     private final MortgageOverpaymentStrategyFactory mortgageOverpaymentStrategyFactory;
@@ -31,7 +31,7 @@ public class MortgageSimulator {
     public List<MortgageCalculationInstallment> simulate(MortgageCalculationParams mortgageCalculationParams) {
         List<MortgageCalculationInstallment> installments = new ArrayList<>();
         BigDecimal leftToRepay = mortgageCalculationParams.getMortgageAmount();
-        BigDecimal annualRate = mortgageCalculationParams.getWibor().add(mortgageCalculationParams.getRate()).divide(HUNDRED, SCALE_OF_FOURTY, HALF_DOWN);
+        BigDecimal annualRate = mortgageCalculationParams.getWibor().add(mortgageCalculationParams.getRate()).divide(HUNDRED, MORE_PRECISE_SCALE, HALF_DOWN);
 
         BigDecimal installmentAmount = calculateInstallmentAmount(leftToRepay, annualRate, mortgageCalculationParams.getNumberOfInstallments(), mortgageCalculationParams.getRepaymentStart());
 
@@ -119,7 +119,7 @@ public class MortgageSimulator {
             BigDecimal periodRate = calculatePeriodRate(annualRate, from, to);
             BigDecimal onePlusPeriodRate = periodRate.add(ONE);
             multiplicationOfRates = multiplicationOfRates.multiply(onePlusPeriodRate);
-            sumOfFactors = sumOfFactors.add(ONE.divide(multiplicationOfRates, SCALE_OF_FOURTY, HALF_DOWN));
+            sumOfFactors = sumOfFactors.add(ONE.divide(multiplicationOfRates, MORE_PRECISE_SCALE, HALF_DOWN));
             from = to.plusDays(1);
         }
         return mortgageAmount.divide(sumOfFactors, SCALE_OF_TWO, HALF_DOWN);
@@ -131,8 +131,8 @@ public class MortgageSimulator {
 
     private BigDecimal calculatePeriodRate(BigDecimal annualRate, LocalDate fromInclusive, LocalDate toInclusive) {
         if (theSameMonth(fromInclusive, toInclusive)) {
-            BigDecimal daysBetween = BigDecimal.valueOf(DAYS.between(fromInclusive, toInclusive.plusDays(1))).setScale(SCALE_OF_FOURTY, HALF_DOWN);
-            BigDecimal dailyRate = annualRate.divide(daysInYear(fromInclusive), SCALE_OF_FOURTY, HALF_DOWN);
+            BigDecimal daysBetween = BigDecimal.valueOf(DAYS.between(fromInclusive, toInclusive.plusDays(1))).setScale(MORE_PRECISE_SCALE, HALF_DOWN);
+            BigDecimal dailyRate = annualRate.divide(daysInYear(fromInclusive), MORE_PRECISE_SCALE, HALF_DOWN);
             return daysBetween.multiply(dailyRate);
         }
         return calculatePeriodRate(annualRate, fromInclusive, endOfMonth(fromInclusive))
