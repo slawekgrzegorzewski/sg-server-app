@@ -18,13 +18,14 @@ public class GraphqlMappers {
                 .build();
     }
 
-    public static User mapUser(ApplicationUser fapplicationUserrstByLogin) {
+    public static User mapUser(ApplicationUser applicationUser) {
         return User.newBuilder()
-                .name(fapplicationUserrstByLogin.getFirstName() + " " + fapplicationUserrstByLogin.getLastName())
-                .email(fapplicationUserrstByLogin.getEmail())
-                .defaultDomainId(fapplicationUserrstByLogin.getDefaultDomain().getId())
+                .name(applicationUser.getFirstName() + " " + applicationUser.getLastName())
+                .email(applicationUser.getEmail())
+                .roles(applicationUser.getRoles())
+                .defaultDomainId(applicationUser.getDefaultDomain().getId())
                 .domains(
-                        fapplicationUserrstByLogin.getAssignedDomains()
+                        applicationUser.getAssignedDomains()
                                 .stream()
                                 .map(ApplicationUserDomainRelation::getDomain)
                                 .map(GraphqlMappers::mapDomainSimple)
