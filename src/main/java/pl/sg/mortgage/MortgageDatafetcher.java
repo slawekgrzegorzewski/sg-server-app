@@ -20,7 +20,7 @@ public class MortgageDatafetcher {
     @DgsQuery
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public List<MortgageCalculationInstallment> simulateMortgage(
-            @InputArgument MortgageCalculationParams mortgageCalculationParams
+            @InputArgument("mortgageCalculationParams") MortgageCalculationParams mortgageCalculationParams
     ) {
         return mortgageSimulator.simulate(mortgageCalculationParams);
     }

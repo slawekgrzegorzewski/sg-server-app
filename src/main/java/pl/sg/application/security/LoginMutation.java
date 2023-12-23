@@ -29,11 +29,11 @@ public class LoginMutation {
     }
 
     @DgsMutation
-    public AuthenticationInfo login(@InputArgument LoginParameters loginParameters) {
+    public AuthenticationInfo login(@InputArgument("loginParameters") LoginParameters loginParameters) {
         String login = loginParameters.getLogin();
         String password = loginParameters.getPassword();
 
-        if (login == null || password == null || "".equals(login.trim()) || "".equals(password.trim())) {
+        if (login == null || password == null || login.trim().isEmpty() || password.trim().isEmpty()) {
             throw new BadCredentialsException("user/password is required");
         }
 

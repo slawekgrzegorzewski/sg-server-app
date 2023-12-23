@@ -41,8 +41,8 @@ public class LedfgerDatafetcher {
     @DgsQuery
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public List<RevenueAndExpenseEntry> monthRevenueAndExpenseEntry(
-            @InputArgument int year,
-            @InputArgument int month,
+            @InputArgument("year") int year,
+            @InputArgument("month") int month,
             @RequestHeader("domainId") int domainId
     ) {
         YearMonth yearMonth = YearMonth.of(year, month);
@@ -62,7 +62,7 @@ public class LedfgerDatafetcher {
     @DgsMutation
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public RevenueAndExpenseEntry addRevenueAndExpenseEntry(
-            @InputArgument RevenueAndExpenseEntryInput input,
+            @InputArgument("input") RevenueAndExpenseEntryInput input,
             @RequestHeader("domainId") Domain domain
     ) {
         if (input.getPublicId() == null) {

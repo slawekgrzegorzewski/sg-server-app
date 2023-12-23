@@ -24,7 +24,7 @@ public class DevLoginMutation {
     }
 
     @DgsMutation
-    public AuthenticationInfo login(@InputArgument LoginParameters loginParameters) {
+    public AuthenticationInfo login(@InputArgument("loginParameters") LoginParameters loginParameters) {
         String login = loginParameters.getLogin();
         ApplicationUser firstByLogin = applicationUserService.getByUserLogins(login);
         return mapAuthenticationInfo(

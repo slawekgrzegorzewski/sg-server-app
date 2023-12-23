@@ -2,6 +2,7 @@ package pl.sg.ip.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
 import pl.sg.application.model.Domain;
 
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.List;
 @Entity
 public class TimeRecordCategory {
 
+    @Getter
     @Id
     @SequenceGenerator(
             name = "timeRecordCategoryIpGenerator",
@@ -16,10 +18,12 @@ public class TimeRecordCategory {
             allocationSize = 1
     )
     @GeneratedValue(generator = "timeRecordCategoryIpGenerator")
-    private Integer id;
+    private Long id;
+    @Getter
     @NotNull
     @Column(length = 1_000)
     private String name;
+    @Getter
     @ManyToOne
     private Domain domain;
     @OneToMany(mappedBy = "timeRecordCategory", fetch = FetchType.LAZY)
@@ -28,32 +32,20 @@ public class TimeRecordCategory {
     public TimeRecordCategory() {
     }
 
-    public TimeRecordCategory(Integer id, String name, Domain domain) {
+    public TimeRecordCategory(Long id, String name, Domain domain) {
         this.id = id;
         this.name = name;
         this.domain = domain;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public TimeRecordCategory setId(Integer id) {
+    public TimeRecordCategory setId(Long id) {
         this.id = id;
         return this;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public TimeRecordCategory setName(String name) {
         this.name = name;
         return this;
-    }
-
-    public Domain getDomain() {
-        return domain;
     }
 
     public TimeRecordCategory setDomain(Domain domain) {

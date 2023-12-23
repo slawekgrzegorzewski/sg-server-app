@@ -28,11 +28,11 @@ public class RegistrationMutation {
     }
 
     @DgsMutation
-    public MFAData register(@InputArgument RegistrationParameters registrationParameters) {
+    public MFAData register(@InputArgument("registrationParameters") RegistrationParameters registrationParameters) {
         final String login = registrationParameters.getLogin();
         final String password = registrationParameters.getPassword();
         final String repeatedPassword = registrationParameters.getRepeatedPassword();
-        if (login == null || password == null || "".equals(login.trim()) || "".equals(password.trim()) || !password.equals(repeatedPassword)) {
+        if (login == null || password == null || login.trim().isEmpty() || password.trim().isEmpty() || !password.equals(repeatedPassword)) {
             throw new BadCredentialsException("Username/ password is required");
         }
         Optional<ApplicationUser> firstByLogin = applicationUserService.findByUserLogins(login);
@@ -53,7 +53,7 @@ public class RegistrationMutation {
     }
 
     @DgsMutation
-    public boolean setupMFA(@InputArgument MFAParameters mfaParameters) {
+    public boolean setupMFA(@InputArgument("mfaParameters") MFAParameters mfaParameters) {
         ApplicationUser applicationUser = applicationUserService.getByUserLogins(mfaParameters.getLogin());
         if (!passwordEncoder.matches(mfaParameters.getPassword(), applicationUser.getPassword())) {
             throw new BadCredentialsException("Wrong user/password");

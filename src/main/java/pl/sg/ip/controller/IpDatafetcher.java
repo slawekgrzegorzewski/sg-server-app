@@ -73,7 +73,7 @@ public class IpDatafetcher {
     @TokenBearerAuth(any = "IPR")
     public IntellectualProperty addIPR(
             @RequestHeader("domainId") int domainId,
-            @InputArgument IntellectualPropertyData input,
+            @InputArgument("input") IntellectualPropertyData input,
             DataFetchingEnvironment dataFetchingEnvironment
     ) {
         IntellectualPropertyContext intellectualPropertyContext = DgsContext.getCustomContext(dataFetchingEnvironment);
@@ -85,8 +85,8 @@ public class IpDatafetcher {
     @TokenBearerAuth(any = "IPR")
     public IntellectualProperty updateIPR(
             @RequestHeader("domainId") int domainId,
-            @InputArgument int intellectualPropertyId,
-            @InputArgument IntellectualPropertyData input,
+            @InputArgument("intellectualPropertyId") int intellectualPropertyId,
+            @InputArgument("input") IntellectualPropertyData input,
             DataFetchingEnvironment dataFetchingEnvironment
     ) {
         intellectualPropertyService.update(domainId, intellectualPropertyId, input);
@@ -99,7 +99,7 @@ public class IpDatafetcher {
     @TokenBearerAuth(any = "IPR")
     public String deleteIPR(
             @RequestHeader(value = "domainId") int domainId,
-            @InputArgument int intellectualPropertyId) {
+            @InputArgument("intellectualPropertyId") int intellectualPropertyId) {
         intellectualPropertyService.delete(domainId, intellectualPropertyId);
         return "OK";
     }
@@ -108,7 +108,7 @@ public class IpDatafetcher {
     @TokenBearerAuth(any = "IPR")
     public String createTask(
             @RequestHeader(value = "domainId") int domainId,
-            @InputArgument int intellectualPropertyId,
+            @InputArgument("intellectualPropertyId") int intellectualPropertyId,
             @RequestBody TaskData taskData) {
         intellectualPropertyService.createTask(domainId, intellectualPropertyId, taskData);
         return "OK";
@@ -118,8 +118,8 @@ public class IpDatafetcher {
     @TokenBearerAuth(any = "IPR")
     public String updateTask(
             @RequestHeader(value = "domainId") int domainId,
-            @InputArgument int taskId,
-            @InputArgument TaskData taskData) {
+            @InputArgument("taskId") int taskId,
+            @InputArgument("taskData") TaskData taskData) {
         taskService.update(domainId, taskId, taskData);
         return "OK";
     }
@@ -128,7 +128,7 @@ public class IpDatafetcher {
     @TokenBearerAuth(any = "IPR")
     public String deleteTask(
             @RequestHeader("domainId") int domainId,
-            @InputArgument int taskId) {
+            @InputArgument("taskId") int taskId) {
         taskService.delete(domainId, taskId);
         return "OK";
     }
@@ -137,7 +137,7 @@ public class IpDatafetcher {
     @TokenBearerAuth(any = "IPR")
     public TimeRecord createTimeRecord(
             @RequestHeader("domainId") int domainId,
-            @InputArgument TimeRecordData timeRecordData) {
+            @InputArgument("timeRecordData") TimeRecordData timeRecordData) {
         return modelMapper.map(timeRecordService.create(domainId, timeRecordData), TimeRecord.class);
     }
 
@@ -145,8 +145,8 @@ public class IpDatafetcher {
     @TokenBearerAuth(any = "IPR")
     public String updateTimeRecord(
             @RequestHeader("domainId") int domainId,
-            @InputArgument int timeRecordId,
-            @InputArgument TimeRecordData timeRecordData) {
+            @InputArgument("timeRecordId") int timeRecordId,
+            @InputArgument("timeRecordData") TimeRecordData timeRecordData) {
         this.timeRecordService.update(domainId, timeRecordId, timeRecordData);
         return "OK";
     }
@@ -155,7 +155,7 @@ public class IpDatafetcher {
     @TokenBearerAuth(any = "IPR")
     public String deleteTimeRecord(
             @RequestHeader("domainId") int domainId,
-            @InputArgument int timeRecordId) {
+            @InputArgument("timeRecordId") int timeRecordId) {
         this.timeRecordService.delete(domainId, timeRecordId);
         return "OK";
     }
@@ -164,8 +164,8 @@ public class IpDatafetcher {
     @TokenBearerAuth(any = "IPR")
     public String assignCategoryToTimeRecord(
             @RequestHeader("domainId") int domainId,
-            @InputArgument int timeRecordId,
-            @InputArgument Integer timeRecordCategoryId) {
+            @InputArgument("timeRecordId") int timeRecordId,
+            @InputArgument("timeRecordCategoryId") Integer timeRecordCategoryId) {
         if (timeRecordCategoryId == null) {
             this.timeRecordService.clearCategoryOnTimeRecord(domainId, timeRecordId);
         } else {
@@ -178,7 +178,7 @@ public class IpDatafetcher {
     @TokenBearerAuth(any = "IPR")
     public TimeRecordCategory createTimeRecordCategory(
             @RequestHeader("domainId") int domainId,
-            @InputArgument String name) {
+            @InputArgument("name") String name) {
         return modelMapper.map(
                 this.timeRecordService.createTimeRecordCategory(name, domainId),
                 TimeRecordCategory.class
@@ -189,8 +189,8 @@ public class IpDatafetcher {
     @TokenBearerAuth(any = "IPR")
     public String updateTimeRecordCategory(
             @RequestHeader("domainId") int domainId,
-            @InputArgument int timeRecordId,
-            @InputArgument String name) {
+            @InputArgument("timeRecordId") int timeRecordId,
+            @InputArgument("name") String name) {
         this.timeRecordService.updateTimeRecordCategory(domainId, timeRecordId, name);
         return "OK";
     }
@@ -199,7 +199,7 @@ public class IpDatafetcher {
     @TokenBearerAuth(any = "IPR")
     public String deleteTimeRecordCategory(
             @RequestHeader("domainId") int domainId,
-            @InputArgument int timeRecordId) {
+            @InputArgument("timeRecordId") int timeRecordId) {
         this.timeRecordService.deleteTimeRecordCategory(domainId, timeRecordId);
         return "OK";
     }

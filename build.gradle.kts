@@ -4,8 +4,15 @@ import org.jooq.meta.jaxb.Logging
 import org.jooq.meta.jaxb.Property
 
 java {
+    sourceCompatibility = JavaVersion.VERSION_21
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom("com.netflix.graphql.dgs:graphql-dgs-platform-dependencies:latest.release")
     }
 }
 
@@ -16,47 +23,47 @@ buildscript {
 }
 
 plugins {
-    id("org.springframework.boot") version "3.0.4"
-    id("io.spring.dependency-management") version "1.1.0"
+    id("org.springframework.boot") version "3.2.1"
+    id("io.spring.dependency-management") version "1.1.4"
     id("jvm-test-suite")
     id("java")
     id("org.flywaydb.flyway") version "9.5.1"
-    id("com.netflix.dgs.codegen") version "5.6.0"
+    id("com.netflix.dgs.codegen") version "5.12.4"
     id("nu.studer.jooq") version "8.1"
 }
 
 group = "pl.sg"
 version = "0.0.1-SNAPSHOT"
 
-testing {
-    suites {
-        configureEach {
-            if (this is JvmTestSuite) {
-                useJUnitJupiter()
-            }
-        }
+//testing {
+//    suites {
+//        configureEach {
+//            if (this is JvmTestSuite) {
+//                useJUnitJupiter()
+//            }
+//        }
+//
+//        val integrationTest by registering(JvmTestSuite::class) {
+//            testType.set(TestSuiteType.INTEGRATION_TEST)
+//            sources {
+//                java {
+//                    setSrcDirs(listOf("src/integrationTest/java"))
+//                }
+//                resources {
+//                    setSrcDirs(listOf("src/integrationTest/resources"))
+//                }
+//            }
+//            dependencies {
+//                implementation(project)
+//                runtimeOnly(project)
+//            }
+//        }
+//    }
+//}
 
-        val integrationTest by registering(JvmTestSuite::class) {
-            testType.set(TestSuiteType.INTEGRATION_TEST)
-            sources {
-                java {
-                    setSrcDirs(listOf("src/integrationTest/java"))
-                }
-                resources {
-                    setSrcDirs(listOf("src/integrationTest/resources"))
-                }
-            }
-            dependencies {
-                implementation(project)
-                runtimeOnly(project)
-            }
-        }
-    }
-}
-
-val integrationTestImplementation by configurations.getting {
-    extendsFrom(configurations.testImplementation.get())
-}
+//val integrationTestImplementation by configurations.getting {
+//    extendsFrom(configurations.testImplementation.get())
+//}
 
 repositories {
     mavenCentral()
@@ -64,11 +71,10 @@ repositories {
 
 dependencies {
 
-    implementation(platform("com.netflix.graphql.dgs:graphql-dgs-platform-dependencies:latest.release"))
     implementation("com.netflix.graphql.dgs:graphql-dgs-extended-scalars")
     implementation("com.netflix.graphql.dgs:graphql-dgs-spring-boot-starter")
 
-    implementation("com.graphql-java:graphql-java:19.2")
+    implementation("com.graphql-java:graphql-java:21.3")
 
     implementation("com.amazonaws:aws-java-sdk-s3:1.12.351")
 
@@ -76,7 +82,7 @@ dependencies {
 
     implementation("com.google.code.gson:gson:2.9.0")
 
-    implementation("com.sendgrid:sendgrid-java:4.9.3")
+    implementation("com.sendgrid:sendgrid-java:4.10.1")
 
     implementation("javax.xml.bind:jaxb-api:2.3.1")
 
@@ -121,7 +127,7 @@ dependencies {
 
     runtimeOnly("org.postgresql:postgresql:42.5.1")
 
-    annotationProcessor("org.projectlombok:lombok:1.18.24")
+    annotationProcessor("org.projectlombok:lombok:1.18.30")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
@@ -137,11 +143,11 @@ dependencies {
 
     testRuntimeOnly("org.springframework.security:spring-security-test:5.7.3")
 
-    integrationTestImplementation("net.logstash.logback:logstash-logback-encoder:7.2")
-    integrationTestImplementation("org.testcontainers:junit-jupiter:1.17.5")
-    integrationTestImplementation("org.testcontainers:postgresql:1.17.5")
-    integrationTestImplementation("org.testcontainers:testcontainers:1.17.5")
-    integrationTestImplementation("org.flywaydb:flyway-core:9.5.1")
+//    integrationTestImplementation("net.logstash.logback:logstash-logback-encoder:7.2")
+//    integrationTestImplementation("org.testcontainers:junit-jupiter:1.17.5")
+//    integrationTestImplementation("org.testcontainers:postgresql:1.17.5")
+//    integrationTestImplementation("org.testcontainers:testcontainers:1.17.5")
+//    integrationTestImplementation("org.flywaydb:flyway-core:9.5.1")
 
     jooqGenerator("org.postgresql:postgresql:42.5.1")
     jooqGenerator("jakarta.xml.bind:jakarta.xml.bind-api:4.0.0")
@@ -200,9 +206,9 @@ jooq() {
                 logging = Logging.WARN
                 jdbc.apply {
                     driver = "org.postgresql.Driver"
-                    url = System.getenv("SG_DB_URL")
+                    url = System.getenv("SG_DB_URL") ?: "jdbc:postgresql://192.168.52.169:5432/accountant"
                     user = "postgres"
-                    password = System.getenv("SG_DB_PASSWORD")
+                    password = System.getenv("SG_DB_PASSWORD") ?: "SLAwek1!"
                     properties = listOf(
                         Property().apply {
                             key = "PAGE_SIZE"
