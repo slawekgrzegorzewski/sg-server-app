@@ -29,7 +29,7 @@ plugins {
     id("java")
     id("org.flywaydb.flyway") version "9.5.1"
     id("com.netflix.dgs.codegen") version "5.12.4"
-    id("nu.studer.jooq") version "8.1"
+    id("nu.studer.jooq") version "8.2.1"
 }
 
 group = "pl.sg"
@@ -99,12 +99,12 @@ dependencies {
 
     implementation("org.jboss.aerogear:aerogear-otp-java:1.0.0")
 
-    implementation("org.jooq:jooq:3.17.8")
+    implementation("org.jooq:jooq:3.19.1")
 
     implementation("org.jsoup:jsoup:1.15.3")
 
     implementation("org.modelmapper:modelmapper:3.1.0")
-    implementation("org.modelmapper.extensions:modelmapper-jooq:3.1.1")
+    implementation("org.modelmapper.extensions:modelmapper-jooq:3.2.0")
 
     implementation("org.springframework.boot:spring-boot")
     implementation("org.springframework.boot:spring-boot-starter-aop")
@@ -197,7 +197,7 @@ tasks.withType<com.netflix.graphql.dgs.codegen.gradle.GenerateJavaTask> {
 
 
 jooq() {
-    version.set("3.17.6")
+    version.set("3.19.1")
     edition.set(JooqEdition.OSS)
 
     configurations {
