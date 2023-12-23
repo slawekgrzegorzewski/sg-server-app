@@ -5,10 +5,9 @@ import org.jooq.meta.jaxb.Property
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
-    }
 }
+
+println()
 
 dependencyManagement {
     imports {
