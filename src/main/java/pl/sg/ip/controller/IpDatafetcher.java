@@ -7,7 +7,6 @@ import com.netflix.graphql.dgs.InputArgument;
 import com.netflix.graphql.dgs.context.DgsContext;
 import graphql.schema.DataFetchingEnvironment;
 import org.modelmapper.ModelMapper;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import pl.sg.application.security.annotations.TokenBearerAuth;
 import pl.sg.graphql.schema.types.*;
@@ -109,7 +108,7 @@ public class IpDatafetcher {
     public String createTask(
             @RequestHeader(value = "domainId") int domainId,
             @InputArgument("intellectualPropertyId") int intellectualPropertyId,
-            @RequestBody TaskData taskData) {
+            @InputArgument("taskData") TaskData taskData) {
         intellectualPropertyService.createTask(domainId, intellectualPropertyId, taskData);
         return "OK";
     }

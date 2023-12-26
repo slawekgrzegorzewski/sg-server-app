@@ -49,7 +49,7 @@ public class NodrigenControllerImpl implements NodrigenController {
     @Override
     @GetMapping("/institutions/{country}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public List<NodrigenInstitution> getInstitutions(@PathVariable String country) {
+    public List<NodrigenInstitution> getInstitutions(@PathVariable("country") String country) {
         return nodrigenClient.listInstitutions(country);
     }
 
@@ -111,10 +111,10 @@ public class NodrigenControllerImpl implements NodrigenController {
                 .stream()
                 .peek(t -> {
                     ofNullable(t.getSourceId())
-                            .map(accountRepository::getOne)
+                            .map(accountRepository::getReferenceById)
                             .ifPresent(t::setSourceAccount);
                     ofNullable(t.getDestinationId())
-                            .map(accountRepository::getOne)
+                            .map(accountRepository::getReferenceById)
                             .ifPresent(t::setDestinationAccount);
                 })
                 .map(t -> modelMapper.map(t, NodrigenTransactionsToImportTO.class))
@@ -125,7 +125,9 @@ public class NodrigenControllerImpl implements NodrigenController {
     @PutMapping("/nodrigen_transactions_to_mutually_cancel/{firstTransactionId}/{secondTransactionId}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public void mutuallyCancelTransactions(
-            @RequestDomain Domain domain, @PathVariable int firstTransactionId, @PathVariable int secondTransactionId) {
+            @RequestDomain Domain domain,
+            @PathVariable("firstTransactionId") int firstTransactionId,
+            @PathVariable("secondTransactionId") int secondTransactionId) {
         this.nodrigenService.mutuallyCancelTransactions(domain, firstTransactionId, secondTransactionId);
     }
 
@@ -134,14 +136,15 @@ public class NodrigenControllerImpl implements NodrigenController {
     @PutMapping("/nodrigen_ignore_transaction/{transactionsIds}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public void ignoreTransactions(
-            @RequestDomain Domain domain, @PathVariable List<Integer> transactionsIds) {
+            @RequestDomain Domain domain,
+            @PathVariable("transactionsIds") List<Integer> transactionsIds) {
         this.nodrigenService.ignoreTransactions(domain, transactionsIds);
     }
 
     @Override
     @PostMapping("/fetch/{bankAccountExternalId}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public void fetch(@RequestDomain Domain domain, @PathVariable String bankAccountExternalId) {
+    public void fetch(@RequestDomain Domain domain, @PathVariable("bankAccountExternalId") String bankAccountExternalId) {
         this.bankAccountService.fetch(domain, bankAccountExternalId);
     }
 }

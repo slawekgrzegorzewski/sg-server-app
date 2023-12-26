@@ -16,7 +16,7 @@ public class CurrenciesRestController implements CurrenciesController {
     @Override
     @GetMapping(value = "/{locale}")
     @TokenBearerAuth
-    public List<CurrencyTO> locales(@PathVariable Locale locale) {
+    public List<CurrencyTO> locales(@PathVariable("locale") Locale locale) {
         return Currency.getAvailableCurrencies().stream()
                 .map(c -> new CurrencyTO(c.getCurrencyCode(), c.getDisplayName(locale)))
                 .collect(Collectors.toList());

@@ -6,10 +6,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.sg.accountant.model.billings.summary.MonthSummaryPiggyBank;
 import pl.sg.accountant.service.MonthSummaryService;
-import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.Domain;
 import pl.sg.application.security.annotations.RequestDomain;
-import pl.sg.application.security.annotations.RequestUser;
 import pl.sg.application.security.annotations.TokenBearerAuth;
 
 import java.math.BigDecimal;
@@ -19,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-    @RequestMapping("/month-summaries")
+@RequestMapping("/month-summaries")
 public class MonthSummaryRestController implements MonthSummaryController {
 
     private final MonthSummaryService monthSummaryService;
@@ -32,7 +30,7 @@ public class MonthSummaryRestController implements MonthSummaryController {
     @GetMapping("/savings/{forNMonths}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public Map<YearMonth, Map<Currency, BigDecimal>> getSavingsHistory(@RequestDomain Domain domain,
-                                                                       @PathVariable int forNMonths) {
+                                                                       @PathVariable("forNMonths") int forNMonths) {
         return this.monthSummaryService.getSavingsHistory(domain, forNMonths);
     }
 
@@ -40,7 +38,7 @@ public class MonthSummaryRestController implements MonthSummaryController {
     @GetMapping("/piggy-banks/{forNMonths}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public Map<YearMonth, List<MonthSummaryPiggyBank>> getPiggyBanksHistory(@RequestDomain Domain domain,
-                                                                            @PathVariable int forNMonths) {
+                                                                            @PathVariable("forNMonths") int forNMonths) {
         return this.monthSummaryService.getPiggyBanksHistory(domain, forNMonths);
     }
 }

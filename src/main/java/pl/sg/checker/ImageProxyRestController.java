@@ -1,6 +1,5 @@
 package pl.sg.checker;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,22 +19,19 @@ import java.util.Base64;
 @Validated
 public class ImageProxyRestController {
     private final PageFetcher pageFetcher;
-    private final ModelMapper mapper;
 
-    public ImageProxyRestController(PageFetcher pageFetcher, ModelMapper mapper) {
+    public ImageProxyRestController(PageFetcher pageFetcher) {
         this.pageFetcher = pageFetcher;
-        this.mapper = mapper;
     }
 
     @GetMapping("/{pageUrlBase64}")
-    public ResponseEntity<byte[]> getImage(@PathVariable String pageUrlBase64) {
+    public ResponseEntity<byte[]> getImage(@PathVariable("pageUrlBase64") String pageUrlBase64) {
         HttpHeaders headers = new HttpHeaders();
         String pageUrl = new String(Base64.getDecoder().decode(pageUrlBase64.getBytes(StandardCharsets.UTF_8)));
-        byte[] image = pageFetcher.getImage(pageUrl).get();
+        byte[] image = pageFetcher.getImage(pageUrl).orElseThrow();
         headers.setCacheControl(CacheControl.noCache().getHeaderValue());
 
-        ResponseEntity<byte[]> responseEntity = new ResponseEntity<>(image, headers, HttpStatus.OK);
-        return responseEntity;
+        return new ResponseEntity<>(image, headers, HttpStatus.OK);
     }
 
 }

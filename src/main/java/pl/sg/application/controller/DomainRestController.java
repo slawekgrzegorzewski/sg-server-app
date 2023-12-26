@@ -47,7 +47,7 @@ public class DomainRestController implements DomainController {
     @Override
     @PutMapping("/{domainName}")
     @TokenBearerAuth
-    public DomainSimple createDomain(@RequestUser ApplicationUser user, @PathVariable String domainName) {
+    public DomainSimple createDomain(@RequestUser ApplicationUser user, @PathVariable("domainName") String domainName) {
         return mapper.map(domainService.create(user, new pl.sg.application.model.Domain().setName(domainName)), DomainSimple.class);
     }
 
@@ -66,8 +66,8 @@ public class DomainRestController implements DomainController {
     @PostMapping("/invite/{domainId}/{userLoginToInvite}")
     @TokenBearerAuth
     public void inviteUser(@RequestUser ApplicationUser loggedInUser,
-                           @PathVariable int domainId,
-                           @PathVariable String userLoginToInvite) {
+                           @PathVariable("domainId") int domainId,
+                           @PathVariable("userLoginToInvite") String userLoginToInvite) {
         pl.sg.application.model.Domain domain = domainService.getById(domainId);
         ApplicationUser userToInvite = applicationUserService.getByUserLogins(userLoginToInvite);
         domainService.invite(loggedInUser, domain, userToInvite);
@@ -86,7 +86,7 @@ public class DomainRestController implements DomainController {
     @Override
     @PostMapping("/invitations/accept/{domainId}")
     @TokenBearerAuth
-    public void acceptInvitation(@RequestUser ApplicationUser user, @PathVariable int domainId) {
+    public void acceptInvitation(@RequestUser ApplicationUser user, @PathVariable("domainId") int domainId) {
         pl.sg.application.model.Domain domain = domainService.getById(domainId);
         domainService.acceptInvitations(user, domain);
     }
@@ -94,7 +94,7 @@ public class DomainRestController implements DomainController {
     @Override
     @PostMapping("/invitations/reject/{domainId}")
     @TokenBearerAuth
-    public void rejectInvitation(@RequestUser ApplicationUser user, @PathVariable int domainId) {
+    public void rejectInvitation(@RequestUser ApplicationUser user, @PathVariable("domainId") int domainId) {
         pl.sg.application.model.Domain domain = domainService.getById(domainId);
         domainService.rejectInvitations(user, domain);
     }
@@ -103,8 +103,8 @@ public class DomainRestController implements DomainController {
     @PostMapping("/MEMBER/{domainId}/{userToAddLogin}")
     @TokenBearerAuth
     public Domain setUserMemberOfDomain(@RequestUser ApplicationUser loggedInUser,
-                                        @PathVariable int domainId,
-                                        @PathVariable String userToAddLogin) {
+                                        @PathVariable("domainId") int domainId,
+                                        @PathVariable("userToAddLogin") String userToAddLogin) {
         pl.sg.application.model.Domain domain = domainService.setUserMemberOfDomain(
                 loggedInUser,
                 domainService.getById(domainId),
@@ -116,8 +116,8 @@ public class DomainRestController implements DomainController {
     @PostMapping("/ADMIN/{domainId}/{userToAddLogin}")
     @TokenBearerAuth
     public Domain setUserAdministratorOfDomain(@RequestUser ApplicationUser loggedInUser,
-                                               @PathVariable int domainId,
-                                               @PathVariable String userToAddLogin) {
+                                               @PathVariable("domainId") int domainId,
+                                               @PathVariable("userToAddLogin") String userToAddLogin) {
         ApplicationUser userToAdd = applicationUserService.getByUserLogins(userToAddLogin);
         final pl.sg.application.model.Domain domain = domainService.getById(domainId);
         final pl.sg.application.model.Domain updatedDomain = domainService.setUserAdministratorOfDomain(loggedInUser, domain, userToAdd);
@@ -128,8 +128,8 @@ public class DomainRestController implements DomainController {
     @DeleteMapping("/{domainId}/{userToRemoveLogin}")
     @TokenBearerAuth
     public Domain removeUserFromDomain(@RequestUser ApplicationUser loggedInUser,
-                                       @PathVariable int domainId,
-                                       @PathVariable String userToRemoveLogin) {
+                                       @PathVariable("domainId") int domainId,
+                                       @PathVariable("userToRemoveLogin") String userToRemoveLogin) {
         ApplicationUser userToRemove = applicationUserService.getByUserLogins(userToRemoveLogin);
         final pl.sg.application.model.Domain domain = domainService.getById(domainId);
         final pl.sg.application.model.Domain updatedDomain = domainService.removeUserFromDomain(loggedInUser, domain, userToRemove);

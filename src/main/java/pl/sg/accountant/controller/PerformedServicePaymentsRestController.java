@@ -39,7 +39,7 @@ public class PerformedServicePaymentsRestController implements PerformedServiceP
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public List<PerformedServicePaymentTO> payments(
             @RequestDomain Domain domain,
-            @PathVariable YearMonth forMonth) {
+            @PathVariable("forMonth") YearMonth forMonth) {
         return performedServicePaymentsService.payments(domain).stream()
                 .map(c -> mapper.map(c, PerformedServicePaymentTO.class))
                 .collect(Collectors.toList());

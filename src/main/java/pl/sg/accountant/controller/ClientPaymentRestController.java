@@ -35,7 +35,7 @@ public class ClientPaymentRestController implements ClientPaymentController {
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public List<ClientPayment> clientPayments(
             @RequestDomain Domain domain,
-            @PathVariable YearMonth forMonth) {
+            @PathVariable("forMonth") YearMonth forMonth) {
         return clientPaymentsService.clientPayments(domain, forMonth).stream()
                 .map(c -> mapper.map(c, ClientPayment.class))
                 .collect(Collectors.toList());

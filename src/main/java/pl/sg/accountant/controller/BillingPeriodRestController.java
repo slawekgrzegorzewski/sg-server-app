@@ -43,7 +43,7 @@ public class BillingPeriodRestController implements BillingPeriodController {
     @GetMapping("/{period}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public BillingPeriodInfo periodForMonth(@RequestDomain Domain domain,
-                                            @PathVariable YearMonth period) {
+                                            @PathVariable("period") YearMonth period) {
         return getBilling(domain, period);
     }
 
@@ -59,7 +59,7 @@ public class BillingPeriodRestController implements BillingPeriodController {
     @PutMapping("/{period}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"}, domainAdmin = true)
     public BillingPeriodInfo create(@RequestDomain Domain domain,
-                                    @PathVariable YearMonth period) {
+                                    @PathVariable("period") YearMonth period) {
         final pl.sg.accountant.model.billings.BillingPeriod newEntity = this.billingPeriodsService.create(domain, period);
         return billingPeriodResponseCreator(domain).apply(newEntity);
     }
@@ -76,7 +76,7 @@ public class BillingPeriodRestController implements BillingPeriodController {
     @Override
     @PutMapping("/income/{account}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public String createIncome(@PathVariableWithDomain Account account,
+    public String createIncome(@PathVariableWithDomain("account") Account account,
                                @MapRequestBody(transportClass = IncomeTO.class) Income income) {
         billingPeriodsService.addIncome(account, income);
         return "OK";
@@ -85,9 +85,9 @@ public class BillingPeriodRestController implements BillingPeriodController {
     @Override
     @PutMapping("/income/{account}/{nodrigenTransactionsIds}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public String createIncome(@PathVariableWithDomain Account account,
+    public String createIncome(@PathVariableWithDomain("account") Account account,
                                @MapRequestBody(transportClass = IncomeTO.class) Income income,
-                               @PathVariable List<Integer> nodrigenTransactionsIds) {
+                               @PathVariable("nodrigenTransactionsIds") List<Integer> nodrigenTransactionsIds) {
         billingPeriodsService.addIncome(account, income, nodrigenTransactionsIds);
         return "OK";
     }
@@ -95,7 +95,7 @@ public class BillingPeriodRestController implements BillingPeriodController {
     @Override
     @PutMapping("/expense/{account}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public String createExpense(@PathVariableWithDomain Account account,
+    public String createExpense(@PathVariableWithDomain("account") Account account,
                                 @MapRequestBody(transportClass = ExpenseTO.class) Expense expense) {
         billingPeriodsService.addExpense(account, expense);
         return "OK";
@@ -104,9 +104,9 @@ public class BillingPeriodRestController implements BillingPeriodController {
     @Override
     @PutMapping("/expense/{account}/{nodrigenTransactionsIds}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public String createExpense(@PathVariableWithDomain Account account,
+    public String createExpense(@PathVariableWithDomain("account") Account account,
                                 @MapRequestBody(transportClass = ExpenseTO.class) Expense expense,
-                                @PathVariable List<Integer> nodrigenTransactionsIds) {
+                                @PathVariable("nodrigenTransactionsIds") List<Integer> nodrigenTransactionsIds) {
         billingPeriodsService.addExpense(account, expense, nodrigenTransactionsIds);
         return "OK";
     }

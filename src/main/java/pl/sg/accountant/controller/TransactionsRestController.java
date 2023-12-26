@@ -43,8 +43,8 @@ public class TransactionsRestController implements TransactionsController {
     @Override
     @PostMapping("/transfer/{from}/{to}/{amount}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public FinancialTransactionTO transfer(@PathVariableWithDomain Account from,
-                                           @PathVariableWithDomain Account to,
+    public FinancialTransactionTO transfer(@PathVariableWithDomain("from") Account from,
+                                           @PathVariableWithDomain("to") Account to,
                                            @PathVariable("amount") @PositiveOrZero BigDecimal amount,
                                            @RequestBody String description) {
         FinancialTransaction result = transactionsService.transferMoneyWithoutConversion(from, to, amount, description);
@@ -54,11 +54,11 @@ public class TransactionsRestController implements TransactionsController {
     @Override
     @PostMapping("/transfer_cash/{from}/{to}/{amount}/{firstBankTransactionId}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public FinancialTransactionTO transferCashWithBankTransactions(@PathVariableWithDomain Account from,
-                                                                   @PathVariableWithDomain Account to,
+    public FinancialTransactionTO transferCashWithBankTransactions(@PathVariableWithDomain("from") Account from,
+                                                                   @PathVariableWithDomain("to") Account to,
                                                                    @PathVariable("amount") @PositiveOrZero BigDecimal amount,
                                                                    @RequestBody String description,
-                                                                   @PathVariable int firstBankTransactionId) {
+                                                                   @PathVariable("firstBankTransactionId") int firstBankTransactionId) {
         FinancialTransaction result = transactionsService.transferCashWithoutConversionWithBankTransactions(from, to,
                 amount, description, firstBankTransactionId);
         return mapper.map(result, FinancialTransactionTO.class);
@@ -67,12 +67,12 @@ public class TransactionsRestController implements TransactionsController {
     @Override
     @PostMapping("/transfer/{from}/{to}/{amount}/{firstBankTransactionId}/{secondBankTransactionId}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public FinancialTransactionTO transferWithBankTransactions(@PathVariableWithDomain Account from,
-                                                               @PathVariableWithDomain Account to,
+    public FinancialTransactionTO transferWithBankTransactions(@PathVariableWithDomain("from") Account from,
+                                                               @PathVariableWithDomain("to") Account to,
                                                                @PathVariable("amount") @PositiveOrZero BigDecimal amount,
                                                                @RequestBody String description,
-                                                               @PathVariable int firstBankTransactionId,
-                                                               @PathVariable int secondBankTransactionId) {
+                                                               @PathVariable("firstBankTransactionId") int firstBankTransactionId,
+                                                               @PathVariable("secondBankTransactionId") int secondBankTransactionId) {
         FinancialTransaction result = transactionsService.transferMoneyWithoutConversionWithBankTransactions(from, to,
                 amount, description, firstBankTransactionId, secondBankTransactionId);
         return mapper.map(result, FinancialTransactionTO.class);
@@ -81,8 +81,8 @@ public class TransactionsRestController implements TransactionsController {
     @Override
     @PostMapping("/transfer_with_conversion/{from}/{to}/{amount}/{targetAmount}/{rate}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public FinancialTransactionTO transferWithConversion(@PathVariableWithDomain Account from,
-                                                         @PathVariableWithDomain Account to,
+    public FinancialTransactionTO transferWithConversion(@PathVariableWithDomain("from") Account from,
+                                                         @PathVariableWithDomain("to") Account to,
                                                          @PathVariable("amount") @PositiveOrZero BigDecimal amount,
                                                          @PathVariable("targetAmount") @PositiveOrZero BigDecimal targetAmount,
                                                          @PathVariable("rate") @Positive BigDecimal rate,
@@ -94,13 +94,13 @@ public class TransactionsRestController implements TransactionsController {
     @Override
     @PostMapping("/transfer_cash_with_conversion/{from}/{to}/{amount}/{targetAmount}/{rate}/{firstBankTransactionId}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public FinancialTransactionTO transferCashWithConversionWithBankTransactions(@PathVariableWithDomain Account from,
-                                                                             @PathVariableWithDomain Account to,
+    public FinancialTransactionTO transferCashWithConversionWithBankTransactions(@PathVariableWithDomain("from") Account from,
+                                                                             @PathVariableWithDomain("to") Account to,
                                                                              @PathVariable("amount") @PositiveOrZero BigDecimal amount,
                                                                              @PathVariable("targetAmount") @PositiveOrZero BigDecimal targetAmount,
                                                                              @PathVariable("rate") @Positive BigDecimal rate,
                                                                              @RequestBody String description,
-                                                                             @PathVariable int firstBankTransactionId) {
+                                                                             @PathVariable("firstBankTransactionId") int firstBankTransactionId) {
         FinancialTransaction result = transactionsService.transferCashWithConversionWithBankTransactions(from, to, amount,
                 targetAmount, rate, description, firstBankTransactionId);
         return mapper.map(result, FinancialTransactionTO.class);
@@ -109,14 +109,14 @@ public class TransactionsRestController implements TransactionsController {
     @Override
     @PostMapping("/transfer_with_conversion/{from}/{to}/{amount}/{targetAmount}/{rate}/{firstBankTransactionId}/{secondBankTransactionId}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public FinancialTransactionTO transferWithConversionWithBankTransactions(@PathVariableWithDomain Account from,
-                                                                             @PathVariableWithDomain Account to,
+    public FinancialTransactionTO transferWithConversionWithBankTransactions(@PathVariableWithDomain("from") Account from,
+                                                                             @PathVariableWithDomain("to") Account to,
                                                                              @PathVariable("amount") @PositiveOrZero BigDecimal amount,
                                                                              @PathVariable("targetAmount") @PositiveOrZero BigDecimal targetAmount,
                                                                              @PathVariable("rate") @Positive BigDecimal rate,
                                                                              @RequestBody String description,
-                                                                             @PathVariable int firstBankTransactionId,
-                                                                             @PathVariable int secondBankTransactionId) {
+                                                                             @PathVariable("firstBankTransactionId") int firstBankTransactionId,
+                                                                             @PathVariable("secondBankTransactionId") int secondBankTransactionId) {
         FinancialTransaction result = transactionsService.transferMoneyWithConversionWithBankTransactions(from, to, amount,
                 targetAmount, rate, description, firstBankTransactionId, secondBankTransactionId);
         return mapper.map(result, FinancialTransactionTO.class);
@@ -125,7 +125,7 @@ public class TransactionsRestController implements TransactionsController {
     @Override
     @PostMapping("/credit/{account}/{amount}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public FinancialTransactionTO credit(@PathVariableWithDomain Account account,
+    public FinancialTransactionTO credit(@PathVariableWithDomain("account") Account account,
                                          @PathVariable("amount") @PositiveOrZero BigDecimal amount,
                                          @RequestBody String description) {
         FinancialTransaction result = transactionsService.credit(account, amount, description);
@@ -135,7 +135,7 @@ public class TransactionsRestController implements TransactionsController {
     @Override
     @PostMapping("/debit/{account}/{amount}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public FinancialTransactionTO debit(@PathVariableWithDomain Account account,
+    public FinancialTransactionTO debit(@PathVariableWithDomain("account") Account account,
                                         @PathVariable("amount") @PositiveOrZero BigDecimal amount,
                                         @RequestBody String description) {
         FinancialTransaction result = transactionsService.debit(account, amount, description);

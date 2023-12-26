@@ -42,7 +42,7 @@ public class CubeRecordRestController implements CubeRecordController {
     @GetMapping("/{forDate}")
     @TokenBearerAuth(any = {"CUBES"})
     public List<CubeRecord> forDate(@RequestDomain Domain domain,
-                                    @Nullable @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate forDate) {
+                                    @Nullable @PathVariable("forDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate forDate) {
         if (forDate == null) {
             forDate = LocalDate.now();
         }

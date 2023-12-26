@@ -1,5 +1,6 @@
 package pl.sg.accountant.controller;
 
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -15,10 +16,11 @@ import pl.sg.application.security.annotations.RequestBodyWithDomain;
 import pl.sg.application.security.annotations.RequestDomain;
 import pl.sg.application.security.annotations.TokenBearerAuth;
 
-import jakarta.validation.Valid;
-import java.math.BigDecimal;
 import java.time.YearMonth;
-import java.util.*;
+import java.util.Currency;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static pl.sg.Application.CREATE_ACCOUNT;
@@ -54,8 +56,6 @@ public class AccountsRestController implements AccountsController {
     public List<Account> domainAccount(@RequestDomain Domain domain) {
 
         Map<YearMonth, List<MonthSummaryPiggyBank>> piggyBanksHistory = monthSummaryService.getPiggyBanksHistory(domain, 24);
-        Map<YearMonth, Map<Currency, BigDecimal>> savingsHistory = monthSummaryService.getSavingsHistory(domain, 24);
-
 
         Map<Currency, Double> incomes = new HashMap<>();
 
@@ -69,26 +69,10 @@ public class AccountsRestController implements AccountsController {
                     BillingPeriod billingPeriod = billingPeriodsService.getByPeriodAndDomain(domain, ym);
 
                     billingPeriod.getIncomes()
-                            .forEach(i -> {
-                                incomes.compute(i.getCurrency(), (currency, sum) -> (sum == null ? 0 : sum) + i.getAmount().doubleValue());
-                            });
+                            .forEach(i -> incomes.compute(i.getCurrency(), (currency, sum) -> (sum == null ? 0 : sum) + i.getAmount().doubleValue()));
 
                     billingPeriod.getExpenses()
-                            .forEach(e -> {
-                                expenses.compute(e.getCurrency(), (currency, sum) -> (sum == null ? 0 : sum) + e.getAmount().doubleValue());
-                            });
-
-                    Optional<BigDecimal> sumOfPiggyBanksNoSavings = piggyBanksHistory.get(ym).stream()
-                            .filter(pg -> Objects.equals(pg.currency.getCurrencyCode(), "PLN"))
-                            .filter(pg -> !pg.savings)
-                            .map(pg -> pg.balance)
-                            .reduce(BigDecimal::add);
-
-                    Optional<BigDecimal> sumOfPiggyBanksSavings = piggyBanksHistory.get(ym).stream()
-                            .filter(pg -> Objects.equals(pg.currency.getCurrencyCode(), "PLN"))
-                            .filter(pg -> pg.savings)
-                            .map(pg -> pg.balance)
-                            .reduce(BigDecimal::add);
+                            .forEach(e -> expenses.compute(e.getCurrency(), (currency, sum) -> (sum == null ? 0 : sum) + e.getAmount().doubleValue()));
                 });
 
         return map(accountsService.getForDomain(domain));
@@ -126,7 +110,7 @@ public class AccountsRestController implements AccountsController {
     @Override
     @DeleteMapping("/{account}")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public String deleteAccount(@PathVariableWithDomain(requireAdmin = true) pl.sg.accountant.model.accounts.Account account) {
+    public String deleteAccount(@PathVariableWithDomain(requireAdmin = true, name = "account") pl.sg.accountant.model.accounts.Account account) {
         accountsService.delete(account);
         return "Deleted.";
     }
