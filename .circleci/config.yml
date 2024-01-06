@@ -22,6 +22,7 @@ jobs:
                   - ~/.m2
                 key: v1-dependencies-{{ checksum "build.gradle.kts" }}
             - run: gradle clean build
+            - run: ls -al /build/libs
             - setup_remote_docker
             - aws-ecr/build-and-push-image:
                 repo: 'backend'
