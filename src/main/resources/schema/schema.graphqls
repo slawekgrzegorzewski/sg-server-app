@@ -6,9 +6,9 @@ scalar Currency
 type Query {
     accounts: [Account!]!
     allIPRs: [IntellectualProperty!]!
-    nonIPTimeRecords: [TimeRecord!]!
     allTimeRecordCategories: [TimeRecordCategory!]!
     monthRevenueAndExpenseEntry(year: Int!, month: Int!): [RevenueAndExpenseEntry!]
+    nonIPTimeRecords: [TimeRecord!]!
     simulateMortgage(mortgageCalculationParams: MortgageCalculationParams): [MortgageCalculationInstallment!]!
 }
 
@@ -103,7 +103,7 @@ type User {
 }
 
 type AuthenticationInfo {
-    jwt: String!,
+    jwt: String!
     user: User!
 }
 
