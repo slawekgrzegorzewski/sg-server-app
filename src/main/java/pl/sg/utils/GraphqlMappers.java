@@ -47,7 +47,9 @@ public class GraphqlMappers {
                 .visible(account.isVisible())
                 .bankAccount(ofNullable(bankAccount).map(GraphqlMappers::mapBankAccount).orElse(null))
                 .domain(ofNullable(domain).map(GraphqlMappers::mapDomainSimple).orElse(null))
+                .currentBalance(account.getCurrentBalance())
                 .build();
+
     }
 
     public static BankAccount mapBankAccount(pl.sg.banks.model.BankAccount bankAccount) {
