@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 
 @Component
 public class MortgageOverpaymentStrategyFactoryImpl implements MortgageOverpaymentStrategyFactory {
+
     @Override
     public MortgageOverpaymentStrategy create(MortgageCalculationParams mortgageCalculationParams) {
         boolean yearly = hasYearlyBudgetSet(mortgageCalculationParams);
