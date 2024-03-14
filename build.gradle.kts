@@ -4,7 +4,7 @@ import org.jooq.meta.jaxb.Logging
 import org.jooq.meta.jaxb.Property
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_20
 }
 
 println()
@@ -34,14 +34,14 @@ plugins {
 group = "pl.sg"
 version = "0.0.1-SNAPSHOT"
 
-//testing {
-//    suites {
-//        configureEach {
-//            if (this is JvmTestSuite) {
-//                useJUnitJupiter()
-//            }
-//        }
-//
+testing {
+    suites {
+        configureEach {
+            if (this is JvmTestSuite) {
+                useJUnitJupiter()
+            }
+        }
+
 //        val integrationTest by registering(JvmTestSuite::class) {
 //            testType.set(TestSuiteType.INTEGRATION_TEST)
 //            sources {
@@ -57,8 +57,8 @@ version = "0.0.1-SNAPSHOT"
 //                runtimeOnly(project)
 //            }
 //        }
-//    }
-//}
+    }
+}
 
 //val integrationTestImplementation by configurations.getting {
 //    extendsFrom(configurations.testImplementation.get())
