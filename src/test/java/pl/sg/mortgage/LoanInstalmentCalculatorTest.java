@@ -26,13 +26,11 @@ class LoanInstalmentCalculatorTest {
         mortgageAmount = mortgageAmount.subtract(installmentAmount).add(interest);
         System.out.println("mortgageAmount = " + mortgageAmount);
 
-        installmentAmount = loanInstalmentCalculator.calculateInstallmentAmountWithOverpayment(
-                mortgageAmount,
-                new BigDecimal("6210.09"),
+        installmentAmount = loanInstalmentCalculator.calculateInstallmentAmount(
+                mortgageAmount.subtract(new BigDecimal("6210.09")),
                 annualRate,
                 359,
-                LocalDate.of(2023, 10, 2),
-                LocalDate.of(2023, 10, 3)
+                LocalDate.of(2023, 10, 2)
         );
         System.out.println("installmentAmount = " + installmentAmount);
     }

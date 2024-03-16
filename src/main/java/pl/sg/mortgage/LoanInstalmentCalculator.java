@@ -46,31 +46,6 @@ public class LoanInstalmentCalculator {
         return mortgageAmount.divide(calculation.sumOfFactors(), lessPreciseScale, HALF_DOWN);
     }
 
-    public BigDecimal calculateInstallmentAmountWithOverpayment(
-            BigDecimal mortgageAmountBeforeOverpayment,
-            BigDecimal overpayment,
-            BigDecimal annualRate,
-            int numberOfInstallments,
-            LocalDate startOfRepayment,
-            LocalDate overpaymentDate) {
-        if (numberOfInstallments == 0) {
-            return mortgageAmountBeforeOverpayment.subtract(overpayment);
-        }
-        Calculation calculation = calculatePeriod(
-                new Calculation(startOfRepayment, ZERO, ONE),
-                annualRate,
-                overpaymentDate.plusDays(1));
-        BigDecimal firstPart = mortgageAmountBeforeOverpayment.divide(calculation.sumOfFactors(), lessPreciseScale, HALF_DOWN);
-        calculation = new Calculation(startOfRepayment, ZERO, ONE);
-        for (int i = 1; i <= numberOfInstallments; i++) {
-            LocalDate periodEnd = i == numberOfInstallments
-                    ? calculation.periodStart().plusMonths(1).withDayOfMonth(startOfRepayment.getDayOfMonth())
-                    : calculation.periodStart().plusMonths(1).withDayOfMonth(1);
-            calculation = calculatePeriod(calculation, annualRate, periodEnd);
-        }
-        return mortgageAmountBeforeOverpayment.subtract(overpayment).divide(calculation.sumOfFactors(), lessPreciseScale, HALF_DOWN);
-    }
-
     @NotNull
     private Calculation calculatePeriod(
             Calculation calculation,
