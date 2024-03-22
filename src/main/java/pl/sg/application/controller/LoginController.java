@@ -23,7 +23,7 @@ import java.io.IOException;
 @Slf4j
 @CrossOrigin
 @Validated
-@Profile("https")
+@Profile({"https", "http"})
 public class LoginController {
 
     private static final String TOKEN_PREFIX = "Bearer";
@@ -43,7 +43,7 @@ public class LoginController {
     public String login(@RequestBody @Valid User user, @RequestHeader("x-tfa") String token) {
         String uname = user.getName();
         String upass = user.getPass();
-        if (uname == null || upass == null || "".equals(uname.trim()) || "".equals(upass.trim())) {
+        if (uname == null || upass == null || uname.trim().isEmpty() || upass.trim().isEmpty()) {
             throw new BadCredentialsException("user/password is required");
         }
 

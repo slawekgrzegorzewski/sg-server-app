@@ -16,7 +16,7 @@ import pl.sg.graphql.schema.types.LoginParameters;
 import static pl.sg.utils.GraphqlMappers.mapAuthenticationInfo;
 
 @DgsComponent
-@Profile("https")
+@Profile({"https", "http"})
 public class LoginMutation {
     private final ApplicationUserService applicationUserService;
     private final PasswordEncoder passwordEncoder;
