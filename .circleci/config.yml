@@ -25,25 +25,6 @@ jobs:
             - setup_remote_docker
             - aws-ecr/build-and-push-image:
                 repo: 'backend'
-                tag: latest
-                assume-web-identity: false
-                attach-workspace: false
-                create-repo: false
-                docker-login: false
-                public-registry: false
-                push-image: true
-                remote-docker-layer-caching: false
-                repo-scan-on-push: true
-                setup-remote-docker: false
-                skip-when-tags-exist: false
-                dockerfile: docker/production/Dockerfile
-                platform: linux/amd64
-                region: eu-central-1
-            - run:
-                name: remove existing Docker context
-                command: docker context rm -f builder
-            - aws-ecr/build-and-push-image:
-                repo: 'backend'
                 tag: latest-rpi4
                 assume-web-identity: false
                 attach-workspace: false
@@ -57,25 +38,6 @@ jobs:
                 skip-when-tags-exist: false
                 dockerfile: docker/production/Dockerfile
                 platform: linux/arm64
-                region: eu-central-1
-            - run:
-                name: remove existing Docker context
-                command: docker context rm -f builder
-            - aws-ecr/build-and-push-image:
-                repo: 'backend'
-                tag: latest-debug
-                assume-web-identity: false
-                attach-workspace: false
-                create-repo: false
-                docker-login: false
-                public-registry: false
-                push-image: true
-                remote-docker-layer-caching: false
-                repo-scan-on-push: true
-                setup-remote-docker: false
-                skip-when-tags-exist: false
-                dockerfile: docker/production/Dockerfile-debug
-                platform: linux/amd64
                 region: eu-central-1
             - run:
                 name: remove existing Docker context
@@ -96,9 +58,9 @@ jobs:
                 dockerfile: docker/production/Dockerfile-debug
                 platform: linux/amd64
                 region: eu-central-1
-            - run: scp -o "StrictHostKeyChecking no" build/distributions/docker.zip $SSH_USER@$SSH_HOST:/home/slawek/
-            - run: ssh -o "StrictHostKeyChecking no" $SSH_USER@$SSH_HOST "cd /home/slawek && unzip docker.zip -d tmp && cd tmp && dos2unix deploy_files.sh && chmod +x deploy_files.sh && ./deploy_files.sh"
-            - run: ssh -o "StrictHostKeyChecking no" $SSH_USER@$SSH_HOST "cd /home/slawek/deploy && ./start.sh"
+            - run: scp -o "StrictHostKeyChecking no" build/distributions/dockerRpi4.zip $SSH_USER@$SSH_HOST:/home/slawek/Application
+            - run: ssh -o "StrictHostKeyChecking no" $SSH_USER@$SSH_HOST "cd /home/slawek/Application && unzip dockerRpi4.zip -d tmp && cd tmp/setup && dos2unix deploy_files.sh && chmod +x deploy_files.sh && ./deploy_files.sh"
+            - run: ssh -o "StrictHostKeyChecking no" $SSH_USER@$SSH_HOST "cd /home/slawek/Application/management && ./start.sh"
 
 workflows:
   workflow:

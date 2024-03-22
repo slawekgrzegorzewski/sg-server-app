@@ -181,8 +181,17 @@ val dockerPackage = tasks.register<Zip>("dockerPackage") {
     archiveFileName.set("docker.zip")
 }
 
+val dockerPackageRpi4 = tasks.register<Zip>("dockerPackageRpi4") {
+    from("docker/production_home/copy_to_docker/")
+    include("stack/*")
+    include("management/*")
+    include("setup/deploy_files.sh")
+    archiveFileName.set("dockerRpi4.zip")
+}
+
 tasks.named("build") {
     dependsOn(dockerPackage)
+    dependsOn(dockerPackageRpi4)
 }
 
 tasks.withType<com.netflix.graphql.dgs.codegen.gradle.GenerateJavaTask> {

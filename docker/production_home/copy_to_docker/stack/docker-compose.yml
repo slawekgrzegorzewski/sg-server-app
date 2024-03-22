@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+
+  app:
+    image: 215372400964.dkr.ecr.eu-central-1.amazonaws.com/backend:latest-rpi4
+    container_name: backend
+    ports:
+      - "8080:8080"
+    environment:
+      spring_profiles_active: http,S3Storage
+    configs:
+      - source: application.yml
+        target: /app/application.yml
+    secrets:
+      - jwt_secret_code
+      - sendgrid_api_key
+      - nordigen_secret_id
+      - nordigen_secret_key
+      - postgres_password
+      - aws_access_key_id
+      - aws_secret_access_key
+      - aws_region
+      - random_org_api_key
+    volumes:
+      - $HOME/Application/docker/volumes/logs:/app/logs/
+
+  client:
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: eu-central-1
+        awslogs-group: app
+        awslogs-stream: client
+        awslogs-create-group: 'true'
+    image: 215372400964.dkr.ecr.eu-central-1.amazonaws.com/client:latest-rpi4
+    container_name: client
+    ports:
+      - "80:80"
+    volumes:
+      - $HOME/Application/secrets/nginx.conf:/etc/nginx/nginx.conf:ro
+
+  db:
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: eu-central-1
+        awslogs-group: app
+        awslogs-stream: db
+        awslogs-create-group: 'true'
+    image: postgres:15.6
+    ports:
+      - 5432:5432
+    restart: always
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets:
+      - postgres_password
+    volumes:
+      - $HOME/Application/docker/volumes/postgres:/var/lib/postgresql/data
+      - $HOME/Application/docker/volumes/database_backup:/backup
+        
+configs:
+  application.yml:
+    template_driver: golang
+    file: application.yml.tmpl
+    name: myapp.application.yml${APPLICATION_YML_VERSION:-0}
+    
+secrets:
+  jwt_secret_code:
+    external: true
+  sendgrid_api_key:
+    external: true
+  nordigen_secret_id:
+    external: true
+  nordigen_secret_key:
+    external: true
+  postgres_password:
+    external: true
+  aws_access_key_id:
+    external: true
+  aws_secret_access_key:
+    external: true
+  aws_region:
+    external: true
+  random_org_api_key:
+    external: true
+  
