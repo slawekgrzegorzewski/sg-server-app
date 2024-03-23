@@ -6,9 +6,9 @@ services:
     image: 215372400964.dkr.ecr.eu-central-1.amazonaws.com/backend:latest-rpi4
     container_name: backend
     ports:
-      - "8080:8080"
+      - 8080:8080
     environment:
-      spring_profiles_active: https,S3Storage
+      spring_profiles_active: http,S3Storage
     configs:
       - source: application.yml
         target: /app/application.yml
@@ -23,7 +23,7 @@ services:
       - aws_region
       - random_org_api_key
     volumes:
-      - $HOME/Application/secrets/logback.xml:/app/logback.xml:ro
+      - $HOME/Application/config/logback.xml:/app/logback.xml:ro
       - $HOME/Application/docker/volumes/logs:/app/logs/
     depends_on:
       - db
@@ -41,12 +41,11 @@ services:
     ports:
       - 80:80
       - 443:443
-      - 1985:1985
     secrets:
       - sgapplication.crt
       - sgapplication.key
     volumes:
-      - $HOME/Application/secrets/nginx.conf:/etc/nginx/nginx.conf:ro
+      - $HOME/Application/config/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - app
 

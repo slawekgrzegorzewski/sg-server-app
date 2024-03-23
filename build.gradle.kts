@@ -184,6 +184,7 @@ val dockerPackage = tasks.register<Zip>("dockerPackage") {
 val dockerPackageRpi4 = tasks.register<Zip>("dockerPackageRpi4") {
     from("docker/production_home/copy_to_docker/")
     include("config/logback.xml")
+    include("config/nginx.conf")
     include("stack/*")
     include("management/*")
     include("setup/deploy_files.sh")
