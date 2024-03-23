@@ -36,7 +36,7 @@ jobs:
                 repo-scan-on-push: true
                 setup-remote-docker: false
                 skip-when-tags-exist: false
-                dockerfile: docker/production/Dockerfile
+                dockerfile: docker/production_home/Dockerfile
                 platform: linux/arm64
                 region: eu-central-1
             - run:
@@ -55,7 +55,7 @@ jobs:
                 repo-scan-on-push: true
                 setup-remote-docker: false
                 skip-when-tags-exist: false
-                dockerfile: docker/production/Dockerfile-debug
+                dockerfile: docker/production_home/Dockerfile-debug
                 platform: linux/amd64
                 region: eu-central-1
             - run: scp -o "StrictHostKeyChecking no" build/distributions/dockerRpi4.zip $SSH_USER@$SSH_HOST:/home/slawek/Application

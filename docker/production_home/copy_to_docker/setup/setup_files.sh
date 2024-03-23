@@ -10,6 +10,7 @@ mkdir -p $DOCKER_DIR/volumes/database_backup
 mkdir -p $MANAGEMENT_DIR/database-backups
 
 unzip $APPLICATION_DIR/secrets.zip -d $APPLICATION_DIR/secrets
+mv $CONFIG_DIR/logback.xml $APPLICATION_DIR/secrets
 
 dos2unix $APPLICATION_DIR/secrets/*
 dos2unix $CONFIG_DIR/*
