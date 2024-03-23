@@ -24,6 +24,7 @@ services:
       - aws_region
       - random_org_api_key
     volumes:
+      - $HOME/Application/secrets/logback.xml:/app/logback.xml:ro
       - $HOME/Application/docker/volumes/logs:/app/logs/
     depends_on:
       - db
@@ -46,7 +47,6 @@ services:
       - sgapplication.crt
       - sgapplication.key
     volumes:
-      - $HOME/Application/secrets/logback.xml:/app/logback.xml:ro
       - $HOME/Application/secrets/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - app
