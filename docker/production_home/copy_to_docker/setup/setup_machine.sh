@@ -43,9 +43,9 @@ sudo docker swarm init
 echo "*:*:*:postgres:$6" | sudo tee $HOME/.pgpass
 chmod 400 $HOME/.pgpass
 
-echo "0 * * * * $MANAGEMENT_DIR/backup_data.sh" | sudo tee /var/spool/cron/crontabs/database_backups
-sudo chown slawek:crontab /var/spool/cron/crontabs/database_backups
-sudo chmod 600 /var/spool/cron/crontabs/database_backups
+echo "0 * * * * $MANAGEMENT_DIR/backup_data.sh" | sudo tee -a /var/spool/cron/crontabs/$USERNAME
+sudo chown slawek:crontab /var/spool/cron/crontabs/$USERNAME
+sudo chmod 600 /var/spool/cron/crontabs/$USERNAME
 
 curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
