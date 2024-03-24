@@ -3,7 +3,7 @@ orbs:
   aws-ecr: circleci/aws-ecr@8.1.2
 
 jobs:
-  infrastructure:
+  updateInfrastructure:
     docker:
       - image: cimg/openjdk:21.0.0
     steps:
@@ -18,20 +18,29 @@ jobs:
       - image: cimg/openjdk:21.0.0
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - cache-{{ checksum "build.gradle.kts" }}
+      - run: gradle clean build infrastructureRpi4
+      - save_cache:
+          paths:
+            - ~/.m2
+            - build/distributions/dockerRpi4.zip
+            - build/distributions/infrastructureRpi4.zip
+          key: cache-{{ checksum "build.gradle.kts" }}
+
+  createAndPushImages:
+    docker:
+      - image: cimg/openjdk:21.0.0
+    steps:
+      - checkout
       - when:
           condition:
             equal: [ master, << pipeline.git.branch >> ]
           steps:
             - restore_cache:
                 keys:
-                  - v1-dependencies-{{ checksum "build.gradle.kts" }}
-                  - v1-dependencies-
-            - run: gradle dependencies
-            - save_cache:
-                paths:
-                  - ~/.m2
-                key: v1-dependencies-{{ checksum "build.gradle.kts" }}
-            - run: gradle clean build
+                  - cache-{{ checksum "build.gradle.kts" }}
             - setup_remote_docker
             - aws-ecr/build-and-push-image:
                 repo: 'backend'
@@ -68,11 +77,37 @@ jobs:
                 dockerfile: docker/production_home/Dockerfile-debug
                 platform: linux/arm64
                 region: eu-central-1
+
+  updateApplication:
+    docker:
+      - image: cimg/openjdk:21.0.0
+    steps:
+      - checkout
+      - when:
+          condition:
+            equal: [ master, << pipeline.git.branch >> ]
+          steps:
+            - restore_cache:
+                keys:
+                  - cache-{{ checksum "build.gradle.kts" }}
             - run: scp -o "StrictHostKeyChecking no" build/distributions/dockerRpi4.zip $SSH_USER@$SSH_HOST:/home/$SSH_USER/Application
             - run: ssh -o "StrictHostKeyChecking no" $SSH_USER@$SSH_HOST "cd /home/$SSH_USER/Application && unzip dockerRpi4.zip -d tmp && cd tmp/setup && dos2unix deploy_files.sh && chmod +x deploy_files.sh && ./deploy_files.sh"
             - run: ssh -o "StrictHostKeyChecking no" $SSH_USER@$SSH_HOST "cd /home/$SSH_USER/Application/management && ./start.sh"
 
 workflows:
-  workflow:
+  deploy:
     jobs:
       - build
+      - createAndPushImages
+      - updateApplication
+
+  infrastructure:
+    triggers:
+      - schedule:
+          filters:
+            branches:
+              only:
+                - not_existing_branch_to_disable_auto_triggering
+    jobs:
+      - build
+      - updateInfrastructure
