@@ -3,8 +3,8 @@
 USERNAME=$1
 ./setup-directories.sh
 
-dos2unix ./setup_files.sh
-chmod +x ./setup_files.sh
+dos2unix ./*
+chmod +x ./*.sh
 
 ./setup_files.sh
 ./setup_docker.sh

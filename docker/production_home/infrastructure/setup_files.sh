@@ -15,5 +15,7 @@ dos2unix $MANAGEMENT_DIR/*
 chmod +x $APPLICATION_DIR/secrets/*.sh
 chmod +x $MANAGEMENT_DIR/*.sh
 
+mv managemenent $APPLICATION_DIR
+
 echo | sudo tee -a ~/.pgpass
 sudo chmod 400  ~/.pgpass

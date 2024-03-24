@@ -186,18 +186,22 @@ val infrastructureRpi4 = tasks.register<Zip>("infrastructureRpi4") {
         include("setup_directories.sh")
     }
     from("docker/production_home/infrastructure/"){
+        include("management/*")
+        include("cloud_watch_config.json")
         include("setup_files.sh")
+        include("setup_docker.sh")
         include("setup.sh")
     }
     archiveFileName.set("infrastructureRpi4.zip")
 }
 
 val dockerPackageRpi4 = tasks.register<Zip>("dockerPackageRpi4") {
-    from("docker/production_home/copy_to_docker/")
-    include("config/*")
-    include("management/*")
-    include("setup/*")
-    include("stack/*")
+    from("docker/production_home/copy_to_docker/") {
+        include("config/*")
+        include("management/*")
+        include("setup/*")
+        include("stack/*")
+    }
     archiveFileName.set("dockerRpi4.zip")
 }
 
