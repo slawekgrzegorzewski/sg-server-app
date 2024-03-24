@@ -22,5 +22,5 @@ chmod +x $MANAGEMENT_DIR/*.sh
 chmod 644 $STACK_DIR/application.yml.tmpl
 chmod 644 $STACK_DIR/docker-compose*
 
-sudo echo >> ~/.pgpass
+echo | sudo tee -a ~/.pgpass
 sudo chmod 400  ~/.pgpass

@@ -6,6 +6,6 @@ STACK_DIR=$APPLICATION_DIR/stack
 
 $SECRETS_DIR/setup_secrets.sh
 
-cd $STACK_DIR
+cd $STACK_DIR || exit
 docker stack deploy -c docker-compose-db-only.yml app
-cd $CURRENT_DIR
+cd $CURRENT_DIR || exit
