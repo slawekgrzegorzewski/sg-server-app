@@ -3,6 +3,16 @@ orbs:
   aws-ecr: circleci/aws-ecr@8.1.2
 
 jobs:
+  infrastructure:
+    docker:
+      - image: cimg/openjdk:21.0.0
+    steps:
+      - checkout
+      - run: gradle infrastructureRpi4
+      - run: ssh -o "StrictHostKeyChecking no" $SSH_USER@$SSH_HOST "mkdir /home/$SSH_USER/Application"
+      - run: scp -o "StrictHostKeyChecking no" build/distributions/infrastructureRpi4.zip $SSH_USER@$SSH_HOST:/home/$SSH_USER/Application
+      - run: ssh -o "StrictHostKeyChecking no" $SSH_USER@$SSH_HOST "cd /home/$SSH_USER/Application && unzip dockerRpi4.zip -d tmp && cd tmp && dos2unix *.sh && chmod +x *.sh && ./setup.sh $SSH_USER $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY $AWS_CW_ACCESS_KEY_ID $AWS_CW_SECRET_ACCESS_KEY $SG_DB_PASSWORD"
+
   build:
     docker:
       - image: cimg/openjdk:21.0.0
@@ -58,9 +68,9 @@ jobs:
                 dockerfile: docker/production_home/Dockerfile-debug
                 platform: linux/arm64
                 region: eu-central-1
-            - run: scp -o "StrictHostKeyChecking no" build/distributions/dockerRpi4.zip $SSH_USER@$SSH_HOST:/home/slawek/Application
-            - run: ssh -o "StrictHostKeyChecking no" $SSH_USER@$SSH_HOST "cd /home/slawek/Application && unzip dockerRpi4.zip -d tmp && cd tmp/setup && dos2unix deploy_files.sh && chmod +x deploy_files.sh && ./deploy_files.sh"
-            - run: ssh -o "StrictHostKeyChecking no" $SSH_USER@$SSH_HOST "cd /home/slawek/Application/management && ./start.sh"
+            - run: scp -o "StrictHostKeyChecking no" build/distributions/dockerRpi4.zip $SSH_USER@$SSH_HOST:/home/$SSH_USER/Application
+            - run: ssh -o "StrictHostKeyChecking no" $SSH_USER@$SSH_HOST "cd /home/$SSH_USER/Application && unzip dockerRpi4.zip -d tmp && cd tmp/setup && dos2unix deploy_files.sh && chmod +x deploy_files.sh && ./deploy_files.sh"
+            - run: ssh -o "StrictHostKeyChecking no" $SSH_USER@$SSH_HOST "cd /home/$SSH_USER/Application/management && ./start.sh"
 
 workflows:
   workflow:
