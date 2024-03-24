@@ -1,10 +1,10 @@
 #!/bin/bash
 
 USERNAME=$1
-HOME_DIR=$HOME/Application
-CONFIG_DIR=$HOME_DIR/config
-MANAGEMENT_DIR=$HOME_DIR/management
-SECRETS_DIR=$HOME_DIR/secrets
+APPLICATION_DIR=$HOME/Application
+CONFIG_DIR=$APPLICATION_DIR/config
+MANAGEMENT_DIR=$APPLICATION_DIR/management
+SECRETS_DIR=$APPLICATION_DIR/secrets
 
 dos2unix ./setup_files.sh
 chmod +x ./setup_files.sh
@@ -39,6 +39,7 @@ sudo usermod -aG docker $USERNAME
 sudo systemctl enable docker.service
 sudo systemctl enable containerd.service
 sudo docker swarm init
+$SECRETS_DIR/setup_secrets.sh
 
 echo "*:*:*:postgres:$6" | sudo tee $HOME/.pgpass
 chmod 400 $HOME/.pgpass
