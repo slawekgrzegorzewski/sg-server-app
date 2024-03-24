@@ -102,13 +102,6 @@ workflows:
       - updateApplication
 
   infrastructure:
-    triggers:
-      - schedule:
-          cron: "0 0 * * *"
-          filters:
-            branches:
-              only:
-                - not_existing_branch_to_disable_auto_triggering
     jobs:
       - build
       - updateInfrastructure
