@@ -1,18 +1,18 @@
 #!/bin/bash
 
 USERNAME=$1
-./setup-directories.sh
+source ./setup_directories.sh
 
 dos2unix ./*
 chmod +x ./*.sh
 
-./setup_files.sh
-./setup_docker.sh
+source ./setup_files.sh
+source ./setup_docker.sh
 
 sudo apt-get install -y unzip dos2unix ca-certificates curl gnupg lsb-release postgresql-client-15
 
 echo "*:*:*:postgres:$6" | sudo tee $HOME/.pgpass
-chmod 400 $HOME/.pgpass
+sudo chmod 400 $HOME/.pgpass
 
 echo "0 * * * * $MANAGEMENT_DIR/backup_data.sh" | sudo tee -a /var/spool/cron/crontabs/$USERNAME
 sudo chown slawek:crontab /var/spool/cron/crontabs/$USERNAME

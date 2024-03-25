@@ -1,8 +1,6 @@
-./setup-directories.sh
+source ./setup_directories.sh
 
-chmod 400  ~/.pgpass
-
-mv $CONFIG_DIR/logback.xml $APPLICATION_DIR/secrets
+sudo chmod 400  ~/.pgpass
 
 NEW_CONFIG_DIR=../config
 NEW_STACK_DIR=../stack

@@ -19,6 +19,9 @@ sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 sudo usermod -aG docker $USERNAME
+sudo su - $USERNAME
+cd ~/Application/tmp
+source ./setup_directories.sh
 sudo systemctl enable docker.service
 sudo systemctl enable containerd.service
 sudo docker swarm init

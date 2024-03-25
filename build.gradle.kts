@@ -196,11 +196,14 @@ val infrastructureRpi4 = tasks.register<Zip>("infrastructureRpi4") {
 }
 
 val dockerPackageRpi4 = tasks.register<Zip>("dockerPackageRpi4") {
-    from("docker/production_home/copy_to_docker/") {
+    from("docker/production_home/application/") {
         include("config/*")
-        include("management/*")
         include("setup/*")
         include("stack/*")
+    }
+    from("docker/production_home/common/") {
+        include("setup_directories.sh")
+        into("setup/")
     }
     archiveFileName.set("dockerRpi4.zip")
 }

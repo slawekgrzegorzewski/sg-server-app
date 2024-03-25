@@ -1,3 +1,5 @@
+#!/bin/bash
+
 APPLICATION_DIR=$HOME/Application
 CONFIG_DIR=$APPLICATION_DIR/config
 DOCKER_DIR=$APPLICATION_DIR/docker
