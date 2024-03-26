@@ -63,13 +63,12 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: backend
           IMAGE_TAG: latest-rpi4
-          TAG: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         with:
           context: .
           file: docker/production_home/Dockerfile
           platforms: linux/arm64
           push: true
-          tags: ${{ env.TAG }}
+          tags: ${{ env.ECR_REGISTRY/env.ECR_REPOSITORY:env.IMAGE_TAG }}
         
   dependency-submission:
     runs-on: ubuntu-latest
