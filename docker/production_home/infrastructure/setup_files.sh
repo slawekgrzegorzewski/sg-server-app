@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mkdir -p $APPLICATION_DIR
+mkdir -p $APPLICATION_DIR/fe
 mkdir -p $CONFIG_DIR
 mkdir -p $DOCKER_DIR/volumes/logs
 mkdir -p $DOCKER_DIR/volumes/postgres

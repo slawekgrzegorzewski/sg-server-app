@@ -28,7 +28,7 @@ services:
     depends_on:
       - db
 
-  client:
+  nginx:
     logging:
       driver: awslogs
       options:
@@ -36,8 +36,8 @@ services:
         awslogs-group: app
         awslogs-stream: client
         awslogs-create-group: 'true'
-    image: 215372400964.dkr.ecr.eu-central-1.amazonaws.com/client:latest-rpi4
-    container_name: client
+    image: nginx:1.25.4-bookworm
+    container_name: nginx
     ports:
       - 80:80
       - 443:443
@@ -46,6 +46,7 @@ services:
       - sgapplication.key
     volumes:
       - $HOME/Application/config/nginx.conf:/etc/nginx/nginx.conf:ro
+      - $HOME/Application/fe:/usr/share/nginx:ro
     depends_on:
       - app
 
