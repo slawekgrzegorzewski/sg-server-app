@@ -69,7 +69,7 @@ jobs:
           file: docker/production_home/Dockerfile
           platforms: linux/arm64
           push: true
-          tags: $TAG
+          tags: ${{ env.TAG }}
         
   dependency-submission:
     runs-on: ubuntu-latest
