@@ -41,6 +41,10 @@ jobs:
         with:
           registries: ${{ secrets.AWS_ACCOUNT_ID }}
           mask-password: "true" # see: https://github.com/aws-actions/amazon-ecr-login#docker-credentials
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
       - name: Build, tag, and push image to Amazon ECR
         id: build-publish
         env:
@@ -48,7 +52,7 @@ jobs:
           ECR_REPOSITORY: backend
           IMAGE_TAG: latest-rpi4
         run: |
-          docker buildx build . -f docker/production_home/Dockerfile -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" 
+          docker buildx build . -f docker/production_home/Dockerfile -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" --platform linux/arm64/v8
           docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
           echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
           echo "image_tag=$IMAGE_TAG"
