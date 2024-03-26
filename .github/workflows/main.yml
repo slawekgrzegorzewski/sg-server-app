@@ -68,7 +68,7 @@ jobs:
           file: docker/production_home/Dockerfile
           platforms: linux/arm64
           push: true
-          tags: "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          tags: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         
   dependency-submission:
     runs-on: ubuntu-latest
