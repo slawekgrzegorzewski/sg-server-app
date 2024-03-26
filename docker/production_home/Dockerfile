@@ -1,4 +1,4 @@
-FROM openjdk:21
+FROM azul/zulu-openjdk-debian:21
 COPY build/libs/sg-server-app-0.0.1-SNAPSHOT.jar /app/accountant.jar
 RUN mkdir -p /app/logs
 
