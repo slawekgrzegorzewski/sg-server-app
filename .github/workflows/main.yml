@@ -2,7 +2,9 @@ name: deploy app
 
 on:
   push:
-    branches: [ "master" ]
+    branches:
+      - master
+  workflow_dispatch:
     
 jobs:
   deploy:
