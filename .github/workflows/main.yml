@@ -59,6 +59,10 @@ jobs:
 #          echo "full_image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
       - name: Build and push
         uses: docker/build-push-action@v5
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: backend
+          IMAGE_TAG: latest-rpi4
         with:
           context: .
           file: docker/production_home/Dockerfile
