@@ -50,8 +50,7 @@ jobs:
           ECR_REPOSITORY: backend
         run: |
           docker buildx build . -f docker/production_home/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:latest-rpi4 --platform linux/arm64 --push
-          docker buildx build . -f docker/production_home/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:latest-debug-rpi4 --platform linux/arm64 --push
-          docker buildx build . -f docker/production_home/Dockerfile-debug -t $ECR_REGISTRY/$ECR_REPOSITORY:latest-debug-rpi4-test --platform linux/arm64 --push
+          docker buildx build . -f docker/production_home/Dockerfile-debug -t $ECR_REGISTRY/$ECR_REPOSITORY:latest-debug-rpi4 --platform linux/arm64 --push
           mv build/distributions/dockerRpi4.zip .
       - name: copy dockerRpi4.zip via ssh password
         uses: appleboy/scp-action@master
