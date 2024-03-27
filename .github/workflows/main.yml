@@ -53,35 +53,42 @@ jobs:
           IMAGE_TAG: latest-rpi4
         run: |
           docker buildx build . -f docker/production_home/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG --platform linux/arm64 --push
-          echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
-          echo "image_tag=$IMAGE_TAG"
-          echo "full_image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-#      - name: Build and push
-#        uses: docker/build-push-action@v5
-#        env:
-#          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-#          ECR_REPOSITORY: backend
-#          IMAGE_TAG: latest-rpi4
-#        with:
-#          context: .
-#          file: docker/production_home/Dockerfile
-#          platforms: linux/arm64
-#          push: true
-#          tags: ${{ env.ECR_REGISTRY/env.ECR_REPOSITORY:env.IMAGE_TAG }}
-        
-  dependency-submission:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK 21
-      uses: actions/setup-java@v4
+      - name: Build, tag, and push debug image to Amazon ECR
+        id: build-publish-debug
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: backend
+          IMAGE_TAG: latest-debug-rpi4
+        run: |
+          docker buildx build . -f docker/production_home/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG --platform linux/arm64 --push
+    - name: move dockerRpi4.zip to main folder
+      run: |
+        mv build/distributions/dockerRpi4.zip .
+    - name: copy dockerRpi4.zip via ssh password
+      uses: appleboy/scp-action@master
+      env:
+        SSH_USER: ${{ secrets.SSH_USER }}
       with:
-        java-version: '21'
-        distribution: 'zulu'
-
-    # Generates and submits a dependency graph, enabling Dependabot Alerts for all project dependencies.
-    # See: https://github.com/gradle/actions/blob/main/dependency-submission/README.md
-    - name: Generate and submit dependency graph
-      uses: gradle/actions/dependency-submission@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        password: ${{ secrets.SSH_PASSWORD }}
+        port: 22
+        source: "dockerRpi4.zip"
+        target: "/home/$SSH_USER/Application"
+    - name: unpack and deploy application files
+      uses: appleboy/ssh-action@master
+      env:
+        SSH_USER: ${{ secrets.SSH_USER }}
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        password: ${{ secrets.SSH_PASSWORD }}
+        port: 22
+        script: |
+          cd /home/$SSH_USER/Application
+          unzip dockerRpi4.zip -d tmp
+          cd tmp/setup && dos2unix deploy_files.sh]
+          chmod +x deploy_files.sh
+          ./deploy_files.sh
+          cd /home/$SSH_USER/Application/management
+          ./start.sh
