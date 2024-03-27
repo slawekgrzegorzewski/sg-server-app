@@ -73,8 +73,8 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: 22
-          source: "dockerRpi4.zip"
-          target: "/home/$SSH_USER/Application"
+          source: dockerRpi4.zip
+          target: /home/$SSH_USER/Application
       - name: unpack and deploy application files
         uses: appleboy/ssh-action@master
         env:
