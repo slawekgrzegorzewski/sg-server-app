@@ -85,8 +85,9 @@ jobs:
           script: |
             cd /home/${{ secrets.SSH_USER }}/Application
             unzip dockerRpi4.zip -d tmp
-            cd tmp/setup && dos2unix deploy_files.sh]
+            cd tmp/setup && dos2unix deploy_files.sh
             chmod +x deploy_files.sh
             ./deploy_files.sh
             cd /home/${{ secrets.SSH_USER }}/Application/management
-            ./start.sh
+            docker service scale app_app=0
+            docker service scale app_app=1
