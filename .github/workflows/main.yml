@@ -45,30 +45,30 @@ jobs:
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-#      - name: Build, tag, and push image to Amazon ECR
-#        id: build-publish
-#        env:
-#          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-#          ECR_REPOSITORY: backend
-#          IMAGE_TAG: latest-rpi4
-#        run: |
-#          docker buildx build . -f docker/production_home/Dockerfile -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" --platform linux/arm64/v8
-#          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-#          echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
-#          echo "image_tag=$IMAGE_TAG"
-#          echo "full_image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-      - name: Build and push
-        uses: docker/build-push-action@v5
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-publish
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: backend
           IMAGE_TAG: latest-rpi4
-        with:
-          context: .
-          file: docker/production_home/Dockerfile
-          platforms: linux/arm64
-          push: true
-          tags: ${{ env.ECR_REGISTRY/env.ECR_REPOSITORY:env.IMAGE_TAG }}
+        run: |
+          docker buildx build . -f docker/production_home/Dockerfile -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" --platform linux/arm64
+          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
+          echo "image_tag=$IMAGE_TAG"
+          echo "full_image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+#      - name: Build and push
+#        uses: docker/build-push-action@v5
+#        env:
+#          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+#          ECR_REPOSITORY: backend
+#          IMAGE_TAG: latest-rpi4
+#        with:
+#          context: .
+#          file: docker/production_home/Dockerfile
+#          platforms: linux/arm64
+#          push: true
+#          tags: ${{ env.ECR_REGISTRY/env.ECR_REPOSITORY:env.IMAGE_TAG }}
         
   dependency-submission:
     runs-on: ubuntu-latest
