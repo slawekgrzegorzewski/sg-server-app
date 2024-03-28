@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    container: ubuntu:24.04
+
     services:
       postgres:
         image: postgres:15.6
@@ -28,11 +28,16 @@ jobs:
           - /__w/sg-server-app/sg-server-app/db/:/docker-entrypoint-initdb.d/
     steps:
       - uses: actions/checkout@v3
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'zulu'
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -41,29 +46,32 @@ jobs:
           aws-region: eu-central-1
           role-duration-seconds: 1200
           role-session-name: MySessionName
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
         with:
           registries: ${{ secrets.AWS_ACCOUNT_ID }}
           mask-password: "true" # see: https://github.com/aws-actions/amazon-ecr-login#docker-credentials
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
       - name: test
         run: |
           pwd
           ls -al
           ls -al /__w/sg-server-app/sg-server-app/db
           CONTAINER_ID=$(docker ps -f name=postgres --quiet) && docker exec $CONTAINER_ID psql -h localhost -p 5432 -U postgres -w postgres -c 'CREATE DATABASE accountant;'
+
       - name: Build with Gradle Wrapper
         run: ./gradlew migrateLocal build infrastructureRpi4
         env:
           SG_DB_URL: "jdbc:postgresql://postgres:5432/accountant"
           SG_DB_PASSWORD: postgres
+
       - name: Build, tag, and push image to Amazon ECR
         id: build-publish
         env:
@@ -73,6 +81,7 @@ jobs:
           docker buildx build . -f docker/production_home/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:latest-rpi4 --platform linux/arm64 --push
           docker buildx build . -f docker/production_home/Dockerfile-debug -t $ECR_REGISTRY/$ECR_REPOSITORY:latest-debug-rpi4 --platform linux/arm64 --push
           mv build/distributions/dockerRpi4.zip .
+
       - name: copy dockerRpi4.zip via ssh password
         uses: appleboy/scp-action@master
         with:
@@ -82,6 +91,7 @@ jobs:
           port: 22
           source: dockerRpi4.zip
           target: /home/${{ secrets.SSH_USER }}/Application
+
       - name: unpack and deploy application files
         uses: appleboy/ssh-action@master
         env:
