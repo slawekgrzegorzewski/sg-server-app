@@ -66,6 +66,8 @@ jobs:
           ls -al /__w/sg-server-app/sg-server-app/db
           CONTAINER_ID=$(docker ps -f name=postgres --quiet) && docker exec $CONTAINER_ID psql -h localhost -p 5432 -U postgres -w postgres -c 'CREATE DATABASE accountant;'
           CONTAINER_ID=$(docker ps -f name=postgres --quiet) && docker exec $CONTAINER_ID psql -h localhost -p 5432 -U postgres -w postgres -c 'GRANT ALL PRIVILEGES ON DATABASE accountant TO postgres;'
+          CONTAINER_ID=$(docker ps -f name=postgres --quiet) && docker exec $CONTAINER_ID ls -al /docker-entrypoint-initdb.d
+          CONTAINER_ID=$(docker ps -f name=postgres --quiet) && docker exec $CONTAINER_ID cat /docker-entrypoint-initdb.d/init-build-postgres.sql
 
       - name: Build with Gradle Wrapper
         run: ./gradlew migrateLocal build infrastructureRpi4
