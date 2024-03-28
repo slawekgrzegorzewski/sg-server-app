@@ -25,7 +25,7 @@ jobs:
         ports:
           - 5432:5432
         volumes:
-          - /__w/sg-server-app/sg-server-app/.github/db/init-build-postgres.sh:/docker-entrypoint-initdb.d/init-build-postgres.sh
+          - /__w/sg-server-app/sg-server-app/.github/db/init-build-postgres.sql:/docker-entrypoint-initdb.d/init-build-postgres.sql
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 21
