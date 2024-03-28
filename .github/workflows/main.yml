@@ -26,6 +26,7 @@ jobs:
           - 5432:5432
         volumes:
           - /__w/sg-server-app/sg-server-app/db:/docker-entrypoint-initdb.d
+
     steps:
       - uses: actions/checkout@v3
 
