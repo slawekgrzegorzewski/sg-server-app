@@ -25,8 +25,7 @@ jobs:
         ports:
           - 5432:5432
         volumes:
-          - /__w/sg-server-app/sg-server-app/.github/db/data:/var/lib/postgresql/data
-          - /__w/sg-server-app/sg-server-app/.github/db/init-build-postgres.sql:/docker-entrypoint-initdb.d
+          - /__w/sg-server-app/sg-server-app/.github/db:/docker-entrypoint-initdb.d
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 21
@@ -36,6 +35,10 @@ jobs:
           distribution: 'zulu'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+      - name: test
+        run: |
+          pwd
+          ls -al
       - name: Build with Gradle Wrapper
         run: ./gradlew migrateLocal build infrastructureRpi4
         env:
