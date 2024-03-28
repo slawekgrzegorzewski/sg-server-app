@@ -39,6 +39,7 @@ jobs:
         run: |
           pwd
           ls -al
+          ls -al /__w/sg-server-app/sg-server-app/.github/db
       - name: Build with Gradle Wrapper
         run: ./gradlew migrateLocal build infrastructureRpi4
         env:
