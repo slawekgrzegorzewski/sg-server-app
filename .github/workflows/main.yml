@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    container: ubuntu:24.04
     services:
       postgres:
         image: postgres:15.6
