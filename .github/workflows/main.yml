@@ -40,7 +40,7 @@ jobs:
           pwd
           ls -al
           ls -al /__w/sg-server-app/sg-server-app/db
-          docker ps
+          psql
       - name: Build with Gradle Wrapper
         run: ./gradlew migrateLocal build infrastructureRpi4
         env:
