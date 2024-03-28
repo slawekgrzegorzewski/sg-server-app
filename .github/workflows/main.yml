@@ -24,6 +24,8 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
+        volumes:
+          - .github/db/init-build-postgres.sh:/docker-entrypoint-initdb.d/init-build-postgres.sh
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 21
@@ -34,7 +36,7 @@ jobs:
       - name: test
         run: |
           pwd
-          ls
+          ls -al
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
       - name: create accounant database in postgres
