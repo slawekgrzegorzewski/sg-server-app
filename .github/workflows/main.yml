@@ -70,7 +70,7 @@ jobs:
       - name: Build with Gradle Wrapper
         run: ./gradlew migrateLocal build infrastructureRpi4
         env:
-          SG_DB_URL: "jdbc:postgresql://postgres:5432/accountant"
+          SG_DB_URL: "jdbc:postgresql://localhost:5432/accountant"
           SG_DB_PASSWORD: postgres
 
       - name: Build, tag, and push image to Amazon ECR
