@@ -3,9 +3,9 @@ spring:
     hikari:
       connectionTimeout: 15000
       maximumPoolSize: 5
-    password: SLAwek1!
-    url: jdbc:postgresql://rpi4:5432/accountant
+    url: jdbc:postgresql://localhost:5432/accountant
     username: postgres
+    password: SLAwek1!
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:

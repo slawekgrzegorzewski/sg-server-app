@@ -2,12 +2,20 @@ import nu.studer.gradle.jooq.JooqEdition
 import org.jooq.meta.jaxb.ForcedType
 import org.jooq.meta.jaxb.Logging
 import org.jooq.meta.jaxb.Property
+import java.io.ByteArrayOutputStream
+
+group = "pl.sg"
+version = "0.0.1-SNAPSHOT"
+val output = ByteArrayOutputStream()
+project.exec {
+    commandLine = "aws codeartifact get-authorization-token --domain sg-repository --domain-owner 215372400964 --region eu-central-1 --query authorizationToken --output text".split(" ")
+    standardOutput = output
+}
+val codeartifactToken = output.toString();
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
 }
-
-println()
 
 dependencyManagement {
     imports {
@@ -29,43 +37,39 @@ plugins {
     id("org.flywaydb.flyway") version "9.5.1"
     id("com.netflix.dgs.codegen") version "5.12.4"
     id("nu.studer.jooq") version "8.2.1"
+    id("maven-publish")
 }
-
-group = "pl.sg"
-version = "0.0.1-SNAPSHOT"
-
-//testing {
-//    suites {
-//        configureEach {
-//            if (this is JvmTestSuite) {
-//                useJUnitJupiter()
-//            }
-//        }
-//
-//        val integrationTest by registering(JvmTestSuite::class) {
-//            testType.set(TestSuiteType.INTEGRATION_TEST)
-//            sources {
-//                java {
-//                    setSrcDirs(listOf("src/integrationTest/java"))
-//                }
-//                resources {
-//                    setSrcDirs(listOf("src/integrationTest/resources"))
-//                }
-//            }
-//            dependencies {
-//                implementation(project)
-//                runtimeOnly(project)
-//            }
-//        }
-//    }
-//}
-
-//val integrationTestImplementation by configurations.getting {
-//    extendsFrom(configurations.testImplementation.get())
-//}
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://sg-repository-215372400964.d.codeartifact.eu-central-1.amazonaws.com/maven/sg-repository/")
+        credentials {
+            username = "aws"
+            password = codeartifactToken
+        }
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "pl.sg"
+            artifactId = "sg-app"
+            version = "1.0.0"
+
+            from(components["java"])
+        }
+    }
+    repositories {
+        maven {
+            url = uri("https://sg-repository-215372400964.d.codeartifact.eu-central-1.amazonaws.com/maven/sg-repository/")
+            credentials {
+                username = "aws"
+                password = codeartifactToken
+            }
+        }
+    }
 }
 
 dependencies {
@@ -155,16 +159,16 @@ dependencies {
 
 tasks.jar {
     exclude(
-        "ovh",
-        "application.yml",
-        "application-pc-docker.yml",
-        "application-raspberry-docker.yml",
-        "data.sql"
+            "ovh",
+            "application.yml",
+            "application-pc-docker.yml",
+            "application-raspberry-docker.yml",
+            "data.sql"
     )
 }
 
 val migrateLocal = tasks.register<org.flywaydb.gradle.task.FlywayMigrateTask>("migrateLocal") {
-    url = System.getenv("SG_DB_URL") ?: "jdbc:postgresql://rpi4:5432/accountant"
+    url = System.getenv("SG_DB_URL") ?: "jdbc:postgresql://localhost:5432/accountant"
     user = "postgres"
     password = System.getenv("SG_DB_PASSWORD") ?: "SLAwek1!"
 }
@@ -182,10 +186,10 @@ val dockerPackage = tasks.register<Zip>("dockerPackage") {
 }
 
 val infrastructureRpi4 = tasks.register<Zip>("infrastructureRpi4") {
-    from("docker/production_home/common/"){
+    from("docker/production_home/common/") {
         include("setup_directories.sh")
     }
-    from("docker/production_home/infrastructure/"){
+    from("docker/production_home/infrastructure/") {
         include("management/*")
         include("cloud_watch_config.json")
         include("setup_files.sh")
@@ -218,8 +222,8 @@ tasks.withType<com.netflix.graphql.dgs.codegen.gradle.GenerateJavaTask> {
     generateClient = true
     packageName = "pl.sg.graphql.schema"
     typeMapping = mutableMapOf(
-        "BigDecimal" to "java.math.BigDecimal",
-        "UUID" to "java.util.UUID"
+            "BigDecimal" to "java.math.BigDecimal",
+            "UUID" to "java.util.UUID"
     )
 }
 
@@ -234,14 +238,14 @@ jooq() {
                 logging = Logging.WARN
                 jdbc.apply {
                     driver = "org.postgresql.Driver"
-                    url = System.getenv("SG_DB_URL") ?: "jdbc:postgresql://rpi4:5432/accountant"
+                    url = System.getenv("SG_DB_URL") ?: "jdbc:postgresql://localhost:5432/accountant"
                     user = "postgres"
                     password = System.getenv("SG_DB_PASSWORD") ?: "SLAwek1!"
                     properties = listOf(
-                        Property().apply {
-                            key = "PAGE_SIZE"
-                            value = "2048"
-                        }
+                            Property().apply {
+                                key = "PAGE_SIZE"
+                                value = "2048"
+                            }
                     )
                 }
                 generator.apply {
@@ -253,16 +257,16 @@ jooq() {
                         excludes = "PG_CATALOG.* | INFORMATION_SCHEMA.*"
 
                         forcedTypes = listOf(
-                            ForcedType().apply {
-                                name = "varchar"
-                                includeExpression = ".*"
-                                includeTypes = "JSONB?"
-                            },
-                            ForcedType().apply {
-                                name = "varchar"
-                                includeExpression = ".*"
-                                includeTypes = "INET"
-                            }
+                                ForcedType().apply {
+                                    name = "varchar"
+                                    includeExpression = ".*"
+                                    includeTypes = "JSONB?"
+                                },
+                                ForcedType().apply {
+                                    name = "varchar"
+                                    includeExpression = ".*"
+                                    includeTypes = "INET"
+                                }
                         )
                     }
                     generate.apply {

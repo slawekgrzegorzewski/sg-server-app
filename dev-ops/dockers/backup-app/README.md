@@ -1,11 +1,11 @@
 1. Create a new deployment
-   1. windows
+    1. windows
 
-      `cmd /C "set DEVELOPMENT_DIRECTORY=E:\OneDrive\Dokumenty\SG app backup&& docker compose up backup-app"`
+       `cmd /C "set DEVELOPMENT_DIRECTORY=D:\OneDrive\Dokumenty\SG app backup&& echo ssh_password > $DEVELOPMENT_DIRECTORY/ssh_pass && docker compose up backup-app"`
 
-   1. macOS
+    1. macOS
 
-      `DEVELOPMENT_DIRECTORY=/Users/slawekgrzegorzewski/OneDrive\ -\ private/OneDrive/Dokumenty/SG\ app\ backup/ docker compose up backup-app"`
+       `DEVELOPMENT_DIRECTORY=/Users/slawekgrzegorzewski/OneDrive\ -\ private/OneDrive/Dokumenty/SG\ app\ backup/ docker compose up backup-app"`
 
 2. Run and see logs
 

@@ -27,7 +27,7 @@ public abstract class AbstractContainerBaseTest {
 
 
     static {
-        POSTGRES = new PostgreSQLContainer("postgres:14.5").withDatabaseName("accountant").withUsername("postgres");
+        POSTGRES = new PostgreSQLContainer("postgres:15.6").withDatabaseName("accountant").withUsername("postgres");
         POSTGRES.start();
 
         Flyway flyway = Flyway.configure().dataSource(POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword()).load();

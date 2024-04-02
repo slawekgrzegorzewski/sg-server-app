@@ -56,7 +56,7 @@ services:
         awslogs-group: app
         awslogs-stream: db
         awslogs-create-group: 'true'
-    image: postgres:14.5
+    image: postgres:15.6
     container_name: db
     ports:
       - "5432:5432"

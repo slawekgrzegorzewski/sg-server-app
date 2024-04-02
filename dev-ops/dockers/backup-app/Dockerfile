@@ -1,22 +1,15 @@
-FROM ubuntu:lunar
-
-COPY --chmod=755 download-backups.sh /app/backup.sh
+FROM ubuntu:latest
 
 RUN mkdir /development
 
 ## Install packages
-RUN apt update && apt install -y  \
-    git \
-    bash \
-    curl \
-    openssh-client \
-    python3 \
-    python3-pip \
-    python3-cryptography \
-    awscli \
-    wget \
-    curl \
-    dos2unix
+RUN TZ=Europe/Warsaw && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \
+    apt update && \
+    apt install -y git bash curl openssh-client sshpass \
+                    python3 python3-pip python3-cryptography \
+                    awscli wget curl dos2unix
+
+COPY --chmod=755 download-backups.sh /app/backup.sh
 
 RUN dos2unix /app/backup.sh
 

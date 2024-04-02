@@ -5,6 +5,6 @@ FILE=$(ls "$BACKUPS_DIR")
 BACKUP="$BACKUPS_DIR/$FILE"
 echo "$BACKUP"
 
-psql postgres://postgres:SLAwek1!@rpi4:5432/postgres -c "DROP DATABASE accountant;"
-psql postgres://postgres:SLAwek1!@rpi4:5432/postgres -c "CREATE DATABASE accountant;"
-psql postgres://postgres:SLAwek1!@rpi4:5432/accountant < "$BACKUP"
+psql postgres://postgres:SLAwek1!@localhost:5432/postgres -c "DROP DATABASE accountant;"
+psql postgres://postgres:SLAwek1!@localhost:5432/postgres -c "CREATE DATABASE accountant;"
+psql postgres://postgres:SLAwek1!@localhost:5432/accountant < "$BACKUP"
