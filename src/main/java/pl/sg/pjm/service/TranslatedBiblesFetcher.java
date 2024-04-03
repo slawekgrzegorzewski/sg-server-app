@@ -1,11 +1,19 @@
 package pl.sg.pjm.service;
 
+import com.sendgrid.Method;
+import com.sendgrid.Request;
+import com.sendgrid.Response;
+import com.sendgrid.SendGrid;
+import com.sendgrid.helpers.mail.Mail;
+import com.sendgrid.helpers.mail.objects.Content;
+import com.sendgrid.helpers.mail.objects.Email;
+import com.sendgrid.helpers.mail.objects.Personalization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import pl.sg.ip.service.TaskJPAService;
+import pl.sg.application.configuration.Configuration;
 import pl.sg.pjm.bible.Downloader;
 import pl.sg.pjm.bible.M4Chapters;
 import pl.sg.pjm.bible.model.Book;
@@ -29,13 +37,16 @@ public class TranslatedBiblesFetcher {
     private static final Logger LOG = LoggerFactory.getLogger(TranslatedBiblesFetcher.class);
     private final Path videosLocation;
     private final TranslatedVersesRepository translatedVersesRepository;
+    private final String sendgridApiKey;
 
 
     public TranslatedBiblesFetcher(
             @Value("${pjm.videos-location}") Path videosLocation,
-            TranslatedVersesRepository translatedVersesRepository) {
+            TranslatedVersesRepository translatedVersesRepository,
+            Configuration configuration) {
         this.videosLocation = videosLocation;
         this.translatedVersesRepository = translatedVersesRepository;
+        this.sendgridApiKey = configuration.getSendgridApiKey();
     }
 
     @Scheduled(cron = "${pjm.fetch}", zone = "Europe/Warsaw")
@@ -86,5 +97,34 @@ public class TranslatedBiblesFetcher {
 
         LOG.info("Saving new " + newTranslatedVerses.size() + " verse(s) to DB");
         translatedVersesRepository.saveAll(newTranslatedVerses);
+    }
+
+    private void sendEmail(List<TranslatedVerse> newTranslatedVerses) {
+        Email from = new Email("admin@grzegorzewski.org");
+
+        StringBuilder contentBuilder = new StringBuilder("<div>Nowe przetłumaczone wersety</div>").append("<div style=\"background-color: #b7e1cd;\"><ul>");
+        newTranslatedVerses.stream()
+                .map(tv -> "<li>" + tv.getBook() + " " + tv.getChapter() + ":" + tv.getVerse() + "</li>")
+                .forEach(contentBuilder::append);
+        contentBuilder.append("</ul></div>");
+
+        Content content = new Content("text/html", contentBuilder.toString());
+        Email firstTo = new Email("slawek.grz@gmail.com", "Sławek Grzegorzewski");
+
+        Mail mail = new Mail(from, "Nowe wersety przetłumaczone na PJM", firstTo, content);
+
+        SendGrid sg = new SendGrid(sendgridApiKey);
+        Request request = new Request();
+        try {
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody(mail.build());
+            Response response = sg.api(request);
+            System.out.println(response.getStatusCode());
+            System.out.println(response.getBody());
+            System.out.println(response.getHeaders());
+        } catch (IOException ex) {
+            System.out.println("Could not send email");
+        }
     }
 }
