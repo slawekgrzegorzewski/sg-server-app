@@ -1,8 +1,11 @@
 package pl.sg.pjm.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import pl.sg.ip.service.TaskJPAService;
 import pl.sg.pjm.bible.Downloader;
 import pl.sg.pjm.bible.M4Chapters;
 import pl.sg.pjm.bible.model.Book;
@@ -23,6 +26,7 @@ import java.util.stream.Stream;
 @Component
 public class TranslatedBiblesFetcher {
 
+    private static final Logger LOG = LoggerFactory.getLogger(TranslatedBiblesFetcher.class);
     private final Path videosLocation;
     private final TranslatedVersesRepository translatedVersesRepository;
 
@@ -36,6 +40,7 @@ public class TranslatedBiblesFetcher {
 
     @Scheduled(cron = "${pjm.fetch}", zone = "Europe/Warsaw")
     public void fetchAllTransactions() throws IOException {
+        LOG.info("Deleting all files from " + videosLocation);
         try (Stream<Path> walk = Files.walk(videosLocation)) {
             walk
                     .filter(Files::isRegularFile)
@@ -50,7 +55,10 @@ public class TranslatedBiblesFetcher {
                             }
                     );
         }
+        LOG.info("Downloading files to " + videosLocation);
         Downloader.download(videosLocation);
+
+        LOG.info("Parsing all pjm files from  " + videosLocation);
         Map<Book, List<ChapterVerse>> newVerses = M4Chapters.calculateStatistics(videosLocation);
 
         Map<Book, List<ChapterVerse>> currentVerses = translatedVersesRepository.findAll().stream()
@@ -75,6 +83,8 @@ public class TranslatedBiblesFetcher {
                     })
                     .collect(Collectors.toCollection(() -> newTranslatedVerses));
         }
+
+        LOG.info("Saving new " + newTranslatedVerses.size() + " verse(s) to DB");
         translatedVersesRepository.saveAll(newTranslatedVerses);
     }
 }
