@@ -7,7 +7,6 @@ import com.sendgrid.SendGrid;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
-import com.sendgrid.helpers.mail.objects.Personalization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,22 +51,22 @@ public class TranslatedBiblesFetcher {
     @Scheduled(cron = "${pjm.fetch}", zone = "Europe/Warsaw")
     public void fetchAllTransactions() throws IOException {
         LOG.info("Deleting all files from " + videosLocation);
-        try (Stream<Path> walk = Files.walk(videosLocation)) {
-            walk
-                    .filter(Files::isRegularFile)
-                    .forEach(path ->
-                            {
-                                System.out.println(path);
-                                try {
-                                    Files.deleteIfExists(path);
-                                } catch (IOException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            }
-                    );
-        }
+//        try (Stream<Path> walk = Files.walk(videosLocation)) {
+//            walk
+//                    .filter(Files::isRegularFile)
+//                    .forEach(path ->
+//                            {
+//                                System.out.println(path);
+//                                try {
+//                                    Files.deleteIfExists(path);
+//                                } catch (IOException e) {
+//                                    throw new RuntimeException(e);
+//                                }
+//                            }
+//                    );
+//        }
         LOG.info("Downloading files to " + videosLocation);
-        Downloader.download(videosLocation);
+//        Downloader.download(videosLocation);
 
         LOG.info("Parsing all pjm files from  " + videosLocation);
         Map<Book, List<ChapterVerse>> newVerses = M4Chapters.calculateStatistics(videosLocation);
@@ -94,9 +93,13 @@ public class TranslatedBiblesFetcher {
                     })
                     .collect(Collectors.toCollection(() -> newTranslatedVerses));
         }
-
-        LOG.info("Saving new " + newTranslatedVerses.size() + " verse(s) to DB");
-        translatedVersesRepository.saveAll(newTranslatedVerses);
+        if (newTranslatedVerses.isEmpty()) {
+            LOG.info("No new translated verses");
+        } else {
+            LOG.info("Saving new " + newTranslatedVerses.size() + " verse(s) to DB");
+            translatedVersesRepository.saveAll(newTranslatedVerses);
+            sendEmail(newTranslatedVerses);
+        }
     }
 
     private void sendEmail(List<TranslatedVerse> newTranslatedVerses) {

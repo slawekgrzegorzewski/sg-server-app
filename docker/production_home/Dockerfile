@@ -1,6 +1,7 @@
 FROM azul/zulu-openjdk-debian:21
 COPY build/libs/sg-server-app-0.0.1-SNAPSHOT.jar /app/accountant.jar
 RUN mkdir -p /app/logs
+RUN apt-get update && apt-get install ffmpeg
 
 EXPOSE 8080
 
