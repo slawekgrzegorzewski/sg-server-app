@@ -5,6 +5,7 @@ mkdir -p $CONFIG_DIR
 mkdir -p $DOCKER_DIR/volumes/logs
 mkdir -p $DOCKER_DIR/volumes/postgres
 mkdir -p $DOCKER_DIR/volumes/database_backup
+mkdir -p $DOCKER_DIR/volumes/bibleFiles
 mkdir -p $MANAGEMENT_DIR/database-backups
 mkdir -p $SECRETS_DIR
 mkdir -p $STACK_DIR

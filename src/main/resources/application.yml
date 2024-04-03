@@ -47,3 +47,6 @@ cron:
   fetch-accounts: "-"
   fetch-accounts-monthly: "-"
   fetch-transactions: "-"
+
+pjm:
+  fetch: "-"

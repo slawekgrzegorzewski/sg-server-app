@@ -26,6 +26,7 @@ services:
     volumes:
       - $HOME/Application/config/logback.xml:/app/logback.xml:ro
       - $HOME/Application/docker/volumes/logs:/app/logs/
+      - $HOME/Application/docker/volumes/bibleFiles:/app/bibleFiles/
     depends_on:
       - db
 

@@ -3,3 +3,6 @@ intellectual-property:
     attachments:
       storage:
         dir: ${HOME}/Development/Slawek/S3cpy
+
+pjm:
+  videos-location: ${HOME}/Development/Slawek/bibleFiles

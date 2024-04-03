@@ -50,10 +50,16 @@ jobs:
           role-session-name: MySessionName
 
       - name: Build with Gradle Wrapper
-        run: ./gradlew migrateLocal build infrastructureRpi4
+        run: ./gradlew migrate build infrastructureRpi4
         env:
           SG_DB_URL: "jdbc:postgresql://localhost:5432/accountant"
           SG_DB_PASSWORD: postgres
+
+      - name: Build with Gradle Wrapper
+        run: ./gradlew migrate
+        env:
+          SG_DB_URL: ${{ secrets.SG_DB_URL }}
+          SG_DB_PASSWORD: ${{ secrets.SG_DB_PASSWORD }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2

@@ -11,7 +11,7 @@ project.exec {
     commandLine = "aws codeartifact get-authorization-token --domain sg-repository --domain-owner 215372400964 --region eu-central-1 --query authorizationToken --output text".split(" ")
     standardOutput = output
 }
-val codeartifactToken = output.toString();
+val codeartifactToken = output.toString()
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
@@ -120,6 +120,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-cache")
 
+    implementation("pl.sg:pjm:1.0.1")
+
     implementation("net.logstash.logback:logstash-logback-encoder:7.2")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
@@ -167,16 +169,10 @@ tasks.jar {
     )
 }
 
-val migrateLocal = tasks.register<org.flywaydb.gradle.task.FlywayMigrateTask>("migrateLocal") {
+val migrate = tasks.register<org.flywaydb.gradle.task.FlywayMigrateTask>("migrate") {
     url = System.getenv("SG_DB_URL") ?: "jdbc:postgresql://localhost:5432/accountant"
     user = "postgres"
     password = System.getenv("SG_DB_PASSWORD") ?: "SLAwek1!"
-}
-
-val migrateProduction = tasks.register<org.flywaydb.gradle.task.FlywayMigrateTask>("migrateProduction") {
-    url = "jdbc:postgresql://grzegorzewski.org:5432/accountant"
-    user = "postgres"
-    password = ""
 }
 
 val dockerPackage = tasks.register<Zip>("dockerPackage") {
