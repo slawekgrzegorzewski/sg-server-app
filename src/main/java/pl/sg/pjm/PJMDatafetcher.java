@@ -24,12 +24,9 @@ public class PJMDatafetcher {
     public CompletableFuture<String> triggerTranslatedPJMVersesCheck() {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                LOG.info("Starting fetching translated PJM verses");
                 translatedBiblesFetcher.fetchTranslatedVerses();
-                LOG.info("Finished fetching translated PJM verses");
                 return "OK";
             } catch (IOException e) {
-                LOG.info("Error during fetching translated PJM verses");
                 return "Not OK";
             }
         });

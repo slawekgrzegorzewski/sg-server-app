@@ -47,7 +47,6 @@ public class TranslatedBiblesFetcher {
     }
 
     @Scheduled(cron = "${pjm.fetch}", zone = "Europe/Warsaw")
-    @Async
     public void fetchTranslatedVerses() throws IOException {
         LOG.info("Deleting all files from " + videosLocation);
 //        try (Stream<Path> walk = Files.walk(videosLocation)) {
@@ -69,25 +68,17 @@ public class TranslatedBiblesFetcher {
 
         LOG.info("Parsing all pjm files from  " + videosLocation);
         Map<Book, List<ChapterVerse>> newVerses = M4Chapters.calculateStatistics(videosLocation);
-        int i = 0;
-        LOG.info("" + (i++));
         Map<Book, List<ChapterVerse>> currentVerses = translatedVersesRepository.findAll().stream()
                 .collect(Collectors.groupingBy(
                         TranslatedVerse::getBook,
                         Collectors.mapping(tv -> ChapterVerse.of(tv.getChapter(), tv.getVerse()), Collectors.toList())
                 ));
-        LOG.info("" + (i++));
         List<TranslatedVerse> newTranslatedVerses = new ArrayList<>();
-        LOG.info("" + (i++));
         OffsetDateTime now = OffsetDateTime.now();
-        LOG.info("" + (i++));
 
         for (Book book : Book.values()) {
-            LOG.info("" + (i++));
             List<ChapterVerse> newVersion = new ArrayList<>(newVerses.getOrDefault(book, new ArrayList<>()));
-            LOG.info("" + (i++));
             newVersion.removeAll(currentVerses.getOrDefault(book, List.of()));
-            LOG.info("" + (i++));
             newVersion.stream()
                     .map(chapterVerse -> {
                         TranslatedVerse translatedVerse = new TranslatedVerse();
@@ -98,7 +89,6 @@ public class TranslatedBiblesFetcher {
                         return translatedVerse;
                     })
                     .collect(Collectors.toCollection(() -> newTranslatedVerses));
-            LOG.info("" + (i++));
         }
         if (newTranslatedVerses.isEmpty()) {
             LOG.info("No new translated verses");
