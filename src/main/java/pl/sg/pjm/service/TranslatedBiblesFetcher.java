@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
-@EnableAsync
 public class TranslatedBiblesFetcher {
 
     private static final Logger LOG = LoggerFactory.getLogger(TranslatedBiblesFetcher.class);
