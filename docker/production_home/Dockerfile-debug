@@ -1,9 +1,7 @@
 FROM azul/zulu-openjdk-debian:21
-COPY build/libs/sg-server-app-0.0.1-SNAPSHOT.jar /app/accountant.jar
-RUN mkdir -p /app/logs
-RUN apt-get update && apt-get install -y ffmpeg
+RUN mkdir -p /app/logs && apt-get update && apt-get install -y ffmpeg
 
+COPY build/libs/sg-server-app-0.0.1-SNAPSHOT.jar /app/accountant.jar
 EXPOSE 8080
 EXPOSE 5005
-
 CMD ["java", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", "-jar", "/app/accountant.jar", "--spring.config.location=file:///app/application.yml", "--logging.config=/app/logback.xml"]
