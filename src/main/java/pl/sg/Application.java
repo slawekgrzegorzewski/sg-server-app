@@ -7,6 +7,8 @@ import org.modelmapper.spi.SourceGetter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import pl.sg.accountant.model.accounts.FinancialTransaction;
 import pl.sg.accountant.model.accounts.PerformedServicePayment;
 import pl.sg.accountant.transport.FinancialTransactionTO;
@@ -294,6 +296,15 @@ public class Application {
                 .registerTypeAdapter(LocalDate.class, new LocalDateJsonDeserializer())
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeJsonDeserializer())
                 .create();
+    }
+
+    @Bean
+    public ScheduledTaskRegistrar scheduledTaskRegistrar() {
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(20);
+        ScheduledTaskRegistrar scheduledTaskRegistrar = new ScheduledTaskRegistrar();
+        scheduledTaskRegistrar.setScheduler(scheduler);
+        return scheduledTaskRegistrar;
     }
 
 //    @Bean(name = "multipartResolver")
