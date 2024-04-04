@@ -110,5 +110,5 @@ jobs:
             chmod +x deploy_files.sh
             ./deploy_files.sh
             cd /home/${{ secrets.SSH_USER }}/Application/management
-            docker service scale app_app=0
-            docker service scale app_app=1
+            ./stop.sh
+            ./start.sh
