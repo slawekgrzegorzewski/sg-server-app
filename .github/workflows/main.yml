@@ -111,4 +111,5 @@ jobs:
             ./deploy_files.sh
             cd /home/${{ secrets.SSH_USER }}/Application/management
             ./stop.sh
+            sleep 5
             ./start.sh

@@ -10,6 +10,8 @@ import com.sendgrid.helpers.mail.objects.Email;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import pl.sg.application.configuration.Configuration;
@@ -31,6 +33,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
+@EnableAsync
 public class TranslatedBiblesFetcher {
 
     private static final Logger LOG = LoggerFactory.getLogger(TranslatedBiblesFetcher.class);
@@ -49,6 +52,7 @@ public class TranslatedBiblesFetcher {
     }
 
     @Scheduled(cron = "${pjm.fetch}", zone = "Europe/Warsaw")
+    @Async
     public void fetchTranslatedVerses() throws IOException {
         LOG.info("Deleting all files from " + videosLocation);
 //        try (Stream<Path> walk = Files.walk(videosLocation)) {
