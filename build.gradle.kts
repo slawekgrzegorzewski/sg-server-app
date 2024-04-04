@@ -12,9 +12,9 @@ var profile = if (Os.isFamily(Os.FAMILY_MAC)) " --profile sg-app" else ""
 println(profile)
 project.exec {
     commandLine =
-        "aws codeartifact $profile get-authorization-token --domain sg-repository --domain-owner 215372400964 --region eu-central-1 --query authorizationToken --output text".split(
-            " "
-        )
+        "aws codeartifact $profile get-authorization-token --domain sg-repository --domain-owner 215372400964 --region eu-central-1 --query authorizationToken --output text"
+            .split(" ")
+            .filter { it.isNotBlank() }
     standardOutput = output
 }
 val codeartifactToken = output.toString()
