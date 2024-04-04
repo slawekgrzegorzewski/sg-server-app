@@ -17,8 +17,12 @@ public class PJMDatafetcher {
 
     @DgsMutation
     @TokenBearerAuth(any = "PJM")
-    public String triggerTranslatedPJMVersesCheck() throws IOException {
-        translatedBiblesFetcher.fetchTranslatedVerses();
-        return "OK";
+    public String triggerTranslatedPJMVersesCheck() {
+        try {
+            translatedBiblesFetcher.fetchTranslatedVerses();
+            return "OK";
+        } catch (IOException e) {
+            return "Not OK";
+        }
     }
 }
