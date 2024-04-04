@@ -1,4 +1,5 @@
 import nu.studer.gradle.jooq.JooqEdition
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.jooq.meta.jaxb.ForcedType
 import org.jooq.meta.jaxb.Logging
 import org.jooq.meta.jaxb.Property
@@ -7,8 +8,12 @@ import java.io.ByteArrayOutputStream
 group = "pl.sg"
 version = "0.0.1-SNAPSHOT"
 val output = ByteArrayOutputStream()
+var profile = if (Os.isFamily(Os.FAMILY_MAC)) " --profile sg-app" else ""
 project.exec {
-    commandLine = "aws codeartifact get-authorization-token --domain sg-repository --domain-owner 215372400964 --region eu-central-1 --query authorizationToken --output text".split(" ")
+    commandLine =
+        "aws codeartifact $profile get-authorization-token --domain sg-repository --domain-owner 215372400964 --region eu-central-1 --query authorizationToken --output text".split(
+            " "
+        )
     standardOutput = output
 }
 val codeartifactToken = output.toString()

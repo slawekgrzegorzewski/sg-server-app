@@ -30,6 +30,7 @@ type Mutation{
     createTimeRecordCategory(name: String!): TimeRecordCategory!
     updateTimeRecordCategory(timeRecordId: Int!, name: String!): String!
     deleteTimeRecordCategory(timeRecordId:Int!): String!
+    triggerTranslatedPJMVersesCheck: Boolean!
 }
 
 input LoginParameters{

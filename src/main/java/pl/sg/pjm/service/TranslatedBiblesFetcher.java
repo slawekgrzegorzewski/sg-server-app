@@ -49,7 +49,7 @@ public class TranslatedBiblesFetcher {
     }
 
     @Scheduled(cron = "${pjm.fetch}", zone = "Europe/Warsaw")
-    public void fetchAllTransactions() throws IOException {
+    public void fetchTranslatedVerses() throws IOException {
         LOG.info("Deleting all files from " + videosLocation);
 //        try (Stream<Path> walk = Files.walk(videosLocation)) {
 //            walk
