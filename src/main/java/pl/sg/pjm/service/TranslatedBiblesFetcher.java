@@ -50,22 +50,22 @@ public class TranslatedBiblesFetcher {
     @Async
     public void fetchTranslatedVerses() throws IOException {
         LOG.info("Deleting all files from " + videosLocation);
-//        try (Stream<Path> walk = Files.walk(videosLocation)) {
-//            walk
-//                    .filter(Files::isRegularFile)
-//                    .forEach(path ->
-//                            {
-//                                System.out.println(path);
-//                                try {
-//                                    Files.deleteIfExists(path);
-//                                } catch (IOException e) {
-//                                    throw new RuntimeException(e);
-//                                }
-//                            }
-//                    );
-//        }
+        try (Stream<Path> walk = Files.walk(videosLocation)) {
+            walk
+                    .filter(Files::isRegularFile)
+                    .forEach(path ->
+                            {
+                                System.out.println(path);
+                                try {
+                                    Files.deleteIfExists(path);
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                    );
+        }
         LOG.info("Downloading files to " + videosLocation);
-//        Downloader.download(videosLocation);
+        Downloader.download(videosLocation);
 
         LOG.info("Parsing all pjm files from  " + videosLocation);
         Map<Book, List<ChapterVerse>> newVerses = M4Chapters.calculateStatistics(videosLocation);
