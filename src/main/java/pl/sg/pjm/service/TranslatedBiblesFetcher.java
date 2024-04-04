@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import pl.sg.application.configuration.Configuration;
+import pl.sg.pjm.bible.Downloader;
 import pl.sg.pjm.bible.M4Chapters;
 import pl.sg.pjm.bible.model.Book;
 import pl.sg.pjm.bible.model.ChapterVerse;
@@ -21,12 +22,14 @@ import pl.sg.pjm.entities.TranslatedVerse;
 import pl.sg.pjm.repositories.TranslatedVersesRepository;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class TranslatedBiblesFetcher {
