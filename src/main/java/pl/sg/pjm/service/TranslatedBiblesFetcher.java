@@ -101,6 +101,7 @@ public class TranslatedBiblesFetcher {
     }
 
     private void sendEmail(List<TranslatedVerse> newTranslatedVerses) {
+        LOG.info("sending email");
         Email from = new Email("admin@grzegorzewski.org");
 
         StringBuilder contentBuilder = new StringBuilder("<div>Nowe przetłumaczone wersety</div>").append("<div style=\"background-color: #b7e1cd;\"><ul>");
@@ -121,11 +122,9 @@ public class TranslatedBiblesFetcher {
             request.setEndpoint("mail/send");
             request.setBody(mail.build());
             Response response = sg.api(request);
-            System.out.println(response.getStatusCode());
-            System.out.println(response.getBody());
-            System.out.println(response.getHeaders());
+            LOG.info("Email sent statusCode = " + response.getStatusCode() + "; response body = " + response.getBody() + "; response headers = " + response.getHeaders());
         } catch (IOException ex) {
-            System.out.println("Could not send email");
+            LOG.error("Could not send email");
         }
     }
 }
