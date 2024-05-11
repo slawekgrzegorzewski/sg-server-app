@@ -126,6 +126,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-cache")
 
     implementation("pl.sg:pjm:1.0.2")
+    implementation("pl.sg:loans:1.0.0")
 
     implementation("net.logstash.logback:logstash-logback-encoder:7.2")
 
@@ -162,6 +163,10 @@ dependencies {
     jooqGenerator("org.postgresql:postgresql:42.5.1")
     jooqGenerator("jakarta.xml.bind:jakarta.xml.bind-api:4.0.0")
     jooqGenerator(project(":sg-generator-strategy"))
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }
 
 tasks.jar {

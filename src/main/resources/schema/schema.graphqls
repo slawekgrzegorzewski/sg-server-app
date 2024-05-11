@@ -9,7 +9,7 @@ type Query {
     allTimeRecordCategories: [TimeRecordCategory!]!
     monthRevenueAndExpenseEntry(year: Int!, month: Int!): [RevenueAndExpenseEntry!]
     nonIPTimeRecords: [TimeRecord!]!
-    simulateMortgage(mortgageCalculationParams: MortgageCalculationParams): [MortgageCalculationInstallment!]!
+    simulateLoan(loanCalculationParams: LoanCalculationParams): [LoanCalculationInstallment!]!
 }
 
 type Mutation{
@@ -54,8 +54,8 @@ input MFAParameters{
     otp: String!
 }
 
-input MortgageCalculationParams {
-    mortgageAmount: BigDecimal!,
+input LoanCalculationParams {
+    loanAmount: BigDecimal!,
     repaymentStart: LocalDate!,
     rate: BigDecimal!,
     wibor: BigDecimal!,
@@ -64,7 +64,7 @@ input MortgageCalculationParams {
     overpaymentYearlyBudget: BigDecimal!
 }
 
-type MortgageCalculationInstallment {
+type LoanCalculationInstallment {
     paymentFrom: LocalDate!
     paymentTo: LocalDate!,
     remainingCapitalAtTheBeginning: BigDecimal!,
