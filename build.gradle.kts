@@ -8,12 +8,12 @@ import java.io.ByteArrayOutputStream
 group = "pl.sg"
 version = "0.0.1-SNAPSHOT"
 val output = ByteArrayOutputStream()
-var profile = if (Os.isFamily(Os.FAMILY_MAC)) " --profile sg-app" else ""
+var command = if (Os.isFamily(Os.FAMILY_MAC)) "dev-ops/setup/get-authorization-token.sh" else "aws codeartifact get-authorization-token --domain sg-repository --domain-owner 215372400964 --region eu-central-1 --query authorizationToken --output text"
+
+println(command)
 project.exec {
-    commandLine =
-        "aws codeartifact $profile get-authorization-token --domain sg-repository --domain-owner 215372400964 --region eu-central-1 --query authorizationToken --output text"
-            .split(" ")
-            .filter { it.isNotBlank() }
+    commandLine = command.split(" ")
+        .filter { it.isNotBlank() }
     standardOutput = output
 }
 val codeartifactToken = output.toString()

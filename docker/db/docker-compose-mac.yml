@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15.6
+    ports:
+      - "15432:5432"
+    container_name: db
+    environment:
+      - POSTGRES_PASSWORD=SLAwek1!
+    volumes:
+      - ${HOME}/Development/Slawek/files/docker_volumes/db:/var/lib/postgresql/data
