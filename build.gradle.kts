@@ -10,10 +10,9 @@ version = "0.0.1-SNAPSHOT"
 val output = ByteArrayOutputStream()
 var command = if (Os.isFamily(Os.FAMILY_MAC)) "dev-ops/setup/get-authorization-token.sh" else "aws codeartifact get-authorization-token --domain sg-repository --domain-owner 215372400964 --region eu-central-1 --query authorizationToken --output text"
 
-println(command)
 project.exec {
     commandLine = command.split(" ")
-        .filter { it.isNotBlank() }
+            .filter { it.isNotBlank() }
     standardOutput = output
 }
 val codeartifactToken = output.toString()
@@ -105,6 +104,8 @@ dependencies {
 
     implementation("org.hibernate.validator:hibernate-validator:8.0.0.Final")
 
+    implementation("org.javamoney:moneta:1.4.4")
+
     implementation("org.jboss.aerogear:aerogear-otp-java:1.0.0")
 
     implementation("org.jooq:jooq:3.19.1")
@@ -126,7 +127,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-cache")
 
     implementation("pl.sg:pjm:1.0.2")
-    implementation("pl.sg:loans:1.0.0")
+    implementation("pl.sg:loans:1.0.2")
 
     implementation("net.logstash.logback:logstash-logback-encoder:7.2")
 

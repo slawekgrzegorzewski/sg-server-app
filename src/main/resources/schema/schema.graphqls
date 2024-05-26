@@ -10,6 +10,9 @@ type Query {
     monthRevenueAndExpenseEntry(year: Int!, month: Int!): [RevenueAndExpenseEntry!]
     nonIPTimeRecords: [TimeRecord!]!
     simulateLoan(loanCalculationParams: LoanCalculationParams): [LoanCalculationInstallment!]!
+    simulateExistingLoan(loanSimulationParams: LoanSimulationParams): [LoanCalculationInstallment!]!
+    loans: Loans!
+    singleLoan(input: LoanQuery): Loan!
 }
 
 type Mutation{
@@ -31,6 +34,15 @@ type Mutation{
     updateTimeRecordCategory(timeRecordId: Int!, name: String!): String!
     deleteTimeRecordCategory(timeRecordId:Int!): String!
     triggerTranslatedPJMVersesCheck: String!
+    createLoan(input: LoanCreationInput): Loan!
+    updateLoan(input: LoanUpdateInput): Loan!
+    deleteLoan(input: LoanDeleteInput): String!
+    createInstallment(input: InstallmentCreationInput!): Installment!
+    deleteInstallment(installmentPublicId: UUID!): String!
+    createConstantForNFirstInstallmentRateStrategyConfig(input: ConstantForNFirstInstallmentRateStrategyConfigCreationInput!): RateStrategyConfig!
+    deleteRateStrategyConfig(input: RateStrategyConfigDeleteInput!): String!
+    createNthDayOfMonthRepaymentDayStrategyConfig(input: NthDayOfMonthRepaymentDayStrategyConfigInput!): RepaymentDayStrategyConfig!
+    deleteRepaymentDayStrategyConfig(input: RepaymentDayStrategyConfigDeleteInput!): String!
 }
 
 input LoginParameters{
@@ -62,6 +74,12 @@ input LoanCalculationParams {
     numberOfInstallments: Int!,
     overpaymentMonthlyBudget: BigDecimal!,
     overpaymentYearlyBudget: BigDecimal!
+}
+
+input LoanSimulationParams {
+    loanId: UUID!,
+    monthlyBudget: MonetaryAmountInput,
+    yearlyOverpayment: MonetaryAmountInput
 }
 
 type LoanCalculationInstallment {
@@ -208,4 +226,113 @@ type BankAccount {
     bic: String,
     externalId: String!,
     domain: DomainSimple!,
+}
+
+interface RateStrategyConfig {
+    publicId: UUID!,
+    name: String!
+}
+
+type ConstantForNFirstInstallmentRateStrategyConfig implements RateStrategyConfig {
+    publicId: UUID!,
+    name: String!
+    constantRate:BigDecimal!
+    variableRateMargin:BigDecimal!
+    becomesVariableRateAfterNInstallments:Int!
+}
+
+input ConstantForNFirstInstallmentRateStrategyConfigCreationInput {
+    name: String!
+    constantRate:BigDecimal!
+    variableRateMargin:BigDecimal!
+    becomesVariableRateAfterNInstallments:Int!
+}
+
+input RateStrategyConfigDeleteInput {
+    publicId: UUID!
+}
+
+interface RepaymentDayStrategyConfig {
+    publicId: UUID!,
+    name: String!
+}
+
+type NthDayOfMonthRepaymentDayStrategyConfig implements RepaymentDayStrategyConfig {
+    publicId: UUID!,
+    name: String!
+    dayOfMonth:Int!
+}
+
+input NthDayOfMonthRepaymentDayStrategyConfigInput {
+    name: String!
+    dayOfMonth:Int!
+}
+
+input RepaymentDayStrategyConfigDeleteInput {
+    publicId: UUID!
+}
+
+type Loans {
+    rateStrategyConfigs: [RateStrategyConfig!]!
+    repaymentDayStrategyConfigs:[RepaymentDayStrategyConfig!]!
+    loans: [Loan!]!
+}
+
+type MonetaryAmount {
+    amount: BigDecimal!
+    currency: Currency!
+}
+
+input MonetaryAmountInput {
+    amount: BigDecimal!
+    currency: Currency!
+}
+
+type Installment {
+    publicId:UUID!
+    paidAt:LocalDate!
+    repaidInterest:MonetaryAmount!
+    repaidAmount:MonetaryAmount!
+    overpayment:MonetaryAmount!
+}
+
+type Loan {
+    publicId:UUID!
+    name: String!
+    paymentDate:LocalDate!
+    numberOfInstallments: Int!
+    repaymentDayStrategyConfig: RepaymentDayStrategyConfig!
+    rateStrategyConfig: RateStrategyConfig!
+    paidAmount: MonetaryAmount!
+    installments: [Installment!]!
+}
+
+input LoanQuery {
+    publicId: UUID!
+}
+
+input LoanCreationInput {
+    name: String!
+    paymentDate:LocalDate!
+    numberOfInstallments:Int!
+    repaymentDayStrategyConfigId: UUID!
+    rateStrategyConfigId: UUID!
+    paidAmount: MonetaryAmountInput!
+}
+
+input LoanUpdateInput {
+    loanId: UUID!
+    name: String!
+}
+
+input LoanDeleteInput {
+    loanId: UUID!
+}
+
+input InstallmentCreationInput {
+    loanId: UUID!
+    paidAt:LocalDate!
+    repaidInterest: MonetaryAmountInput!
+    repaidAmount: MonetaryAmountInput!
+    overpayment: MonetaryAmountInput!
 }

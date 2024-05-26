@@ -4,42 +4,47 @@ import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.web.bind.annotation.RequestHeader;
+import pl.sg.application.repository.DomainRepository;
 import pl.sg.application.security.annotations.TokenBearerAuth;
-import pl.sg.loans.calculator.LoanSimulator;
+import pl.sg.graphql.schema.types.LoanCalculationParams;
 import pl.sg.loans.model.LoanCalculationInstallment;
-import pl.sg.loans.model.LoanCalculationParams;
+import pl.sg.loans.service.LoanService;
 
 import java.util.List;
 
 @DgsComponent
 public class LoanCalculatorDatafetcher {
-    private final LoanSimulator loanSimulator;
 
-    public LoanCalculatorDatafetcher(LoanSimulator loanSimulator) {
-        this.loanSimulator = loanSimulator;
+    private final DomainRepository domainRepository;
+    private final LoanService loanService;
+
+    public LoanCalculatorDatafetcher(DomainRepository domainRepository, LoanService loanService) {
+        this.domainRepository = domainRepository;
+        this.loanService = loanService;
     }
 
     @DgsQuery
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public List<pl.sg.graphql.schema.types.LoanCalculationInstallment> simulateLoan(
-            @InputArgument("loanCalculationParams") pl.sg.graphql.schema.types.LoanCalculationParams loanCalculationParams
+            @InputArgument("loanCalculationParams") LoanCalculationParams loanCalculationParams
     ) {
-        return loanSimulator.simulate(map(loanCalculationParams))
+        return loanService.simulate(loanCalculationParams)
                 .stream()
                 .map(LoanCalculatorDatafetcher::map)
                 .toList();
     }
 
-    @NotNull
-    private static LoanCalculationParams map(pl.sg.graphql.schema.types.LoanCalculationParams loanCalculationParams) {
-        return new LoanCalculationParams(
-                loanCalculationParams.getLoanAmount(),
-                loanCalculationParams.getRepaymentStart(),
-                loanCalculationParams.getRate(),
-                loanCalculationParams.getWibor(),
-                loanCalculationParams.getNumberOfInstallments(),
-                loanCalculationParams.getOverpaymentMonthlyBudget(),
-                loanCalculationParams.getOverpaymentYearlyBudget());
+    @DgsQuery
+    @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
+    public List<pl.sg.graphql.schema.types.LoanCalculationInstallment> simulateExistingLoan(
+            @RequestHeader("domainId") int domainId,
+            @InputArgument("loanSimulationParams") pl.sg.graphql.schema.types.LoanSimulationParams loanSimulationParams
+    ) {
+        return loanService.simulateExistingLoan(loanSimulationParams, domainRepository.getReferenceById(domainId))
+                .stream()
+                .map(LoanCalculatorDatafetcher::map)
+                .toList();
     }
 
     @NotNull
