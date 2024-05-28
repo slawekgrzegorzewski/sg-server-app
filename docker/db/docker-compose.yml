@@ -9,4 +9,4 @@ services:
     environment:
       - POSTGRES_PASSWORD=SLAwek1!
     volumes:
-      - D:\\Development\\docker_volumes\\db:/var/lib/postgresql/data
+      - F:\\Development\\docker_volumes\\db:/var/lib/postgresql/data
