@@ -2,7 +2,11 @@ intellectual-property:
   task:
     attachments:
       storage:
-        dir: ${HOME}/Development/Slawek/S3cpy
+        dir: ${HOME}/Development/Slawek/files/S3cpy
 
 pjm:
-  videos-location: ${HOME}/Development/Slawek/bibleFiles
+  videos-location: ${HOME}/Development/Slawek/files/bibleFiles
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:15432/accountant

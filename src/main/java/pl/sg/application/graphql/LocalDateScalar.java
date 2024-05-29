@@ -30,7 +30,7 @@ public class LocalDateScalar implements Coercing<LocalDate, String> {
         try {
             return LocalDate.parse(input.toString(), FORMATTER);
         } catch (DateTimeParseException ex) {
-            throw new CoercingParseValueException("Value is not a valid BigDecimal", ex);
+            throw new CoercingParseValueException("Value is not a valid LocalDate", ex);
         }
     }
 

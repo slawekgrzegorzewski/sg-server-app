@@ -4,9 +4,9 @@ services:
   db:
     image: postgres:15.6
     ports:
-      - "5432:5432"
+      - "15432:5432"
     container_name: db
     environment:
       - POSTGRES_PASSWORD=SLAwek1!
     volumes:
-      - F:\\Development\\docker_volumes\\db:/var/lib/postgresql/data
+      - ${HOME}/Development/Slawek/files/docker_volumes/db:/var/lib/postgresql/data
