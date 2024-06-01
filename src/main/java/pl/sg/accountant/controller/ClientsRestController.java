@@ -3,7 +3,7 @@ package pl.sg.accountant.controller;
 import org.modelmapper.ModelMapper;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import pl.sg.accountant.service.ClientsService;
+import pl.sg.accountant.service.OtherPartiesService;
 import pl.sg.accountant.transport.accounts.Client;
 import pl.sg.application.model.Domain;
 import pl.sg.application.security.annotations.RequestBodyWithDomain;
@@ -11,6 +11,7 @@ import pl.sg.application.security.annotations.RequestDomain;
 import pl.sg.application.security.annotations.TokenBearerAuth;
 
 import jakarta.validation.Valid;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,11 +22,11 @@ import static pl.sg.Application.UPDATE_CLIENT;
 @RequestMapping("/clients")
 @Validated
 public class ClientsRestController implements ClientsController {
-    private final ClientsService clientsService;
+    private final OtherPartiesService otherPartiesService;
     private final ModelMapper mapper;
 
-    public ClientsRestController(ClientsService clientsService, ModelMapper mapper) {
-        this.clientsService = clientsService;
+    public ClientsRestController(OtherPartiesService otherPartiesService, ModelMapper mapper) {
+        this.otherPartiesService = otherPartiesService;
         this.mapper = mapper;
     }
 
@@ -33,7 +34,7 @@ public class ClientsRestController implements ClientsController {
     @GetMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public List<Client> clients(@RequestDomain Domain domain) {
-        return clientsService.clients(domain).stream()
+        return otherPartiesService.clients(domain).stream()
                 .map(c -> mapper.map(c, Client.class))
                 .collect(Collectors.toList());
     }
@@ -47,8 +48,10 @@ public class ClientsRestController implements ClientsController {
                     mapperName = CREATE_CLIENT,
                     create = true
             )
-            @Valid pl.sg.accountant.model.accounts.Client client) {
-        return mapper.map(clientsService.create(client), Client.class);
+            @Valid pl.sg.accountant.model.bussines.Client client) {
+        return mapper.map(
+                otherPartiesService.createClient(client.getName(), client.getDomain()),
+                Client.class);
     }
 
     @Override
@@ -59,7 +62,9 @@ public class ClientsRestController implements ClientsController {
                     transportClass = Client.class,
                     mapperName = UPDATE_CLIENT
             )
-            @Valid pl.sg.accountant.model.accounts.Client client) {
-        return mapper.map(clientsService.update(client), Client.class);
+            @Valid pl.sg.accountant.model.bussines.Client client) {
+        return mapper.map(
+                otherPartiesService.updateClient(client.getPublicId(), client.getDomain(), client.getName()),
+                Client.class);
     }
 }

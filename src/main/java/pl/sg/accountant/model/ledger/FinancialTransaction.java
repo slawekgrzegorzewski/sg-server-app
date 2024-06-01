@@ -1,7 +1,8 @@
-package pl.sg.accountant.model.accounts;
+package pl.sg.accountant.model.ledger;
 
 import pl.sg.accountant.model.AccountsException;
 import pl.sg.accountant.model.OperationType;
+import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.model.validation.AccountTransaction;
 import pl.sg.integrations.nodrigen.model.transcations.NodrigenTransaction;
 

@@ -3,7 +3,7 @@ package pl.sg.accountant.service;
 import org.springframework.stereotype.Component;
 import pl.sg.accountant.model.AccountsException;
 import pl.sg.accountant.model.accounts.Account;
-import pl.sg.accountant.model.accounts.FinancialTransaction;
+import pl.sg.accountant.model.ledger.FinancialTransaction;
 import pl.sg.accountant.model.billings.BillingPeriod;
 import pl.sg.accountant.model.billings.Expense;
 import pl.sg.accountant.model.billings.Income;

@@ -1,6 +1,6 @@
 package pl.sg.utils;
 
-import pl.sg.accountant.model.accounts.FinancialTransaction;
+import pl.sg.accountant.model.ledger.FinancialTransaction;
 import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.ApplicationUserDomainRelation;
 import pl.sg.application.model.Domain;

@@ -1,6 +1,6 @@
 package pl.sg.accountant.service;
 
-import pl.sg.accountant.model.accounts.ClientPayment;
+import pl.sg.accountant.model.ledger.ClientPayment;
 import pl.sg.application.model.Domain;
 
 import java.time.YearMonth;

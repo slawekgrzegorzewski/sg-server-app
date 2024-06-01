@@ -3,7 +3,7 @@ package pl.sg.accountant.controller;
 import org.modelmapper.ModelMapper;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import pl.sg.accountant.model.accounts.PerformedServicePayment;
+import pl.sg.accountant.model.ledger.PerformedServicePayment;
 import pl.sg.accountant.service.PerformedServicePaymentsService;
 import pl.sg.accountant.transport.accounts.PerformedServicePaymentTO;
 import pl.sg.application.model.ApplicationUser;

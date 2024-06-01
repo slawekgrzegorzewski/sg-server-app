@@ -47,7 +47,7 @@ public class ServicesRestController implements ServicesController {
                     mapperName = CREATE_CLIENT,
                     create = true
             )
-            @Valid pl.sg.accountant.model.accounts.Service service) {
+            @Valid pl.sg.accountant.model.ledger.Service service) {
         return mapper.map(servicesService.create(service), Service.class);
     }
 
@@ -59,7 +59,7 @@ public class ServicesRestController implements ServicesController {
                     transportClass = Service.class,
                     mapperName = UPDATE_CLIENT
             )
-            @Valid pl.sg.accountant.model.accounts.Service service) {
+            @Valid pl.sg.accountant.model.ledger.Service service) {
         return mapper.map(servicesService.update(service), Service.class);
     }
 }

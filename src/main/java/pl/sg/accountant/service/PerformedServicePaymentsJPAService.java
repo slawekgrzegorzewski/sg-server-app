@@ -2,9 +2,9 @@ package pl.sg.accountant.service;
 
 import org.springframework.stereotype.Component;
 import pl.sg.accountant.model.AccountsException;
-import pl.sg.accountant.model.accounts.ClientPayment;
-import pl.sg.accountant.model.accounts.PerformedService;
-import pl.sg.accountant.model.accounts.PerformedServicePayment;
+import pl.sg.accountant.model.ledger.ClientPayment;
+import pl.sg.accountant.model.ledger.PerformedService;
+import pl.sg.accountant.model.ledger.PerformedServicePayment;
 import pl.sg.accountant.repository.PerformedServicePaymentRepository;
 import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.Domain;

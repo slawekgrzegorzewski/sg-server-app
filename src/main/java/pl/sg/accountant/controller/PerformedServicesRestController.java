@@ -50,7 +50,7 @@ public class PerformedServicesRestController implements PerformedServicesControl
                     mapperName = CREATE_PERFORMED_SERVICE,
                     create = true
             )
-            @Valid pl.sg.accountant.model.accounts.PerformedService performedService) {
+            @Valid pl.sg.accountant.model.ledger.PerformedService performedService) {
         return mapper.map(performedServicesService.create(performedService), PerformedService.class);
     }
 
@@ -62,7 +62,7 @@ public class PerformedServicesRestController implements PerformedServicesControl
                     transportClass = PerformedService.class,
                     mapperName = UPDATE_PERFORMED_SERVICE
             )
-            @Valid pl.sg.accountant.model.accounts.PerformedService service) {
+            @Valid pl.sg.accountant.model.ledger.PerformedService service) {
         return mapper.map(performedServicesService.update(service), PerformedService.class);
     }
 }

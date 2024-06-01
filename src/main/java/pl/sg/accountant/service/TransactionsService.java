@@ -1,7 +1,7 @@
 package pl.sg.accountant.service;
 
 import pl.sg.accountant.model.accounts.Account;
-import pl.sg.accountant.model.accounts.FinancialTransaction;
+import pl.sg.accountant.model.ledger.FinancialTransaction;
 import pl.sg.application.model.Domain;
 
 import java.math.BigDecimal;

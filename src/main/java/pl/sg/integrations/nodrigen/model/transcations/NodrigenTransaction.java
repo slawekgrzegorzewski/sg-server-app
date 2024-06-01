@@ -1,6 +1,6 @@
 package pl.sg.integrations.nodrigen.model.transcations;
 
-import pl.sg.accountant.model.accounts.FinancialTransaction;
+import pl.sg.accountant.model.ledger.FinancialTransaction;
 import pl.sg.integrations.nodrigen.model.balances.NodrigenAmount;
 import pl.sg.integrations.nodrigen.model.balances.NodrigenBalanceEmbeddable;
 import pl.sg.banks.model.BankAccount;

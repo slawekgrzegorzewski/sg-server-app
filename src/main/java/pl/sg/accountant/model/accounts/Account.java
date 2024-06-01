@@ -1,13 +1,14 @@
 package pl.sg.accountant.model.accounts;
 
-import pl.sg.application.model.Domain;
-import pl.sg.application.model.WithDomain;
-import pl.sg.banks.model.BankAccount;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
+import pl.sg.accountant.model.ledger.FinancialTransaction;
+import pl.sg.application.model.Domain;
+import pl.sg.application.model.WithDomain;
+import pl.sg.banks.model.BankAccount;
+
 import java.math.BigDecimal;
 import java.util.Currency;
 

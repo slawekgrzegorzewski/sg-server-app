@@ -18,11 +18,14 @@ import pl.sg.application.service.AuthorizationService;
 import pl.sg.application.api.WithDomain;
 
 import jakarta.persistence.EntityManager;
+
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -46,8 +49,17 @@ public class RequestBodyWithDomainResolver implements HandlerMethodArgumentResol
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         RequestBodyWithDomain ann = parameter.getParameterAnnotation(RequestBodyWithDomain.class);
-        final boolean isWithDomain = Arrays.asList(parameter.getParameterType().getInterfaces()).contains(pl.sg.application.model.WithDomain.class);
+        final boolean isWithDomain = findAllInterfaces(parameter.getParameterType()).contains(pl.sg.application.model.WithDomain.class);
         return ann != null && isWithDomain;
+    }
+
+    private List<Class<?>> findAllInterfaces(Class<?> parameterType) {
+        List<Class<?>> interfaces = new ArrayList<>();
+        interfaces.addAll(Arrays.stream(parameterType.getInterfaces()).toList());
+        if (parameterType.getSuperclass() != null) {
+            interfaces.addAll(findAllInterfaces(parameterType.getSuperclass()));
+        }
+        return interfaces;
     }
 
     @Override
