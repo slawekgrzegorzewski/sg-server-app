@@ -1,6 +1,6 @@
 package pl.sg.accountant.service;
 
-import pl.sg.accountant.model.accounts.Service;
+import pl.sg.accountant.model.ledger.Service;
 import pl.sg.application.model.Domain;
 
 import java.util.List;

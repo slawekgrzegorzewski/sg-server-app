@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import pl.sg.accountant.model.AccountsException;
 import pl.sg.accountant.model.OperationType;
 import pl.sg.accountant.model.accounts.Account;
-import pl.sg.accountant.model.accounts.FinancialTransaction;
+import pl.sg.accountant.model.ledger.FinancialTransaction;
 import pl.sg.accountant.repository.AccountRepository;
 import pl.sg.accountant.repository.FinancialTransactionRepository;
 import pl.sg.application.model.Domain;

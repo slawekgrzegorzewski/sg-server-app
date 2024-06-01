@@ -10,7 +10,7 @@ public interface ClientsController {
 
     List<Client> clients(Domain domain);
 
-    Client createClient(@Valid pl.sg.accountant.model.accounts.Client client);
+    Client createClient(@Valid pl.sg.accountant.model.bussines.Client client);
 
-    Client updateClient(@Valid pl.sg.accountant.model.accounts.Client client);
+    Client updateClient(@Valid pl.sg.accountant.model.bussines.Client client);
 }

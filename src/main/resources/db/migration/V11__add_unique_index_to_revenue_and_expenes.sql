@@ -1,1 +1,0 @@
-create unique index domain_year_order_idx on revenue_and_expense_entries(domain_id, extract(year from entry_date), entry_order);

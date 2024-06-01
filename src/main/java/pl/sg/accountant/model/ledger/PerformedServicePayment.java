@@ -1,4 +1,4 @@
-package pl.sg.accountant.model.accounts;
+package pl.sg.accountant.model.ledger;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

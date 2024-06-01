@@ -11,7 +11,7 @@ public interface PerformedServicesController {
 
     List<PerformedService> services(Domain domain, YearMonth forMonth);
 
-    PerformedService createService(@Valid pl.sg.accountant.model.accounts.PerformedService client);
+    PerformedService createService(@Valid pl.sg.accountant.model.ledger.PerformedService client);
 
-    PerformedService updateService(@Valid pl.sg.accountant.model.accounts.PerformedService client);
+    PerformedService updateService(@Valid pl.sg.accountant.model.ledger.PerformedService client);
 }

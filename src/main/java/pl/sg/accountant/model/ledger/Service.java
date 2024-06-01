@@ -1,11 +1,11 @@
-package pl.sg.accountant.model.accounts;
+package pl.sg.accountant.model.ledger;
 
 import jakarta.persistence.*;
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;
 
 @Entity
-public class Client implements WithDomain<Client> {
+public class Service implements WithDomain<Service> {
     @Id
     @SequenceGenerator(
             name = "commonIdGenerator",
@@ -19,10 +19,10 @@ public class Client implements WithDomain<Client> {
     Domain domain;
 
 
-    public Client() {
+    public Service() {
     }
 
-    public Client(int id, String name) {
+    public Service(int id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -31,7 +31,7 @@ public class Client implements WithDomain<Client> {
         return id;
     }
 
-    public Client setId(Integer id) {
+    public Service setId(Integer id) {
         this.id = id;
         return this;
     }
@@ -40,7 +40,7 @@ public class Client implements WithDomain<Client> {
         return name;
     }
 
-    public Client setName(String name) {
+    public Service setName(String name) {
         this.name = name;
         return this;
     }
@@ -49,7 +49,7 @@ public class Client implements WithDomain<Client> {
         return domain;
     }
 
-    public Client setDomain(Domain domain) {
+    public Service setDomain(Domain domain) {
         this.domain = domain;
         return this;
     }

@@ -2,7 +2,7 @@ package pl.sg.accountant.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import pl.sg.accountant.model.accounts.PerformedService;
+import pl.sg.accountant.model.ledger.PerformedService;
 import pl.sg.application.model.Domain;
 
 import java.time.LocalDate;

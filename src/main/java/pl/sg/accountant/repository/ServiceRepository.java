@@ -1,7 +1,7 @@
 package pl.sg.accountant.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import pl.sg.accountant.model.accounts.Service;
+import pl.sg.accountant.model.ledger.Service;
 import pl.sg.application.model.Domain;
 
 import java.util.List;

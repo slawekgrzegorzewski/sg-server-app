@@ -50,7 +50,7 @@ public class ClientPaymentRestController implements ClientPaymentController {
                     mapperName = CREATE_CLIENT_PAYMENT,
                     create = true
             )
-            @Valid pl.sg.accountant.model.accounts.ClientPayment clientPayment) {
+            @Valid pl.sg.accountant.model.ledger.ClientPayment clientPayment) {
         return mapper.map(clientPaymentsService.create(clientPayment), ClientPayment.class);
     }
 
@@ -62,7 +62,7 @@ public class ClientPaymentRestController implements ClientPaymentController {
                     transportClass = ClientPayment.class,
                     mapperName = UPDATE_CLIENT_PAYMENT
             )
-            @Valid pl.sg.accountant.model.accounts.ClientPayment clientPayment) {
+            @Valid pl.sg.accountant.model.ledger.ClientPayment clientPayment) {
         return mapper.map(clientPaymentsService.update(clientPayment), ClientPayment.class);
     }
 }

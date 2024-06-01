@@ -1,4 +1,4 @@
-package pl.sg.ledger;
+package pl.sg.accountant.model.ledger;
 
 import jakarta.persistence.*;
 import pl.sg.application.model.Domain;

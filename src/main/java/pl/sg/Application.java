@@ -8,8 +8,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
-import pl.sg.accountant.model.accounts.FinancialTransaction;
-import pl.sg.accountant.model.accounts.PerformedServicePayment;
+import pl.sg.accountant.model.ledger.FinancialTransaction;
+import pl.sg.accountant.model.ledger.PerformedServicePayment;
 import pl.sg.accountant.transport.FinancialTransactionTO;
 import pl.sg.accountant.transport.HolidayCurrencies;
 import pl.sg.accountant.transport.PiggyBank;
@@ -66,36 +66,36 @@ public class Application {
         modelMapper.typeMap(pl.sg.accountant.model.accounts.Account.class, Account.class);
         modelMapper.typeMap(pl.sg.accountant.model.billings.BillingPeriod.class, BillingPeriod.class);
         modelMapper.typeMap(pl.sg.accountant.model.billings.PiggyBank.class, PiggyBank.class);
-        modelMapper.typeMap(pl.sg.accountant.model.accounts.ClientPayment.class, ClientPayment.class)
-                .addMapping(pl.sg.accountant.model.accounts.ClientPayment::getServices, ClientPayment::setServiceRelations);
-        modelMapper.typeMap(pl.sg.accountant.model.accounts.PerformedService.class, PerformedService.class)
-                .addMapping(pl.sg.accountant.model.accounts.PerformedService::getPayments, PerformedService::setClientPaymentsRelations);
+        modelMapper.typeMap(pl.sg.accountant.model.ledger.ClientPayment.class, ClientPayment.class)
+                .addMapping(pl.sg.accountant.model.ledger.ClientPayment::getServices, ClientPayment::setServiceRelations);
+        modelMapper.typeMap(pl.sg.accountant.model.ledger.PerformedService.class, PerformedService.class)
+                .addMapping(pl.sg.accountant.model.ledger.PerformedService::getPayments, PerformedService::setClientPaymentsRelations);
 
         modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentTO.class)
-                .addMapping(getPropertyOfPSP(pl.sg.accountant.model.accounts.ClientPayment::getDate, null), PerformedServicePaymentTO::setDate);
+                .addMapping(getPropertyOfPSP(pl.sg.accountant.model.ledger.ClientPayment::getDate, null), PerformedServicePaymentTO::setDate);
         modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentTO.class)
-                .addMapping(getPropertyOfPSP(pl.sg.accountant.model.accounts.ClientPayment::getCurrency, null), PerformedServicePaymentTO::setCurrency);
+                .addMapping(getPropertyOfPSP(pl.sg.accountant.model.ledger.ClientPayment::getCurrency, null), PerformedServicePaymentTO::setCurrency);
         modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentTO.class)
-                .addMapping(getPropertyOfPSP(pl.sg.accountant.model.accounts.ClientPayment::isInvoice, false), PerformedServicePaymentTO::setInvoice);
+                .addMapping(getPropertyOfPSP(pl.sg.accountant.model.ledger.ClientPayment::isInvoice, false), PerformedServicePaymentTO::setInvoice);
         modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentTO.class)
-                .addMapping(getPropertyOfPSP(pl.sg.accountant.model.accounts.ClientPayment::isBillOfSale, false), PerformedServicePaymentTO::setBillOfSale);
+                .addMapping(getPropertyOfPSP(pl.sg.accountant.model.ledger.ClientPayment::isBillOfSale, false), PerformedServicePaymentTO::setBillOfSale);
         modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentTO.class)
-                .addMapping(getPropertyOfPSP(pl.sg.accountant.model.accounts.ClientPayment::isBillOfSaleAsInvoice, false), PerformedServicePaymentTO::setBillOfSaleAsInvoice);
+                .addMapping(getPropertyOfPSP(pl.sg.accountant.model.ledger.ClientPayment::isBillOfSaleAsInvoice, false), PerformedServicePaymentTO::setBillOfSaleAsInvoice);
         modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentTO.class)
-                .addMapping(getPropertyOfPSP(pl.sg.accountant.model.accounts.ClientPayment::isNotRegistered, false), PerformedServicePaymentTO::setNotRegistered);
+                .addMapping(getPropertyOfPSP(pl.sg.accountant.model.ledger.ClientPayment::isNotRegistered, false), PerformedServicePaymentTO::setNotRegistered);
 
         modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentSimpleTO.class)
-                .addMapping(getPropertyOfPSP(pl.sg.accountant.model.accounts.ClientPayment::getDate, null), PerformedServicePaymentSimpleTO::setDate);
+                .addMapping(getPropertyOfPSP(pl.sg.accountant.model.ledger.ClientPayment::getDate, null), PerformedServicePaymentSimpleTO::setDate);
         modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentSimpleTO.class)
-                .addMapping(getPropertyOfPSP(pl.sg.accountant.model.accounts.ClientPayment::getCurrency, null), PerformedServicePaymentSimpleTO::setCurrency);
+                .addMapping(getPropertyOfPSP(pl.sg.accountant.model.ledger.ClientPayment::getCurrency, null), PerformedServicePaymentSimpleTO::setCurrency);
         modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentSimpleTO.class)
-                .addMapping(getPropertyOfPSP(pl.sg.accountant.model.accounts.ClientPayment::isInvoice, false), PerformedServicePaymentSimpleTO::setInvoice);
+                .addMapping(getPropertyOfPSP(pl.sg.accountant.model.ledger.ClientPayment::isInvoice, false), PerformedServicePaymentSimpleTO::setInvoice);
         modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentSimpleTO.class)
-                .addMapping(getPropertyOfPSP(pl.sg.accountant.model.accounts.ClientPayment::isBillOfSale, false), PerformedServicePaymentSimpleTO::setBillOfSale);
+                .addMapping(getPropertyOfPSP(pl.sg.accountant.model.ledger.ClientPayment::isBillOfSale, false), PerformedServicePaymentSimpleTO::setBillOfSale);
         modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentSimpleTO.class)
-                .addMapping(getPropertyOfPSP(pl.sg.accountant.model.accounts.ClientPayment::isBillOfSaleAsInvoice, false), PerformedServicePaymentSimpleTO::setBillOfSaleAsInvoice);
+                .addMapping(getPropertyOfPSP(pl.sg.accountant.model.ledger.ClientPayment::isBillOfSaleAsInvoice, false), PerformedServicePaymentSimpleTO::setBillOfSaleAsInvoice);
         modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentSimpleTO.class)
-                .addMapping(getPropertyOfPSP(pl.sg.accountant.model.accounts.ClientPayment::isNotRegistered, false), PerformedServicePaymentSimpleTO::setNotRegistered);
+                .addMapping(getPropertyOfPSP(pl.sg.accountant.model.ledger.ClientPayment::isNotRegistered, false), PerformedServicePaymentSimpleTO::setNotRegistered);
 
         modelMapper.typeMap(Account.class, pl.sg.accountant.model.accounts.Account.class, CREATE_ACCOUNT)
                 .setConverter(context -> applyChanges(context.getSource(), new pl.sg.accountant.model.accounts.Account()));
@@ -109,22 +109,22 @@ public class Application {
         modelMapper.typeMap(Category.class, pl.sg.accountant.model.billings.Category.class, UPDATE_CATEGORY)
                 .setConverter(context -> applyChanges(context.getSource(), context.getDestination()));
 
-        modelMapper.typeMap(Client.class, pl.sg.accountant.model.accounts.Client.class, CREATE_CLIENT)
-                .setConverter(context -> applyChanges(context.getSource(), new pl.sg.accountant.model.accounts.Client()));
+        modelMapper.typeMap(Client.class, pl.sg.accountant.model.bussines.Client.class, CREATE_CLIENT)
+                .setConverter(context -> applyChanges(context.getSource(), new pl.sg.accountant.model.bussines.Client()));
 
-        modelMapper.typeMap(Client.class, pl.sg.accountant.model.accounts.Client.class, UPDATE_CLIENT)
+        modelMapper.typeMap(Client.class, pl.sg.accountant.model.bussines.Client.class, UPDATE_CLIENT)
                 .setConverter(context -> applyChanges(context.getSource(), context.getDestination()));
 
-        modelMapper.typeMap(ClientPayment.class, pl.sg.accountant.model.accounts.ClientPayment.class, CREATE_CLIENT_PAYMENT)
+        modelMapper.typeMap(ClientPayment.class, pl.sg.accountant.model.ledger.ClientPayment.class, CREATE_CLIENT_PAYMENT)
                 .setConverter(context -> applyChanges(context.getSource(), modelMapper));
 
-        modelMapper.typeMap(ClientPayment.class, pl.sg.accountant.model.accounts.ClientPayment.class, UPDATE_CLIENT_PAYMENT)
+        modelMapper.typeMap(ClientPayment.class, pl.sg.accountant.model.ledger.ClientPayment.class, UPDATE_CLIENT_PAYMENT)
                 .setConverter(context -> applyChanges(context.getSource(), context.getDestination()));
 
-        modelMapper.typeMap(PerformedService.class, pl.sg.accountant.model.accounts.PerformedService.class, CREATE_PERFORMED_SERVICE)
-                .setConverter(context -> applyChanges(context.getSource(), new pl.sg.accountant.model.accounts.PerformedService(), modelMapper));
+        modelMapper.typeMap(PerformedService.class, pl.sg.accountant.model.ledger.PerformedService.class, CREATE_PERFORMED_SERVICE)
+                .setConverter(context -> applyChanges(context.getSource(), new pl.sg.accountant.model.ledger.PerformedService(), modelMapper));
 
-        modelMapper.typeMap(PerformedService.class, pl.sg.accountant.model.accounts.PerformedService.class, UPDATE_PERFORMED_SERVICE)
+        modelMapper.typeMap(PerformedService.class, pl.sg.accountant.model.ledger.PerformedService.class, UPDATE_PERFORMED_SERVICE)
                 .setConverter(context -> applyChanges(context.getSource(), context.getDestination()));
 
         modelMapper.typeMap(PerformedServicePaymentTO.class, PerformedServicePayment.class, CREATE_PERFORMED_SERVICE_PAYMENT)
@@ -139,10 +139,10 @@ public class Application {
         modelMapper.typeMap(PiggyBank.class, pl.sg.accountant.model.billings.PiggyBank.class, UPDATE_PIGGY_BANK)
                 .setConverter(context -> applyChanges(context.getSource(), context.getDestination()));
 
-        modelMapper.typeMap(Service.class, pl.sg.accountant.model.accounts.Service.class, CREATE_SERVICE)
-                .setConverter(context -> applyChanges(context.getSource(), new pl.sg.accountant.model.accounts.Service()));
+        modelMapper.typeMap(Service.class, pl.sg.accountant.model.ledger.Service.class, CREATE_SERVICE)
+                .setConverter(context -> applyChanges(context.getSource(), new pl.sg.accountant.model.ledger.Service()));
 
-        modelMapper.typeMap(Service.class, pl.sg.accountant.model.accounts.Service.class, UPDATE_SERVICE)
+        modelMapper.typeMap(Service.class, pl.sg.accountant.model.ledger.Service.class, UPDATE_SERVICE)
                 .setConverter(context -> applyChanges(context.getSource(), context.getDestination()));
 
         modelMapper.typeMap(CubeRecord.class, pl.sg.cubes.model.CubeRecord.class, CREATE_CUBE_RECORD)
@@ -173,7 +173,7 @@ public class Application {
         return modelMapper;
     }
 
-    private <T> SourceGetter<PerformedServicePayment> getPropertyOfPSP(Function<pl.sg.accountant.model.accounts.ClientPayment, T> mapper, T defaultValue) {
+    private <T> SourceGetter<PerformedServicePayment> getPropertyOfPSP(Function<pl.sg.accountant.model.ledger.ClientPayment, T> mapper, T defaultValue) {
         return psp -> Optional.ofNullable(psp)
                 .map(PerformedServicePayment::getClientPayment)
                 .map(mapper)
@@ -194,25 +194,25 @@ public class Application {
         return destination;
     }
 
-    private pl.sg.accountant.model.accounts.Client applyChanges(Client source, pl.sg.accountant.model.accounts.Client destination) {
+    private pl.sg.accountant.model.bussines.Client applyChanges(Client source, pl.sg.accountant.model.bussines.Client destination) {
         destination.setName(source.getName());
         return destination;
     }
 
-    private pl.sg.accountant.model.accounts.PerformedService applyChanges(PerformedService source, pl.sg.accountant.model.accounts.PerformedService destination, ModelMapper modelMapper) {
+    private pl.sg.accountant.model.ledger.PerformedService applyChanges(PerformedService source, pl.sg.accountant.model.ledger.PerformedService destination, ModelMapper modelMapper) {
         destination.setDate(source.getDate());
         destination.setPrice(source.getPrice());
         destination.setCurrency(source.getCurrency());
         if (source.getClient() != null) {
-            destination.setClient(modelMapper.map(source.getClient(), pl.sg.accountant.model.accounts.Client.class));
+            destination.setClient(modelMapper.map(source.getClient(), pl.sg.accountant.model.bussines.Client.class));
         }
         if (source.getService() != null) {
-            destination.setService(modelMapper.map(source.getService(), pl.sg.accountant.model.accounts.Service.class));
+            destination.setService(modelMapper.map(source.getService(), pl.sg.accountant.model.ledger.Service.class));
         }
         return destination;
     }
 
-    private pl.sg.accountant.model.accounts.PerformedService applyChanges(PerformedService source, pl.sg.accountant.model.accounts.PerformedService destination) {
+    private pl.sg.accountant.model.ledger.PerformedService applyChanges(PerformedService source, pl.sg.accountant.model.ledger.PerformedService destination) {
         destination.setDate(source.getDate());
         destination.setPrice(source.getPrice());
         return destination;
@@ -221,11 +221,11 @@ public class Application {
     private PerformedServicePayment applyChanges(PerformedServicePaymentTO source, PerformedServicePayment destination, ModelMapper modelMapper) {
         PerformedService performedService = source.getPerformedService();
         if (performedService != null) {
-            destination.setPerformedService(modelMapper.map(performedService, pl.sg.accountant.model.accounts.PerformedService.class));
+            destination.setPerformedService(modelMapper.map(performedService, pl.sg.accountant.model.ledger.PerformedService.class));
         }
         ClientPayment clientPayment = source.getClientPayment();
         if (clientPayment != null) {
-            destination.setClientPayment(modelMapper.map(clientPayment, pl.sg.accountant.model.accounts.ClientPayment.class));
+            destination.setClientPayment(modelMapper.map(clientPayment, pl.sg.accountant.model.ledger.ClientPayment.class));
         }
         destination.setPrice(source.getPrice());
         return destination;
@@ -241,22 +241,22 @@ public class Application {
         return destination;
     }
 
-    private pl.sg.accountant.model.accounts.Service applyChanges(Service source, pl.sg.accountant.model.accounts.Service destination) {
+    private pl.sg.accountant.model.ledger.Service applyChanges(Service source, pl.sg.accountant.model.ledger.Service destination) {
         destination.setName(source.getName());
         return destination;
     }
 
-    private pl.sg.accountant.model.accounts.ClientPayment applyChanges(ClientPayment source, ModelMapper modelMapper) {
-        pl.sg.accountant.model.accounts.ClientPayment destination = applyChanges(source, new pl.sg.accountant.model.accounts.ClientPayment());
+    private pl.sg.accountant.model.ledger.ClientPayment applyChanges(ClientPayment source, ModelMapper modelMapper) {
+        pl.sg.accountant.model.ledger.ClientPayment destination = applyChanges(source, new pl.sg.accountant.model.ledger.ClientPayment());
         if (source.getClient() != null) {
-            destination.setClient(modelMapper.map(source.getClient(), pl.sg.accountant.model.accounts.Client.class));
+            destination.setClient(modelMapper.map(source.getClient(), pl.sg.accountant.model.bussines.Client.class));
         }
         destination.setPrice(source.getPrice());
         destination.setCurrency(source.getCurrency());
         return destination;
     }
 
-    private pl.sg.accountant.model.accounts.ClientPayment applyChanges(ClientPayment source, pl.sg.accountant.model.accounts.ClientPayment destination) {
+    private pl.sg.accountant.model.ledger.ClientPayment applyChanges(ClientPayment source, pl.sg.accountant.model.ledger.ClientPayment destination) {
         destination.setDate(source.getDate());
         destination.setBillOfSale(source.isBillOfSale());
         destination.setBillOfSaleAsInvoice(source.isBillOfSaleAsInvoice());

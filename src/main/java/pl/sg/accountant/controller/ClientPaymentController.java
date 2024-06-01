@@ -11,7 +11,7 @@ public interface ClientPaymentController {
 
     List<ClientPayment> clientPayments(Domain domain, YearMonth forMonth);
 
-    ClientPayment createClientPayment(@Valid pl.sg.accountant.model.accounts.ClientPayment clientPayment);
+    ClientPayment createClientPayment(@Valid pl.sg.accountant.model.ledger.ClientPayment clientPayment);
 
-    ClientPayment updateClientPayment(@Valid pl.sg.accountant.model.accounts.ClientPayment clientPayment);
+    ClientPayment updateClientPayment(@Valid pl.sg.accountant.model.ledger.ClientPayment clientPayment);
 }

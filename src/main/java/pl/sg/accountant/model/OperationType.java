@@ -1,7 +1,7 @@
 package pl.sg.accountant.model;
 
 import pl.sg.accountant.model.accounts.Account;
-import pl.sg.accountant.model.accounts.FinancialTransaction;
+import pl.sg.accountant.model.ledger.FinancialTransaction;
 
 import java.util.function.BiConsumer;
 

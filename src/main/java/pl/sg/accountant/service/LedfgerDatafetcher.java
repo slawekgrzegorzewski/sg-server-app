@@ -1,4 +1,4 @@
-package pl.sg.ledger;
+package pl.sg.accountant.service;
 
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsMutation;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import pl.sg.application.model.Domain;
 import pl.sg.application.security.annotations.TokenBearerAuth;
 import pl.sg.graphql.schema.types.DomainSimple;
+import pl.sg.graphql.schema.types.LedgerQuery;
 import pl.sg.graphql.schema.types.RevenueAndExpenseEntry;
 import pl.sg.graphql.schema.types.RevenueAndExpenseEntryInput;
 
@@ -40,12 +41,11 @@ public class LedfgerDatafetcher {
 
     @DgsQuery
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public List<RevenueAndExpenseEntry> monthRevenueAndExpenseEntry(
-            @InputArgument("year") int year,
-            @InputArgument("month") int month,
+    public List<RevenueAndExpenseEntry> monthLedger(
+            @InputArgument("ledgerQuery") LedgerQuery ledgerQuery,
             @RequestHeader("domainId") int domainId
     ) {
-        YearMonth yearMonth = YearMonth.of(year, month);
+        YearMonth yearMonth = YearMonth.of(ledgerQuery.getYearMonth().getYear(), ledgerQuery.getYearMonth().getMonth());
         return dslContext.select(
                         REVENUE_AND_EXPENSE_ENTRIES.asterisk(),
                         DOMAIN.ID.as("domain_id"),

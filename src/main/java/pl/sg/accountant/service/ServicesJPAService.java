@@ -1,7 +1,7 @@
 package pl.sg.accountant.service;
 
 import org.springframework.stereotype.Component;
-import pl.sg.accountant.model.accounts.Service;
+import pl.sg.accountant.model.ledger.Service;
 import pl.sg.accountant.repository.ServiceRepository;
 import pl.sg.application.model.Domain;
 

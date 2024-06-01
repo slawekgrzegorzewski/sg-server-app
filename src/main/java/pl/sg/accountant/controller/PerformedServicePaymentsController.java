@@ -1,6 +1,6 @@
 package pl.sg.accountant.controller;
 
-import pl.sg.accountant.model.accounts.PerformedServicePayment;
+import pl.sg.accountant.model.ledger.PerformedServicePayment;
 import pl.sg.accountant.transport.accounts.PerformedServicePaymentTO;
 import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.Domain;
