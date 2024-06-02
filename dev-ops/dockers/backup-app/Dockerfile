@@ -1,5 +1,4 @@
 FROM ubuntu:mantic
-FROM azul/zulu-openjdk-debian:21
 
 RUN mkdir /development
 
