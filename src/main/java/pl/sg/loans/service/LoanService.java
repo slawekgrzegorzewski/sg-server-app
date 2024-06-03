@@ -214,7 +214,7 @@ public class LoanService {
         return loanSimulator.simulate(
                 new LoanCalculationParams(
                         leftToPay.getNumber().numberValue(BigDecimal.class),
-                        lastRegularInstallment.map(Installment::getPaidAt).orElseGet(loan::getPaymentDate),
+                        lastRegularInstallment.map(Installment::getPaidAt).map(paidAt -> paidAt.plusDays(1)).orElseGet(loan::getPaymentDate),
                         rateStrategy.getNextInstallmentPercent(),
                         new BigDecimal("0"),
                         loan.getNumberOfInstallments() - (int) loan.getInstallments().stream().filter(installment -> !installment.getRepaidInterest().isNegativeOrZero()).count(),
