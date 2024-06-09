@@ -1,6 +1,7 @@
 package pl.sg.accountant.model.ledger;
 
 import pl.sg.accountant.model.bussines.Client;
+import pl.sg.accountant.model.bussines.Service;
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;
 

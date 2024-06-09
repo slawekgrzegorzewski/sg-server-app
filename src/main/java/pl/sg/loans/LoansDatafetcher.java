@@ -4,7 +4,6 @@ import com.netflix.graphql.dgs.*;
 import org.javamoney.moneta.Money;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.bind.annotation.RequestHeader;
-import pl.sg.application.repository.DomainRepository;
 import pl.sg.application.security.annotations.TokenBearerAuth;
 import pl.sg.graphql.schema.DgsConstants;
 import pl.sg.graphql.schema.types.*;
@@ -21,11 +20,9 @@ import java.util.UUID;
 
 @DgsComponent
 public class LoansDatafetcher {
-    private final DomainRepository domainRepository;
     private final LoanService loanService;
 
-    public LoansDatafetcher(DomainRepository domainRepository, LoanService loanService) {
-        this.domainRepository = domainRepository;
+    public LoansDatafetcher(LoanService loanService) {
         this.loanService = loanService;
     }
 
@@ -35,7 +32,7 @@ public class LoansDatafetcher {
             @RequestHeader("domainId") int domainId
     ) {
         return Loans.newBuilder()
-                .loans(loanService.findAllDomainLoans(domainRepository.getReferenceById(domainId)).stream().map(LoansDatafetcher::map).toList())
+                .loans(loanService.findAllDomainLoans(domainId).stream().map(LoansDatafetcher::map).toList())
                 .build();
     }
 
@@ -45,7 +42,7 @@ public class LoansDatafetcher {
             @RequestHeader("domainId") int domainId
     ) {
         return loanService
-                .findAllDomainRateStrategyConfigs(domainRepository.getReferenceById(domainId))
+                .findAllDomainRateStrategyConfigs(domainId)
                 .stream()
                 .map(LoansDatafetcher::map)
                 .toList();
@@ -57,7 +54,7 @@ public class LoansDatafetcher {
             @RequestHeader("domainId") int domainId
     ) {
         return loanService
-                .findAllDomainRepaymentDayStrategyConfigs(domainRepository.getReferenceById(domainId))
+                .findAllDomainRepaymentDayStrategyConfigs(domainId)
                 .stream()
                 .map(LoansDatafetcher::map)
                 .toList();
@@ -73,7 +70,7 @@ public class LoansDatafetcher {
                 loanService
                         .findLoanByPublicId(
                                 input.getPublicId(),
-                                domainRepository.getReferenceById(domainId)));
+                                domainId));
     }
 
     @DgsMutation
@@ -91,7 +88,7 @@ public class LoansDatafetcher {
                                 input.getRepaymentDayStrategyConfigId(),
                                 input.getRateStrategyConfigId(),
                                 map(input.getPaidAmount()),
-                                domainRepository.getReferenceById(domainId)));
+                                domainId));
     }
 
     @DgsMutation
@@ -105,7 +102,7 @@ public class LoansDatafetcher {
                         .updateLoan(
                                 input.getLoanId(),
                                 input.getName(),
-                                domainRepository.getReferenceById(domainId)));
+                                domainId));
     }
 
     @DgsMutation
@@ -117,7 +114,7 @@ public class LoansDatafetcher {
         loanService
                 .deleteLoan(
                         input.getLoanId(),
-                        domainRepository.getReferenceById(domainId));
+                        domainId);
         return "OK";
     }
 
@@ -135,7 +132,7 @@ public class LoansDatafetcher {
                                 map(input.getRepaidInterest()),
                                 map(input.getRepaidAmount()),
                                 map(input.getOverpayment()),
-                                domainRepository.getReferenceById(domainId)));
+                                domainId));
     }
 
     @DgsMutation
@@ -144,7 +141,7 @@ public class LoansDatafetcher {
             @RequestHeader("domainId") int domainId,
             @InputArgument("installmentPublicId") UUID installmentPublicId
     ) {
-        loanService.deleteInstallment(installmentPublicId, domainRepository.getReferenceById(domainId));
+        loanService.deleteInstallment(installmentPublicId, domainId);
         return "OK";
     }
 
@@ -157,7 +154,7 @@ public class LoansDatafetcher {
         return map(
                 loanService
                         .createConstantForNFirstInstallmentRateStrategy(
-                                domainRepository.getReferenceById(domainId),
+                                domainId,
                                 input.getName(),
                                 input.getConstantRate(),
                                 input.getVariableRateMargin(),
@@ -170,7 +167,7 @@ public class LoansDatafetcher {
             @RequestHeader("domainId") int domainId,
             @InputArgument("input") RateStrategyConfigDeleteInput rateStrategyConfigDeleteInput
     ) {
-        loanService.deleteRateStrategyConfig(rateStrategyConfigDeleteInput.getPublicId(), domainRepository.getReferenceById(domainId));
+        loanService.deleteRateStrategyConfig(rateStrategyConfigDeleteInput.getPublicId(), domainId);
         return "OK";
     }
 
@@ -183,7 +180,7 @@ public class LoansDatafetcher {
         return map(
                 loanService
                         .createNthDayOfMonthStrategy(
-                                domainRepository.getReferenceById(domainId),
+                                domainId,
                                 input.getName(),
                                 input.getDayOfMonth()));
     }
@@ -194,7 +191,7 @@ public class LoansDatafetcher {
             @RequestHeader("domainId") int domainId,
             @InputArgument("input") RepaymentDayStrategyConfigDeleteInput repaymentDayStrategyConfigDeleteInput
     ) {
-        loanService.deleteRepaymentDayStrategyConfig(repaymentDayStrategyConfigDeleteInput.getPublicId(), domainRepository.getReferenceById(domainId));
+        loanService.deleteRepaymentDayStrategyConfig(repaymentDayStrategyConfigDeleteInput.getPublicId(), domainId);
         return "OK";
     }
 

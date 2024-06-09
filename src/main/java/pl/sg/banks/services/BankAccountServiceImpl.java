@@ -3,7 +3,7 @@ package pl.sg.banks.services;
 import org.springframework.stereotype.Controller;
 import pl.sg.accountant.model.AccountsException;
 import pl.sg.accountant.model.accounts.Account;
-import pl.sg.accountant.repository.AccountRepository;
+import pl.sg.accountant.repository.accounts.AccountRepository;
 import pl.sg.application.model.Domain;
 import pl.sg.banks.model.BankAccount;
 import pl.sg.banks.repositories.BankAccountRepository;

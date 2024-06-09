@@ -5,7 +5,7 @@ import pl.sg.application.model.Domain;
 
 public interface AccountantSettingsService {
 
-    AccountantSettings getForDomain(Domain domain);
+    AccountantSettings getForDomain(int domainId);
 
     AccountantSettings createForDomain(Domain domain);
 

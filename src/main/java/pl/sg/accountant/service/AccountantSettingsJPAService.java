@@ -5,17 +5,21 @@ import pl.sg.accountant.model.AccountantSettings;
 import pl.sg.accountant.model.AccountsException;
 import pl.sg.accountant.repository.AccountantSettingsRepository;
 import pl.sg.application.model.Domain;
+import pl.sg.application.repository.DomainRepository;
 
 @Component
 public class AccountantSettingsJPAService implements AccountantSettingsService {
     private final AccountantSettingsRepository accountantSettingsRepository;
+    private final DomainRepository domainRepository;
 
-    public AccountantSettingsJPAService(AccountantSettingsRepository accountantSettingsRepository) {
+    public AccountantSettingsJPAService(AccountantSettingsRepository accountantSettingsRepository, DomainRepository domainRepository) {
         this.accountantSettingsRepository = accountantSettingsRepository;
+        this.domainRepository = domainRepository;
     }
 
     @Override
-    public AccountantSettings getForDomain(Domain domain) {
+    public AccountantSettings getForDomain(int domainId) {
+        Domain domain = domainRepository.getReferenceById(domainId);
         if (accountantSettingsRepository.findByDomain(domain).isEmpty()) {
             createForDomain(domain);
         }

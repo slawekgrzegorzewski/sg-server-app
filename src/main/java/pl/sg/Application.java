@@ -139,10 +139,10 @@ public class Application {
         modelMapper.typeMap(PiggyBank.class, pl.sg.accountant.model.billings.PiggyBank.class, UPDATE_PIGGY_BANK)
                 .setConverter(context -> applyChanges(context.getSource(), context.getDestination()));
 
-        modelMapper.typeMap(Service.class, pl.sg.accountant.model.ledger.Service.class, CREATE_SERVICE)
-                .setConverter(context -> applyChanges(context.getSource(), new pl.sg.accountant.model.ledger.Service()));
+        modelMapper.typeMap(Service.class, pl.sg.accountant.model.bussines.Service.class, CREATE_SERVICE)
+                .setConverter(context -> applyChanges(context.getSource(), new pl.sg.accountant.model.bussines.Service()));
 
-        modelMapper.typeMap(Service.class, pl.sg.accountant.model.ledger.Service.class, UPDATE_SERVICE)
+        modelMapper.typeMap(Service.class, pl.sg.accountant.model.bussines.Service.class, UPDATE_SERVICE)
                 .setConverter(context -> applyChanges(context.getSource(), context.getDestination()));
 
         modelMapper.typeMap(CubeRecord.class, pl.sg.cubes.model.CubeRecord.class, CREATE_CUBE_RECORD)
@@ -207,7 +207,7 @@ public class Application {
             destination.setClient(modelMapper.map(source.getClient(), pl.sg.accountant.model.bussines.Client.class));
         }
         if (source.getService() != null) {
-            destination.setService(modelMapper.map(source.getService(), pl.sg.accountant.model.ledger.Service.class));
+            destination.setService(modelMapper.map(source.getService(), pl.sg.accountant.model.bussines.Service.class));
         }
         return destination;
     }
@@ -241,7 +241,7 @@ public class Application {
         return destination;
     }
 
-    private pl.sg.accountant.model.ledger.Service applyChanges(Service source, pl.sg.accountant.model.ledger.Service destination) {
+    private pl.sg.accountant.model.bussines.Service applyChanges(Service source, pl.sg.accountant.model.bussines.Service destination) {
         destination.setName(source.getName());
         return destination;
     }

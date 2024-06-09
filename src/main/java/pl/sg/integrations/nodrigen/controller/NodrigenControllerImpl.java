@@ -2,7 +2,7 @@ package pl.sg.integrations.nodrigen.controller;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.web.bind.annotation.*;
-import pl.sg.accountant.repository.AccountRepository;
+import pl.sg.accountant.repository.accounts.AccountRepository;
 import pl.sg.application.model.Domain;
 import pl.sg.application.security.annotations.RequestDomain;
 import pl.sg.application.security.annotations.TokenBearerAuth;

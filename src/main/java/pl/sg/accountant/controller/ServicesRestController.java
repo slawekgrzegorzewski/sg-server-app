@@ -3,7 +3,7 @@ package pl.sg.accountant.controller;
 import org.modelmapper.ModelMapper;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import pl.sg.accountant.service.ServicesService;
+import pl.sg.accountant.service.bussines.ServicesService;
 import pl.sg.accountant.transport.accounts.Service;
 import pl.sg.application.model.Domain;
 import pl.sg.application.security.annotations.RequestBodyWithDomain;
@@ -47,7 +47,7 @@ public class ServicesRestController implements ServicesController {
                     mapperName = CREATE_CLIENT,
                     create = true
             )
-            @Valid pl.sg.accountant.model.ledger.Service service) {
+            @Valid pl.sg.accountant.model.bussines.Service service) {
         return mapper.map(servicesService.create(service), Service.class);
     }
 
@@ -59,7 +59,7 @@ public class ServicesRestController implements ServicesController {
                     transportClass = Service.class,
                     mapperName = UPDATE_CLIENT
             )
-            @Valid pl.sg.accountant.model.ledger.Service service) {
+            @Valid pl.sg.accountant.model.bussines.Service service) {
         return mapper.map(servicesService.update(service), Service.class);
     }
 }

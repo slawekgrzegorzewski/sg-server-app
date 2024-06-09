@@ -2,7 +2,7 @@ package pl.sg.accountant.controller;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.web.bind.annotation.*;
-import pl.sg.accountant.service.CategoryService;
+import pl.sg.accountant.service.billings.CategoryService;
 import pl.sg.accountant.transport.billings.Category;
 import pl.sg.application.model.Domain;
 import pl.sg.application.security.annotations.RequestBodyWithDomain;

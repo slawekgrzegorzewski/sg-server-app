@@ -6,11 +6,12 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.sg.accountant.model.billings.BillingPeriod;
 import pl.sg.accountant.model.billings.summary.MonthSummaryPiggyBank;
-import pl.sg.accountant.service.AccountsService;
-import pl.sg.accountant.service.BillingPeriodsService;
-import pl.sg.accountant.service.MonthSummaryService;
+import pl.sg.accountant.service.accounts.AccountsService;
+import pl.sg.accountant.service.billings.BillingPeriodsService;
+import pl.sg.accountant.service.billings.summary.MonthSummaryService;
 import pl.sg.accountant.transport.accounts.Account;
 import pl.sg.application.model.Domain;
+import pl.sg.application.repository.DomainRepository;
 import pl.sg.application.security.annotations.PathVariableWithDomain;
 import pl.sg.application.security.annotations.RequestBodyWithDomain;
 import pl.sg.application.security.annotations.RequestDomain;
@@ -31,13 +32,15 @@ import static pl.sg.Application.UPDATE_ACCOUNT;
 @Validated
 public class AccountsRestController implements AccountsController {
     private final AccountsService accountsService;
-    private final ModelMapper mapper;
-
-    private final MonthSummaryService monthSummaryService;
     private final BillingPeriodsService billingPeriodsService;
+    private final DomainRepository domainRepository;
+    private final ModelMapper mapper;
+    private final MonthSummaryService monthSummaryService;
 
-    public AccountsRestController(AccountsService accountsService, ModelMapper mapper, MonthSummaryService monthSummaryService, BillingPeriodsService billingPeriodsService) {
+
+    public AccountsRestController(AccountsService accountsService, BillingPeriodsService billingPeriodsService, DomainRepository domainRepository, ModelMapper mapper, MonthSummaryService monthSummaryService) {
         this.accountsService = accountsService;
+        this.domainRepository = domainRepository;
         this.mapper = mapper;
         this.monthSummaryService = monthSummaryService;
         this.billingPeriodsService = billingPeriodsService;
@@ -75,7 +78,7 @@ public class AccountsRestController implements AccountsController {
                             .forEach(e -> expenses.compute(e.getCurrency(), (currency, sum) -> (sum == null ? 0 : sum) + e.getAmount().doubleValue()));
                 });
 
-        return map(accountsService.getForDomain(domain));
+        return map(accountsService.getForDomain(domain.getId()));
     }
 
     private List<Account> map(List<pl.sg.accountant.model.accounts.Account> accounts) {

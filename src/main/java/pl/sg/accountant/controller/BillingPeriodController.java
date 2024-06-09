@@ -1,10 +1,9 @@
 package pl.sg.accountant.controller;
 
-import org.springframework.web.bind.annotation.PathVariable;
 import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.model.billings.Expense;
 import pl.sg.accountant.model.billings.Income;
-import pl.sg.accountant.repository.BillingPeriodInfo;
+import pl.sg.accountant.repository.billings.BillingPeriodInfo;
 import pl.sg.application.model.Domain;
 
 import java.time.YearMonth;

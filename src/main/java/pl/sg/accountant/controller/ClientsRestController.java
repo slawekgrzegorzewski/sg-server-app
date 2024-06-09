@@ -3,7 +3,7 @@ package pl.sg.accountant.controller;
 import org.modelmapper.ModelMapper;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import pl.sg.accountant.service.OtherPartiesService;
+import pl.sg.accountant.service.bussines.OtherPartiesService;
 import pl.sg.accountant.transport.accounts.Client;
 import pl.sg.application.model.Domain;
 import pl.sg.application.security.annotations.RequestBodyWithDomain;
@@ -34,7 +34,7 @@ public class ClientsRestController implements ClientsController {
     @GetMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public List<Client> clients(@RequestDomain Domain domain) {
-        return otherPartiesService.clients(domain).stream()
+        return otherPartiesService.clients(domain.getId()).stream()
                 .map(c -> mapper.map(c, Client.class))
                 .collect(Collectors.toList());
     }
@@ -50,7 +50,7 @@ public class ClientsRestController implements ClientsController {
             )
             @Valid pl.sg.accountant.model.bussines.Client client) {
         return mapper.map(
-                otherPartiesService.createClient(client.getName(), client.getDomain()),
+                otherPartiesService.createClient(client.getName(), client.getDomain().getId()),
                 Client.class);
     }
 
@@ -64,7 +64,7 @@ public class ClientsRestController implements ClientsController {
             )
             @Valid pl.sg.accountant.model.bussines.Client client) {
         return mapper.map(
-                otherPartiesService.updateClient(client.getPublicId(), client.getDomain(), client.getName()),
+                otherPartiesService.updateClient(client.getPublicId(), client.getDomain().getId(), client.getName()),
                 Client.class);
     }
 }
