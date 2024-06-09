@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.sg.accountant.model.billings.summary.MonthSummaryPiggyBank;
-import pl.sg.accountant.service.MonthSummaryService;
+import pl.sg.accountant.service.billings.summary.MonthSummaryService;
 import pl.sg.application.model.Domain;
 import pl.sg.application.security.annotations.RequestDomain;
 import pl.sg.application.security.annotations.TokenBearerAuth;

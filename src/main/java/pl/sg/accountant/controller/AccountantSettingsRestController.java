@@ -28,7 +28,7 @@ public class AccountantSettingsRestController implements AccountantSettingsContr
     @GetMapping
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public AccountantSettings getForDomain(@RequestDomain Domain domain) {
-        return this.mapper.map(accountantSettingsService.getForDomain(domain), AccountantSettings.class);
+        return this.mapper.map(accountantSettingsService.getForDomain(domain.getId()), AccountantSettings.class);
     }
 
     @Override

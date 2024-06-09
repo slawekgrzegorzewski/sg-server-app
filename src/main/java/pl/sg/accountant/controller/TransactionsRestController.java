@@ -5,7 +5,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.model.ledger.FinancialTransaction;
-import pl.sg.accountant.service.TransactionsService;
+import pl.sg.accountant.service.ledger.TransactionsService;
 import pl.sg.accountant.transport.FinancialTransactionTO;
 import pl.sg.application.model.Domain;
 import pl.sg.application.security.annotations.PathVariableWithDomain;

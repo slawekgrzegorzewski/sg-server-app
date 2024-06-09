@@ -3,7 +3,7 @@ package pl.sg.loans.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import pl.sg.application.model.Domain;
+import pl.sg.application.repository.DomainRepository;
 import pl.sg.graphql.schema.types.LoanSimulationParams;
 import pl.sg.loans.calculator.LoanSimulator;
 import pl.sg.loans.model.*;
@@ -14,19 +14,21 @@ import pl.sg.loans.repositories.RepaymentDayStrategyConfigRepository;
 import pl.sg.loans.service.rate.ConstantRateStrategy;
 import pl.sg.loans.service.rate.RateStrategyFactory;
 import pl.sg.loans.service.repayment.RepaymentDayStrategyFactory;
-import pl.sg.loans.utils.LoansException;
 import pl.sg.loans.utils.RateStrategy;
 
-import javax.money.CurrencyUnit;
 import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 
+import static pl.sg.application.CurrencyValidator.validateCurrency;
+import static pl.sg.application.DomainValidator.validateDomain;
+
 @Component
 public class LoanService {
 
     private static final Logger LOG = LoggerFactory.getLogger(LoanService.class);
+    private final DomainRepository domainRepository;
     private final InstallmentRepository installmentRepository;
     private final LoanRepository loanRepository;
     private final LoanSimulator loanSimulator;
@@ -35,10 +37,11 @@ public class LoanService {
     private final RateStrategyConfigRepository rateStrategyConfigRepository;
     private final RateStrategyFactory rateStrategyFactory;
 
-    public LoanService(InstallmentRepository installmentRepository,
+    public LoanService(DomainRepository domainRepository, InstallmentRepository installmentRepository,
                        LoanRepository loanRepository, LoanSimulator loanSimulator,
                        RepaymentDayStrategyConfigRepository repaymentDayStrategyConfigRepository, RepaymentDayStrategyFactory repaymentDayStrategyFactory,
                        RateStrategyConfigRepository rateStrategyConfigRepository, RateStrategyFactory rateStrategyFactory) {
+        this.domainRepository = domainRepository;
         this.installmentRepository = installmentRepository;
         this.loanRepository = loanRepository;
         this.loanSimulator = loanSimulator;
@@ -50,10 +53,10 @@ public class LoanService {
 
     public Loan findLoanByPublicId(
             UUID loanPublicId,
-            Domain domain
+            int domainId
     ) {
         Loan loan = Objects.requireNonNull(loanRepository.findByPublicId(loanPublicId));
-        validateDomain(domain, loan.getDomain());
+        validateDomain(domainRepository.getReferenceById(domainId), loan.getDomain());
         return loan;
     }
 
@@ -64,12 +67,12 @@ public class LoanService {
             UUID repaymentDayStrategyConfigPublicId,
             UUID rateStrategyConfigPublicId,
             MonetaryAmount paidAmount,
-            Domain domain
+            int domainId
     ) {
         RepaymentDayStrategyConfig repaymentDayStrategyConfig = Objects.requireNonNull(repaymentDayStrategyConfigRepository.findByPublicId(repaymentDayStrategyConfigPublicId));
-        validateDomain(domain, repaymentDayStrategyConfig.getDomain());
+        validateDomain(domainId, repaymentDayStrategyConfig.getDomain());
         RateStrategyConfig rateStrategyConfig = Objects.requireNonNull(rateStrategyConfigRepository.findByPublicId(rateStrategyConfigPublicId));
-        validateDomain(domain, rateStrategyConfig.getDomain());
+        validateDomain(domainId, rateStrategyConfig.getDomain());
         Loan loan = new Loan();
         loan.setName(name);
         loan.setPaymentDate(paymentDate);
@@ -77,24 +80,24 @@ public class LoanService {
         loan.setRepaymentDayStrategyConfig(repaymentDayStrategyConfig);
         loan.setRateStrategyConfig(rateStrategyConfig);
         loan.setPaidAmount(paidAmount);
-        loan.setDomain(domain);
+        loan.setDomain(domainRepository.getReferenceById(domainId));
         return loanRepository.save(loan);
     }
 
     public Loan updateLoan(
             UUID loanId,
             String name,
-            Domain domain
+            int domainId
     ) {
         Loan loan = Objects.requireNonNull(loanRepository.findByPublicId(loanId));
-        validateDomain(domain, loan.getDomain());
+        validateDomain(domainId, loan.getDomain());
         loan.setName(name);
         return loanRepository.save(loan);
     }
 
-    public void deleteLoan(UUID loanId, Domain domain) {
+    public void deleteLoan(UUID loanId, int domainId) {
         Loan loan = Objects.requireNonNull(loanRepository.findByPublicId(loanId));
-        validateDomain(domain, loan.getDomain());
+        validateDomain(domainId, loan.getDomain());
         installmentRepository.deleteAllByLoan(loan);
         loanRepository.delete(loan);
     }
@@ -105,10 +108,10 @@ public class LoanService {
             MonetaryAmount repaidInterest,
             MonetaryAmount repaidAmount,
             MonetaryAmount overpayment,
-            Domain domain
+            int domainId
     ) {
         Loan loan = Objects.requireNonNull(loanRepository.findByPublicId(loanPublicId));
-        validateDomain(domain, loan.getDomain());
+        validateDomain(domainId, loan.getDomain());
         validateCurrency(loan.getPaidAmount().getCurrency(), repaidInterest.getCurrency(), "repaidInterest");
         validateCurrency(loan.getPaidAmount().getCurrency(), repaidAmount.getCurrency(), "repaidAmount");
         validateCurrency(loan.getPaidAmount().getCurrency(), overpayment.getCurrency(), "overpayment");
@@ -121,58 +124,46 @@ public class LoanService {
         return installmentRepository.save(installment);
     }
 
-    public void deleteInstallment(UUID installmentPublicId, Domain domain) {
+    public void deleteInstallment(UUID installmentPublicId, int domainId) {
         Installment installment = Objects.requireNonNull(installmentRepository.findInstallmentByPublicId(installmentPublicId));
-        validateDomain(domain, installment.getLoan().getDomain());
+        validateDomain(domainId, installment.getLoan().getDomain());
         installmentRepository.delete(installment);
     }
 
-    private void validateDomain(Domain domain, Domain otherDomain) {
-        if (!domain.getId().equals(otherDomain.getId())) {
-            throw new LoansException("Domains doesn't match " + domain.getId() + ":" + otherDomain.getId());
-        }
+    public List<Loan> findAllDomainLoans(int domainId) {
+        return loanRepository.findAllByDomain(domainRepository.getReferenceById(domainId));
     }
 
-    private void validateCurrency(CurrencyUnit currency, CurrencyUnit otherCurrency, String fieldName) {
-        if (!currency.equals(otherCurrency)) {
-            throw new LoansException("Currencies of loan and " + fieldName + " doesn't match " + currency + ":" + otherCurrency);
-        }
+    public List<RepaymentDayStrategyConfig> findAllDomainRepaymentDayStrategyConfigs(int domainId) {
+        return repaymentDayStrategyConfigRepository.findAllByDomain(domainRepository.getReferenceById(domainId));
     }
 
-    public List<Loan> findAllDomainLoans(Domain domain) {
-        return loanRepository.findAllByDomain(domain);
+    public List<RateStrategyConfig> findAllDomainRateStrategyConfigs(int domainId) {
+        return rateStrategyConfigRepository.findAllByDomain(domainRepository.getReferenceById(domainId));
     }
 
-    public List<RepaymentDayStrategyConfig> findAllDomainRepaymentDayStrategyConfigs(Domain domain) {
-        return repaymentDayStrategyConfigRepository.findAllByDomain(domain);
-    }
-
-    public List<RateStrategyConfig> findAllDomainRateStrategyConfigs(Domain domain) {
-        return rateStrategyConfigRepository.findAllByDomain(domain);
-    }
-
-    public NthDayOfMonthRepaymentDayStrategyConfig createNthDayOfMonthStrategy(Domain domain, String name, int nthDayOfMonth) {
+    public NthDayOfMonthRepaymentDayStrategyConfig createNthDayOfMonthStrategy(int domainId, String name, int nthDayOfMonth) {
         NthDayOfMonthRepaymentDayStrategyConfig nthDayOfMonthRepaymentDayStrategyConfig = new NthDayOfMonthRepaymentDayStrategyConfig();
-        nthDayOfMonthRepaymentDayStrategyConfig.setDomain(domain);
+        nthDayOfMonthRepaymentDayStrategyConfig.setDomain(domainRepository.getReferenceById(domainId));
         nthDayOfMonthRepaymentDayStrategyConfig.setName(name);
         nthDayOfMonthRepaymentDayStrategyConfig.setDayOfMonth(nthDayOfMonth);
         return repaymentDayStrategyConfigRepository.save(nthDayOfMonthRepaymentDayStrategyConfig);
     }
 
-    public void deleteRateStrategyConfig(UUID publicId, Domain domain) {
+    public void deleteRateStrategyConfig(UUID publicId, int domainId) {
         RateStrategyConfig rateStrategyConfig = Objects.requireNonNull(rateStrategyConfigRepository.findByPublicId(publicId));
-        validateDomain(rateStrategyConfig.getDomain(), domain);
+        validateDomain(rateStrategyConfig.getDomain(), domainRepository.getReferenceById(domainId));
         rateStrategyConfigRepository.delete(rateStrategyConfig);
     }
 
     public ConstantForNFirstInstallmentRateStrategyConfig createConstantForNFirstInstallmentRateStrategy(
-            Domain domain,
+            int domainId,
             String name,
             BigDecimal constantRate,
             BigDecimal variableRateMargin,
             int becomesVariableRateAfterNInstallments) {
         ConstantForNFirstInstallmentRateStrategyConfig constantForNFirstInstallmentRateStrategyConfig = new ConstantForNFirstInstallmentRateStrategyConfig();
-        constantForNFirstInstallmentRateStrategyConfig.setDomain(domain);
+        constantForNFirstInstallmentRateStrategyConfig.setDomain(domainRepository.getReferenceById(domainId));
         constantForNFirstInstallmentRateStrategyConfig.setName(name);
         constantForNFirstInstallmentRateStrategyConfig.setConstantRate(constantRate);
         constantForNFirstInstallmentRateStrategyConfig.setVariableRateMargin(variableRateMargin);
@@ -180,9 +171,9 @@ public class LoanService {
         return rateStrategyConfigRepository.save(constantForNFirstInstallmentRateStrategyConfig);
     }
 
-    public void deleteRepaymentDayStrategyConfig(UUID publicId, Domain domain) {
+    public void deleteRepaymentDayStrategyConfig(UUID publicId, int domainId) {
         RepaymentDayStrategyConfig repaymentDayStrategyConfig = Objects.requireNonNull(repaymentDayStrategyConfigRepository.findByPublicId(publicId));
-        validateDomain(repaymentDayStrategyConfig.getDomain(), domain);
+        validateDomain(repaymentDayStrategyConfig.getDomain(), domainRepository.getReferenceById(domainId));
         repaymentDayStrategyConfigRepository.delete(repaymentDayStrategyConfig);
     }
 
@@ -200,8 +191,8 @@ public class LoanService {
         );
     }
 
-    public List<LoanCalculationInstallment> simulateExistingLoan(LoanSimulationParams loanSimulationParams, Domain domain) {
-        Loan loan = Objects.requireNonNull(findLoanByPublicId(loanSimulationParams.getLoanId(), domain));
+    public List<LoanCalculationInstallment> simulateExistingLoan(LoanSimulationParams loanSimulationParams, int domainId) {
+        Loan loan = Objects.requireNonNull(findLoanByPublicId(loanSimulationParams.getLoanId(), domainId));
         MonetaryAmount leftToPay = loan.getPaidAmount();
         for (Installment installment : loan.getInstallments()) {
             leftToPay = leftToPay.subtract(installment.getRepaidAmount()).subtract(installment.getOverpayment());

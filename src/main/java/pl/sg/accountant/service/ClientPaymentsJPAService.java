@@ -2,7 +2,7 @@ package pl.sg.accountant.service;
 
 import org.springframework.stereotype.Component;
 import pl.sg.accountant.model.ledger.ClientPayment;
-import pl.sg.accountant.repository.ClientPaymentRepository;
+import pl.sg.accountant.repository.ledger.ClientPaymentRepository;
 import pl.sg.application.model.Domain;
 
 import java.time.YearMonth;

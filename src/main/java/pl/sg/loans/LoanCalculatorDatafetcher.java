@@ -5,7 +5,6 @@ import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.bind.annotation.RequestHeader;
-import pl.sg.application.repository.DomainRepository;
 import pl.sg.application.security.annotations.TokenBearerAuth;
 import pl.sg.graphql.schema.types.LoanCalculationParams;
 import pl.sg.loans.model.LoanCalculationInstallment;
@@ -16,11 +15,9 @@ import java.util.List;
 @DgsComponent
 public class LoanCalculatorDatafetcher {
 
-    private final DomainRepository domainRepository;
     private final LoanService loanService;
 
-    public LoanCalculatorDatafetcher(DomainRepository domainRepository, LoanService loanService) {
-        this.domainRepository = domainRepository;
+    public LoanCalculatorDatafetcher(LoanService loanService) {
         this.loanService = loanService;
     }
 
@@ -41,7 +38,7 @@ public class LoanCalculatorDatafetcher {
             @RequestHeader("domainId") int domainId,
             @InputArgument("loanSimulationParams") pl.sg.graphql.schema.types.LoanSimulationParams loanSimulationParams
     ) {
-        return loanService.simulateExistingLoan(loanSimulationParams, domainRepository.getReferenceById(domainId))
+        return loanService.simulateExistingLoan(loanSimulationParams, domainId)
                 .stream()
                 .map(LoanCalculatorDatafetcher::map)
                 .toList();

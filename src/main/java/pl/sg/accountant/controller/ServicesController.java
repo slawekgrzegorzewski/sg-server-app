@@ -10,7 +10,7 @@ public interface ServicesController {
 
     List<Service> services(Domain domain);
 
-    Service createService(@Valid pl.sg.accountant.model.ledger.Service client);
+    Service createService(@Valid pl.sg.accountant.model.bussines.Service client);
 
-    Service updateService(@Valid pl.sg.accountant.model.ledger.Service client);
+    Service updateService(@Valid pl.sg.accountant.model.bussines.Service client);
 }

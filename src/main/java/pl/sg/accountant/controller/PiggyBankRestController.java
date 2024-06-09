@@ -2,7 +2,7 @@ package pl.sg.accountant.controller;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.web.bind.annotation.*;
-import pl.sg.accountant.service.PiggyBanksService;
+import pl.sg.accountant.service.billings.PiggyBanksService;
 import pl.sg.accountant.transport.PiggyBank;
 import pl.sg.application.model.Domain;
 import pl.sg.application.security.annotations.RequestBodyWithDomain;

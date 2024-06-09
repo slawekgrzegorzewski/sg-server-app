@@ -7,7 +7,6 @@ type Query {
     accounts: [Account!]!
     allIPRs: [IntellectualProperty!]!
     allTimeRecordCategories: [TimeRecordCategory!]!
-    monthRevenueAndExpenseEntry(year: Int!, month: Int!): [RevenueAndExpenseEntry!]
     nonIPTimeRecords: [TimeRecord!]!
     simulateLoan(loanCalculationParams: LoanCalculationParams): [LoanCalculationInstallment!]!
     simulateExistingLoan(loanSimulationParams: LoanSimulationParams): [LoanCalculationInstallment!]!
@@ -15,6 +14,9 @@ type Query {
     singleLoan(input: LoanQuery): Loan!
     monthLedger(ledgerQuery: LedgerQuery): [RevenueAndExpenseEntry!]!
     allClients: [Client!]!
+    allSuppliers: [Supplier!]!
+    monthFinancialDocuments(yearMonthInput: YearMonthInput!): [FinancialDocument!]!
+    settings: Settings!
 }
 
 type Mutation{
@@ -48,6 +50,14 @@ type Mutation{
     createClient(clientCreationInput: ClientCreationInput!): Client!
     updateClient(clientUpdateInput: ClientUpdateInput!): Client!
     deleteClient(clientPublicId:UUID!): String!
+    createSupplier(supplierCreationInput: SupplierCreationInput!): Supplier!
+    updateSupplier(supplierUpdateInput: SupplierUpdateInput!): Supplier!
+    deleteSupplier(supplierPublicId:UUID!): String!
+    createBill(billCreationInput: BillCreationInput!): FinancialDocument!
+    updateBill(billUpdateInput: BillUpdateInput!): FinancialDocument!
+    createInvoice(invoiceCreationInput: InvoiceCreationInput!): Invoice!
+    updateInvoice(invoiceUpdateInput: InvoiceUpdateInput!): Invoice!
+    deleteFinancialDocument(financialDocumentPublicId: UUID!): String!
 }
 
 input LoginParameters{
@@ -351,7 +361,19 @@ input YearMonthInput {
     month: Int!
 }
 
-type Client {
+interface OtherParty {
+    publicId: UUID!
+    name: String!
+    domain: DomainSimple!
+}
+
+type Client implements OtherParty{
+    publicId: UUID!
+    name: String!
+    domain: DomainSimple!
+}
+
+type Supplier implements OtherParty{
     publicId: UUID!
     name: String!
     domain: DomainSimple!
@@ -364,4 +386,147 @@ input ClientCreationInput {
 input ClientUpdateInput {
     publicId: UUID!
     name: String!
+}
+
+input SupplierCreationInput {
+    name: String!
+}
+
+input SupplierUpdateInput {
+    publicId: UUID!
+    name: String!
+}
+
+enum FinancialDocumentKind {
+    BILL_OF_PURCHASE
+    BILL_OF_SALE
+    CREDIT_INVOICE
+    DEBIT_INVOICE
+}
+
+enum BillType {
+    BILL_OF_SALE
+    BILL_OF_PURCHASE
+}
+
+input BillCreationInput {
+    type: BillType!
+    otherPartyId: UUID!
+    name:String!
+    description: String!
+    amount: MonetaryAmountInput!
+    createdAt: LocalDate!
+}
+
+input BillUpdateInput {
+    type: BillType!
+    billPublicId: UUID!
+    otherPartyId: UUID!
+    name:String!
+    description: String!
+    amount: MonetaryAmountInput!
+    createdAt: LocalDate!
+}
+
+enum InvoiceType {
+    CREDIT
+    DEBIT
+}
+
+input InvoiceCreationInput {
+    type: InvoiceType!
+    name:String
+    otherPartyId: UUID!
+    amount: MonetaryAmountInput!
+    vat: MonetaryAmountInput!
+    createdAt: LocalDate!
+    dueTo: LocalDate!
+    description: String!
+}
+
+
+input InvoiceUpdateInput {
+    type: InvoiceType!
+    invoicePublicId: UUID!
+    name:String
+    otherPartyId: UUID!
+    amount: MonetaryAmountInput!
+    vat: MonetaryAmountInput!
+    createdAt: LocalDate!
+    dueTo: LocalDate!
+    description: String!
+}
+
+interface FinancialDocument {
+    publicId:UUID!
+    name:String!
+    otherParty:OtherParty!
+    amount:MonetaryAmount!
+    createdAt:LocalDate!
+    description:String!
+    domain:DomainSimple!
+}
+
+type BillOfPurchase implements FinancialDocument {
+    publicId:UUID!
+    name:String!
+    otherParty:Supplier!
+    amount:MonetaryAmount!
+    createdAt:LocalDate!
+    description:String!
+    domain:DomainSimple!
+}
+
+type BillOfSale implements FinancialDocument {
+    publicId:UUID!
+    name:String!
+    otherParty:Client!
+    amount:MonetaryAmount!
+    createdAt:LocalDate!
+    description:String!
+    domain:DomainSimple!
+}
+
+interface Invoice implements FinancialDocument {
+    publicId:UUID!
+    name:String!
+    otherParty:OtherParty!
+    amount:MonetaryAmount!
+    vat:MonetaryAmount!
+    createdAt:LocalDate!
+    dueTo:LocalDate!
+    description:String!
+    domain:DomainSimple!
+}
+
+type CreditInvoice implements Invoice & FinancialDocument {
+    publicId:UUID!
+    name:String!
+    otherParty:Client!
+    amount:MonetaryAmount!
+    vat:MonetaryAmount!
+    createdAt:LocalDate!
+    dueTo:LocalDate!
+    description:String!
+    domain:DomainSimple!
+}
+
+type DebitInvoice implements Invoice & FinancialDocument {
+    publicId:UUID!
+    name:String!
+    otherParty:Supplier!
+    amount:MonetaryAmount!
+    vat:MonetaryAmount!
+    createdAt:LocalDate!
+    dueTo:LocalDate!
+    description:String!
+    domain:DomainSimple!
+}
+
+type AccountantSettings {
+    isCompany:Boolean!
+}
+
+type Settings {
+    accountantSettings: AccountantSettings!
 }
