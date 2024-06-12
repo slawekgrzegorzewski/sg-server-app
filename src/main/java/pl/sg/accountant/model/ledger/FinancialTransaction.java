@@ -7,6 +7,7 @@ import pl.sg.accountant.model.validation.AccountTransaction;
 import pl.sg.integrations.nodrigen.model.transcations.NodrigenTransaction;
 
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -193,7 +194,7 @@ public class FinancialTransaction {
     }
 
     private void validateEnoughMoney(Account account, BigDecimal amount) {
-        if (account.getAvailableBalance().compareTo(amount) < 0) {
+        if (account.getAvailableBalance().getNumber().numberValue(BigDecimal.class).compareTo(amount) < 0) {
             throw new AccountsException("Not enough money");
         }
     }

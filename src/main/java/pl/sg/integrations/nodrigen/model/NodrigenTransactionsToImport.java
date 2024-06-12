@@ -20,8 +20,8 @@ public class NodrigenTransactionsToImport {
     private BigDecimal debit;
     private String description;
     private Instant timeOfTransaction;
-    private Integer destinationId;
-    private Integer sourceId;
+    private Long destinationId;
+    private Long sourceId;
     @Transient
     private Account destinationAccount;
     @Transient
@@ -60,11 +60,11 @@ public class NodrigenTransactionsToImport {
         return timeOfTransaction;
     }
 
-    public Integer getDestinationId() {
+    public Long getDestinationId() {
         return destinationId;
     }
 
-    public Integer getSourceId() {
+    public Long getSourceId() {
         return sourceId;
     }
 

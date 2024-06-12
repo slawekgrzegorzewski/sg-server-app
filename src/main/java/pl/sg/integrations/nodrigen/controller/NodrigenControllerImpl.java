@@ -111,9 +111,11 @@ public class NodrigenControllerImpl implements NodrigenController {
                 .stream()
                 .peek(t -> {
                     ofNullable(t.getSourceId())
+                            .map(Long::intValue)
                             .map(accountRepository::getReferenceById)
                             .ifPresent(t::setSourceAccount);
                     ofNullable(t.getDestinationId())
+                            .map(Long::intValue)
                             .map(accountRepository::getReferenceById)
                             .ifPresent(t::setDestinationAccount);
                 })

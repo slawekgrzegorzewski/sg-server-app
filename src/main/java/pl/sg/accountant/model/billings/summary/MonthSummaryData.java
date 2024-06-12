@@ -1,5 +1,6 @@
 package pl.sg.accountant.model.billings.summary;
 
+import org.apache.xmlbeans.impl.store.Cur;
 import pl.sg.accountant.model.accounts.Account;
 import pl.sg.accountant.model.billings.PiggyBank;
 
@@ -19,7 +20,7 @@ public class MonthSummaryData {
         MonthSummaryData result = new MonthSummaryData();
         result.accounts = accounts.stream()
                 .map(a ->
-                        new MonthSummaryAccount(a.getId(), a.getName(), a.getCurrency(), a.getCurrentBalance(),
+                        new MonthSummaryAccount((int) (long) a.getId(), a.getName(), a.getCurrency(), a.getCurrentBalance().getNumber().numberValue(BigDecimal.class),
                                 a.getLastTransactionIncludedInBalance() == null ? null : a.getLastTransactionIncludedInBalance().getId())
                 )
                 .collect(Collectors.toList());

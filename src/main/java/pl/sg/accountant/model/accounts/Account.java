@@ -4,15 +4,22 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.CompositeType;
+import org.javamoney.moneta.Money;
 import pl.sg.accountant.model.ledger.FinancialTransaction;
+import pl.sg.application.database.MonetaryAmountType;
 import pl.sg.application.model.Domain;
 import pl.sg.application.model.WithDomain;
 import pl.sg.banks.model.BankAccount;
 
+import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
 import java.util.Currency;
+import java.util.UUID;
 
-@Entity
+@Entity(name = "accounts")
 public class Account implements WithDomain<Account> {
     @Id
     @SequenceGenerator(
@@ -21,39 +28,45 @@ public class Account implements WithDomain<Account> {
             allocationSize = 1
     )
     @GeneratedValue(generator = "commonIdGenerator")
-    private Integer id;
+    private Long id;
+
+    @Getter
+    private UUID publicId = UUID.randomUUID();
+
     @NotNull
     private String name;
-    @NotNull
-    private Currency currency;
-    @Column(columnDefinition = "numeric(19,2) default 0")
-    @Digits(integer = Integer.MAX_VALUE, fraction = 2)
-    @NotNull
-    private BigDecimal currentBalance = new BigDecimal(0);
 
-    @Column(columnDefinition = "numeric(19,2) default 0")
-    @Digits(integer = Integer.MAX_VALUE, fraction = 2)
-    @PositiveOrZero
-    @NotNull
-    private BigDecimal creditLimit = new BigDecimal(0);
+    @AttributeOverride(name = "amount", column = @Column(name = "current_balance", columnDefinition = "numeric(19,2) default 0"))
+    @AttributeOverride(name = "currency", column = @Column(name = "currency", updatable = false))
+    @CompositeType(MonetaryAmountType.class)
+    private MonetaryAmount currentBalance;
+
+    @AttributeOverride(name = "amount", column = @Column(name = "credit_limit", columnDefinition = "numeric(19,2) default 0"))
+    @AttributeOverride(name = "currency", column = @Column(name = "currency", insertable = false, updatable = false))
+    @CompositeType(MonetaryAmountType.class)
+    private MonetaryAmount creditLimit;
 
     @ManyToOne
     private FinancialTransaction lastTransactionIncludedInBalance;
+
     @Column(columnDefinition = "boolean not null default true")
     private boolean visible;
+
+
     @OneToOne
     BankAccount bankAccount;
+
     @ManyToOne
     private Domain domain;
 
     public Account() {
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -67,32 +80,27 @@ public class Account implements WithDomain<Account> {
     }
 
     public Currency getCurrency() {
-        return currency;
+        return Currency.getInstance(currentBalance.getCurrency().getCurrencyCode());
     }
 
-    public Account setCurrency(Currency currency) {
-        this.currency = currency;
-        return this;
-    }
-
-    public BigDecimal getAvailableBalance() {
+    public MonetaryAmount getAvailableBalance() {
         return currentBalance.add(creditLimit);
     }
 
-    public BigDecimal getCurrentBalance() {
+    public MonetaryAmount getCurrentBalance() {
         return currentBalance;
     }
 
-    public Account setCurrentBalance(BigDecimal currentBalance) {
+    public Account setCurrentBalance(MonetaryAmount currentBalance) {
         this.currentBalance = currentBalance;
         return this;
     }
 
-    public BigDecimal getCreditLimit() {
+    public MonetaryAmount getCreditLimit() {
         return creditLimit;
     }
 
-    public void setCreditLimit(BigDecimal creditLimit) {
+    public void setCreditLimit(MonetaryAmount creditLimit) {
         this.creditLimit = creditLimit;
     }
 
@@ -116,12 +124,12 @@ public class Account implements WithDomain<Account> {
 
     public void debit(FinancialTransaction financialTransaction) {
         this.lastTransactionIncludedInBalance = financialTransaction;
-        this.currentBalance = this.currentBalance.subtract(financialTransaction.getDebit());
+        this.currentBalance = this.currentBalance.subtract(Money.of(financialTransaction.getDebit(), this.currentBalance.getCurrency().getCurrencyCode()));
     }
 
     public void credit(FinancialTransaction financialTransaction) {
         this.lastTransactionIncludedInBalance = financialTransaction;
-        this.currentBalance = this.currentBalance.add(financialTransaction.getCredit());
+        this.currentBalance = this.currentBalance.add(Money.of(financialTransaction.getCredit(), this.currentBalance.getCurrency().getCurrencyCode()));
     }
 
     public boolean isVisible() {

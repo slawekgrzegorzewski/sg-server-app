@@ -2,6 +2,11 @@ package pl.sg;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
+import org.javamoney.moneta.Money;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.spi.SourceGetter;
 import org.springframework.boot.SpringApplication;
@@ -19,17 +24,23 @@ import pl.sg.accountant.transport.billings.Category;
 import pl.sg.application.api.DomainSimple;
 import pl.sg.banks.transport.BankAccount;
 import pl.sg.cubes.transport.CubeRecord;
+import pl.sg.graphql.schema.types.MonetaryAmount;
 import pl.sg.integrations.nodrigen.model.NodrigenTransactionsToImport;
 import pl.sg.integrations.nodrigen.transport.NodrigenBankPermission;
 import pl.sg.integrations.nodrigen.transport.NodrigenTransactionsToImportTO;
 import pl.sg.ip.model.IntellectualProperty;
 import pl.sg.ip.model.Task;
 
+import javax.money.CurrencyUnit;
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Currency;
 import java.util.Optional;
 import java.util.function.Function;
+
+import static java.util.Optional.ofNullable;
 
 @SpringBootApplication
 @EnableAsync
@@ -63,7 +74,21 @@ public class Application {
     @Bean
     public ModelMapper modelMapper() {
         final ModelMapper modelMapper = new ModelMapper();
-        modelMapper.typeMap(pl.sg.accountant.model.accounts.Account.class, Account.class);
+        modelMapper.typeMap(pl.sg.accountant.model.accounts.Account.class, Account.class)
+                .setConverter(mappingContext -> {
+                    pl.sg.accountant.model.accounts.Account source = mappingContext.getSource();
+                    Account account = new Account();
+                    account.setId(source.getId().intValue());
+                    account.setName(source.getName());
+                    account.setCurrency(ofNullable(source.getCurrentBalance()).map(javax.money.MonetaryAmount::getCurrency).map(CurrencyUnit::getCurrencyCode).map(Currency::getInstance).orElse(null));
+                    account.setCurrentBalance(ofNullable(source.getCurrentBalance()).map(javax.money.MonetaryAmount::getNumber).map(n -> n.numberValue(BigDecimal.class)).orElse(null));
+                    account.setCreditLimit(ofNullable(source.getCreditLimit()).map(javax.money.MonetaryAmount::getNumber).map(n -> n.numberValue(BigDecimal.class)).orElse(null));
+                    account.setBalanceIndex(ofNullable(source.getLastTransactionIncludedInBalance()).map(FinancialTransaction::getId).orElse(0));
+                    account.setVisible(source.isVisible());
+                    account.setBankAccount(ofNullable(source.getBankAccount()).map(ba -> modelMapper.map(ba, BankAccount.class)).orElse(null));
+                    account.setDomain(ofNullable(source.getDomain()).map(d -> modelMapper.map(d, DomainSimple.class)).orElse(null));
+                    return account;
+                });
         modelMapper.typeMap(pl.sg.accountant.model.billings.BillingPeriod.class, BillingPeriod.class);
         modelMapper.typeMap(pl.sg.accountant.model.billings.PiggyBank.class, PiggyBank.class);
         modelMapper.typeMap(pl.sg.accountant.model.ledger.ClientPayment.class, ClientPayment.class)
@@ -96,6 +121,24 @@ public class Application {
                 .addMapping(getPropertyOfPSP(pl.sg.accountant.model.ledger.ClientPayment::isBillOfSaleAsInvoice, false), PerformedServicePaymentSimpleTO::setBillOfSaleAsInvoice);
         modelMapper.typeMap(PerformedServicePayment.class, PerformedServicePaymentSimpleTO.class)
                 .addMapping(getPropertyOfPSP(pl.sg.accountant.model.ledger.ClientPayment::isNotRegistered, false), PerformedServicePaymentSimpleTO::setNotRegistered);
+
+        modelMapper.typeMap(javax.money.MonetaryAmount.class, MonetaryAmount.class)
+                .setConverter(context -> {
+                    javax.money.MonetaryAmount monetaryAmount = context.getSource();
+                    return MonetaryAmount.newBuilder()
+                            .amount(monetaryAmount.getNumber().numberValue(BigDecimal.class))
+                            .currency(Currency.getInstance(monetaryAmount.getCurrency().getCurrencyCode()))
+                            .build();
+                });
+        modelMapper.typeMap(javax.money.MonetaryAmount.class, MonetaryAmount.class)
+                .setConverter(context -> {
+                    javax.money.MonetaryAmount monetaryAmount = context.getSource();
+                    return MonetaryAmount.newBuilder()
+                            .amount(monetaryAmount.getNumber().numberValue(BigDecimal.class))
+                            .currency(Currency.getInstance(monetaryAmount.getCurrency().getCurrencyCode()))
+                            .build();
+                });
+
 
         modelMapper.typeMap(Account.class, pl.sg.accountant.model.accounts.Account.class, CREATE_ACCOUNT)
                 .setConverter(context -> applyChanges(context.getSource(), new pl.sg.accountant.model.accounts.Account()));
@@ -174,7 +217,7 @@ public class Application {
     }
 
     private <T> SourceGetter<PerformedServicePayment> getPropertyOfPSP(Function<pl.sg.accountant.model.ledger.ClientPayment, T> mapper, T defaultValue) {
-        return psp -> Optional.ofNullable(psp)
+        return psp -> ofNullable(psp)
                 .map(PerformedServicePayment::getClientPayment)
                 .map(mapper)
                 .orElse(defaultValue);
@@ -182,9 +225,9 @@ public class Application {
 
     private pl.sg.accountant.model.accounts.Account applyChanges(Account source, pl.sg.accountant.model.accounts.Account destination) {
         destination.setName(source.getName());
-        destination.setCurrency(source.getCurrency());
         destination.setVisible(source.isVisible());
-        destination.setCreditLimit(source.getCreditLimit());
+        destination.setCurrentBalance(Money.of(source.getCurrentBalance(), source.getCurrency().getCurrencyCode()));
+        destination.setCreditLimit(Money.of(source.getCreditLimit(), source.getCurrency().getCurrencyCode()));
         return destination;
     }
 
@@ -309,5 +352,4 @@ public class Application {
 //        resolver.setResolveLazily(true);
 //        return resolver;
 //    }
-
 }
