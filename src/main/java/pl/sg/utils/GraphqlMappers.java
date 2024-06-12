@@ -6,6 +6,9 @@ import pl.sg.application.model.ApplicationUserDomainRelation;
 import pl.sg.application.model.Domain;
 import pl.sg.graphql.schema.types.*;
 
+import java.math.BigDecimal;
+import java.util.Currency;
+
 import static java.util.Optional.ofNullable;
 
 public class GraphqlMappers {
@@ -39,15 +42,14 @@ public class GraphqlMappers {
         final Domain domain = account.getDomain();
         FinancialTransaction lastTransactionIncludedInBalance = account.getLastTransactionIncludedInBalance();
         return Account.newBuilder()
-                .id(account.getId())
+                .publicId(account.getPublicId())
                 .name(account.getName())
-                .currency(account.getCurrency())
-                .creditLimit(account.getCreditLimit())
+                .creditLimit(map(account.getCreditLimit()))
                 .balanceIndex(ofNullable(lastTransactionIncludedInBalance).map(FinancialTransaction::getId).orElse(null))
                 .visible(account.isVisible())
                 .bankAccount(ofNullable(bankAccount).map(GraphqlMappers::mapBankAccount).orElse(null))
                 .domain(ofNullable(domain).map(GraphqlMappers::mapDomainSimple).orElse(null))
-                .currentBalance(account.getCurrentBalance())
+                .currentBalance(map(account.getCurrentBalance()))
                 .build();
 
     }
@@ -70,6 +72,13 @@ public class GraphqlMappers {
         return DomainSimple.newBuilder()
                 .id(domain.getId())
                 .name(domain.getName())
+                .build();
+    }
+
+    private static MonetaryAmount map(javax.money.MonetaryAmount monetaryAmount) {
+        return MonetaryAmount.newBuilder()
+                .amount(monetaryAmount.getNumber().numberValue(BigDecimal.class))
+                .currency(Currency.getInstance(monetaryAmount.getCurrency().getCurrencyCode()))
                 .build();
     }
 }

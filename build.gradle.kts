@@ -184,6 +184,7 @@ val migrate = tasks.register<org.flywaydb.gradle.task.FlywayMigrateTask>("migrat
     url = System.getenv("SG_DB_URL") ?: "jdbc:postgresql://localhost:5432/accountant"
     user = "postgres"
     password = System.getenv("SG_DB_PASSWORD") ?: "SLAwek1!"
+
 }
 
 val dockerPackage = tasks.register<Zip>("dockerPackage") {

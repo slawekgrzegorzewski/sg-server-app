@@ -1,5 +1,6 @@
 package pl.sg.accountant.service.billings;
 
+import org.javamoney.moneta.Money;
 import org.springframework.stereotype.Component;
 import pl.sg.accountant.model.AccountsException;
 import pl.sg.accountant.model.accounts.Account;
@@ -191,7 +192,8 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
     }
 
     private void validateAmount(Account account, BigDecimal amount) {
-        if (account.getAvailableBalance().add(amount).compareTo(BigDecimal.ZERO) < 0) {
+        if (!(account.getAvailableBalance().add(Money.of(amount, account.getCurrentBalance().getCurrency().getCurrencyCode())).isPositiveOrZero()))
+        {
             throw new AccountsException("There is not enough money for that expense.");
         }
     }
