@@ -11,6 +11,7 @@ import pl.sg.application.repository.DomainRepository;
 import pl.sg.banks.repositories.BankAccountRepository;
 import pl.sg.graphql.schema.types.MonetaryAmountInput;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -59,7 +60,6 @@ public class AccountsJPAService implements AccountsService {
     public Account createAccount(
             int domainId,
             String name,
-            MonetaryAmountInput currentBalance,
             MonetaryAmountInput creditLimit,
             boolean visible,
             @Nullable Integer bankAccountId,
@@ -67,7 +67,7 @@ public class AccountsJPAService implements AccountsService {
         Account account = new Account();
         account.setDomain(domainRepository.getReferenceById(domainId));
         account.setName(name);
-        account.setCurrentBalance(map(currentBalance));
+        account.setCurrentBalance(Money.of(BigDecimal.ZERO, creditLimit.getCurrency().getCurrencyCode()));
         account.setCreditLimit(map(creditLimit));
         account.setVisible(visible);
         account.setBankAccount(ofNullable(bankAccountId).map(bankAccountRepository::getReferenceById).orElse(null));
@@ -87,7 +87,6 @@ public class AccountsJPAService implements AccountsService {
             int domainId,
             UUID publicId,
             String name,
-            MonetaryAmountInput currentBalance,
             MonetaryAmountInput creditLimit,
             boolean visible,
             @Nullable Integer bankAccountId,
@@ -95,7 +94,6 @@ public class AccountsJPAService implements AccountsService {
         Account account = Objects.requireNonNull(accountRepository.findByPublicId(publicId));
         validateDomain(domainId, account.getDomain());
         account.setName(name);
-        account.setCurrentBalance(map(currentBalance));
         account.setCreditLimit(map(creditLimit));
         account.setVisible(visible);
         account.setBankAccount(ofNullable(bankAccountId).map(bankAccountRepository::getReferenceById).orElse(null));

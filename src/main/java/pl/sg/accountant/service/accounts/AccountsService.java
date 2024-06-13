@@ -17,11 +17,11 @@ public interface AccountsService {
 
     Account createAccount(Account account);
 
-    Account createAccount(int domainId, String name, MonetaryAmountInput currentBalance, MonetaryAmountInput creditLimit, boolean visible, @Nullable Integer bankAccountId, @Nullable Integer balanceIndex);
+    Account createAccount(int domainId, String name, MonetaryAmountInput creditLimit, boolean visible, @Nullable Integer bankAccountId, @Nullable Integer balanceIndex);
 
     Account update(Account account);
 
-    Account update(int domainId, UUID publicId, String name, MonetaryAmountInput currentBalance, MonetaryAmountInput creditLimit, boolean visible, @Nullable Integer bankAccountId, @Nullable Integer balanceIndex);
+    Account update(int domainId, UUID publicId, String name, MonetaryAmountInput creditLimit, boolean visible, @Nullable Integer bankAccountId, @Nullable Integer balanceIndex);
 
     void delete(Account account);
 

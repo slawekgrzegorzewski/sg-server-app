@@ -6,13 +6,13 @@ import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
 import org.springframework.web.bind.annotation.RequestHeader;
 import pl.sg.application.security.annotations.TokenBearerAuth;
-import pl.sg.graphql.schema.types.Account;
-import pl.sg.graphql.schema.types.AccountCreationInput;
-import pl.sg.graphql.schema.types.AccountUpdateInput;
+import pl.sg.graphql.schema.types.*;
 import pl.sg.utils.GraphqlMappers;
 
-import java.util.List;
+import java.util.Currency;
+import java.util.Locale;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @DgsComponent
 public class AccountsDatafetcher {
@@ -24,11 +24,18 @@ public class AccountsDatafetcher {
 
     @DgsQuery
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
-    public List<Account> accounts(@RequestHeader("domainId") int domainId) {
-        return accountsService.getForDomain(domainId)
-                .stream()
-                .map(GraphqlMappers::mapAccount)
-                .toList();
+    public AccountsResponse accounts(@RequestHeader("domainId") int domainId, @RequestHeader("locale") Locale locale) {
+        return AccountsResponse.newBuilder()
+                .supportedCurrencies(
+                        Currency.getAvailableCurrencies().stream()
+                                .map(c -> CurrencyInfo.newBuilder().code(c.getCurrencyCode()).description(c.getDisplayName(locale)).build())
+                                .collect(Collectors.toList()))
+                .accounts(
+                        accountsService.getForDomain(domainId)
+                                .stream()
+                                .map(GraphqlMappers::mapAccount)
+                                .toList())
+                .build();
     }
 
     @DgsMutation
@@ -40,7 +47,6 @@ public class AccountsDatafetcher {
                 accountsService.createAccount(
                         domainId,
                         accountCreationInput.getName(),
-                        accountCreationInput.getCurrentBalance(),
                         accountCreationInput.getCreditLimit(),
                         accountCreationInput.getVisible(),
                         accountCreationInput.getBankAccountId(),
@@ -59,7 +65,6 @@ public class AccountsDatafetcher {
                         domainId,
                         accountUpdateInput.getPublicId(),
                         accountUpdateInput.getName(),
-                        accountUpdateInput.getCurrentBalance(),
                         accountUpdateInput.getCreditLimit(),
                         accountUpdateInput.getVisible(),
                         accountUpdateInput.getBankAccountId(),
