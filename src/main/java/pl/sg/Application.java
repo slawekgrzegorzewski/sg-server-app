@@ -2,10 +2,6 @@ package pl.sg;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
 import org.javamoney.moneta.Money;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.spi.SourceGetter;
@@ -37,7 +33,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Currency;
-import java.util.Optional;
 import java.util.function.Function;
 
 import static java.util.Optional.ofNullable;
@@ -77,6 +72,9 @@ public class Application {
         modelMapper.typeMap(pl.sg.accountant.model.accounts.Account.class, Account.class)
                 .setConverter(mappingContext -> {
                     pl.sg.accountant.model.accounts.Account source = mappingContext.getSource();
+                    if (source == null) {
+                        return null;
+                    }
                     Account account = new Account();
                     account.setId(source.getId().intValue());
                     account.setName(source.getName());
