@@ -1,34 +1,34 @@
 package pl.sg.accountant.service.billings;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.javamoney.moneta.Money;
 import org.springframework.stereotype.Component;
 import pl.sg.accountant.model.AccountsException;
 import pl.sg.accountant.model.accounts.Account;
-import pl.sg.accountant.model.ledger.FinancialTransaction;
 import pl.sg.accountant.model.billings.BillingPeriod;
 import pl.sg.accountant.model.billings.Expense;
 import pl.sg.accountant.model.billings.Income;
 import pl.sg.accountant.model.billings.PiggyBank;
 import pl.sg.accountant.model.billings.summary.MonthSummary;
+import pl.sg.accountant.model.ledger.FinancialTransaction;
 import pl.sg.accountant.repository.billings.BillingPeriodRepository;
 import pl.sg.accountant.repository.billings.ExpenseRepository;
 import pl.sg.accountant.repository.billings.IncomeRepository;
 import pl.sg.accountant.repository.billings.summary.MonthlySummaryRepository;
-import pl.sg.accountant.service.ledger.TransactionsService;
 import pl.sg.accountant.service.accounts.AccountsService;
+import pl.sg.accountant.service.ledger.TransactionsService;
 import pl.sg.application.model.ApplicationUser;
 import pl.sg.application.model.Domain;
 import pl.sg.integrations.nodrigen.model.transcations.NodrigenTransaction;
 import pl.sg.integrations.nodrigen.repository.NodrigenTransactionRepository;
 
-import jakarta.persistence.EntityNotFoundException;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.util.Currency;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Component
 public class BillingPeriodsJPAService implements BillingPeriodsService {
@@ -117,7 +117,7 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
 
     @Override
     public void addIncome(Account account, Income income) {
-        addIncome2(account, income);
+        addIncome2(account, income, List.of());
     }
 
     @Override
@@ -126,11 +126,10 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
         for (NodrigenTransaction nodrigenTransaction : nodrigenTransactions) {
             validateNodrigenTransactionBelongsToAnAccount(account, nodrigenTransaction);
         }
-        FinancialTransaction transaction = addIncome2(account, income);
-        markNodrigenTransactionsCompleted(nodrigenTransactions, transaction);
+        markNodrigenTransactionsCompleted(addIncome2(account, income, nodrigenTransactions));
     }
 
-    private FinancialTransaction addIncome2(Account account, Income income) {
+    private Map<FinancialTransaction, NodrigenTransaction> addIncome2(Account account, Income income, List<NodrigenTransaction> nodrigenTransactions) {
         BillingPeriod billingPeriod = unfinishedCurrentOrPreviousMonthBillingPeriod(account.getDomain());
         if (income.getIncomeDate() == null) {
             income.setIncomeDate(billingPeriod.getPeriod().equals(YearMonth.now()) ? LocalDate.now() : billingPeriod.getPeriod().atEndOfMonth());
@@ -140,15 +139,41 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
         validateAmount(account, income.getAmount());
         validateDates(billingPeriod.getPeriod(), income.getIncomeDate());
 
-        FinancialTransaction ft = transactionsService.credit(account, income.getAmount(), income.getIncomeDate().atStartOfDay(), income.getDescription());
         income.setBillingPeriod(billingPeriod);
         incomeRepository.save(income);
-        return ft;
+        return createFinancialTransactions(account, income, nodrigenTransactions);
+    }
+
+    private Map<FinancialTransaction, NodrigenTransaction> createFinancialTransactions(
+            Account account,
+            Income income,
+            List<NodrigenTransaction> nodrigenTransactions) {
+        if (nodrigenTransactions.isEmpty()) {
+            Map<FinancialTransaction, NodrigenTransaction> completionMap = new HashMap<>();
+            completionMap.put(
+                    transactionsService.credit(
+                            account,
+                            income.getAmount(),
+                            income.getIncomeDate().atStartOfDay(),
+                            income.getDescription()),
+                    null);
+            return completionMap;
+        }
+        return nodrigenTransactions.stream()
+                .filter(Predicate.not(NodrigenTransaction::isHandled))
+                .collect(Collectors.toMap(
+                        nodrigenTransaction -> transactionsService.credit(
+                                account,
+                                nodrigenTransaction.getTransactionAmount().getAmount().abs(),
+                                income.getIncomeDate().atStartOfDay(),
+                                income.getDescription()),
+                        Function.identity()
+                ));
     }
 
     @Override
     public void addExpense(Account account, Expense expense) {
-        addExpense2(account, expense);
+        addExpense2(account, expense, List.of());
     }
 
     @Override
@@ -157,11 +182,10 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
         for (NodrigenTransaction nodrigenTransaction : nodrigenTransactions) {
             validateNodrigenTransactionBelongsToAnAccount(account, nodrigenTransaction);
         }
-        FinancialTransaction transaction = addExpense2(account, expense);
-        markNodrigenTransactionsCompleted(nodrigenTransactions, transaction);
+        markNodrigenTransactionsCompleted(addExpense2(account, expense, nodrigenTransactions));
     }
 
-    private FinancialTransaction addExpense2(Account account, Expense expense) {
+    private Map<FinancialTransaction, NodrigenTransaction> addExpense2(Account account, Expense expense, List<NodrigenTransaction> nodrigenTransactions) {
         BillingPeriod billingPeriod = unfinishedCurrentOrPreviousMonthBillingPeriod(account.getDomain());
         if (expense.getExpenseDate() == null) {
             expense.setExpenseDate(billingPeriod.getPeriod().equals(YearMonth.now()) ? LocalDate.now() : billingPeriod.getPeriod().atEndOfMonth());
@@ -171,19 +195,41 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
         validateAmount(account, expense.getAmount().negate());
         validateDates(billingPeriod.getPeriod(), expense.getExpenseDate());
 
-        FinancialTransaction ft = transactionsService.debit(account, expense.getAmount(), expense.getExpenseDate().atStartOfDay(), expense.getDescription());
         expense.setBillingPeriod(billingPeriod);
         expenseRepository.save(expense);
-        return ft;
+        return getFinancialTransaction(account, expense, nodrigenTransactions);
     }
 
-    private void markNodrigenTransactionsCompleted(List<NodrigenTransaction> nodrigenTransactions, FinancialTransaction transaction) {
-        for (NodrigenTransaction nodrigenTransaction : nodrigenTransactions) {
-            if (nodrigenTransaction.getTransactionAmount().getAmount().compareTo(BigDecimal.ZERO) >= 0)
-                nodrigenTransaction.setCreditTransaction(transaction);
-            else nodrigenTransaction.setDebitTransaction(transaction);
+    private Map<FinancialTransaction, NodrigenTransaction> getFinancialTransaction(Account account, Expense expense, List<NodrigenTransaction> nodrigenTransactions) {
+
+        if (nodrigenTransactions.isEmpty()) {
+            Map<FinancialTransaction, NodrigenTransaction> completionMap = new HashMap<>();
+            completionMap.put(
+                    transactionsService.debit(account, expense.getAmount(), expense.getExpenseDate().atStartOfDay(), expense.getDescription()),
+                    null);
+            return completionMap;
         }
-        nodrigenTransactionRepository.saveAll(nodrigenTransactions);
+        return nodrigenTransactions.stream()
+                .filter(Predicate.not(NodrigenTransaction::isHandled))
+                .collect(Collectors.toMap(
+                        nodrigenTransaction -> transactionsService.debit(
+                                account,
+                                nodrigenTransaction.getTransactionAmount().getAmount().abs(),
+                                expense.getExpenseDate().atStartOfDay(),
+                                expense.getDescription()),
+                        Function.identity()
+                ));
+    }
+
+    private void markNodrigenTransactionsCompleted(Map<FinancialTransaction, NodrigenTransaction> completionMap) {
+        for (Map.Entry<FinancialTransaction, NodrigenTransaction> transactions : completionMap.entrySet()) {
+            FinancialTransaction financialTransaction = transactions.getKey();
+            NodrigenTransaction nodrigenTransaction = transactions.getValue();
+            if (nodrigenTransaction.getTransactionAmount().getAmount().compareTo(BigDecimal.ZERO) >= 0)
+                nodrigenTransaction.setCreditTransaction(financialTransaction);
+            else nodrigenTransaction.setDebitTransaction(financialTransaction);
+        }
+        nodrigenTransactionRepository.saveAll(completionMap.values());
     }
 
     private BillingPeriod unfinishedCurrentOrPreviousMonthBillingPeriod(Domain domain) {
@@ -192,8 +238,7 @@ public class BillingPeriodsJPAService implements BillingPeriodsService {
     }
 
     private void validateAmount(Account account, BigDecimal amount) {
-        if (!(account.getAvailableBalance().add(Money.of(amount, account.getCurrentBalance().getCurrency().getCurrencyCode())).isPositiveOrZero()))
-        {
+        if (!(account.getAvailableBalance().add(Money.of(amount, account.getCurrentBalance().getCurrency().getCurrencyCode())).isPositiveOrZero())) {
             throw new AccountsException("There is not enough money for that expense.");
         }
     }
