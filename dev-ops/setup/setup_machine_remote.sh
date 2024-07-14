@@ -2,15 +2,21 @@
 
 USERNAME=$1
 HOME_DIR=/home/$USERNAME
-
+MAIN_AWS_ACCESS_KEY_ID=$2
+MAIN_AWS_SECRET_ACCESS_KEY=$3
+LOGS_AWS_ACCESS_KEY_ID=$4
+LOGS_AWS_SECRET_ACCESS_KEY=$5
+POSTGRES_PASSWORD=$6
+SAMBA_USER=SG-APP-STORAGE
+SAMBA_PASSWORD=$7
 
 sudo mkdir -p /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
 wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
 sudo apt-get update
-sudo apt-get install -y unzip ca-certificates curl gnupg lsb-release postgresql-client-14 docker-ce docker-ce-cli containerd.io docker-compose-plugin dos2unix
+sudo apt-get install -y unzip ca-certificates curl gnupg lsb-release postgresql-client-14 docker-ce docker-ce-cli containerd.io docker-compose-plugin dos2unix samba-common smbclient samba-common-bin smbclient  cifs-utils
 
 unzip $HOME_DIR/docker-ovh.zip -d $HOME_DIR/docker_files
 mv $HOME_DIR/docker_files/docker\ -\ ovh $HOME_DIR/docker_files/dockerFiles
@@ -37,25 +43,25 @@ sudo systemctl enable docker.service
 sudo systemctl enable containerd.service
 sudo docker swarm init
 
-echo "*:*:*:postgres:$6" | tee $HOME_DIR/.pgpass
+echo "*:*:*:postgres:$POSTGRES_PASSWORD" | tee $HOME_DIR/.pgpass
 chmod 400 $HOME_DIR/.pgpass
 
-echo "0 * * * * /home/slawek/management/backup_data.sh" | sudo tee /var/spool/cron/crontabs/database_backups
-sudo chown slawek:crontab /var/spool/cron/crontabs/database_backups
-sudo chmod 600 /var/spool/cron/crontabs/database_backups
+echo "0 * * * * /home/slawek/Application/management/backup_data.sh" | sudo tee /var/spool/cron/crontabs/slawek
+sudo chown slawek:crontab /var/spool/cron/crontabs/slawek
+sudo chmod 600 /var/spool/cron/crontabs/slawek
 
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 sudo ./aws/install
 rm -rf aws awscliv2.zip
 
 mkdir -p $HOME_DIR/.aws
 echo "[default]" > $HOME_DIR/.aws/credentials
-echo "aws_access_key_id = $2" >>$HOME_DIR/.aws/credentials
-echo "aws_secret_access_key = $3" >>$HOME_DIR/.aws/credentials
+echo "aws_access_key_id = $MAIN_AWS_ACCESS_KEY_ID" >>$HOME_DIR/.aws/credentials
+echo "aws_secret_access_key = $MAIN_AWS_SECRET_ACCESS_KEY" >>$HOME_DIR/.aws/credentials
 echo "[AmazonCloudWatchAgent]" >>$HOME_DIR/.aws/credentials
-echo "aws_access_key_id = $4" >>$HOME_DIR/.aws/credentials
-echo "aws_secret_access_key = $5" >>$HOME_DIR/.aws/credentials
+echo "aws_access_key_id = $LOGS_AWS_ACCESS_KEY_ID" >>$HOME_DIR/.aws/credentials
+echo "aws_secret_access_key = $LOGS_AWS_SECRET_ACCESS_KEY" >>$HOME_DIR/.aws/credentials
 chmod 600 $HOME_DIR/.aws/credentials
 
 echo "[default]" >$HOME_DIR/.aws/config
@@ -69,8 +75,8 @@ chmod 600 $HOME_DIR/.aws/config
 sudo mkdir -p /etc/systemd/system/docker.service.d/
 sudo touch /etc/systemd/system/docker.service.d/aws-credentials.conf
 sudo echo "[Service]" | sudo tee /etc/systemd/system/docker.service.d/aws-credentials.conf
-sudo echo "Environment=\"AWS_ACCESS_KEY_ID=$4\"" | sudo tee -a /etc/systemd/system/docker.service.d/aws-credentials.conf
-sudo echo "Environment=\"AWS_SECRET_ACCESS_KEY=$5\"" | sudo tee -a /etc/systemd/system/docker.service.d/aws-credentials.conf
+sudo echo "Environment=\"AWS_ACCESS_KEY_ID=$LOGS_AWS_ACCESS_KEY_ID\"" | sudo tee -a /etc/systemd/system/docker.service.d/aws-credentials.conf
+sudo echo "Environment=\"AWS_SECRET_ACCESS_KEY=$LOGS_AWS_SECRET_ACCESS_KEY``\"" | sudo tee -a /etc/systemd/system/docker.service.d/aws-credentials.conf
 
 sudo systemctl daemon-reload
 sudo service docker restart
@@ -93,3 +99,9 @@ rm $HOME_DIR/cloud_watch_config.json
 rm $HOME_DIR/docker-ovh.zip
 rm $HOME_DIR/setup_machine_remote.sh
 rm -rf $HOME_DIR/docker_files
+
+echo "//192.168.52.1/Application/config $HOME_DIR/Application/config cifs uid=slawek,gid=slawek,username=$SAMBA_USER,password=$SAMBA_PASSWORD,vers=1.0,file_mode=0777,dir_mode=0777 0 0" | sudo tee -a /etc/fstab
+echo "//192.168.52.1/Application/fe $HOME_DIR/Application/fe cifs uid=slawek,gid=slawek,username=$SAMBA_USER,password=$SAMBA_PASSWORD,vers=1.0,file_mode=0777,dir_mode=0777 0 0" | sudo tee -a /etc/fstab
+echo "//192.168.52.1/Application/management $HOME_DIR/Application/management cifs uid=slawek,gid=slawek,username=$SAMBA_USER,password=$SAMBA_PASSWORD,vers=1.0,file_mode=0777,dir_mode=0777 0 0" | sudo tee -a /etc/fstab
+echo "//192.168.52.1/Application/secrets $HOME_DIR/Application/secrets cifs uid=slawek,gid=slawek,username=$SAMBA_USER,password=$SAMBA_PASSWORD,vers=1.0,file_mode=0777,dir_mode=0777 0 0" | sudo tee -a /etc/fstab
+echo "//192.168.52.1/Application/stack $HOME_DIR/Application/stack cifs uid=slawek,gid=slawek,username=$SAMBA_USER,password=$SAMBA_PASSWORD,vers=1.0,file_mode=0777,dir_mode=0777 0 0" | sudo tee -a /etc/fstab
