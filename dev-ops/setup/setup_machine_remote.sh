@@ -105,3 +105,4 @@ echo "//192.168.52.1/Application/fe $HOME_DIR/Application/fe cifs uid=slawek,gid
 echo "//192.168.52.1/Application/management $HOME_DIR/Application/management cifs uid=slawek,gid=slawek,username=$SAMBA_USER,password=$SAMBA_PASSWORD,vers=1.0,file_mode=0777,dir_mode=0777 0 0" | sudo tee -a /etc/fstab
 echo "//192.168.52.1/Application/secrets $HOME_DIR/Application/secrets cifs uid=slawek,gid=slawek,username=$SAMBA_USER,password=$SAMBA_PASSWORD,vers=1.0,file_mode=0777,dir_mode=0777 0 0" | sudo tee -a /etc/fstab
 echo "//192.168.52.1/Application/stack $HOME_DIR/Application/stack cifs uid=slawek,gid=slawek,username=$SAMBA_USER,password=$SAMBA_PASSWORD,vers=1.0,file_mode=0777,dir_mode=0777 0 0" | sudo tee -a /etc/fstab
+echo "//192.168.52.1/Artifacts $HOME_DIR/Artifacts cifs uid=slawek,gid=slawek,username=$SAMBA_USER,password=$SAMBA_PASSWORD,vers=1.0,file_mode=0777,dir_mode=0777 0 0" | sudo tee -a /etc/fstab
