@@ -40,7 +40,7 @@ jobs:
         run: |
           sudo echo $SG_CERT_CA > /usr/share/ca-certificates/sg.crt
           sudo cat /usr/share/ca-certificates/sg.crt
-          sudo echo sg.crt >> /etc/ca-certificates.conf
+          echo sg.crt >> sudo tee -a /etc/ca-certificates.conf
           sudo update-ca-certificates
 
       - name: Login to Registry
