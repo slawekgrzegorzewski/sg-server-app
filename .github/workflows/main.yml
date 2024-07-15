@@ -39,8 +39,11 @@ jobs:
           ECR_REGISTRY: ${{ secrets.SG_CERT_CA }}
         run: |
           sudo echo $SG_CERT_CA > /usr/share/ca-certificates/sg.crt
+          echo "SSSS"
           sudo cat /usr/share/ca-certificates/sg.crt
+          echo "TTTT"
           echo sg.crt >> sudo tee -a /etc/ca-certificates.conf
+          echo "EEEE"
           sudo update-ca-certificates
 
       - name: Login to Registry
