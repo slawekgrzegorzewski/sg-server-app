@@ -38,10 +38,9 @@ jobs:
         env:
           SG_CERT_CA: ${{ secrets.SG_CERT_CA }}
         run: |
-          sudo ls /etc/ssl/certs
-          sudo echo $SG_CERT_CA > /usr/share/ca-certificates/sg.crt
+          sudo echo $SG_CERT_CA > /etc/ssl/certs/sg.crt
           echo "SSSS"
-          sudo cat /usr/share/ca-certificates/sg.crt
+          sudo cat /etc/ssl/certs/sg.crt
           echo "TTTT"
           echo sg.crt >> sudo tee -a /etc/ca-certificates.conf
           echo "EEEE"
