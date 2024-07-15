@@ -26,6 +26,31 @@ jobs:
           - 5432:5432
 
     steps:
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: setup CA
+        id: setup-ca
+        env:
+          ECR_REGISTRY: ${{ secrets.SG_CERT_CA }}
+        run: |
+          echo $SG_CERT_CA > /usr/share/ca-certificates/sg.crt
+          cat /usr/share/ca-certificates/sg.crt
+          echo sg.crt >> /etc/ca-certificates.conf
+          update-ca-certificates
+
+      - name: Login to Registry
+        id: login-to-registry
+        uses: docker/login-action@v3
+        with:
+          registry: grzegorzewski.org:5000
+          username: ${{ secrets.SG_REGISTRY_USER }}
+          password: ${{ secrets.SG_REGISTRY_PASSWORD }}
+
       - uses: actions/checkout@v3
 
       - name: prepare db
@@ -60,20 +85,6 @@ jobs:
         env:
           SG_DB_URL: ${{ secrets.SG_DB_URL }}
           SG_DB_PASSWORD: ${{ secrets.SG_DB_PASSWORD }}
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Login to Registry
-        id: login-to-registry
-        uses: docker/login-action@v3
-        with:
-          registry: grzegorzewski.org:5000
-          username: ${{ secrets.SG_REGISTRY_USER }}
-          password: ${{ secrets.SG_REGISTRY_PASSWORD }}
 
       - name: Build, tag, and push image to Amazon ECR
         id: build-publish
