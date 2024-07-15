@@ -41,6 +41,7 @@ jobs:
           SG_CERT_CA_2: ${{ secrets.SG_CERT_CA_2 }}
           SG_CERT_CA_3: ${{ secrets.SG_CERT_CA_3 }}
         run: |
+          sudo cat /etc/docker/certs.d/mydomain.com:5000/ca-certificates.crt
           echo $SG_CERT_CA | sudo tee /usr/share/ca-certificates/sg.crt
           echo $SG_CERT_CA_1 | sudo tee /usr/share/ca-certificates/sg1.crt
           echo $SG_CERT_CA_2 | sudo tee /usr/share/ca-certificates/sg2.crt
