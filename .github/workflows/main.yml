@@ -42,10 +42,10 @@ jobs:
           SG_CERT_CA_3: ${{ secrets.SG_CERT_CA_3 }}
         run: |
           sudo mkdir -p /etc/docker/certs.d/grzegorzewski.com:5000/
-          echo $SG_CERT_CA | sudo tee /etc/docker/certs.d/grzegorzewski.com:5000/sg.crt
-          echo $SG_CERT_CA_1 | sudo tee /etc/docker/certs.d/grzegorzewski.com:5000/sg1.crt
-          echo $SG_CERT_CA_2 | sudo tee /etc/docker/certs.d/grzegorzewski.com:5000/sg2.crt
-          echo $SG_CERT_CA_3 | sudo tee /etc/docker/certs.d/grzegorzewski.com:5000/sg3.crt
+          echo $SG_CERT_CA | sudo tee /etc/docker/certs.d/grzegorzewski.com/sg.crt
+          echo $SG_CERT_CA_1 | sudo tee /etc/docker/certs.d/grzegorzewski.com/sg1.crt
+          echo $SG_CERT_CA_2 | sudo tee /etc/docker/certs.d/grzegorzewski.com/sg2.crt
+          echo $SG_CERT_CA_3 | sudo tee /etc/docker/certs.d/grzegorzewski.com/sg3.crt
           echo sg.crt | sudo tee -a /etc/ca-certificates.conf
           echo sg1.crt | sudo tee -a /etc/ca-certificates.conf
           echo sg2.crt | sudo tee -a /etc/ca-certificates.conf
