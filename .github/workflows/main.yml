@@ -36,7 +36,7 @@ jobs:
       - name: setup CA
         id: setup-ca
         env:
-          ECR_REGISTRY: ${{ secrets.SG_CERT_CA }}
+          SG_CERT_CA: ${{ secrets.SG_CERT_CA }}
         run: |
           sudo echo $SG_CERT_CA > /usr/share/ca-certificates/sg.crt
           echo "SSSS"
