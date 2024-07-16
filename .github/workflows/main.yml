@@ -70,7 +70,6 @@ jobs:
         id: build
         run: |
            ./gradlew migrate build infrastructureRpi4
-            echo tag=$(git rev-parse --short "$GITHUB_SHA") >> "$GITHUB_OUTPUT"
         env:
           SG_DB_URL: "jdbc:postgresql://localhost:5432/accountant"
           SG_DB_PASSWORD: postgres
@@ -86,11 +85,9 @@ jobs:
         env:
           REGISTRY: ${{ secrets.SG_REGISTRY_URL }}
           REPOSITORY: backend
-          TAG: ${{ steps.build.output }}
         run: |
-          echo "TAG=$TAG"
-          docker buildx build . -f docker/production_home/Dockerfile -t $REGISTRY/$REPOSITORY:latest-rpi4 -t $REGISTRY/$REPOSITORY:$TAG-rpi4 --platform linux/arm64 --push
-          docker buildx build . -f docker/production_home/Dockerfile-debug -t $REGISTRY/$REPOSITORY:latest-debug-rpi4 -t $REGISTRY/$REPOSITORY:$TAG-debug-rpi4 --platform linux/arm64 --push
+          docker buildx build . -f docker/production_home/Dockerfile -t $REGISTRY/$REPOSITORY:latest-rpi4 -t $REGISTRY/$REPOSITORY:$(git rev-parse --short "$GITHUB_SHA")-rpi4 --platform linux/arm64 --push
+          docker buildx build . -f docker/production_home/Dockerfile-debug -t $REGISTRY/$REPOSITORY:latest-debug-rpi4 -t $REGISTRY/$REPOSITORY:$(git rev-parse --short "$GITHUB_SHA")-debug-rpi4 --platform linux/arm64 --push
           mv build/distributions/dockerRpi4.zip .
 
       - name: copy dockerRpi4.zip via ssh password
