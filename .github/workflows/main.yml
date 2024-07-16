@@ -57,17 +57,11 @@ jobs:
           java-version: '21'
           distribution: 'zulu'
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-central-1
-          role-duration-seconds: 1200
-          role-session-name: MySessionName
-
       - name: Build with Gradle Wrapper
-        run: ./gradlew migrate build infrastructureRpi4
+        id: build
+        run: |
+           ./gradlew migrate build infrastructureRpi4
+            echo tag=$(git rev-parse --short "$GITHUB_SHA") >> "$GITHUB_OUTPUT"
         env:
           SG_DB_URL: "jdbc:postgresql://localhost:5432/accountant"
           SG_DB_PASSWORD: postgres
@@ -83,9 +77,11 @@ jobs:
         env:
           REGISTRY: ${{ secrets.SG_REGISTRY_URL }}
           REPOSITORY: backend
+          TAG: ${{ steps.build.output.tag }}
         run: |
-          docker buildx build . -f docker/production_home/Dockerfile -t $REGISTRY/$REPOSITORY:latest-rpi4 --platform linux/arm64 --push
-          docker buildx build . -f docker/production_home/Dockerfile-debug -t $REGISTRY/$REPOSITORY:latest-debug-rpi4 --platform linux/arm64 --push
+          echo "TAG=$TAG"
+          docker buildx build . -f docker/production_home/Dockerfile -t $REGISTRY/$REPOSITORY:latest-rpi4 -t $REGISTRY/$REPOSITORY:$TAG-rpi4 --platform linux/arm64 --push
+          docker buildx build . -f docker/production_home/Dockerfile-debug -t $REGISTRY/$REPOSITORY:latest-debug-rpi4 -t $REGISTRY/$REPOSITORY:$TAG-debug-rpi4 --platform linux/arm64 --push
           mv build/distributions/dockerRpi4.zip .
 
       - name: copy dockerRpi4.zip via ssh password
