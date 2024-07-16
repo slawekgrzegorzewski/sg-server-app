@@ -86,8 +86,8 @@ jobs:
           REGISTRY: ${{ secrets.SG_REGISTRY_URL }}
           REPOSITORY: backend
         run: |
-          docker buildx build . -f docker/production_home/Dockerfile -t $REGISTRY/$REPOSITORY:latest-rpi4 -t $REGISTRY/$REPOSITORY:$(git rev-parse --short "$GITHUB_SHA")-rpi4 --platform linux/arm64 --push
-          docker buildx build . -f docker/production_home/Dockerfile-debug -t $REGISTRY/$REPOSITORY:latest-debug-rpi4 -t $REGISTRY/$REPOSITORY:$(git rev-parse --short "$GITHUB_SHA")-debug-rpi4 --platform linux/arm64 --push
+          docker buildx build . -f docker/production_home/Dockerfile -t $REGISTRY/$REPOSITORY:latest-rpi4 -t $REGISTRY/$REPOSITORY:$(date +'%Y-%m-%d_%H-%M')-$(git rev-parse --short "$GITHUB_SHA")-rpi4 --platform linux/arm64 --push
+          docker buildx build . -f docker/production_home/Dockerfile-debug -t $REGISTRY/$REPOSITORY:latest-debug-rpi4 -t $REGISTRY/$REPOSITORY:$(date +'%Y-%m-%d_%H-%M')-$(git rev-parse --short "$GITHUB_SHA")-debug-rpi4 --platform linux/arm64 --push
           mv build/distributions/dockerRpi4.zip .
 
       - name: copy dockerRpi4.zip via ssh password
