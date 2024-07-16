@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+
+  registry:
+    image: registry:2.8.3
+    container_name: registry
+    ports:
+      - 5000:5000
+    volumes:
+      - $HOME/Artifacts:/var/lib/registry
+      - $HOME/Artifacts/auth:/auth
+    secrets:
+      - sgapplication.crt
+      - sgapplication.key
+    environment:
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+      REGISTRY_HTTP_TLS_CERTIFICATE: /run/secrets/sgapplication.crt
+      REGISTRY_HTTP_TLS_KEY: /run/secrets/sgapplication.key
+      REGISTRY_HTTP_HEADERS_Access-Control-Allow-Origin: '[http://grzegorzewski.org:4080]'
+      REGISTRY_HTTP_HEADERS_Access-Control-Allow-Methods: '[HEAD,GET,OPTIONS,DELETE]'
+      REGISTRY_HTTP_HEADERS_Access-Control-Allow-Credentials: '[true]'
+      REGISTRY_HTTP_HEADERS_Access-Control-Allow-Headers: '[Authorization,Accept,Cache-Control]'
+      REGISTRY_HTTP_HEADERS_Access-Control-Expose-Headers: '[Docker-Content-Digest]'
+    restart: always
+    networks:
+      - registry_network
+
+  ui:
+    image: joxit/docker-registry-ui:2.5.7
+    ports:
+      - 4080:80
+    environment:
+      REGISTRY_TITLE: My Private Docker Registry
+      REGISTRY_URL: https://grzegorzewski.org:5000
+      SINGLE_REGISTRY: 'true'
+    depends_on:
+      - registry
+    networks:
+      - registry_network
+
+secrets:
+  sgapplication.crt:
+    file: $HOME/Application/secrets/certs/sgapplication.crt
+  sgapplication.key:
+    file: $HOME/Application/secrets/certs/sgapplication.key
+
+networks:
+  registry_network:
+    driver: overlay

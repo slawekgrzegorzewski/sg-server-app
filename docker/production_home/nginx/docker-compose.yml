@@ -1,0 +1,47 @@
+
+version: '3.8'
+
+services:
+
+  nginx:
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: eu-central-1
+        awslogs-group: app
+        awslogs-stream: client
+        awslogs-create-group: 'true'
+    image: nginx:1.25.4-bookworm
+    container_name: nginx
+    ports:
+      - 80:80
+      - 443:443
+    secrets:
+      - sgapplication.crt
+      - sgapplication.key
+    volumes:
+      - $HOME/Application/config/nginx.conf:/etc/nginx/nginx.conf:ro
+      - $HOME/Application/fe:/usr/share/nginx:ro
+    depends_on:
+      - app
+    deploy:
+      placement:
+        constraints:
+          - node.hostname==rpi3
+    networks:
+      - app_app_network
+      - registry_registry_network
+
+secrets:
+  sgapplication.crt:
+    file: $HOME/Application/secrets/certs/sgapplication.crt
+  sgapplication.key:
+    file: $HOME/Application/secrets/certs/sgapplication.key
+
+networks:
+  app_app_network:
+    name: app_app_network
+    external: true
+  registry_registry_network:
+    name: registry_registry_network
+    external: true
