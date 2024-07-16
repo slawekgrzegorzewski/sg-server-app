@@ -86,7 +86,7 @@ jobs:
         env:
           REGISTRY: ${{ secrets.SG_REGISTRY_URL }}
           REPOSITORY: backend
-          TAG: ${{ steps.build.output.tag }}
+          TAG: ${{ steps.build.output }}
         run: |
           echo "TAG=$TAG"
           docker buildx build . -f docker/production_home/Dockerfile -t $REGISTRY/$REPOSITORY:latest-rpi4 -t $REGISTRY/$REPOSITORY:$TAG-rpi4 --platform linux/arm64 --push
