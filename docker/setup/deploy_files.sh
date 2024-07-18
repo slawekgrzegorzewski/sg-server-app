@@ -3,7 +3,7 @@ source ./setup_directories.sh
 sudo chmod 400  ~/.pgpass
 
 SOURCE_CONFIG_DIR=../config
-SOURCE_STACK_DIR=../
+SOURCE_STACK_DIR=..
 SOURCE_MANAGEMENT_DIR=../management
 
 dos2unix $SOURCE_CONFIG_DIR/*
