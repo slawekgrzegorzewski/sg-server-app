@@ -89,33 +89,3 @@ jobs:
           docker buildx build . -f docker/production_home/Dockerfile -t $REGISTRY/$REPOSITORY:latest-rpi4 -t $REGISTRY/$REPOSITORY:$(date +'%Y-%m-%d_%H-%M')-$(git rev-parse --short "$GITHUB_SHA")-rpi4 --platform linux/arm64 --push
           docker buildx build . -f docker/production_home/Dockerfile-debug -t $REGISTRY/$REPOSITORY:latest-debug-rpi4 -t $REGISTRY/$REPOSITORY:$(date +'%Y-%m-%d_%H-%M')-$(git rev-parse --short "$GITHUB_SHA")-debug-rpi4 --platform linux/arm64 --push
           mv build/distributions/dockerRpi4.zip .
-
-      - name: copy dockerRpi4.zip via ssh password
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          port: 22
-          source: dockerRpi4.zip
-          target: /home/${{ secrets.SSH_USER }}/Application
-
-      - name: unpack and deploy application files
-        uses: appleboy/ssh-action@master
-        env:
-          SSH_USER: ${{ secrets.SSH_USER }}
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          port: 22
-          script: |
-            cd /home/${{ secrets.SSH_USER }}/Application
-            unzip dockerRpi4.zip -d tmp
-            cd tmp/setup && dos2unix deploy_files.sh
-            chmod +x deploy_files.sh
-            ./deploy_files.sh
-            cd /home/${{ secrets.SSH_USER }}/Application/management
-            ./stop.sh
-            sleep 5
-            ./start.sh
