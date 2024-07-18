@@ -1,4 +1,4 @@
-name: deploy app
+name: update configuration
 
 on:
   workflow_dispatch:
@@ -35,6 +35,7 @@ jobs:
         id: build
         run: |
            ./gradlew dockerPackageRpi4
+          mv build/distributions/dockerRpi4.zip .
 
       - name: copy dockerRpi4.zip via ssh password
         uses: appleboy/scp-action@master
@@ -58,10 +59,8 @@ jobs:
           script: |
             cd /home/${{ secrets.SSH_USER }}/Application
             unzip dockerRpi4.zip -d tmp
-            cd tmp/setup && dos2unix deploy_files.sh
-            chmod +x deploy_files.sh
+            cd tmp/setup && dos2unix setup_directories.sh deploy_files.sh
+            chmod +x setup_directories.sh deploy_files.sh
             ./deploy_files.sh
             cd /home/${{ secrets.SSH_USER }}/Application/management
-            ./stop.sh
-            sleep 5
-            ./start.sh
+            ./stop.sh && sleep 5 && ./start.sh

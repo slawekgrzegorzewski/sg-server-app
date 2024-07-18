@@ -2,12 +2,16 @@ source ./setup_directories.sh
 
 sudo chmod 400  ~/.pgpass
 
-NEW_CONFIG_DIR=../config
-NEW_STACK_DIR=../stack
+SOURCE_CONFIG_DIR=../config
+SOURCE_STACK_DIR=../
+SOURCE_MANAGEMENT_DIR=../management
 
-cp -f $NEW_STACK_DIR/* $STACK_DIR
-cp -f $NEW_CONFIG_DIR/logback.xml $CONFIG_DIR
-cp -f $NEW_CONFIG_DIR/nginx.conf $CONFIG_DIR
+dos2unix $SOURCE_MANAGEMENT_DIR/*
+cp -f $SOURCE_MANAGEMENT_DIR/* $MANAGEMENT_DIR
+cp -f $SOURCE_STACK_DIR/docker-compose.yml $STACK_DIR
+cp -f $SOURCE_CONFIG_DIR/logback.xml $CONFIG_DIR
+cp -f $SOURCE_CONFIG_DIR/nginx.conf $CONFIG_DIR
+cp -f $SOURCE_CONFIG_DIR/application.yml.tmpl $CONFIG_DIR
 
 dos2unix $STACK_DIR/*
 dos2unix $CONFIG_DIR/*
