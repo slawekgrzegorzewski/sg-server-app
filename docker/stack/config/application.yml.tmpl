@@ -4,7 +4,7 @@ spring:
       connectionTimeout: 15000
       maximumPoolSize: 5
     password: {{ secret "postgres_password" }}
-    url: jdbc:postgresql://db:5432/accountant
+    url: jdbc:postgresql://application_database:5432/accountant
     username: postgres
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -24,13 +24,7 @@ spring:
       mode: always
 
 server:
-  ssl:
-    key-store: /run/secrets/sgapplication.p12
-    key-store-password: {{ secret "key_store_password" }}
-    key-store-type: pkcs12
-    key-alias: 1
-    key-password: {{ secret "key_password" }}
-  port: 8443
+  port: 8080
 
 nodrigen:
   service-url: https://bankaccountdata.gocardless.com/api/v2/
@@ -47,3 +41,8 @@ aws:
   intellectual-property-task:
     attachments:
       bucket-name: intellectualpropertytask
+
+
+pjm:
+  videos-location: /app/bibleFiles
+  fetch: "0 0 17 * * *"
