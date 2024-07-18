@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -86,6 +86,5 @@ jobs:
           REGISTRY: ${{ secrets.SG_REGISTRY_URL }}
           REPOSITORY: backend
         run: |
-          docker buildx build . -f docker/production_home/Dockerfile -t $REGISTRY/$REPOSITORY:latest-rpi4 -t $REGISTRY/$REPOSITORY:$(date +'%Y-%m-%d_%H-%M')-$(git rev-parse --short "$GITHUB_SHA")-rpi4 --platform linux/arm64 --push
-          docker buildx build . -f docker/production_home/Dockerfile-debug -t $REGISTRY/$REPOSITORY:latest-debug-rpi4 -t $REGISTRY/$REPOSITORY:$(date +'%Y-%m-%d_%H-%M')-$(git rev-parse --short "$GITHUB_SHA")-debug-rpi4 --platform linux/arm64 --push
-          mv build/distributions/dockerRpi4.zip .
+          docker buildx build . -f docker/Dockerfile -t $REGISTRY/$REPOSITORY:latest-rpi4 -t $REGISTRY/$REPOSITORY:$(date +'%Y-%m-%d_%H-%M')-$(git rev-parse --short "$GITHUB_SHA")-rpi4 --platform linux/arm64 --push
+          docker buildx build . -f docker/Dockerfile-debug -t $REGISTRY/$REPOSITORY:latest-debug-rpi4 -t $REGISTRY/$REPOSITORY:$(date +'%Y-%m-%d_%H-%M')-$(git rev-parse --short "$GITHUB_SHA")-debug-rpi4 --platform linux/arm64 --push
