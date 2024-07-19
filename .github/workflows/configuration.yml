@@ -62,5 +62,6 @@ jobs:
             cd tmp/setup && dos2unix setup_directories.sh deploy_files.sh
             chmod +x setup_directories.sh deploy_files.sh
             ./deploy_files.sh
+            sudo rm -rf /home/${{ secrets.SSH_USER }}/Application/tmp && sudo rm /home/${{ secrets.SSH_USER }}/Application/dockerRpi4.zip
             cd /home/${{ secrets.SSH_USER }}/Application/management
             ./stop.sh && sleep 5 && ./start.sh

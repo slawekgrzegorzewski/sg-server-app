@@ -91,8 +91,8 @@ services:
     ports:
       - 5000:5000
     volumes:
-      - $HOME/Artifacts:/var/lib/registry
-      - $HOME/Artifacts/auth:/auth
+      - $HOME/Application/stack/registry/dataa:/var/lib/registry
+      - $HOME/Application/stack/registry/auth:/auth
     secrets:
       - sgapplication.crt
       - sgapplication.key

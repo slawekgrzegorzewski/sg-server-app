@@ -197,8 +197,7 @@ val infrastructureRpi4 = tasks.register<Zip>("infrastructureRpi4") {
     from("docker/common/") {
         include("setup_directories.sh")
     }
-    from("docker/infrastructure/") {
-        include("management/*")
+    from("dev-ops/setup/infrastructure/") {
         include("cloud_watch_config.json")
         include("setup_files.sh")
         include("setup_docker.sh")

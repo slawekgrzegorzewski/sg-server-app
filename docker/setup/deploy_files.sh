@@ -15,7 +15,3 @@ sudo cp -f $SOURCE_STACK_DIR/docker-compose.yml $STACK_DIR
 sudo cp -f $SOURCE_CONFIG_DIR/logback.xml $CONFIG_DIR
 sudo cp -f $SOURCE_CONFIG_DIR/nginx.conf $CONFIG_DIR
 sudo cp -f $SOURCE_CONFIG_DIR/application.yml.tmpl $CONFIG_DIR
-
-sudo cd ../../
-sudo rm -rf tmp
-sudo rm dockerRpi4.zip
