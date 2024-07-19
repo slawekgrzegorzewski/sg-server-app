@@ -15,6 +15,8 @@ sudo chmod 644 docker-compose.yml
 cd $SOURCE_MANAGEMENT_DIR
 sudo dos2unix *.sh
 
+cd $CURRENT_DIR
+
 sudo cp -f $SOURCE_MANAGEMENT_DIR/*.sh $MANAGEMENT_DIR
 sudo cp -f $SOURCE_STACK_DIR/docker-compose.yml $STACK_DIR
 sudo cp -f $SOURCE_CONFIG_DIR/logback.xml $CONFIG_DIR
