@@ -89,3 +89,11 @@ jobs:
           export BUILD_DATE=$(date +'%Y-%m-%d_%H-%M')
           docker buildx build . -f docker/Dockerfile -t $REGISTRY/$REPOSITORY:latest-rpi4 -t $REGISTRY/$REPOSITORY:$BUILD_DATE-$(git rev-parse --short "$GITHUB_SHA")-rpi4 --platform linux/arm64 --push
           docker buildx build . -f docker/Dockerfile-debug -t $REGISTRY/$REPOSITORY:latest-debug-rpi4 -t $REGISTRY/$REPOSITORY:$BUILD_DATE-$(git rev-parse --short "$GITHUB_SHA")-debug-rpi4 --platform linux/arm64 --push
+
+      - name: Update the service
+        id: update
+        env:
+          REGISTRY: ${{ secrets.SG_REGISTRY_URL }}
+          REPOSITORY: backend
+        run: |
+          docker service update --force --image $REGISTRY/$REPOSITORY:latest-rpi4 application_backend
