@@ -1,9 +1,10 @@
 source ./setup_directories.sh
 
 CURRENT_DIR=$(pwd)
-SOURCE_CONFIG_DIR=../config
-SOURCE_STACK_DIR=..
-SOURCE_MANAGEMENT_DIR=../management
+TMP_DIR=$(realpath ..)
+SOURCE_STACK_DIR=$TMP_DIR
+SOURCE_CONFIG_DIR=$TMP_DIR/config
+SOURCE_MANAGEMENT_DIR=$TMP_DIR/management
 
 cd $SOURCE_CONFIG_DIR
 sudo dos2unix application.yml.tmpl  logback.xml  nginx.conf
