@@ -4,7 +4,7 @@ version: '3.8'
 services:
 
   backend:
-    image: grzegorzewski.org:5000/backend:latest-rpi4
+    image: grzegorzewski.org:5000/backend:latest
     container_name: backend
     ports:
       - 8080:8080
