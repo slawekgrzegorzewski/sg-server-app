@@ -92,8 +92,15 @@ jobs:
 
       - name: Update the service
         id: update
+        uses: appleboy/ssh-action@master
         env:
+          SSH_USER: ${{ secrets.SSH_USER }}
           REGISTRY: ${{ secrets.SG_REGISTRY_URL }}
           REPOSITORY: backend
-        run: |
-          docker service update --force --image $REGISTRY/$REPOSITORY:latest-rpi4 application_backend
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: 22
+          script: |
+            docker service update --force --image $REGISTRY/$REPOSITORY:latest-rpi4 application_backend
