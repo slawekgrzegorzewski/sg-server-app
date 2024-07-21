@@ -5,7 +5,7 @@ STACK_DIR=$APPLICATION_DIR/stack
 SECRETS_DIR=$APPLICATION_DIR/secrets
 
 source $APPLICATION_DIR/secrets/put_secrets_to_env.sh
-$SECRETS_DIR/setup_secrets.sh $STACK_DIR/registry/auth
+$SECRETS_DIR/setup_secrets.sh $STACK_DIR/config
 docker login -p $REGISTRY_PASSWORD -u $REGISTRY_USER $REGISTRY_URL
 
 cd $STACK_DIR || exit
