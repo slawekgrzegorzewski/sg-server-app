@@ -78,20 +78,5 @@ jobs:
           REPOSITORY: backend
         run: |
           export BUILD_DATE=$(date +'%Y-%m-%d_%H-%M')
-          docker buildx build . -f docker/Dockerfile -t $REGISTRY/$REPOSITORY:latest -t $REGISTRY/$REPOSITORY:$BUILD_DATE-$(git rev-parse --short "$GITHUB_SHA")-rpi4 --platform linux/arm64 --push
-          docker buildx build . -f docker/Dockerfile-debug -t $REGISTRY/$REPOSITORY:latest-debug -t $REGISTRY/$REPOSITORY:$BUILD_DATE-$(git rev-parse --short "$GITHUB_SHA")-debug-rpi4 --platform linux/arm64 --push
-
-      - name: Update the service
-        id: update
-        uses: appleboy/ssh-action@master
-        env:
-          SSH_USER: ${{ secrets.SSH_USER }}
-          REGISTRY: ${{ secrets.SG_REGISTRY_URL }}
-          REPOSITORY: backend
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          port: 22
-          script: |
-            docker service update --force --image ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:latest application_backend
+          docker buildx build . -f docker/Dockerfile -t $REGISTRY/$REPOSITORY:latest -t $REGISTRY/$REPOSITORY:$BUILD_DATE-$(git rev-parse --short "$GITHUB_SHA") --platform linux/arm64 --push
+          docker buildx build . -f docker/Dockerfile-debug -t $REGISTRY/$REPOSITORY:latest-debug -t $REGISTRY/$REPOSITORY:$BUILD_DATE-$(git rev-parse --short "$GITHUB_SHA")-debug --platform linux/arm64 --push
