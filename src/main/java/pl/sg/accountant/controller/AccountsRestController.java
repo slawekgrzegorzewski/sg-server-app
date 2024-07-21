@@ -6,6 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.sg.accountant.model.billings.BillingPeriod;
 import pl.sg.accountant.model.billings.summary.MonthSummaryPiggyBank;
+import pl.sg.accountant.repository.accounts.AccountWatcherRepository;
 import pl.sg.accountant.service.accounts.AccountsService;
 import pl.sg.accountant.service.billings.BillingPeriodsService;
 import pl.sg.accountant.service.billings.summary.MonthSummaryService;
@@ -36,14 +37,16 @@ public class AccountsRestController implements AccountsController {
     private final DomainRepository domainRepository;
     private final ModelMapper mapper;
     private final MonthSummaryService monthSummaryService;
+    private final AccountWatcherRepository accountWatcherRepository;
 
 
-    public AccountsRestController(AccountsService accountsService, BillingPeriodsService billingPeriodsService, DomainRepository domainRepository, ModelMapper mapper, MonthSummaryService monthSummaryService) {
+    public AccountsRestController(AccountsService accountsService, BillingPeriodsService billingPeriodsService, DomainRepository domainRepository, ModelMapper mapper, MonthSummaryService monthSummaryService, AccountWatcherRepository accountWatcherRepository) {
         this.accountsService = accountsService;
         this.domainRepository = domainRepository;
         this.mapper = mapper;
         this.monthSummaryService = monthSummaryService;
         this.billingPeriodsService = billingPeriodsService;
+        this.accountWatcherRepository = accountWatcherRepository;
     }
 
     @Override
@@ -57,7 +60,8 @@ public class AccountsRestController implements AccountsController {
     @GetMapping("/mine")
     @TokenBearerAuth(any = {"ACCOUNTANT_ADMIN", "ACCOUNTANT_USER"})
     public List<Account> domainAccount(@RequestDomain Domain domain) {
-
+        accountWatcherRepository.findAll().stream()
+                .forEach(aw -> System.out.println("aw = " + aw.toString()));
         Map<YearMonth, List<MonthSummaryPiggyBank>> piggyBanksHistory = monthSummaryService.getPiggyBanksHistory(domain, 24);
 
         Map<Currency, Double> incomes = new HashMap<>();
