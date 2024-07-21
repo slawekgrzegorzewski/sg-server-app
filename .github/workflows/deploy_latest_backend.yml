@@ -1,4 +1,4 @@
-name: build app
+name: deploy latest backend
 
 on:
   workflow_dispatch:
