@@ -26,10 +26,6 @@ services:
       - $APPLICATION_CONFIG_DIR/logback.xml:/app/logback.xml:ro
       - $PERMANENT_DATA_DIR/sg-application/logs:/app/logs/
       - $PERMANENT_DATA_DIR/bibleFiles:/app/bibleFiles/
-    deploy:
-      placement:
-        constraints:
-          - node.hostname==rpi5
     networks:
       - sg_app_network
 
@@ -51,10 +47,6 @@ services:
     volumes:
       - $APPLICATION_CONFIG_DIR/nginx.conf:/etc/nginx/nginx.conf:ro
       - $PERMANENT_DATA_DIR/sg-application-gateway:/usr/share/nginx:ro
-    deploy:
-      placement:
-        constraints:
-          - node.hostname==rpi3
     networks:
       - sg_app_network
 

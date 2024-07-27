@@ -22,10 +22,6 @@ services:
       - $CORE_CONFIG_DIR/nginx.conf:/etc/nginx/nginx.conf:ro
       - $CORE_CONFIG_DIR/htpasswd:/auth/htpasswd:ro
       - $PERMANENT_DATA_DIR/core_gateway/html:/usr/share/nginx:ro
-    deploy:
-      placement:
-        constraints:
-          - node.hostname==rpi3
     networks:
       - cluster_network
     depends_on:
