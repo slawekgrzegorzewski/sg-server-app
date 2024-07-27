@@ -1,4 +1,4 @@
-name: update configuration
+name: update cluster
 
 on:
   workflow_dispatch:
@@ -43,9 +43,9 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
-          port: 22
+          port: 25
           source: dockerRpi4.zip
-          target: /home/${{ secrets.SSH_USER }}/Application
+          target: /home/${{ secrets.SSH_USER }}/Cluster
 
       - name: unpack and deploy application files
         uses: appleboy/ssh-action@master
@@ -55,14 +55,17 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
-          port: 22
+          port: 25
           script: |
-            cd /home/${{ secrets.SSH_USER }}/Application/management && ./stop.sh
-            cd /home/${{ secrets.SSH_USER }}/Application
-            unzip dockerRpi4.zip -d tmp
-            cd tmp/setup && dos2unix setup_directories.sh deploy_files.sh
-            chmod +x setup_directories.sh deploy_files.sh
-            ./deploy_files.sh
-            sudo rm -rf /home/${{ secrets.SSH_USER }}/Application/tmp && sudo rm /home/${{ secrets.SSH_USER }}/Application/dockerRpi4.zip
-            cd /home/${{ secrets.SSH_USER }}/Application/management
-            ./start.sh
+            cd /home/${{ secrets.SSH_USER }}/Cluster/
+            core/management/stop_all.sh
+            unzip -o dockerRpi4.zip
+            dos2unix core/**/*
+            dos2unix db/**/*
+            dos2unix secrets/**/*
+            dos2unix sg-application/**/*
+            chmod +x core/**/*
+            chmod +x db/**/*
+            chmod +x secrets/**/*
+            chmod +x sg-application/**/*
+            core/management/start_all.sh
