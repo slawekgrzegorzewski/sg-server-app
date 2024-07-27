@@ -47,6 +47,16 @@ jobs:
           source: dockerRpi4.zip
           target: /home/${{ secrets.SSH_USER }}/Cluster
 
+      - name: copy update_cluster.sh via ssh password
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: 25
+          source: dev-ops/apps/utils/update_cluster.sh
+          target: /home/${{ secrets.SSH_USER }}/Cluster
+
       - name: unpack and deploy application files
         uses: appleboy/ssh-action@master
         env:
@@ -58,23 +68,8 @@ jobs:
           port: 25
           script: |
             cd /home/${{ secrets.SSH_USER }}/Cluster/
-            core/management/stop_all.sh
-            sleep 20
+            dos2unix update_cluster.sh
+            chmod +x update_cluster.sh
+            ./update_cluster.sh
+            rm update_cluster.sh
             
-            rm -rf core
-            rm -rf db
-            rm -rf sg-application 
-            
-            unzip -o dockerRpi4.zip
-            
-            dos2unix core/**/*
-            dos2unix db/**/*
-            dos2unix secrets/**/*
-            dos2unix sg-application/**/*
-            
-            chmod +x core/**/*
-            chmod +x db/**/*
-            chmod +x secrets/**/*
-            chmod +x sg-application/**/*
-            
-            core/management/start_all.sh
