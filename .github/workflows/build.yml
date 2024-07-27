@@ -18,7 +18,7 @@ jobs:
         id: setup-insecure-registry
         run: |
           echo { | sudo tee /etc/docker/daemon.json
-          echo "\"insecure-registries\" : [\"grzegorzewski.org:5005\"]" | sudo tee -a /etc/docker/daemon.json
+          echo "\"insecure-registries\" : [\"https://grzegorzewski.org:5005\"]" | sudo tee -a /etc/docker/daemon.json
           echo } | sudo tee -a /etc/docker/daemon.json
           sudo systemctl restart docker
 
@@ -87,8 +87,7 @@ jobs:
         run: |
           export BUILD_DATE=$(date +'%Y-%m-%d_%H-%M')
           docker buildx build . -f dev-ops/apps/sg-application/Dockerfile -t $REGISTRY/$REPOSITORY:latest -t $REGISTRY/$REPOSITORY:$BUILD_DATE-$(git rev-parse --short "$GITHUB_SHA") --platform linux/arm64
-          docker buildx build . -f dev-ops/apps/sg-application/Dockerfile -t $REGISTRY/$REPOSITORY:latest -t $REGISTRY/$REPOSITORY:$BUILD_DATE-$(git rev-parse --short "$GITHUB_SHA") --platform linux/arm64
-          docker buildx build . -f dev-ops/apps/sg-application//Dockerfile-debug -t $REGISTRY/$REPOSITORY:latest-debug -t $REGISTRY/$REPOSITORY:$BUILD_DATE-$(git rev-parse --short "$GITHUB_SHA")-debug --platform linux/arm64
+          docker buildx build . -f dev-ops/apps/sg-application/Dockerfile-debug -t $REGISTRY/$REPOSITORY:latest-debug -t $REGISTRY/$REPOSITORY:$BUILD_DATE-$(git rev-parse --short "$GITHUB_SHA")-debug --platform linux/arm64
           docker push $REGISTRY/$REPOSITORY:latest
           docker push $REGISTRY/$REPOSITORY:$BUILD_DATE-$(git rev-parse --short "$GITHUB_SHA")
           docker push $REGISTRY/$REPOSITORY:latest-debug
