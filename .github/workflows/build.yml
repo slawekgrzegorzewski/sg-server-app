@@ -86,5 +86,5 @@ jobs:
           REPOSITORY: backend
         run: |
           export BUILD_DATE=$(date +'%Y-%m-%d_%H-%M')
-          docker buildx build . -f docker/Dockerfile -t $REGISTRY/$REPOSITORY:latest -t $REGISTRY/$REPOSITORY:$BUILD_DATE-$(git rev-parse --short "$GITHUB_SHA") --platform linux/arm64 --push
-          docker buildx build . -f docker/Dockerfile-debug -t $REGISTRY/$REPOSITORY:latest-debug -t $REGISTRY/$REPOSITORY:$BUILD_DATE-$(git rev-parse --short "$GITHUB_SHA")-debug --platform linux/arm64 --push
+          docker buildx build . -f dev-ops/apps/sg-application/Dockerfile -t $REGISTRY/$REPOSITORY:latest -t $REGISTRY/$REPOSITORY:$BUILD_DATE-$(git rev-parse --short "$GITHUB_SHA") --platform linux/arm64 --push
+          docker buildx build . -f dev-ops/apps/sg-application//Dockerfile-debug -t $REGISTRY/$REPOSITORY:latest-debug -t $REGISTRY/$REPOSITORY:$BUILD_DATE-$(git rev-parse --short "$GITHUB_SHA")-debug --platform linux/arm64 --push
