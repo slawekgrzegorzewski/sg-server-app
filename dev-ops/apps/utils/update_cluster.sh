@@ -1,6 +1,9 @@
 #!/bin/bash
 
 core/management/stop_all.sh
+sleep 5
+core/management/stop_all.sh
+sleep 5
 core/management/stop_all.sh
 sleep 20
 

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 SCRIPT_DIR=$(dirname -- $(realpath ${BASH_SOURCE}))
 CONTAINER_ID=$(docker ps -f name=db_database --quiet)
 FILE_NAME=database_`date +"%Y-%m-%d_%H-%M-%S"`.sql
