@@ -4,7 +4,7 @@ spring:
       connectionTimeout: 15000
       maximumPoolSize: 5
     password: {{ secret "postgres_password" }}
-    url: jdbc:postgresql://application_database:5432/accountant
+    url: jdbc:postgresql://db_database:5432/accountant
     username: postgres
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect

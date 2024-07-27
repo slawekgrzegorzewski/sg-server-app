@@ -14,7 +14,7 @@ sudo apt-get install -y unzip dos2unix ca-certificates curl gnupg lsb-release po
 echo "*:*:*:postgres:$6" | sudo tee $HOME/.pgpass
 sudo chmod 400 $HOME/.pgpass
 
-echo "0 * * * * $MANAGEMENT_DIR/backup_data.sh" | sudo tee -a /var/spool/cron/crontabs/$USERNAME
+echo "0 * * * * $DB_MANAGEMENT_DIR/backup_data.sh" | sudo tee -a /var/spool/cron/crontabs/$USERNAME
 sudo chown slawek:crontab /var/spool/cron/crontabs/$USERNAME
 sudo chmod 600 /var/spool/cron/crontabs/$USERNAME
 

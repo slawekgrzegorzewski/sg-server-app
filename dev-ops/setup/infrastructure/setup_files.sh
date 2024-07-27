@@ -1,20 +1,20 @@
 #!/bin/bash
 
-mkdir -p $APPLICATION_DIR/fe
-mkdir -p $CONFIG_DIR
+mkdir -p $SG_APPLICATION_DIR/fe
+mkdir -p $APPLICATION_CONFIG_DIR
 mkdir -p $DOCKER_DIR/volumes/logs
 mkdir -p $DOCKER_DIR/volumes/postgres
 mkdir -p $DOCKER_DIR/volumes/database_backup
 mkdir -p $DOCKER_DIR/volumes/bibleFiles
-mkdir -p $MANAGEMENT_DIR/database-backups
+mkdir -p $DB_MANAGEMENT_DIR/database-backups
 mkdir -p $SECRETS_DIR
-mkdir -p $STACK_DIR
+mkdir -p $APPLICATION_STACK_DIR
 
-unzip $APPLICATION_DIR/secrets.zip -d $APPLICATION_DIR/secrets
+unzip $SG_APPLICATION_DIR/secrets.zip -d $SG_APPLICATION_DIR/secrets
 
 mv management/* $MANAGEMENT_DIR
 
-dos2unix $APPLICATION_DIR/secrets/*
+dos2unix $SG_APPLICATION_DIR/secrets/*
 dos2unix $MANAGEMENT_DIR/*
 
 chmod +x $MANAGEMENT_DIR/*.sh

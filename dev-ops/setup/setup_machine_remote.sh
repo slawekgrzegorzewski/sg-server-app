@@ -46,7 +46,7 @@ sudo docker swarm init
 echo "*:*:*:postgres:$POSTGRES_PASSWORD" | tee $HOME_DIR/.pgpass
 chmod 400 $HOME_DIR/.pgpass
 
-echo "0 * * * * /home/slawek/Application/management/backup_data.sh" | sudo tee /var/spool/cron/crontabs/slawek
+echo "0 * * * * /home/slawek/Cluster/Application/management/backup_data.sh" | sudo tee /var/spool/cron/crontabs/slawek
 sudo chown slawek:crontab /var/spool/cron/crontabs/slawek
 sudo chmod 600 /var/spool/cron/crontabs/slawek
 
@@ -100,9 +100,4 @@ rm $HOME_DIR/docker-ovh.zip
 rm $HOME_DIR/setup_machine_remote.sh
 rm -rf $HOME_DIR/docker_files
 
-echo "//192.168.52.1/Application/config $HOME_DIR/Application/config cifs uid=slawek,gid=slawek,username=$SAMBA_USER,password=$SAMBA_PASSWORD,vers=1.0,file_mode=0777,dir_mode=0777 0 0" | sudo tee -a /etc/fstab
-echo "//192.168.52.1/Application/fe $HOME_DIR/Application/fe cifs uid=slawek,gid=slawek,username=$SAMBA_USER,password=$SAMBA_PASSWORD,vers=1.0,file_mode=0777,dir_mode=0777 0 0" | sudo tee -a /etc/fstab
-echo "//192.168.52.1/Application/management $HOME_DIR/Application/management cifs uid=slawek,gid=slawek,username=$SAMBA_USER,password=$SAMBA_PASSWORD,vers=1.0,file_mode=0777,dir_mode=0777 0 0" | sudo tee -a /etc/fstab
-echo "//192.168.52.1/Application/secrets $HOME_DIR/Application/secrets cifs uid=slawek,gid=slawek,username=$SAMBA_USER,password=$SAMBA_PASSWORD,vers=1.0,file_mode=0777,dir_mode=0777 0 0" | sudo tee -a /etc/fstab
-echo "//192.168.52.1/Application/stack $HOME_DIR/Application/stack cifs uid=slawek,gid=slawek,username=$SAMBA_USER,password=$SAMBA_PASSWORD,vers=1.0,file_mode=0777,dir_mode=0777 0 0" | sudo tee -a /etc/fstab
-echo "//192.168.52.1/Artifacts $HOME_DIR/Artifacts cifs uid=slawek,gid=slawek,username=$SAMBA_USER,password=$SAMBA_PASSWORD,vers=1.0,file_mode=0777,dir_mode=0777 0 0" | sudo tee -a /etc/fstab
+echo "//192.168.52.1/Cluster $HOME_DIR/Cluster cifs uid=slawek,gid=slawek,username=$SAMBA_USER,password=$SAMBA_PASSWORD,vers=1.0,file_mode=0777,dir_mode=0777 0 0" | sudo tee -a /etc/fstab

@@ -207,21 +207,42 @@ val infrastructureRpi4 = tasks.register<Zip>("infrastructureRpi4") {
 }
 
 val dockerPackageRpi4 = tasks.register<Zip>("dockerPackageRpi4") {
-    from("docker/stack/") {
-        include("config/*")
-        include("docker-compose.yml")
+    from("dev-ops/apps/common") {
+        include("management/*")
+        include("setup/*")
+        into("core")
     }
-    from("docker/setup/") {
-        include("deploy_files.sh")
-        into("setup/")
+    from("dev-ops/apps/core") {
+        include("management/*")
+        include("setup/*")
+        include("stack/*")
+        include("stack/config/*")
+        exclude("stack/README.md")
+        into("core")
     }
-    from("docker/common/") {
-        include("setup_directories.sh")
-        into("setup/")
+    from("dev-ops/apps/common") {
+        include("management/*")
+        include("setup/*")
+        into("db")
     }
-    from("docker/management/") {
-        include("*")
-        into("management/")
+    from("dev-ops/apps/db") {
+        include("management/*")
+        include("setup/*")
+        include("stack/*")
+        into("db")
+    }
+    from("dev-ops/apps/common") {
+        include("management/*")
+        include("setup/*")
+        into("sg-application")
+    }
+    from("dev-ops/apps/sg-application") {
+        include("management/*")
+        include("setup/*")
+        include("stack/*")
+        include("stack/config/*")
+        exclude("Dockerfile*")
+        into("sg-application")
     }
     archiveFileName.set("dockerRpi4.zip")
 }

@@ -32,4 +32,4 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           port: 22
           script: |
-            docker service update --force --image ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:latest application_backend
+            docker service update --force --image ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:latest sg-application_backend
