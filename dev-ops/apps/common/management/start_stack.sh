@@ -7,7 +7,6 @@ source $SCRIPT_DIR/../setup/setup_directories.sh
 $SCRIPT_DIR/../setup/setup.sh
 
 source $SECRETS_DIR/put_secrets_to_env.sh
-docker login -p $REGISTRY_PASSWORD -u $REGISTRY_USER $REGISTRY_URL
 
 $SECRETS_DIR/setup_secrets.sh
 
