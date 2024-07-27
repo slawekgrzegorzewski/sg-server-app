@@ -14,6 +14,12 @@ jobs:
 
     steps:
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
       - name: setup insecure registry
         id: setup-insecure-registry
         run: |
@@ -27,12 +33,6 @@ jobs:
         run: |
           docker run -e POSTGRES_PASSWORD=postgres --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5 -p 5432:5432 -d --name postgres postgres:15.6
           docker ps
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
 
       - name: Login to Registry
         id: login-to-registry
