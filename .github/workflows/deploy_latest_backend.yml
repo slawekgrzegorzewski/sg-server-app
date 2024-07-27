@@ -11,6 +11,14 @@ jobs:
 
     steps:
 
+      - name: setup insecure registry
+        id: setup-insecure-registry
+        run: |
+          echo { | sudo tee /etc/docker/daemon.json
+          echo "\"insecure-registries\" : [\"https://grzegorzewski.org:5005\"]" | sudo tee -a /etc/docker/daemon.json
+          echo } | sudo tee -a /etc/docker/daemon.json
+          sudo systemctl restart docker
+
       - name: Login to Registry
         id: login-to-registry
         uses: docker/login-action@v3
