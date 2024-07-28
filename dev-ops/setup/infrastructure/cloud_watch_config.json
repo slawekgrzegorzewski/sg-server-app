@@ -8,13 +8,13 @@
       "files": {
         "collect_list": [
           {
-            "file_path": "/home/slawek/Application/docker/volumes/logs/log.txt",
+            "file_path": "/home/slawek/Cluster/permanent_data/sg-application/logs/log.txt",
             "log_group_name": "app",
             "log_stream_name": "backend",
             "retention_in_days": -1
           },
           {
-            "file_path": "/home/slawek/Application/docker/volumes/logs/requests.txt",
+            "file_path": "/home/slawek/Cluster/permanent_data/sg-application/logs/requests.txt",
             "log_group_name": "app",
             "log_stream_name": "backend-requests",
             "retention_in_days": -1

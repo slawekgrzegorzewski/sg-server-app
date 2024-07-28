@@ -24,7 +24,7 @@ services:
       - postgres_password
     volumes:
       - $POSTGRES_DATA_DIR:/var/lib/postgresql/data
-      - $PERMANENT_DATA_DIR/database/backup:/backup
+      - $DATABASE_BACKUP_DIR:/backup
     networks:
       - sg_app_network
       - cluster_network

@@ -1,17 +1,54 @@
 #!/bin/bash
 
 USERNAME=$1
+MAIN_AWS_ACCOUNT_KEY_ID=$2
+MAIN_AWS_ACCOUNT_ACCESS_KEY=$3
+LOGS_AWS_ACCOUNT_KEY_ID=$4
+LOGS_AWS_ACCOUNT_KEY_ID=$5
+POSTGRES_PASSWORD=$6
+
 source ./setup_directories.sh
 
-dos2unix ./*
-chmod +x ./*.sh
+sudo echo '$USERNAME    ALL=(ALL:ALL) NOPASSWD:ALL' | sudo tee /etc/sudoers.d/$USERNAME
+sudo apt-get update
+sudo apt-get -y install dos2unix
+sudo echo '$USERNAME    ALL=(ALL:ALL) ALL' | sudo tee /etc/sudoers.d/$USERNAME
 
-source ./setup_files.sh
-source ./setup_docker.sh
+dos2unix **/*
+chmod +x **/*.sh
+
+unzip $CLUSTER_DIR/secrets.zip -d $CLUSTER_DIR/secrets
+dos2unix $CLUSTER_DIR/secrets/**/*
+chmod +x $CLUSTER_DIR/secrets/**/*
+
+# Add Docker's official GPG key:
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+sudo usermod -aG docker $USERNAME
+sudo su - $USERNAME
+sudo systemctl enable docker.service
+sudo systemctl enable containerd.service
+
+echo { | sudo tee /etc/docker/daemon.json
+echo "\"insecure-registries\" : [\"https://grzegorzewski.org:5005\"]" | sudo tee -a /etc/docker/daemon.json
+echo } | sudo tee -a /etc/docker/daemon.json
+sudo systemctl restart docker
 
 sudo apt-get install -y unzip dos2unix ca-certificates curl gnupg lsb-release postgresql-client-15
 
-echo "*:*:*:postgres:$6" | sudo tee $HOME/.pgpass
+echo "*:*:*:postgres:$POSTGRES_PASSWORD" | sudo tee $HOME/.pgpass
 sudo chmod 400 $HOME/.pgpass
 
 echo "0 * * * * $DB_MANAGEMENT_DIR/backup_data.sh" | sudo tee -a /var/spool/cron/crontabs/$USERNAME
@@ -25,11 +62,11 @@ rm -rf aws awscliv2.zip
 
 mkdir -p $HOME/.aws
 echo "[default]" > $HOME/.aws/credentials
-echo "aws_access_key_id = $2" >>$HOME/.aws/credentials
-echo "aws_secret_access_key = $3" >>$HOME/.aws/credentials
+echo "aws_access_key_id = $MAIN_AWS_ACCOUNT_KEY_ID" >>$HOME/.aws/credentials
+echo "aws_secret_access_key = $MAIN_AWS_ACCOUNT_ACCESS_KEY" >>$HOME/.aws/credentials
 echo "[AmazonCloudWatchAgent]" >>$HOME/.aws/credentials
-echo "aws_access_key_id = $4" >>$HOME/.aws/credentials
-echo "aws_secret_access_key = $5" >>$HOME/.aws/credentials
+echo "aws_access_key_id = $LOGS_AWS_ACCOUNT_KEY_ID" >>$HOME/.aws/credentials
+echo "aws_secret_access_key = $LOGS_AWS_ACCOUNT_KEY_ID" >>$HOME/.aws/credentials
 chmod 600 $HOME/.aws/credentials
 
 echo "[default]" >$HOME/.aws/config
@@ -43,8 +80,8 @@ chmod 600 $HOME/.aws/config
 sudo mkdir -p /etc/systemd/system/docker.service.d/
 sudo touch /etc/systemd/system/docker.service.d/aws-credentials.conf
 sudo echo "[Service]" | sudo tee /etc/systemd/system/docker.service.d/aws-credentials.conf
-sudo echo "Environment=\"AWS_ACCESS_KEY_ID=$4\"" | sudo tee -a /etc/systemd/system/docker.service.d/aws-credentials.conf
-sudo echo "Environment=\"AWS_SECRET_ACCESS_KEY=$5\"" | sudo tee -a /etc/systemd/system/docker.service.d/aws-credentials.conf
+sudo echo "Environment=\"AWS_ACCESS_KEY_ID=$LOGS_AWS_ACCOUNT_KEY_ID\"" | sudo tee -a /etc/systemd/system/docker.service.d/aws-credentials.conf
+sudo echo "Environment=\"AWS_SECRET_ACCESS_KEY=$LOGS_AWS_ACCOUNT_KEY_ID\"" | sudo tee -a /etc/systemd/system/docker.service.d/aws-credentials.conf
 
 sudo systemctl daemon-reload
 sudo service docker restart

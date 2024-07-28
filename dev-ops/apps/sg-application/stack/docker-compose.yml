@@ -28,8 +28,8 @@ services:
           - node.hostname!=rpi3
     volumes:
       - $APPLICATION_CONFIG_DIR/logback.xml:/app/logback.xml:ro
-      - $PERMANENT_DATA_DIR/sg-application/logs:/app/logs/
-      - $PERMANENT_DATA_DIR/bibleFiles:/app/bibleFiles/
+      - $SG_APPLICATION_LOGS_DIR:/app/logs/
+      - $SG_APPLICATION_BIBLE_FILES_DIR:/app/bibleFiles/
     networks:
       - sg_app_network
 
@@ -39,7 +39,7 @@ services:
       options:
         awslogs-region: eu-central-1
         awslogs-group: app
-        awslogs-stream: client
+        awslogs-stream: sg-application-gw
         awslogs-create-group: 'true'
     image: nginx:1.25.4-bookworm
     container_name: nginx
@@ -50,7 +50,7 @@ services:
       - sgapplication.key
     volumes:
       - $APPLICATION_CONFIG_DIR/nginx.conf:/etc/nginx/nginx.conf:ro
-      - $PERMANENT_DATA_DIR/sg-application-gateway:/usr/share/nginx:ro
+      - $SG_APPLICATION_GATEWAY_DIR:/usr/share/nginx:ro
     networks:
       - sg_app_network
 

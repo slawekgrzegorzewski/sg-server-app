@@ -194,13 +194,11 @@ val dockerPackage = tasks.register<Zip>("dockerPackage") {
 }
 
 val infrastructureRpi4 = tasks.register<Zip>("infrastructureRpi4") {
-    from("docker/common/") {
+    from("dev-ops/apps/common/setup") {
         include("setup_directories.sh")
     }
     from("dev-ops/setup/infrastructure/") {
         include("cloud_watch_config.json")
-        include("setup_files.sh")
-        include("setup_docker.sh")
         include("setup.sh")
     }
     archiveFileName.set("infrastructureRpi4.zip")

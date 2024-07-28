@@ -7,7 +7,7 @@ services:
       driver: awslogs
       options:
         awslogs-region: eu-central-1
-        awslogs-group: app
+        awslogs-group: core-gw
         awslogs-stream: client
         awslogs-create-group: 'true'
     image: nginx:1.25.4-bookworm
@@ -21,7 +21,7 @@ services:
     volumes:
       - $CORE_CONFIG_DIR/nginx.conf:/etc/nginx/nginx.conf:ro
       - $CORE_CONFIG_DIR/htpasswd:/auth/htpasswd:ro
-      - $PERMANENT_DATA_DIR/core_gateway/html:/usr/share/nginx:ro
+      - $CORE_GATEWAY_HTML_DIR:/usr/share/nginx:ro
     networks:
       - cluster_network
     depends_on:
@@ -34,7 +34,7 @@ services:
     ports:
       - 5000:5000
     volumes:
-      - $PERMANENT_DATA_DIR/registry/data:/var/lib/registry
+      - $CORE_REGISTRY_DATA_DIR:/var/lib/registry
     environment:
       REGISTRY_HTTP_HEADERS_Access-Control-Allow-Origin: '[http://rpi5:4080]'
       REGISTRY_HTTP_HEADERS_Access-Control-Allow-Methods: '[HEAD,GET,OPTIONS,DELETE]'
