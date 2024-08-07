@@ -17,7 +17,7 @@ services:
         condition: none
     volumes:
       - /home/slawek/Cluster/sg-application/management:/home/a
-      -
+
   backend:
     image: grzegorzewski.org:5005/backend:latest
     container_name: backend
