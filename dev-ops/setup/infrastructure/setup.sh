@@ -95,7 +95,7 @@ function configure_aws_cli_and_access {
   sudo service docker restart
 }
 
-function conigure_aws_agent {
+function configure_aws_agent {
   wget https://amazoncloudwatch-agent.s3.amazonaws.com/ubuntu/arm64/latest/amazon-cloudwatch-agent.deb
   sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
   rm amazon-cloudwatch-agent.deb
@@ -124,4 +124,4 @@ install_docker
 configure_db
 configure_aws_cli_and_access
 #only on main node
-conigure_aws_agent
+configure_aws_agent
