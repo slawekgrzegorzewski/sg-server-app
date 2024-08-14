@@ -53,7 +53,7 @@ jobs:
       - name: Build with Gradle Wrapper
         id: build
         run: |
-           ./gradlew migrate build infrastructureRpi4
+           ./gradlew migrate build
         env:
           SG_DB_URL: "jdbc:postgresql://localhost:5432/accountant"
           SG_DB_PASSWORD: postgres
