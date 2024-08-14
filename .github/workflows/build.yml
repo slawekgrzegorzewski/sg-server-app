@@ -86,7 +86,7 @@ jobs:
           username: ${{ secrets.SG_REGISTRY_USER }}
           password: ${{ secrets.SG_REGISTRY_PASSWORD }}
 
-      - name: Build, tag, and push image to Amazon ECR
+      - name: Build, tag, and push image to a registry
         id: build-publish
         env:
           REGISTRY: ${{ secrets.SG_REGISTRY_URL }}
