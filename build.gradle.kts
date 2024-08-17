@@ -126,7 +126,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-cache")
 
-    implementation("pl.sg:pjm:1.0.2")
+    implementation("pl.sg:sg-utils:1.0.0")
+    implementation("pl.sg:loans:1.0.2")
     implementation("pl.sg:loans:1.0.2")
 
     implementation("net.logstash.logback:logstash-logback-encoder:7.2")
