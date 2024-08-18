@@ -25,14 +25,18 @@ import java.time.format.DateTimeFormatter;
 public class DebugRestTemplateInterceptor implements ClientHttpRequestInterceptor {
 
     private static final Logger LOG = LoggerFactory.getLogger(DebugRestTemplateInterceptor.class);
+    private final Path logsDirPath;
+
+    public DebugRestTemplateInterceptor(Path logsDirPath) {
+        this.logsDirPath = logsDirPath;
+    }
 
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
         RequestLogInfo requestLogInfo = traceRequest(request, body);
         ClientHttpResponse response = execution.execute(request, body);
         traceResponse(response, requestLogInfo);
-        Path dir = Paths.get(
-                "requests",
+        Path dir = logsDirPath.resolve(
                 requestLogInfo.getRequestURI().toString()
                         .replace("https://", "")
                         .replace("/", "_")

@@ -10,3 +10,8 @@ pjm:
 spring:
   datasource:
     url: jdbc:postgresql://localhost:15432/accountant
+
+nodrigen:
+  log:
+    requests:
+      dir: ${HOME}/Development/Slawek/files/nodrigen_requests

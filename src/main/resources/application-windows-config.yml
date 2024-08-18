@@ -6,3 +6,8 @@ intellectual-property:
 
 pjm:
   videos-location: "F:\\Development\\bibleFiles"
+
+nodrigen:
+  log:
+    requests:
+      dir: "F:\\Development\\nodrigen_requests"

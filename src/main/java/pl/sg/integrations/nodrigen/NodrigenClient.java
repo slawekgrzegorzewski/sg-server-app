@@ -22,6 +22,7 @@ import pl.sg.utils.DebugRestTemplateInterceptor;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,8 @@ public class NodrigenClient {
     private static final Logger LOG = LoggerFactory.getLogger(NodrigenClient.class);
     @Value("${nodrigen.service-url}")
     private String nodrigenUrl;
+    @Value("${nodrigen.log.requests.dir}")
+    private String nodrigenLogRequestsDir;
     private final NodrigenAccessRepository nodrigenAccessRepository;
     private final Configuration configuration;
 
@@ -281,7 +284,7 @@ public class NodrigenClient {
     private RestTemplate createDebuggingRestTemplate() {
         ClientHttpRequestFactory factory = new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory());
         RestTemplate restTemplate = new RestTemplate(factory);
-        restTemplate.setInterceptors(List.of(new DebugRestTemplateInterceptor()));
+        restTemplate.setInterceptors(List.of(new DebugRestTemplateInterceptor(Paths.get(nodrigenLogRequestsDir))));
         return restTemplate;
     }
 }
