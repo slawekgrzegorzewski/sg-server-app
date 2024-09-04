@@ -1,5 +1,7 @@
 package pl.sg.banks.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import pl.sg.accountant.model.AccountsException;
 import pl.sg.accountant.model.accounts.Account;
@@ -34,6 +36,8 @@ import static java.util.Optional.ofNullable;
 
 @Controller
 public class BankAccountServiceImpl implements BankAccountService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(BankAccountServiceImpl.class);
 
     private final AccountRepository accountRepository;
     private final BankAccountRepository bankAccountRepository;
@@ -101,6 +105,7 @@ public class BankAccountServiceImpl implements BankAccountService {
                     .collect(Collectors.toCollection(() -> toSave));
             nodrigenTransactionRepository.saveAll(toSave);
         } catch (EUAEndedException exception) {
+            LOG.warn("Withdrawing permission for bank account %d and external id %s due to".formatted(bankAccount.getId(), bankAccount.getExternalId()), exception);
             nodrigenService.recreateRequisition(bankAccount);
         }
 
@@ -220,6 +225,7 @@ public class BankAccountServiceImpl implements BankAccountService {
                     .collect(Collectors.toCollection(() -> toSave));
             nodrigenBankAccountBalanceRepository.saveAll(toSave);
         } catch (EUAEndedException exception) {
+            LOG.warn("Withdrawing permission for bank account %d and external id %s due to".formatted(bankAccount.getId(), bankAccount.getExternalId()), exception);
             nodrigenService.recreateRequisition(bankAccount);
         }
 
