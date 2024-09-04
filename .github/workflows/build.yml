@@ -93,5 +93,11 @@ jobs:
           REPOSITORY: backend
         run: |
           export BUILD_DATE=$(date +'%Y-%m-%d_%H-%M')
-          docker buildx build . -f dev-ops/docker/Dockerfile -t $REGISTRY/$REPOSITORY:latest -t $REGISTRY/$REPOSITORY:$BUILD_DATE-$(git rev-parse --short "$GITHUB_SHA") --platform linux/amd64,linux/arm64 --push
-          docker buildx build . -f dev-ops/docker/Dockerfile-debug -t $REGISTRY/$REPOSITORY:latest-debug -t $REGISTRY/$REPOSITORY:$BUILD_DATE-$(git rev-parse --short "$GITHUB_SHA")-debug --platform linux/amd64,linux/arm64 --push
+          docker buildx build . -f dev-ops/docker/Dockerfile -t $REGISTRY/$REPOSITORY:latest -t $REGISTRY/$REPOSITORY:$BUILD_DATE-$(git rev-parse --short "$GITHUB_SHA") --platform linux/amd64 --load
+          docker buildx build . -f dev-ops/docker/Dockerfile -t $REGISTRY/$REPOSITORY:latest -t $REGISTRY/$REPOSITORY:$BUILD_DATE-$(git rev-parse --short "$GITHUB_SHA") --platform linux/arm64 --load
+          docker buildx build . -f dev-ops/docker/Dockerfile-debug -t $REGISTRY/$REPOSITORY:latest-debug -t $REGISTRY/$REPOSITORY:$BUILD_DATE-$(git rev-parse --short "$GITHUB_SHA")-debug --platform linux/amd64 --load
+          docker buildx build . -f dev-ops/docker/Dockerfile-debug -t $REGISTRY/$REPOSITORY:latest-debug -t $REGISTRY/$REPOSITORY:$BUILD_DATE-$(git rev-parse --short "$GITHUB_SHA")-debug --platform linux/arm64 --load
+          docker push $REGISTRY/$REPOSITORY:latest
+          docker push $REGISTRY/$REPOSITORY:$BUILD_DATE-$(git rev-parse --short "$GITHUB_SHA")
+          docker push $REGISTRY/$REPOSITORY:latest-debug
+          docker push $REGISTRY/$REPOSITORY:$BUILD_DATE-$(git rev-parse --short "$GITHUB_SHA")-debug
