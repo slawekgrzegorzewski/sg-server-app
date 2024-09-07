@@ -8,11 +8,17 @@ import java.io.ByteArrayOutputStream
 group = "pl.sg"
 version = "0.0.1-SNAPSHOT"
 val output = ByteArrayOutputStream()
-var command = if (Os.isFamily(Os.FAMILY_MAC)) "dev-ops/setup/get-authorization-token.sh" else "aws codeartifact get-authorization-token --domain sg-repository --domain-owner 215372400964 --region eu-central-1 --query authorizationToken --output text"
+var command =
+    if (Os.isFamily(Os.FAMILY_MAC)) "dev-ops/setup/get-authorization-token.sh" else "aws codeartifact get-authorization-token --domain sg-repository --domain-owner 215372400964 --region eu-central-1 --query authorizationToken --output text"
+
+file("dev-ops/docker/currency.properties")
+    .copyTo(
+        file("${System.getProperty("java.home")}\\lib\\currency.properties"),
+        overwrite = true)
 
 project.exec {
     commandLine = command.split(" ")
-            .filter { it.isNotBlank() }
+        .filter { it.isNotBlank() }
     standardOutput = output
 }
 val codeartifactToken = output.toString()
@@ -67,7 +73,8 @@ publishing {
     }
     repositories {
         maven {
-            url = uri("https://sg-repository-215372400964.d.codeartifact.eu-central-1.amazonaws.com/maven/sg-repository/")
+            url =
+                uri("https://sg-repository-215372400964.d.codeartifact.eu-central-1.amazonaws.com/maven/sg-repository/")
             credentials {
                 username = "aws"
                 password = codeartifactToken
@@ -173,11 +180,11 @@ tasks.withType<Test> {
 
 tasks.jar {
     exclude(
-            "ovh",
-            "application.yml",
-            "application-pc-docker.yml",
-            "application-raspberry-docker.yml",
-            "data.sql"
+        "ovh",
+        "application.yml",
+        "application-pc-docker.yml",
+        "application-raspberry-docker.yml",
+        "data.sql"
     )
 }
 
@@ -192,8 +199,8 @@ tasks.withType<com.netflix.graphql.dgs.codegen.gradle.GenerateJavaTask> {
     generateClient = true
     packageName = "pl.sg.graphql.schema"
     typeMapping = mutableMapOf(
-            "BigDecimal" to "java.math.BigDecimal",
-            "UUID" to "java.util.UUID"
+        "BigDecimal" to "java.math.BigDecimal",
+        "UUID" to "java.util.UUID"
     )
 }
 
@@ -212,10 +219,10 @@ jooq() {
                     user = "postgres"
                     password = System.getenv("SG_DB_PASSWORD") ?: "SLAwek1!"
                     properties = listOf(
-                            Property().apply {
-                                key = "PAGE_SIZE"
-                                value = "2048"
-                            }
+                        Property().apply {
+                            key = "PAGE_SIZE"
+                            value = "2048"
+                        }
                     )
                 }
                 generator.apply {
@@ -227,16 +234,16 @@ jooq() {
                         excludes = "PG_CATALOG.* | INFORMATION_SCHEMA.*"
 
                         forcedTypes = listOf(
-                                ForcedType().apply {
-                                    name = "varchar"
-                                    includeExpression = ".*"
-                                    includeTypes = "JSONB?"
-                                },
-                                ForcedType().apply {
-                                    name = "varchar"
-                                    includeExpression = ".*"
-                                    includeTypes = "INET"
-                                }
+                            ForcedType().apply {
+                                name = "varchar"
+                                includeExpression = ".*"
+                                includeTypes = "JSONB?"
+                            },
+                            ForcedType().apply {
+                                name = "varchar"
+                                includeExpression = ".*"
+                                includeTypes = "INET"
+                            }
                         )
                     }
                     generate.apply {
