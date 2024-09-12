@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static java.util.Optional.empty;
@@ -135,7 +136,12 @@ public class NodrigenClient {
                     AccountDetails.class,
                     "get account details " + bankAccountId,
                     createDebuggingRestTemplate(),
-                    EUAEndedException::new);
+                    httpStatusCode -> {
+                        if (httpStatusCode.value() == 429) {
+                            return new EUAEndedException();
+                        }
+                        return new RuntimeException();
+                    });
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -148,7 +154,12 @@ public class NodrigenClient {
             return logErrorCodeAndThrowException(
                     RequestEntity.get(new URI(nodrigenUrl + "accounts/" + bankAccountId + "/transactions/")).headers(headers).build(),
                     TransactionsMain.class, "get transactions " + bankAccountId, createDebuggingRestTemplate(),
-                    EUAEndedException::new);
+                    httpStatusCode -> {
+                        if (httpStatusCode.value() == 429) {
+                            return new EUAEndedException();
+                        }
+                        return new RuntimeException();
+                    });
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -163,7 +174,12 @@ public class NodrigenClient {
                     BalancesMain.class,
                     "get balances " + bankAccountId,
                     createDebuggingRestTemplate(),
-                    EUAEndedException::new);
+                    httpStatusCode -> {
+                        if (httpStatusCode.value() == 429) {
+                            return new EUAEndedException();
+                        }
+                        return new RuntimeException();
+                    });
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -173,17 +189,17 @@ public class NodrigenClient {
                                                           Class<T> entityClass,
                                                           String requestDescription,
                                                           RestTemplate restTemplate,
-                                                          Supplier<RuntimeException> exceptionSupplier) {
+                                                          Function<HttpStatusCode, RuntimeException> exceptionSupplier) {
         try {
             ResponseEntity<T> response = restTemplate.exchange(request, entityClass);
             if (!response.getStatusCode().is2xxSuccessful()) {
                 LOG.error("Problem with " + requestDescription + ofNullable(response.getBody()).map(v -> " - " + v).orElse(""));
-                throw exceptionSupplier.get();
+                throw exceptionSupplier.apply(response.getStatusCode());
             }
             return ofNullable(response.getBody());
         } catch (HttpClientErrorException ex) {
             LOG.warn("Problem with " + requestDescription, ex);
-            throw exceptionSupplier.get();
+            throw exceptionSupplier.apply(null);
         }
     }
 
