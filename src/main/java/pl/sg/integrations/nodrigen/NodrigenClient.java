@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
@@ -260,7 +259,6 @@ public class NodrigenClient {
 
         if (response.getStatusCode().is2xxSuccessful()) {
             nodrigenAccess.setAccessToken(response.getBody().getAccess());
-            nodrigenAccess.setAccessExpires(response.getBody().getAccessExpires());
             nodrigenAccess.setAccessExpiresAt(LocalDateTime.now().plusSeconds(response.getBody().getAccessExpires()));
             nodrigenAccessRepository.save(nodrigenAccess);
             return nodrigenAccess.getAccessToken();
@@ -281,10 +279,8 @@ public class NodrigenClient {
         if (response.getStatusCode().is2xxSuccessful()) {
             NodrigenAccess nodrigenAccess = new NodrigenAccess();
             nodrigenAccess.setAccessToken(response.getBody().getAccess());
-            nodrigenAccess.setAccessExpires(response.getBody().getAccessExpires());
             nodrigenAccess.setAccessExpiresAt(LocalDateTime.now().plusSeconds(response.getBody().getAccessExpires()));
             nodrigenAccess.setRefreshToken(response.getBody().getRefresh());
-            nodrigenAccess.setRefreshExpires(response.getBody().getRefreshExpires());
             nodrigenAccess.setRefreshExpiresAt(LocalDateTime.now().plusSeconds(response.getBody().getRefreshExpires()));
             nodrigenAccessRepository.save(nodrigenAccess);
             return nodrigenAccess.getAccessToken();

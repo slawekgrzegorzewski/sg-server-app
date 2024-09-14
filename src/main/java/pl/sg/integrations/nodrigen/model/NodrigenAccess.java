@@ -17,11 +17,9 @@ public class NodrigenAccess {
     private Integer id;
     @Column(columnDefinition="TEXT")
     private String accessToken;
-    private Long accessExpires;
     private LocalDateTime accessExpiresAt;
     @Column(columnDefinition="TEXT")
     private String refreshToken;
-    private Long refreshExpires;
     private LocalDateTime refreshExpiresAt;
     private LocalDateTime archivedAt;
 
@@ -35,14 +33,6 @@ public class NodrigenAccess {
 
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
-    }
-
-    public Long getAccessExpires() {
-        return accessExpires;
-    }
-
-    public void setAccessExpires(Long accessExpires) {
-        this.accessExpires = accessExpires;
     }
 
     public LocalDateTime getAccessExpiresAt() {
@@ -59,14 +49,6 @@ public class NodrigenAccess {
 
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
-    }
-
-    public Optional<Long> getRefreshExpires() {
-        return Optional.ofNullable(refreshExpires);
-    }
-
-    public void setRefreshExpires(Long refreshExpires) {
-        this.refreshExpires = refreshExpires;
     }
 
     public Optional<LocalDateTime> getRefreshExpiresAt() {

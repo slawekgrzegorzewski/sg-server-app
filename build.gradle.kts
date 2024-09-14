@@ -11,17 +11,18 @@ val output = ByteArrayOutputStream()
 var command =
     if (Os.isFamily(Os.FAMILY_MAC)) "dev-ops/setup/get-authorization-token.sh" else "aws codeartifact get-authorization-token --domain sg-repository --domain-owner 215372400964 --region eu-central-1 --query authorizationToken --output text"
 
-file("dev-ops/docker/currency.properties")
-    .copyTo(
-        file("${System.getProperty("java.home")}\\lib\\currency.properties"),
-        overwrite = true)
-
 project.exec {
     commandLine = command.split(" ")
         .filter { it.isNotBlank() }
     standardOutput = output
 }
 val codeartifactToken = output.toString()
+
+
+file("dev-ops/docker/currency.properties")
+    .copyTo(
+        file("${System.getProperty("java.home")}\\lib\\currency.properties"),
+        overwrite = true)
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
@@ -144,19 +145,14 @@ dependencies {
     compileOnly("org.projectlombok:lombok:1.18.24")
 
     runtimeOnly("com.github.joschi.jackson:jackson-datatype-threetenbp:2.12.5")
-
     runtimeOnly("org.postgresql:postgresql:42.5.1")
 
     annotationProcessor("org.projectlombok:lombok:1.18.30")
-
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
     testImplementation("com.jayway.jsonpath:json-path:2.7.0")
-
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.1")
-
     testImplementation("org.hamcrest:hamcrest-library:2.2")
-
     testImplementation("org.springframework.boot:spring-boot-starter-test:2.7.4")
     testImplementation("org.springframework.boot:spring-boot-test")
     testImplementation("org.springframework:spring-test:5.3.23")
